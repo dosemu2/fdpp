@@ -28,7 +28,7 @@
 ; added some more functions
 ; changed bcopy, scopy, sncopy,...
 ; to      memcpy, strcpy, strncpy
-; Bart Oldeman: optimized a bit: see /usr/include/bits/string.h from 
+; Bart Oldeman: optimized a bit: see /usr/include/bits/string.h from
 ; glibc 2.2
 ;
 ; $Id: asmsupt.asm 1568 2011-04-09 02:42:51Z bartoldeman $
@@ -72,7 +72,7 @@
   %define   MEMCMP   INIT_MEMCMP
 
 %else
-  
+
   segment HMA_TEXT
 
 %endif
@@ -115,7 +115,7 @@
 ;
 pascal_setup:
                 pop     ax                      ; get return address
-                
+
                 push    bp                      ; Standard C entry
                 mov     bp,sp
 %ifdef WATCOM
@@ -137,12 +137,12 @@ pascal_setup:
                 mov cx,[4+bp]  ; majority (8) wants that (near and far)
                 mov si,[6+bp]  ; majority (3) wants that (near)
                 mov di,[8+bp]  ; majority (3) wants that (near)
-                
+
                 jmp ax
 
 
 
-        
+
 ;***********************************************
 ;
 ;       VOID memcpy(REG BYTE *s, REG BYTE *d, REG COUNT n);
@@ -168,12 +168,12 @@ domemcpy:
 memcpy_return:
 %if 0                           ; only needed for fmemcpyback
                 cld
-%endif        
+%endif
 
 ;
 ; pascal_return - pop saved registers and do return
 ;
-        
+
                 jmp short pascal_return
 
 
@@ -217,19 +217,19 @@ FMEMSET:
 
                 ; Get the fill byte ch
                 mov     ax,[bp+6]
-                
+
                 ; Get the far source pointer, s
                 les     di,[bp+8]
 		mov	bl,8
 
-domemset:                
+domemset:
                 mov	ah, al
 
                 shr	cx,1
                 rep     stosw
                 jnc     pascal_return
                 stosb
-                
+
                 jmp  short pascal_return
 
 ;***************************************************************
@@ -239,7 +239,7 @@ domemset:
                 global  MEMSET
 MEMSET:
                 call pascal_setup
-                
+
                 ; Get the repitition count, n - preset above
                 ; mov     cx,[bp+4]
 
@@ -274,7 +274,7 @@ pascal_return:
                 ret
 
 ;*****************************************************************
-                
+
 ; fstrcpy (void FAR*dest, void FAR *src);
 
 %ifndef _INIT
@@ -289,7 +289,7 @@ FSTRCPY:
                 les   di,[bp+8]
 
 		mov   bl,8
-                
+
                 jmp short dostrcpy
 %endif
 
@@ -308,16 +308,16 @@ STRCPY:
 
 dostrcpy:
 
-strcpy_loop:                
+strcpy_loop:
                 lodsb
                 stosb
                 test al,al
                 jne  strcpy_loop
-                
+
 		jmp  short pascal_return
 
-;******************************************************************                
-%ifndef _INIT                
+;******************************************************************
+%ifndef _INIT
                 global  FSTRLEN
 FSTRLEN:
                 call pascal_setup
@@ -337,13 +337,13 @@ STRLEN:
                 mov   di,[bp+4]
 		mov   bl,2
 
-dostrlen:           
+dostrlen:
                 mov al,0
                 mov cx,0xffff
                 repne scasb
 
                 mov ax,cx
-                not ax                
+                not ax
                 dec ax
 
                 jmp short pascal_return
@@ -360,18 +360,18 @@ STRCHR:
                 ; mov             si,[bp+6] - preset above
 		mov bl,4
 
-strchr_loop:                
+strchr_loop:
                 lodsb
                 cmp  al,cl
                 je   strchr_found
                 test al,al
                 jne  strchr_loop
-                
+
 strchr_retzero:
                 xor ax, ax               ; return NULL if not found
                 mov dx, ax               ; for fstrchr()
                 jmp short pascal_return
-                
+
 strchr_found:
                 mov ax, si
                 mov dx, ds               ; for fstrchr()
@@ -390,7 +390,7 @@ FSTRCHR:
 
                 ; Get ch (preset above)
                 ;mov cx, [bp+4]
-                
+
                 ;and the source pointer, src
                 lds si, [bp+6]
 
@@ -431,7 +431,7 @@ FSTRCMP:
 
                 ; and the destination pointer, d
                 les             di,[bp+8]
-                
+
                 mov bl,8
 
 %if 0
@@ -451,7 +451,7 @@ STRCMP:
                 ; mov             di,[bp+6]
                 xchg si,di
 
-dostrcmp:                       
+dostrcmp:
 %endif
                                     ; replace strncmp(s1,s2)-->
                                     ;         strncmp(s1,s2,0xffff)
@@ -459,7 +459,7 @@ dostrcmp:
 %if 0
                 jmp short dostrncmp
 
-                
+
 ;**********************************************************************
                 global  FSTRNCMP
 FSTRNCMP:
@@ -472,7 +472,7 @@ FSTRNCMP:
                 les             di,[bp+8]
                 mov             cx,[bp+12]
                 mov             bl,10
-                
+
                 jmp short dostrncmp
 
 ;******
@@ -492,13 +492,13 @@ dostrncmp:
 %endif
                 jcxz strncmp_retzero
 
-strncmp_loop:                
+strncmp_loop:
                 lodsb
                 scasb
                 jne  strncmp_done
                 test al,al
                 loopne   strncmp_loop
-                jmp  short strncmp_retzero		
+                jmp  short strncmp_retzero
 %endif
 
 ;**********************************************************************
@@ -509,7 +509,7 @@ FMEMCMP:
 
                 ; the length - preset above
                 ; mov cx, [bp+4]
-                
+
                 ; Get the source pointer, ss
                 les di,[bp+6]
 
@@ -521,7 +521,7 @@ FMEMCMP:
                 jmp short domemcmp
 
 ;******
-;  memcmp(BYTE     *s1 , BYTE     *s2, int count);        
+;  memcmp(BYTE     *s1 , BYTE     *s2, int count);
                 global  MEMCMP
 MEMCMP:
                 call pascal_setup

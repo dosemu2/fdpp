@@ -38,20 +38,20 @@ segment PSP
 
 STACK_SIZE      equ     384/2           ; stack allocated in words
 
-;************************************************************       
+;************************************************************
 ; KERNEL BEGINS HERE, i.e. this is byte 0 of KERNEL.SYS
-;************************************************************       
+;************************************************************
 
 ..start:
-entry:  
+entry:
                 jmp short realentry
 
-;************************************************************       
+;************************************************************
 ; KERNEL CONFIGURATION AREA
 ; this is copied up on the very beginning
 ; it's a good idea to keep this in sync with KConfig.h
-;************************************************************       
-                global _LowKernelConfig                                        
+;************************************************************
+                global _LowKernelConfig
 _LowKernelConfig:
                 db 'CONFIG'             ; constant
                 dw configend-configstart; size of config area
@@ -74,20 +74,20 @@ Version_Release             dw 1        ; 0=release build, >0=svn#
 
 configend:
 
-;************************************************************       
+;************************************************************
 ; KERNEL CONFIGURATION AREA END
-;************************************************************       
+;************************************************************
 
 
-;************************************************************       
+;************************************************************
 ; KERNEL real entry (at ~60:20)
-;                               
+;
 ; moves the INIT part of kernel.sys to high memory (~9000:0)
 ; then jumps there
 ; to aid debugging, some '123' messages are output
 ; this area is discardable and used as temporary PSP for the
 ; init sequence
-;************************************************************       
+;************************************************************
 
                 cpu 8086                ; (keep initial entry compatible)
 
@@ -95,9 +95,9 @@ realentry:                              ; execution continues here
 
                 push ax
                 push bx
-                pushf              
+                pushf
                 mov ax, 0e31h           ; '1' Tracecode - kernel entered
-                mov bx, 00f0h                                        
+                mov bx, 00f0h
                 int 010h
                 popf
                 pop bx
@@ -111,16 +111,16 @@ segment INIT_TEXT
 
                 extern  _FreeDOSmain
                 extern  _query_cpu
-                
+
                 ;
                 ; kernel start-up
                 ;
 kernel_start:
 
                 push bx
-                pushf              
+                pushf
                 mov ax, 0e32h           ; '2' Tracecode - kernel entered
-                mov bx, 00f0h                                        
+                mov bx, 00f0h
                 int 010h
                 popf
                 pop bx
@@ -168,7 +168,7 @@ kernel_start:
                 mov     di,si
                 shr     cx,1
                 rep     movsw
-                
+
                 cld
 %ifndef WATCOM                          ; for WATCOM: CS equal for HMA and INIT
                 add     ax,dx
@@ -183,9 +183,9 @@ cont:           ; Now set up call frame
                 mov     bp,sp           ; and set up stack frame for c
 
                 push bx
-                pushf              
+                pushf
                 mov ax, 0e33h           ; '3' Tracecode - kernel entered
-                mov bx, 00f0h                                        
+                mov bx, 00f0h
                 int 010h
                 popf
                 pop bx
@@ -209,7 +209,7 @@ cont:           ; Now set up call frame
                 cpu XCPU
 %endif
                 mov     [_CPULevel], al
-                
+
                 mov     ax,ss
                 mov     ds,ax
                 mov     es,ax
@@ -240,7 +240,7 @@ cpu_abort:
         mov bl, 07h             ; page in bh, bl = colour for some modes
         int 10h                 ; write character (may change bp!)
 
-        db 0A8h                 ; [test al,imm8] skip "pop si" [=imm8] after the first iteration 
+        db 0A8h                 ; [test al,imm8] skip "pop si" [=imm8] after the first iteration
 .first:
         pop si                  ; (first iteration only) get message address from stack
         cs lodsb                ; get character
@@ -276,10 +276,10 @@ cpu_abort:
 segment INIT_TEXT_END
 
 
-;************************************************************       
+;************************************************************
 ; KERNEL CODE AREA END
 ; the NUL device
-;************************************************************       
+;************************************************************
 
 segment CONST
 
@@ -330,9 +330,9 @@ _intvec_table:  db 10h
                 global _int1e_table
 _int1e_table:   times 0eh db 0
 
-;************************************************************       
-; KERNEL FIXED DATA AREA 
-;************************************************************       
+;************************************************************
+; KERNEL FIXED DATA AREA
+;************************************************************
 
 
 segment _FIXED_DATA
@@ -396,7 +396,7 @@ _lastdrive      db      0               ; 0021 value of last drive
 _nul_dev:           ; 0022 device chain root
                 extern  _con_dev:wrt LGROUP
                 dw      _con_dev, seg _con_dev
-                                        ; next is con_dev at init time.  
+                                        ; next is con_dev at init time.
                 dw      8004h           ; attributes = char device, NUL bit set
                 dw      _nul_strtgy
                 dw      _nul_intr
@@ -411,7 +411,7 @@ setverPtr       dw      0,0             ; 0037 setver list
 _LoL_nbuffers   dw      1               ; 003F number of buffers
                 dw      1               ; 0041 size of pre-read buffer
                 global  _BootDrive
-_BootDrive      db      1               ; 0043 drive we booted from   
+_BootDrive      db      1               ; 0043 drive we booted from
 
                 global  _CPULevel
 _CPULevel       db      0               ; 0044 cpu type (MSDOS >0 indicates dword moves ok, ie 386+)
@@ -420,7 +420,7 @@ _CPULevel       db      0               ; 0044 cpu type (MSDOS >0 indicates dwor
                                         ; see cpu.asm, use >= as may add checks for 486 ...
 
                 dw      0               ; 0045 Extended memory in KBytes
-buf_info:               
+buf_info:
                 global  _firstbuf
 _firstbuf       dd      0               ; 0047 disk buffer chain
                 dw      0               ; 004B Number of dirty buffers
@@ -438,7 +438,7 @@ _VgaSet         db      0               ; 0060 unknown
                 dw      0               ; 0061 unknown
                 global  _uppermem_link
 _uppermem_link  db      0               ; 0063 upper memory link flag
-_min_pars       dw      0               ; 0064 minimum paragraphs of memory 
+_min_pars       dw      0               ; 0064 minimum paragraphs of memory
                                         ;      required by program being EXECed
                 global  _uppermem_root
 _uppermem_root  dw      0ffffh          ; 0066 dmd_upper_root (usually 9fff)
@@ -455,10 +455,10 @@ _os_setver_minor        db      0
 _os_setver_major        db      5
                 global  _os_minor
 _os_minor       db      0
-                global  _os_major              
+                global  _os_major
 _os_major       db      5
 _rev_number     db      0
-                global  _version_flags         
+                global  _version_flags
 _version_flags  db      0
 
                 global  os_release
@@ -495,17 +495,17 @@ _winPatchTable: ; returns offsets to various internal variables
                                ; an empty table, purposely not _CritPatch
                                ; ie we just point to a 0 word to mark end
                 dw _uppermem_root ; seg of last arena header in conv memory
-                                  ; this matches MS DOS's location, but 
+                                  ; this matches MS DOS's location, but
                                   ; do we have the same meaning?
 %ENDIF ; WIN31SUPPORT
 
 ;;  The first 5 sft entries appear to have to be at DS:00cc
                 times (0cch - ($ - DATASTART)) db 0
                 global _firstsftt
-_firstsftt:             
+_firstsftt:
                 dd -1                   ; link to next
-                dw 5                    ; count 
-        
+                dw 5                    ; count
+
 ; Some references seem to indicate that this data should start at 01fbh in
 ; order to maintain 100% MS-DOS compatibility.
                 times (01fbh - ($ - DATASTART)) db 0
@@ -629,7 +629,7 @@ daysSince1980   dw      0FFFFh          ; 34 - number of days since epoch
                 global  _DayOfWeek
 _DayOfWeek      db      2               ; 36 - day of week
 _console_swap   db      0               ; 37 console swapped during read from dev
-                global  _dosidle_flag        
+                global  _dosidle_flag
 _dosidle_flag   db      1               ; 38 - safe to call int28 if nonzero
 _abort_progress db      0               ; 39 - abort in progress
                 global  _CharReqHdr
@@ -796,7 +796,7 @@ init_tos:
                 resb 16
                 global __init_end
 __init_end:
-init_end:        
+init_end:
 
 segment _DATA
 ; blockdev private stack
@@ -835,7 +835,7 @@ _Dyn:
 
 markEndInstanceData:  ; mark end of DOS data seg we say needs instancing
 
-        
+
 segment ID_B
     global __INIT_DATA_START
 __INIT_DATA_START:
@@ -859,14 +859,14 @@ segment HMA_TEXT_START
                 global __HMATextAvailable
 __HMATextAvailable:
                 global  __HMATextStart
-__HMATextStart:   
- 
-; 
+__HMATextStart:
+
+;
 ; the HMA area is filled with 1eh+3(=sizeof VDISK) = 33 byte dummy data,
 ; so nothing will ever be below 0xffff:0031
 ;
 segment HMA_TEXT
-begin_hma:              
+begin_hma:
                 times 10h db 0   ; filler [ffff:0..ffff:10]
                 times 20h db 0
                 db 0
@@ -889,7 +889,7 @@ __U4D:
                 ; reserve space for far jump to cp/m routine
                 resb 5
 
-;End of HMA segment                
+;End of HMA segment
 segment HMA_TEXT_END
                 global  __HMATextEnd
 __HMATextEnd:                   ; and c version
@@ -903,7 +903,7 @@ segment _STACK  class=STACK stack
 
 
 
-    
+
 
 segment CONST
         ; dummy interrupt return handlers
@@ -912,20 +912,20 @@ segment CONST
                 global _int28_handler
                 global _int2a_handler
                 global _empty_handler
-_int22_handler:         
+_int22_handler:
 _int28_handler:
 _int2a_handler:
 _empty_handler:
                 iret
-    
+
 
 global _initforceEnableA20
 initforceEnableA20:
                 call near forceEnableA20
-                retf   
+                retf
 
     global __HMARelocationTableStart
-__HMARelocationTableStart:   
+__HMARelocationTableStart:
 
                 global  _int2f_handler
                 extern  reloc_call_int2f_handler
@@ -1002,7 +1002,7 @@ _init_call_p_0: jmp  0:reloc_call_p_0
 
 
    global __HMARelocationTableEnd
-__HMARelocationTableEnd:    
+__HMARelocationTableEnd:
 
 ;
 ; if we were lucky, we found all entries from the outside to the kernel.
@@ -1015,14 +1015,14 @@ __HMARelocationTableEnd:
 ; for obvious reasons it should be located at the relocation table
 ;
     global _XMSDriverAddress
-_XMSDriverAddress:  
+_XMSDriverAddress:
                     dw 0            ; XMS driver, if detected
                     dw 0
 
     global _ENABLEA20
 _ENABLEA20:
     mov ah,5
-UsingXMSdriver:    
+UsingXMSdriver:
     push bx
     call far [cs:_XMSDriverAddress]
     pop  bx
@@ -1042,25 +1042,25 @@ forceEnableA20:
     push ds
     push es
     push ax
-    
-forceEnableA20retry:    
+
+forceEnableA20retry:
     mov  ds, [cs:dslowmem]
     mov  es, [cs:eshighmem]
-    
-    mov ax, [ds:00000h]    
-    cmp ax, [es:00010h]    
+
+    mov ax, [ds:00000h]
+    cmp ax, [es:00010h]
     jne forceEnableA20success
 
-    mov ax, [ds:00002h]    
-    cmp ax, [es:00012h]    
+    mov ax, [ds:00002h]
+    cmp ax, [es:00012h]
     jne forceEnableA20success
 
-    mov ax, [ds:00004h]    
-    cmp ax, [es:00014h]    
+    mov ax, [ds:00004h]
+    cmp ax, [es:00014h]
     jne forceEnableA20success
 
-    mov ax, [ds:00006h]    
-    cmp ax, [es:00016h]    
+    mov ax, [ds:00006h]
+    cmp ax, [es:00016h]
     jne forceEnableA20success
 
 ;
@@ -1068,17 +1068,17 @@ forceEnableA20retry:
 ;
 
     call far _ENABLEA20
-    
+
     jmp short forceEnableA20retry
-    
-    
-    
-forceEnableA20success:    
+
+
+
+forceEnableA20success:
     pop ax
     pop es
     pop ds
     ret
-                
+
 ;
 ; global f*cking compatibility issues:
 ;
@@ -1094,12 +1094,12 @@ _ExecUserDisableA20:
     jne NeedToDisable
     cmp word [cs:_XMSDriverAddress+2], byte 0
     je noNeedToDisable
-NeedToDisable:        
-    push ax 
+NeedToDisable:
+    push ax
     call far _DISABLEA20
     pop ax
 noNeedToDisable:
-    iret        
+    iret
 
 
 ;

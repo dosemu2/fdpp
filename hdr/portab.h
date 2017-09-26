@@ -192,7 +192,7 @@ typedef unsigned       size_t;
 #define PARASIZE       16       /* "paragraph" size     */
 typedef unsigned       size_t;
 #endif
-           /* functions, that are shared between C and ASM _must_ 
+           /* functions, that are shared between C and ASM _must_
               have a certain calling standard. These are declared
               as 'ASMCFUNC', and is (and will be ?-) cdecl */
 #define ASMCFUNC CDECL

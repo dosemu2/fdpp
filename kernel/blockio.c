@@ -51,12 +51,12 @@ STATIC BOOL flush1(struct buffer FAR * bp);
 
 /*
     this searches the buffer list for the given disk/block.
-    
+
     returns:
     a far pointer to the buffer.
 
     If the buffer is found the UNCACHE bit is not set and else it is set.
-        
+
     new:
         upper layer may set UNCACHE attribute
         UNCACHE buffers are recycled first.
@@ -158,7 +158,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
 BOOL DeleteBlockInBufferCache(ULONG blknolow, ULONG blknohigh, COUNT dsk, int mode)
 {
   struct buffer FAR *bp = firstbuf;
-        
+
   /* Search through buffers to see if the required block  */
   /* is already in a buffer                               */
 
@@ -484,10 +484,10 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
 }
 
 /*
-       this removes any (additionally allocated) buffers 
+       this removes any (additionally allocated) buffers
        from the HMA buffer chain, because they get allocated to the 'user'
-*/     
-     
+*/
+
 void AllocateHMASpace (size_t lowbuffer, size_t highbuffer)
 {
   REG struct buffer FAR *bp = firstbuf;

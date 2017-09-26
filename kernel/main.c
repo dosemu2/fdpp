@@ -61,7 +61,7 @@ STATIC void setup_int_vectors(void);
 #ifdef _MSC_VER
 BYTE _acrtused = 0;
 
-__segment DosDataSeg = 0;       /* serves for all references to the DOS DATA segment 
+__segment DosDataSeg = 0;       /* serves for all references to the DOS DATA segment
                                    necessary for MSC+our funny linking model
                                  */
 __segment DosTextSeg = 0;
@@ -132,7 +132,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
 /*
     InitializeAllBPBs()
-    
+
     or MakeNortonDiskEditorHappy()
 
     it has been determined, that FDOS's BPB tables are initialized,
@@ -343,7 +343,7 @@ STATIC void init_kernel(void)
 
   /* Init the file system one more time     */
   FsConfig();
-  
+
   configDone();
 
   InitializeAllBPBs();
@@ -647,7 +647,7 @@ VOID init_fatal(BYTE * err_msg)
 
 /*
        Initialize all printers
- 
+
        this should work. IMHO, this might also be done on first use
        of printer, as I never liked the noise by a resetting printer, and
        I usually much more often reset my system, then I print :-)
@@ -692,9 +692,9 @@ STATIC VOID InitSerialPorts(VOID)
         the default is to boot from harddisk, because
         the user is assumed to just have forgotten to
         remove the floppy/bootable CD from the drive.
-        
+
         user has some seconds to hit ANY key to continue
-        to boot from floppy/cd, else the system is 
+        to boot from floppy/cd, else the system is
         booted from HD
 */
 
@@ -706,14 +706,14 @@ STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 
   r.a.b.h = 0x4b;               /* bootable CDROM - get status */
   r.a.b.l = statusOnly;
-  r.d.b.l = (char)drive;          
+  r.d.b.l = (char)drive;
   r.si  = (int)buffer;
-  init_call_intr(0x13, &r);     
-  
+  init_call_intr(0x13, &r);
+
   if (r.flags & 1)
         return FALSE;
-  
-  return TRUE;  
+
+  return TRUE;
 }
 
 STATIC void CheckContinueBootFromHarddisk(void)
@@ -753,7 +753,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
     );
 
   key = GetBiosKey(InitKernelConfig.BootHarddiskSeconds);
-  
+
   if (key != -1 && (key & 0xff) != 'h' && (key & 0xff) != 'H')
   {
     /* user has hit a key, continue to boot from floppy/CD */

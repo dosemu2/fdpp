@@ -44,11 +44,11 @@ static BYTE *RcsId =
 	MS NET plays by its own rules
 
 	at least TE's network card driver DM9PCI (some 10$ NE2000 clone) does:
-	with SP=8DC before calling down to execrh, and SP=8CC when 
-	callf [interrupt], 	DM9PCI touches DOSDS:792, 
+	with SP=8DC before calling down to execrh, and SP=8CC when
+	callf [interrupt], 	DM9PCI touches DOSDS:792,
 	14 bytes into error stack :-(((
-	
-	so some optimizations were made.		
+
+	so some optimizations were made.
 	this uses the fact, that only CharReq device buffer is ever used.
 	fortunately, this saves some code as well :-)
 

@@ -39,9 +39,9 @@ void get_partition_offset(int drive)
 {
     static struct deviceparams dp;
     int err=0;
-    
+
     printf("Getting drive info: int21h function 440Dh subfunction 0860h\n");
-    
+
     dp.specfunc = 1;		/* Get current information */
 
     __asm {
@@ -58,11 +58,11 @@ void get_partition_offset(int drive)
     if (!err)
     {
       printf("Partition Offset = %02lXh  [c=%02u,h=%02u,s=%2u]\n",  dp.hiddensecs, dp.cylinders, dp.heads, dp.secpertrack);
-      printf("FAT32 version 4860h to compare\n"); 
+      printf("FAT32 version 4860h to compare\n");
     }
     else
       printf("Original version failed, checking FAT32 version using 4860h\n");
-     
+
     __asm {
       mov ax, 0x440d
       mov bx, drive
@@ -135,7 +135,7 @@ void read_mbr(int drive, const void *buf)
       //printf("Success reading MBR\n\n");
       return;
     }
-    
+
     __asm {
       mov ax, 0x440d
       mov bx, drive
@@ -151,20 +151,20 @@ void read_mbr(int drive, const void *buf)
       //printf("Success reading FAT32 MBR\n\n");
       return;
     }
-    
+
     printf("mbr read error");
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
     unsigned int c,h,s;
     static uint8_t buf[1024];
     unsigned drive = (unsigned)(argv[1][0]);  /* a=1,b=2,... */
     drive = drive-'a'+1;
     printf("Query drive %c:\n", 'a'+drive-1);
-    
+
     get_partition_offset(drive);
-    
+
     read_mbr(drive, buf);
     printf("MBR: %02Xh %02Xh %02Xh %02Xh %02Xh %02Xh %02Xh %02Xh\n",
 	    ((const uint8_t *)buf)[0],
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
       mbr.sectors=s;
       read_mbr(drive, buf);
       if (buf[0] != 0) {
-          printf("Found at %u,%u,%u\n", c,h,s); 
+          printf("Found at %u,%u,%u\n", c,h,s);
 
           printf("MBR: %02Xh %02Xh %02Xh %02Xh %02Xh %02Xh %02Xh %02Xh\n",
 	    ((const uint8_t *)buf)[0],
@@ -197,12 +197,12 @@ int main(int argc, char *argv[])
 	    ((const uint8_t *)buf)[5],
 	    ((const uint8_t *)buf)[6],
 	    ((const uint8_t *)buf)[7]);
-          
+
           exit(0);
       }
     }
     printf("c=%u,", c); fflush(NULL);
     }
-      
+
     return 0;
 }

@@ -1,7 +1,7 @@
 /* Included by initialisation functions */
 
 #if _MSC_VER != 0
-extern __segment DosDataSeg;    /* serves for all references to the DOS DATA segment 
+extern __segment DosDataSeg;    /* serves for all references to the DOS DATA segment
                                    necessary for MSC+our funny linking model
                                  */
 

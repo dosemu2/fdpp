@@ -317,7 +317,7 @@ STATIC int nlsGetData(struct nlsPackage FAR * nls, int subfct,
                       ((struct nlsExtCntryInfo FAR *)poi)->size + 3);
       case NLS_DOS_38:         /* Normal Country Information */
         return cpyBuf(buf, bufsize, &(((struct nlsExtCntryInfo FAR *)poi)->dateFmt), 24);       /* standard cinfo has no more 34 _used_ bytes */
-        /* don't copy 34, copy only 0x18 instead, 
+        /* don't copy 34, copy only 0x18 instead,
            see comment at DosGetCountryInformation                      TE */
       default:
         /* All other subfunctions just return the found nlsPoinerInf

@@ -37,7 +37,7 @@ struct cds {
   union {
     BYTE FAR *_cdsRedirRec; /* IFS record */
     struct {
-      UWORD _cdsStrtClst;   /* if local path (Flags & CDSPHYSDRV): 
+      UWORD _cdsStrtClst;   /* if local path (Flags & CDSPHYSDRV):
                                start cluster of CWD; root == 0,
                                never access == 0xFFFF */
       UWORD _cdsParam;
@@ -79,7 +79,7 @@ struct cds {
    1       1               installable file system (IFS)
 */
 #define CDSMODEMASK        (CDSNETWDRV | CDSPHYSDRV)
- 
+
 /* #define CDSVALID        (CDSNETWDRV | CDSPHYSDRV) */
 #define CDSVALID CDSMODEMASK
 

@@ -69,7 +69,7 @@ segment _DATAEND        class=DATA align=1
 segment CONST		class=DATA align=2
 segment CONST2		class=DATA align=2
 ;for MSC
-segment	DCONST      	class=DCONST   align=2     
+segment	DCONST      	class=DCONST   align=2
 segment	DYN_DATA        class=DYN_DATA
 segment	HMA_TEXT_START	class=CODE align=16
 segment	HMA_TEXT	class=CODE
@@ -94,6 +94,6 @@ segment IDATA           class=ID   align=2
 segment ID_E            class=ID   align=2
 segment	IC      	class=IC   align=2
 segment	IB_B      	class=IB   align=2
-segment	IB      	class=IB   align=2     
+segment	IB      	class=IB   align=2
 segment	IB_E      	class=IB   align=2
 %endif

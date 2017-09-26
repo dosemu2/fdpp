@@ -126,9 +126,9 @@ struct dpb FAR * GetDriveDPB(UBYTE drive, COUNT * rc)
 {
   struct dpb FAR *dpb;
   struct cds FAR *cdsp;
-  
+
   cdsp = get_cds1(drive);
-  
+
   if (cdsp == NULL)
   {
     *rc = DE_INVLDDRV;
@@ -180,7 +180,7 @@ sft FAR * idx_to_sft(int SftIndex)
     return (sft FAR *) - 1;
   return lpCurSft;
 }
-      
+
 int get_sft_idx(unsigned hndl)
 {
   psp FAR *p = MK_FP(cu_psp, 0);
@@ -216,7 +216,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
   }
   if (mode == XFR_FORCE_WRITE)
     mode = XFR_WRITE;
-    
+
 /*
  *   Do remote first or return error.
  *   must have been opened from remote.
@@ -304,7 +304,7 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
   sft FAR *s = idx_to_sft(sft_idx);
   if (FP_OFF(s) == (size_t) -1)
     return DE_INVLDHNDL;
-        
+
   /* Test for invalid mode                        */
   if (mode > SEEK_END)
     return DE_INVLDFUNC;
@@ -476,13 +476,13 @@ bits for flags (bits 11-8 are internal FreeDOS bits only)
 12 O_LARGEFILE allow files >= 2gb but < 4gb (not implemented yet)
 11 O_LEGACY not called from int21/ah=6c: find right fn for redirector
 10 O_CREAT if file does not exist, create it
-9 O_TRUNC if file exists, truncate and open it \ not both 
+9 O_TRUNC if file exists, truncate and open it \ not both
 8 O_OPEN  if file exists, open it              /
 7 O_NOINHERIT do not inherit handle on exec
-6 \ 
+6 \
 5  - sharing modes
-4 / 
-3 reserved 
+4 /
+3 reserved
 2 bits 2,1,0 = 100: RDONLY and do not modify file's last access time
                     (not implemented yet)
 1 \ 0=O_RDONLY, 1=O_WRONLY,
@@ -604,7 +604,7 @@ long DosOpen(char FAR * fname, unsigned mode, unsigned attrib)
 {
   long result;
   unsigned hndl;
-  
+
   /* test if mode is in range                     */
   if ((mode & ~O_VALIDMASK) != 0)
     return DE_INVLDACC;
@@ -629,7 +629,7 @@ COUNT CloneHandle(unsigned hndl)
 
   if (sftp == (sft FAR *) -1 || (sftp->sft_mode & O_NOINHERIT))
     return DE_INVLDHNDL;
-  
+
   /* now that we have the system file table entry, get the fnode  */
   /* index, and increment the count, so that we've effectively    */
   /* cloned the file.                                             */
@@ -862,7 +862,7 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
   /*
     DriveString should be in form of "C:", "C:\", "\", "", ., or .\
     where missing drive is treated as a request for the current drive,
-    or network name in form "\\SERVER\share" 
+    or network name in form "\\SERVER\share"
     however, network names like \\SERVER\C aren't supported yet
   */
   cdsp = NULL;
@@ -1047,7 +1047,7 @@ COUNT DosFindNext(void)
  *  test 40h. I used RamView to see location MSD 116:04be and
  *  FD f??:04be, the byte set with 0xc4 = Remote/Network drive 4.
  *  Ralf Brown docs for dos 4eh say bit 7 set == remote so what is
- *  bit 6 for? 
+ *  bit 6 for?
  *  SHSUCDX Mod info say "test redir not network bit".
  *  Just to confuse the rest, MSCDEX sets bit 5 too.
  *
@@ -1117,7 +1117,7 @@ COUNT DosGetFattr(BYTE FAR * name)
   result = truename(name, PriPathName, CDS_MODE_CHECK_DEV_PATH);
   if (result < SUCCESS)
     return result;
-  
+
 /* /// Added check for "d:\", which returns 0x10 (subdirectory) under DOS.
        - Ron Cemer */
            /* Theoretically: If the redirectory's qualify function
@@ -1307,7 +1307,7 @@ struct dhdr FAR *IsDevice(const char FAR * fname)
   {
 */
 
-/*  BUGFIX: MSCD000<00> should be handled like MSCD000<20> TE 
+/*  BUGFIX: MSCD000<00> should be handled like MSCD000<20> TE
     ie the 8 character device name may be padded with spaces ' ' or NULs '\0'
 
     Note: fname is assumed an ASCIIZ string (ie not padded, unknown length)
@@ -1379,7 +1379,7 @@ COUNT DosTruename(const char FAR *src, char FAR *dest)
   /* RBIL: The buffer has be unchanged, if the call fails.
      Therefore, the name is created in an internal buffer
      and copied into the user buffer only on success.
-  */  
+  */
   COUNT rc = truename(src, PriPathName, CDS_MODE_ALLOW_WILDCARDS);
   if (rc >= SUCCESS)
   {

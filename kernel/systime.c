@@ -49,7 +49,7 @@ extern request ASM ClkReqHdr;
 
 const UWORD *is_leap_year_monthdays(UWORD y)
 {
-  /* this is correct in a strict mathematical sense   
+  /* this is correct in a strict mathematical sense
      return ((y) & 3 ? days[0] : (y) % 100 ? days[1] : (y) % 400 ? days[0] : days[1]); */
 
   /* this will work until 2200 - long enough for me - and saves 0x1f bytes */
@@ -95,7 +95,7 @@ int DosSetTime(const struct dostime *dt)
   if (dt->hour > 23 || dt->minute > 59 ||
       dt->second > 59 || dt->hundredth > 99)
      return DE_INVLDDATA;
- 
+
   /* for ClkRecord.clkDays */
   ExecuteClockDriverRequest(C_INPUT);
 

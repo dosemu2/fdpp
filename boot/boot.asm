@@ -397,7 +397,7 @@ read_next:
 ;******************** LBA_READ *******************************
 
                                                 ; check for LBA support
-                                                                                
+
                 mov     ah,041h                 ;
                 mov     bx,055aah               ;
                 mov     dl, [drive]
@@ -414,22 +414,22 @@ read_next:
 
                 sbb     bx,0aa55h - 1           ; tests for carry (from shr) too!
                 jne     read_normal_BIOS
-                
-                                
+
+
                                                 ; OK, drive seems to support LBA addressing
 
                 lea     si,[LBA_PACKET]
-                            
-                                                ; setup LBA disk block                                  
+
+                                                ; setup LBA disk block
                 mov     LBA_SECTOR_32,bx        ; bx is 0 if extended 13h mode supported
                 mov     LBA_SECTOR_48,bx
-        
+
                 mov     ah,042h
                 jmp short    do_int13_read
 
-                                                        
 
-read_normal_BIOS:      
+
+read_normal_BIOS:
 
 ;******************** END OF LBA_READ ************************
                 mov     cx,LBA_SECTOR_0
@@ -473,12 +473,12 @@ read_normal_BIOS:
 
                 les     bx,[LBA_OFF]
                 mov     ax, 0x0201
-do_int13_read:                
+do_int13_read:
                 mov     dl, [drive]
                 int     0x13
                 jc      boot_error              ; exit on error
 
-                mov     ax, word [bsBytesPerSec]  
+                mov     ax, word [bsBytesPerSec]
 
                 push    di
                 mov     si,READBUF              ; copy read in sector data to

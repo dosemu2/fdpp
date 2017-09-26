@@ -7,7 +7,7 @@ COMPILERPATH=$(WATCOM)
 CC=*wcc
 CL=wcl
 INCLUDEPATH=$(COMPILERPATH)\H
-INCLUDE=$(COMPILERPATH)\h 
+INCLUDE=$(COMPILERPATH)\h
 EDPATH=$(COMPILERPATH)\EDDAT
 
 !if $(XCPU) != 186
@@ -17,7 +17,7 @@ TARGETOPT=-0
 !endif
 
 LIBPATH=$(COMPILERPATH)\lib286
-LIBUTIL=wlib -q 
+LIBUTIL=wlib -q
 LIBPLUS=
 LIBTERM=
 
@@ -32,27 +32,27 @@ TARGET=KWC
 CLIB=$(COMPILERPATH)\lib286\dos\clibm.lib
 
 # we use our own ones, which override these ones when linking.
-#  
+#
 
 MATH_EXTRACT=*i4m
 MATH_INSERT=+i4m
 
 
 #
-# heavy stuff - building  
+# heavy stuff - building
 #
 # -e=<num>      set limit on number of error messages
 # -ms           small memory model (small code/small data)
-# -j            change char default from unsigned to signed   
+# -j            change char default from unsigned to signed
 #-nc=<id>      set code class name
 #-nd=<id>      set data segment name
 #-nm=<file>    set module name
-#-nt=<id>      set name of text segment  
+#-nt=<id>      set name of text segment
 # -g=<id>       set code group name
 # -os           -> favor code size over execution time in optimizations
-# -s            remove stack overflow checks  
-# -w=<num>      set warning level number 
-# -we           treat all warnings as errors   
+# -s            remove stack overflow checks
+# -w=<num>      set warning level number
+# -we           treat all warnings as errors
 # -ze           enable extensions (i.e., near, far, export, etc.)
 # -zl           remove default library information
 # -zp=<num>     pack structure members with alignment {1,2,4,8,16}

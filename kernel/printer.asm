@@ -83,7 +83,7 @@ PrtWrite:
                 jcxz    PrtWr3                  ; Exit if nothing to write
 
 PrtCharLoop:                                    ; next character loop
-		 
+
                 mov     bx, 2			; number of retries
 PrtRetryTwice:
                 mov     ah, PRT_GETSTATUS       ; get status, ah=2
@@ -138,12 +138,12 @@ PrtIOCall:
                 mov     al, E_NOTRDY
 		jz      ret_error_code
 
-                test    ah, PRT_OUTOFPAPER	; 20h 
+                test    ah, PRT_OUTOFPAPER	; 20h
                 mov     al, E_WRITE
                 jz      ret_error_code		; not out of paper -> E_WRITE
 
 ret_error_code_9:
-                mov     al, E_PAPER  
+                mov     al, E_PAPER
 
 ret_error_code:
                 cmp     al, E_NOTRDY            ; 2 = no error
@@ -224,7 +224,7 @@ PrtGnIoctl3:
 ; but should print a little bit
 ;
 ; the status bits = AH
-; 
+;
 ;               1                       0
 ; 80 - BUSY  not busy               busy
 ; 40 - ACK   transfer finished      not yet finished

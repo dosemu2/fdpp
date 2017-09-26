@@ -130,7 +130,7 @@ cpm_error:      mov     al,0
 
 print_hex:      mov     cl, 12
 hex_loop:
-                mov     ax, dx                             
+                mov     ax, dx
                 shr     ax, cl
                 and     al, 0fh
                 cmp     al, 10
@@ -147,7 +147,7 @@ divide_by_zero_message db 0dh,0ah,'Interrupt divide by zero, stack:',0dh,0ah,0
 
                 global reloc_call_int0_handler
 reloc_call_int0_handler:
-                
+
                 mov si,divide_by_zero_message
 
 zero_message_loop:
@@ -158,15 +158,15 @@ zero_message_loop:
                 inc si
                 mov bx, 0070h
                 mov ah, 0eh
-                
+
                 int  10h
-                
+
                 jmp short zero_message_loop
-                
+
 zero_done:
-                mov bp, sp              
+                mov bp, sp
                 xor si, si         ; print 13 words of stack for debugging LUDIV etc.
-stack_loop:             
+stack_loop:
                 mov dx, [bp+si]
                 call print_hex
                 mov al, ' '
@@ -179,8 +179,8 @@ stack_loop:
                 int 10h
                 mov al, 0ah
                 int 10h
-                                                                                                
-                mov ax,04c7fh       ; terminate with errorlevel 127                                                
+
+                mov ax,04c7fh       ; terminate with errorlevel 127
                 int 21h
                 sti
 thats_it:       hlt
@@ -192,7 +192,7 @@ invalid_opcode_message db 0dh,0ah,'Invalid Opcode at ',0
 reloc_call_int6_handler:
 
                 mov si,invalid_opcode_message
-                jmp short zero_message_loop        
+                jmp short zero_message_loop
 
                 global reloc_call_int19_handler
 reloc_call_int19_handler:
@@ -275,7 +275,7 @@ int21_reentry:
                 cmp     ah,62h
                 jne     int21_1
 
-int21_user:     
+int21_user:
                 call    dos_crit_sect
 
                 push    ss
@@ -287,7 +287,7 @@ int21_user:
 
 ;
 ; normal entry, use one of our 4 stacks
-; 
+;
 ; DX=DGROUP
 ; CX=STACK
 ; SI=userSS
@@ -323,7 +323,7 @@ int21_1:
                 cmp     byte [_ErrorMode],0
                 je      int21_2
 
-int21_onerrorstack:                
+int21_onerrorstack:
                 mov     cx,_error_tos
 
 
@@ -331,17 +331,17 @@ int21_onerrorstack:
                 mov     ss,dx
                 mov     sp,cx
                 sti
-                
+
                 push    si  ; user SS:SP
                 push    bp
-                
+
                 call    _int21_service
                 jmp     short int21_exit_nodec
 
-                
+
 int21_2:        inc     byte [_InDOS]
                 mov     cx,_char_api_tos
-                or      ah,ah   
+                or      ah,ah
                 jz      int21_3
                 cmp     ah,0ch
                 jbe     int21_normalentry
@@ -361,7 +361,7 @@ int21_normalentry:
                 ; Push the far pointer to the register frame for
                 ; int21_syscall and remainder of kernel.
                 ;
-                
+
                 push    si  ; user SS:SP
                 push    bp
                 call    _int21_service
@@ -373,7 +373,7 @@ int21_exit:     dec     byte [_InDOS]
                 ; were modified by the system call.
                 ;
 
-                
+
 int21_exit_nodec:
                 pop bp      ; get back user stack
                 pop si
@@ -439,7 +439,7 @@ reloc_call_low_int25_handler:
                 pushf
                 push    ax
                 mov     ax,025h
-int2526:                
+int2526:
                 push    cx
                 push    dx
                 push    bx
@@ -464,7 +464,7 @@ int2526:
                 sti
 
                 Protect386Registers
-        
+
                 push    dx
                 push    cx                      ; save user stack
 
@@ -578,7 +578,7 @@ CritErr05:
                 mov     bp,[es:PSP_USERSP]
                 RestoreSP
                 Restore386Registers
-                mov     bp,cx        
+                mov     bp,cx
                 ;
                 ; and call critical error handler
                 ;

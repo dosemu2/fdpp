@@ -95,7 +95,7 @@ ComInStat:	; similar to ComNdRead but returns no char, only flags
 ;                test    al,20h	; DSR (why do we test this?)
 ;                jz      ComNdRtn
 ComInAvail:	jmp	_IOExit	; return "ready"
-		
+
 
 ComNdRead:
                 call    GetComStat

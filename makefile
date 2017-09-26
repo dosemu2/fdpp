@@ -1,7 +1,7 @@
-# What you WANT on DOS is: 
+# What you WANT on DOS is:
 # EDIT CONFIG.B, COPY CONFIG.B to CONFIG.BAT, RUN BUILD.BAT
 # On Linux, use config.mak, and "make all", "make clean", or "make clobber"
-# On Windows, use config.mak, and 
+# On Windows, use config.mak, and
 # "mingw32-make all", "mingw32-make clean", or "mingw32-make clobber"
 
 default:

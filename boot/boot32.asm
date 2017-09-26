@@ -61,7 +61,7 @@ Entry:          jmp     short real_start
 
 %define LOADSEG         0x0060
 
-%define FATSEG          0x2000         
+%define FATSEG          0x2000
 
 %define fat_sector      bp+0x48         ; last accessed sector of the FAT
 
@@ -141,7 +141,7 @@ secshift:	inc	ax
 		jne	secshift
 		mov	byte [fat_secshift], al
 		dec	cx
- 
+
 ;       FINDFILE: Searches for the file in the root directory.
 ;
 ;       Returns:
@@ -157,7 +157,7 @@ ff_next_cluster:
                 push    ax
                 call    convert_cluster
                 jc      boot_error                      ; EOC encountered
-                                
+
 ff_next_sector:
                 push    bx                              ; save sector count
 
@@ -189,11 +189,11 @@ ff_find_next_cluster:
                 call    next_cluster
                 jmp     short ff_next_cluster
 ff_done:
-                
+
                 mov     ax, [es:di+0x1A-11]        ; get cluster number
                 mov     dx, [es:di+0x14-11]
 c4:
-                sub     bx, bx                  ; ES points to LOADSEG      
+                sub     bx, bx                  ; ES points to LOADSEG
 c5:             push    dx
                 push    ax
                 push    bx
@@ -209,24 +209,24 @@ c6:
                 pop     dx
                 call    next_cluster
                 jmp     short c5
-                
+
 boot_error:
 		xor	ah,ah
 		int	0x16			; wait for a key
 		int	0x19			; reboot the machine
 
-; input: 
+; input:
 ;    DX:AX - cluster
 ; output:
 ;    DX:AX - next cluster
 ;    CX = 0
 ; modify:
 ;    DI
-next_cluster:  
+next_cluster:
                 push    es
                 mov     di, ax
                 and     di, [fat_secmask]
-                
+
                 mov     cx, [fat_secshift]
 cn_loop:
                 shr     dx,1
@@ -236,7 +236,7 @@ cn_loop:
                                                ; cluster resides
                                                ; DI - cluster index in this
                                                ; sector
-                                               
+
                 shl     di,1                   ; DI - offset in the sector
                 shl     di,1
                 add     ax, [fat_start]
@@ -264,7 +264,7 @@ cn_exit:
                 ret
 
 
-boot_success:   
+boot_success:
                 mov     bl, [drive]
 		jmp	far [loadsegoff_60]
 
@@ -302,7 +302,7 @@ c3:
 
 ; prints text after call to this function.
 
-print_1char:        
+print_1char:
                 xor   bx, bx                   ; video page 0
                 mov   ah, 0x0E                 ; else print it
                 int   0x10                     ; via TTY mode
@@ -312,7 +312,7 @@ print1:         lodsb                          ; get token
                 cmp   al, 0                    ; end of string?
                 jne   print_1char              ; until done
                 ret                            ; and jump to it
-                
+
 ;input:
 ;   DX:AX - 32-bit DOS sector number
 ;   ES:BX - destination buffer
@@ -366,7 +366,7 @@ read_next:      push    dx
                 int     0x13
 
                 pop     ax
-                pop     dx         
+                pop     dx
                 jnc     read_ok                 ; jump if no error
                 xor     ah, ah                  ; else, reset floppy
                 int     0x13

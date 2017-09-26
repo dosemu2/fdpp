@@ -36,7 +36,7 @@ static BYTE *fatdirRcsId =
 #endif
 
 /* Description.
- *  Initialize a fnode so that it will point to the directory with 
+ *  Initialize a fnode so that it will point to the directory with
  *  dirstart starting cluster; in case of passing dirstart == 0
  *  fnode will point to the start of a root directory */
 VOID dir_init_fnode(f_node_ptr fnp, CLUSTER dirstart)
@@ -326,11 +326,11 @@ COUNT dos_findfirst(UCOUNT attr, BYTE * name)
 }
 
 /*
-    BUGFIX TE 06/28/01 
-    
+    BUGFIX TE 06/28/01
+
     when using FcbFindXxx, the only information available is
     the cluster number + entrycount. everything else MUST\
-    be recalculated. 
+    be recalculated.
     a good test for this is MSDOS CHKDSK, which now (seems too) work
 */
 
@@ -363,7 +363,7 @@ COUNT dos_findnext(void)
         /*
            MSD Command.com uses FCB FN 11 & 12 with attrib set to 0x16.
            Bits 0x21 seem to get set some where in MSD so Rd and Arc
-           files are returned. 
+           files are returned.
            RdOnly + Archive bits are ignored
          */
 
@@ -398,13 +398,13 @@ COUNT dos_findnext(void)
 }
 #endif
 /*
-    this receives a name in 11 char field NAME+EXT and builds 
+    this receives a name in 11 char field NAME+EXT and builds
     a zeroterminated string
 
-    unfortunately, blanks are allowed in filenames. like 
+    unfortunately, blanks are allowed in filenames. like
         "test e", " test .y z",...
-        
-    so we have to work from the last blank backward 
+
+    so we have to work from the last blank backward
 */
 void ConvertName83ToNameSZ(BYTE FAR * destSZ, BYTE FAR * srcFCBName)
 {

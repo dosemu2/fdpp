@@ -154,7 +154,7 @@ void displayConfigSettings(KernelConfig * cfg)
   if (cfg->ConfigSize >= 20)
   {
     printf
-        ("%s kernel %s (build %d.%d OEM:%02X)\n", 
+        ("%s kernel %s (build %d.%d OEM:%02X)\n",
         (cfg->Version_OemID == 0xFD)?"FreeDOS":"DOS-C",
         cfg->Version_Release?"SVN":"Release",
         cfg->Version_Major,

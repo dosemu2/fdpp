@@ -331,7 +331,7 @@ DOSBootFiles bootFiles[] = {
 #define OEM_DR     1  /* FD boot sector,(Enhanced) DR-DOS names */
 #endif
 #ifdef WITHOEMCOMPATBS
-#define OEM_PC     3  /* use PC-DOS compatible boot sector and names */ 
+#define OEM_PC     3  /* use PC-DOS compatible boot sector and names */
 #define OEM_MS     4  /* use PC-DOS compatible BS with MS names */
 #define OEM_W9x    5  /* use PC-DOS compatible BS with MS names */
 #define OEM_RX     6  /* use PC-DOS compatible BS with Rx names */
@@ -683,7 +683,7 @@ void initOptions(int argc, char *argv[], SYSOptions *opts)
   {
     int slen;
     /* set source path, reserving room to append filename */
-    if ( (argv[srcarg][1] == ':') || ((argv[srcarg][0]=='\\') && (argv[srcarg][1] == '\\')) ) 
+    if ( (argv[srcarg][1] == ':') || ((argv[srcarg][0]=='\\') && (argv[srcarg][1] == '\\')) )
       strncpy(opts->srcDrive, argv[srcarg], SYS_MAXPATH-13);
     else if (argv[srcarg][1] == '\0') /* assume 1 char is drive not path specifier */
       sprintf(opts->srcDrive, "%c:", toupper(*(argv[srcarg])));
@@ -694,14 +694,14 @@ void initOptions(int argc, char *argv[], SYSOptions *opts)
     if ((slen>2) && (opts->srcDrive[slen-1] != '\\') && (opts->srcDrive[slen-1] != '/'))
       strcat(opts->srcDrive, "\\");
   }
-  /* source path is now in form of just a drive, "X:" 
+  /* source path is now in form of just a drive, "X:"
      or form of drive + path + directory separator, "X:\path\" or "\\path\"
      If just drive we try current path then root, else just indicated path.
   */
 
 
   /* if source and dest are same drive, then source should not be root,
-     so if is same drive and not explicit path, force only current 
+     so if is same drive and not explicit path, force only current
      Note: actual copy routine prevents overwriting self when src=dst
   */
   if ( (opts->dstDrive == (toupper(*(opts->srcDrive))-'A')) && (!opts->srcDrive[2]) )
@@ -759,7 +759,7 @@ void initOptions(int argc, char *argv[], SYSOptions *opts)
   }
 
   /* if unable to determine DOS, assume FreeDOS */
-  if (opts->flavor == OEM_AUTO) opts->flavor = 
+  if (opts->flavor == OEM_AUTO) opts->flavor =
 #ifdef DRSYS
   OEM_EDR;
 #else
@@ -885,7 +885,7 @@ int main(int argc, char **argv)
   if (opts.copyShell)
   {
     printf("Copying shell (command interpreter)...\n");
-  
+
     /* copy command.com, 1st try source path, then try %COMSPEC% */
     sprintf(srcFile, "%s%s", opts.srcDrive, (opts.fnCmd)?opts.fnCmd:"COMMAND.COM");
     if (!copy(srcFile, opts.dstDrive, "COMMAND.COM"))
@@ -973,7 +973,7 @@ void reset_drive(int DosDrive);
 #pragma aux reset_drive = \
       "push ds" \
       "inc dx" \
-      "mov ah, 0xd" \ 
+      "mov ah, 0xd" \
       "int 0x21" \
       "mov ah,0x32" \
       "int 0x21" \
@@ -1030,7 +1030,7 @@ int fat32readwrite(int DosDrive, void *diskReadPacket, unsigned intno)
   regs.x.cx = 0xffff;
   regs.x.si = intno;
   intdos(&regs, &regs);
-  
+
   return regs.x.cflag;
 } /* fat32readwrite */
 
@@ -1373,7 +1373,7 @@ void put_boot(SYSOptions *opts)
     dataSectors = totalSectors
       - bs32->bsResSectors - (bs32->bsFATs * fatSize) - rootDirSectors;
     clusters = dataSectors / bs32->bsSecPerClust;
- 
+
     if (clusters < FAT_MAGIC)        /* < 4085 */
       fs = FAT12;
     else if (clusters < FAT_MAGIC16) /* < 65525 */
@@ -1432,7 +1432,7 @@ void put_boot(SYSOptions *opts)
       {
           unsigned offset;
           offset = (fs == FAT16) ? 0x175 : 0x178;
-          
+
           if ( (newboot[offset]==0x84) && (newboot[offset+1]==0xD2) ) /* test dl,dl */
           {
             /* if always use LBA then NOP out conditional jmp over LBA logic if A: */
@@ -1495,12 +1495,12 @@ void put_boot(SYSOptions *opts)
 
     /* the location of the "0060" segment portion of the far pointer
        in the boot sector is just before cont: in boot*.asm.
-       This happens to be offset 0x78 for FAT32 and offset 0x5c for FAT16 
+       This happens to be offset 0x78 for FAT32 and offset 0x5c for FAT16
 
        force use of value stored in bs by NOPping out mov [drive], dl
        0x82: 88h,56h,40h for fat32 chs & lba boot sectors
 
-       i.e. BE CAREFUL WHEN YOU CHANGE THE BOOT SECTORS !!! 
+       i.e. BE CAREFUL WHEN YOU CHANGE THE BOOT SECTORS !!!
     */
     if (opts->kernel.stdbs)
     {
@@ -1527,7 +1527,7 @@ void put_boot(SYSOptions *opts)
 
     /* the location of the "0060" segment portion of the far pointer
        in the boot sector is just before cont: in boot*.asm.
-       This happens to be offset 0x78 for FAT32 and offset 0x5c for FAT16 
+       This happens to be offset 0x78 for FAT32 and offset 0x5c for FAT16
        The oem boot sectors do not have/need this value for patching.
 
        the location of the jmp address (patching from
@@ -1539,8 +1539,8 @@ void put_boot(SYSOptions *opts)
        force use of value stored in bs by NOPping out mov [drive], dl
        0x66: 88h,56h,24h for fat16 and fat12 boot sectors
        0x4F: 88h,56h,24h for oem compatible fat16 and fat12 boot sectors
-       
-       i.e. BE CAREFUL WHEN YOU CHANGE THE BOOT SECTORS !!! 
+
+       i.e. BE CAREFUL WHEN YOU CHANGE THE BOOT SECTORS !!!
     */
     if (opts->kernel.stdbs)
     {
@@ -1584,7 +1584,7 @@ void put_boot(SYSOptions *opts)
   printf("Root directory starts at sector (PREVIOUS + %u * %u)\n",
          bs->bsFATsecs, bs->bsFATs);
   }
-  
+
   {
     int i = 0;
     memset(&newboot[0x1f1], ' ', 11);
@@ -1634,7 +1634,7 @@ void put_boot(SYSOptions *opts)
       printf("Can't write new boot sector to drive %c:\n", opts->dstDrive + 'A');
       exit(1);
     }
-    
+
     /* for FAT32, we need to update the backup copy as well */
     /* unless user has asked us not to, eg for better dual boot support */
     /* Note: assuming sectors 1-5 & 7-11 (FSINFO+additional boot code)
@@ -1801,7 +1801,7 @@ BOOL copy(const BYTE *source, COUNT drive, const BYTE * filename)
     BYTE far *buffer, far *bufptr;
     UWORD offs;
     unsigned chunk_size;
-    
+
     /* get length of file to copy, then allocate enough memory for whole file */
     filesize = filelength(fdin);
     if (alloc_dos_mem(filesize, &theseg)!=0)

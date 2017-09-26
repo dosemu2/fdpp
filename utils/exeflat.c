@@ -36,10 +36,10 @@ large portions copied from task.c
 
 /* history
 
-        10/??/01 - Bart Oldeman 
+        10/??/01 - Bart Oldeman
                 primary release
 
-        11/28/01 - tom ehlert   
+        11/28/01 - tom ehlert
                 added -UPX option to make the kernel compressable with UPX
 
 */
@@ -79,7 +79,7 @@ static void usage(void)
   printf("usage: exeflat (src.exe) (dest.sys) (relocation-factor)\n");
   printf
       ("               -S10   - Silent relocate segment 10 (down list)\n");
-  
+
   exit(1);
 }
 
@@ -185,12 +185,12 @@ static int exeflat(const char *srcfile, const char *dstfile,
         silentdone++;
         goto dontPrint;
       }
-    
+
     printf("relocation at 0x%04x:0x%04x ->%04x\n", reloc[i].seg,
            reloc[i].off, segment);
-    
+
   dontPrint:
-    
+
     segment += start_seg;
     *spot0 = segment & 0xff;
     *spot1 = segment >> 8;
@@ -306,7 +306,7 @@ static void write_trailer(FILE *dest, size_t size, int compress_sys_file,
   /* hand assembled - so this remains ANSI C ;-) */
   /* well almost: we still need packing and assume little endian ... */
   /* move kernel down to place CONFIG-block, which added above,
-     at start_seg-2:0 (e.g. 0x5e:0) instead of 
+     at start_seg-2:0 (e.g. 0x5e:0) instead of
      start_seg:0 (e.g. 0x60:0) and store there boot drive number
      from BL; kernel.asm will then check presence of additional
      CONFIG-block at this address. */
@@ -366,10 +366,10 @@ int main(int argc, char **argv)
   for (i = 4; i < argc && !UPX; i++)
   {
     char *argptr = argv[i];
-    
+
     if (argptr[0] != '-' && argptr[0] != '/')
       usage();
-    
+
     argptr++;
 
     switch (toupper(argptr[0]))
@@ -384,10 +384,10 @@ int main(int argc, char **argv)
                  LENGTH(silentSegments));
           exit(1);
         }
-        
+
         silentSegments[silentcount++] = (short)strtol(argptr + 1, NULL, 0);
         break;
-        
+
       default:
         usage();
     }

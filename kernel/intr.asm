@@ -28,7 +28,7 @@
 		%include "segs.inc"
 
 %macro INTR 0
-        
+
                 push    bp                      ; Standard C entry
                 mov     bp,sp
                 push    si
@@ -103,7 +103,7 @@ RES_DOSEXEC:
         pop ax                  ; mode
         push es                 ; ret address
         mov ah, 4bh
-        push ds                 
+        push ds
         pop es                  ; es = ds
         int 21h
         jc short no_exec_error
@@ -111,7 +111,7 @@ RES_DOSEXEC:
 no_exec_error:
         ret
 
-;; UCOUNT ASMPASCAL res_read(int fd, void *buf, UCOUNT count); 
+;; UCOUNT ASMPASCAL res_read(int fd, void *buf, UCOUNT count);
     global RES_READ
 RES_READ:
         pop ax         ; ret address
@@ -139,7 +139,7 @@ INIT_CALL_INTR:
 ;
 ; int init_call_XMScall( (WORD FAR * driverAddress)(), WORD AX, WORD DX)
 ;
-; this calls HIMEM.SYS 
+; this calls HIMEM.SYS
 ;
                 global INIT_CALL_XMSCALL
 INIT_CALL_XMSCALL:
@@ -154,7 +154,7 @@ INIT_CALL_XMSCALL:
             push es         ; driver address ("jmp es:cx")
             push cx
             retf
-            
+
 ; void FAR *DetectXMSDriver(VOID)
 global DETECTXMSDRIVER
 DETECTXMSDRIVER:
@@ -172,22 +172,22 @@ detected:
         push bx
         mov ax, 4310h           ; XMS get driver address
         int 2fh
-        
+
         mov ax, bx
         mov dx, es
         pop bx
         pop es
-        ret        
+        ret
 
 global KEYCHECK
 KEYCHECK:
         mov ah, 1
         int 16h
-        ret                
+        ret
 
-;; int open(const char *pathname, int flags); 
+;; int open(const char *pathname, int flags);
     global INIT_DOSOPEN
-INIT_DOSOPEN: 
+INIT_DOSOPEN:
         ;; init calling DOS through ints:
         pop bx         ; ret address
         pop ax         ; flags
@@ -205,16 +205,16 @@ common_no_error:
 
 ;; int close(int fd);
     global CLOSE
-CLOSE:         
+CLOSE:
         pop ax         ; ret address
         pop bx         ; fd
         push ax        ; ret address
         mov ah, 3eh
         jmp short common_int21
 
-;; UCOUNT read(int fd, void *buf, UCOUNT count); 
+;; UCOUNT read(int fd, void *buf, UCOUNT count);
     global READ
-READ: 
+READ:
         pop ax         ; ret address
         pop cx         ; count
         pop dx         ; buf
@@ -223,7 +223,7 @@ READ:
         mov ah, 3fh
         jmp short common_int21
 
-;; int dup2(int oldfd, int newfd); 
+;; int dup2(int oldfd, int newfd);
     global DUP2
 DUP2:
         pop ax         ; ret address
@@ -232,7 +232,7 @@ DUP2:
         push ax        ; ret address
         mov ah, 46h
         jmp short common_int21
-        
+
 ;
 ; ULONG ASMPASCAL lseek(int fd, long position);
 ;
@@ -250,7 +250,7 @@ LSEEK:
         sbb     dx,dx
 seek_ret:
         ret
-        
+
 ;; VOID init_PSPSet(seg psp_seg)
     global INIT_PSPSET
 INIT_PSPSET:
@@ -270,7 +270,7 @@ INIT_DOSEXEC:
         pop ax                  ; mode
         push es                 ; ret address
         mov ah, 4bh
-        push ds                 
+        push ds
         pop es                  ; es = ds
         int 21h
         jc short exec_no_error
@@ -308,8 +308,8 @@ ALLOCMEM:
         sbb bx, bx       ; carry=1 -> ax=-1
         or  ax, bx       ; segment
         ret
-                        
-;; void set_DTA(void far *dta)        
+
+;; void set_DTA(void far *dta)
     global SET_DTA
 SET_DTA:
         pop ax           ; ret address

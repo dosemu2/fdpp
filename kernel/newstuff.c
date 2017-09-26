@@ -34,7 +34,7 @@ static BYTE *mainRcsId =
 #include        "globals.h"
 
 /*
-    TE-TODO: if called repeatedly by same process, 
+    TE-TODO: if called repeatedly by same process,
     last allocation must be freed. if handle count < 20, copy back to PSP
 */
 int SetJFTSize(UWORD nHandles)
@@ -117,7 +117,7 @@ long DosMkTmp(BYTE FAR * pathname, UWORD attr)
      is always a logical drive letter associated with a path
      spec. This letter is also the index into the CDS */
 
-/* 
+/*
 	Definition of functions for the handling of the Current
 	Directory Structure.
 
@@ -221,10 +221,10 @@ long DosMkTmp(BYTE FAR * pathname, UWORD attr)
 /*TE TODO:
 
     experimenting with NUL on MSDOS 7.0 (win95)
-    
+
                         WIN95           FREEDOS
     TRUENAME NUL        C:/NUL             OK
-    TRUENAME .\NUL      C:\DOS\NUL         
+    TRUENAME .\NUL      C:\DOS\NUL
     TRUENAME ..\NUL     C:\NUL
     TRUENAME ..\..\NUL  path not found
     TRUENAME Z:NUL      invalid drive (not lastdrive!!)
@@ -292,7 +292,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     /* referenced for network with empty current_ldt.           */
     return IS_NETWORK;
   }
-  
+
   /* Do we have a drive?                                          */
   if (src[1] == ':')
     result = drLetterToNr(DosUpFChar(src0));
@@ -325,7 +325,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   current_ldt = cdsEntry;
   if (TempCDS.cdsFlags & CDSNETWDRV)
     result |= IS_NETWORK;
-  
+
   if (dhp)
     result |= IS_DEVICE;
 
@@ -389,7 +389,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
       }
     }
   }
-    
+
   /* Make fully-qualified logical path */
   /* register these two used characters and the \0 terminator byte */
   /* we always append the current dir to stat the drive;
@@ -431,7 +431,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
         if (dest[1] == ':')
         {  /* sanity check if this really is a local drive still */
           unsigned i = drLetterToNr(dest[0]);
-          
+
           /* truename returns the "real", not the "virtual" drive letter! */
           if (i < lastdrive) /* sanity check #2 */
             result = (result & 0xffe0) | i;
@@ -562,17 +562,17 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     /* we must always add a seperator if dest = "c:" */
     addChar('\\');
   }
-  
+
   *p = '\0';				/* add the string terminator */
   DosUpFString(rootPos);	        /* upcase the file/path name */
-  
+
 /** Note:
     Only the portions passed in by the user are upcased, because it is
     assumed that the CDS is configured correctly and if it contains
     lower case letters, it is required so **/
-  
+
   tn_printf(("Absolute logical path: \"%s\"\n", dest));
-  
+
   /* Now, all the steps 1) .. 7) are fullfilled. Join now */
   /* search, if this path is a joined drive */
 

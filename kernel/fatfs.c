@@ -86,7 +86,7 @@ ULONG clus2phys(CLUSTER cl_no, struct dpb FAR * dpbp)
 struct dpb FAR *get_dpb(COUNT dsk)
 {
   register struct cds FAR *cdsp = get_cds(dsk);
-  
+
   if (cdsp == NULL || cdsp->cdsFlags & CDSNETWDRV)
     return NULL;
   return cdsp->cdsDpb;
@@ -296,7 +296,7 @@ STATIC int find_fname(const char *path, int attr, f_node_ptr fnp)
 /* Description.
  *  Remove entries with D_LFN attribute preceeding the directory entry
  *  pointed by fnp, fnode isn't modified (I hope).
- * Return value. 
+ * Return value.
  *  SUCCESS     - completed successfully.
  *  DE_ACCESS   - error occurred, fnode is released.
  * input: fnp with valid non-LFN directory entry, not equal to '..' or
@@ -432,7 +432,7 @@ COUNT dos_delete(BYTE * path, int attrib)
     /* Do not delete directories or r/o files       */
     /* lfn entries and volume labels are only found */
     /* by find_fname() if attrib is set to a        */
-    /* special value                                */	  
+    /* special value                                */
     if (fnp->f_dir.dir_attrib & (D_RDONLY | D_DIR))
       return DE_ACCESS;
 
@@ -1121,65 +1121,65 @@ STATIC COUNT dos_extend(f_node_ptr fnp)
 /*
   comments read optimization for large reads: read total clusters in one piece
 
-  running a program like 
-  
-  while (1) {
-    read(fd, header, sizeof(header));   // small read 
-    read(fd, buffer, header.size);      // where size is large, up to 63K 
-                                        // with average ~32K
-    }                                        
+  running a program like
 
-    FreeDOS 2025 is really slow. 
+  while (1) {
+    read(fd, header, sizeof(header));   // small read
+    read(fd, buffer, header.size);      // where size is large, up to 63K
+                                        // with average ~32K
+    }
+
+    FreeDOS 2025 is really slow.
     on a P200 with modern 30GB harddisk, doing above for a 14.5 MB file
-    
+
     MSDOS 6.22 clustersize 8K  ~2.5 sec (accumulates over clusters, reads for 63 sectors seen),
-    IBM PCDOS 7.0          8K  ~4.3 
-    IBM PCDOS 7.0          16K ~2.8 
+    IBM PCDOS 7.0          8K  ~4.3
+    IBM PCDOS 7.0          16K ~2.8
     FreeDOS ke2025             ~17.5
 
-    with the read optimization (ke2025a),    
-    
+    with the read optimization (ke2025a),
+
         clustersize 8K  ~6.5 sec
         clustersize 16K ~4.2 sec
-        
+
     it was verified with IBM feature tool,
     that the drive read ahead cache (says it) is on. still this huge difference ;-)
-        
 
-    it's coded pretty conservative to avoid all special cases, 
+
+    it's coded pretty conservative to avoid all special cases,
     so it shouldn't break anything :-)
 
     possible further optimization:
-    
+
         collect read across clusters (if file is not fragmented).
         MSDOS does this (as readcounts up to 63 sectors where seen)
-        specially important for diskettes, where clustersize is 1 sector 
-        
+        specially important for diskettes, where clustersize is 1 sector
+
         the same should be done for writes as well
 
-    the time to compile the complete kernel (on some P200) is 
+    the time to compile the complete kernel (on some P200) is
     reduced from 67 to 56 seconds - in an otherwise identical configuration.
 
     it's not clear if this improvement shows up elsewhere, but it shouldn't harm either
-    
+
 
     TE 10/18/01 14:00
-    
+
     collect read across clusters (if file is not fragmented) done.
-        
+
     seems still to work :-))
-    
+
     no large performance gains visible, but should now work _much_
     better for the people, that complain about slow floppy access
 
-    the 
-        fnp->f_offset +to_xfer < fnp->f_dir.dir_size &&  avoid EOF problems 
+    the
+        fnp->f_offset +to_xfer < fnp->f_dir.dir_size &&  avoid EOF problems
 
-    condition can probably _carefully_ be dropped    
-    
-    
+    condition can probably _carefully_ be dropped
+
+
     TE 10/18/01 19:00
-    
+
 */
 
 /* Read/write block from disk */
@@ -1209,15 +1209,15 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
   {
     fnp->f_dir.dir_attrib |= D_ARCHIVE;
     /* mark file as modified and set date not valid any more */
-    fnp->f_flags &= ~(SFT_FCLEAN|SFT_FDATE); 
-    
+    fnp->f_flags &= ~(SFT_FCLEAN|SFT_FDATE);
+
     if (dos_extend(fnp) != SUCCESS)
     {
       fnode_to_sft(fnp);
       return 0;
     }
   }
-  
+
   /* Test that we are really about to do a data transfer. If the  */
   /* count is zero and the mode is XFR_READ, just exit. (Any      */
   /* read with a count of zero is a nop).                         */
@@ -1318,7 +1318,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
       /* avoid EOF problems */
       if (mode == XFR_READ && to_xfer > fnp->f_dir.dir_size - fnp->f_offset)
         sectors_wanted = (UCOUNT)(fnp->f_dir.dir_size - fnp->f_offset);
-      
+
       sectors_wanted /= secsize;
 
       if (sectors_wanted == 0)
@@ -1380,7 +1380,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
     bp = getblock(currentblock
                     /*clus2phys(fnp->f_cluster, fnp->f_dpb) + fnp->f_sector */
                     , fnp->f_dpb->dpb_unit);
-    
+
 #ifdef DISPLAY_GETBLOCK
     printf("DATA (rwblock)\n");
 #endif
@@ -1414,7 +1414,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
       fmemcpy(buffer, &bp->b_buffer[boff], xfr_cnt);
     }
 
-    /* complete buffer transferred ? 
+    /* complete buffer transferred ?
        probably not reused later
      */
     if (xfr_cnt == sizeof(bp->b_buffer) ||
@@ -1791,12 +1791,12 @@ STATIC void fnode_to_sft(f_node_ptr fnp)
     the BUG was:
     copy COMMAND.COM xxx
     echo >xxx
-    
-    then, the dirsize of xxx was set to ~20, but the allocated 
+
+    then, the dirsize of xxx was set to ~20, but the allocated
     FAT entries not returned.
     this code corrects this
-    
-    Unfortunately, this code _nearly_ works, but fails one of the 
+
+    Unfortunately, this code _nearly_ works, but fails one of the
     Apps tested (VB ISAM); BO: confirmation???
 */
 
@@ -1867,5 +1867,5 @@ done:
  *      FreeDOS will write all possible bytes, then close file(BUG)
  *
  * the dos_mkdir/extenddir (with getblock() instead of getblockOver) was a real
- * performance killer on large drives. (~0.5 sec /dos_mkdir) TE 
+ * performance killer on large drives. (~0.5 sec /dos_mkdir) TE
  */

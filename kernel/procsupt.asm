@@ -134,16 +134,16 @@ _spawn_int23:
 
                 ; restore to user stack
                 cli					;; Pre-8086 don't disable INT autom.
-;*TE PATCH                       
-;      CtrlC at DosInput (like C:>DATE does) 
+;*TE PATCH
+;      CtrlC at DosInput (like C:>DATE does)
 ;      Nukes the Kernel.
-;      
+;
 ;      it looks like ENTRY.ASM+PROCSUPT.ASM
 ;      got out of sync.
-;      
+;
 ;      spawn_int() assumes a stack layout at
 ;      usr_ss:usr:sp. but usr:ss currently contains 0
-;      
+;
 ;      this patch helps FreeDos to survive CtrlC,
 ;      but should clearly be done somehow else.
                 mov     ss, [_user_r+2]
