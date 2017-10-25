@@ -24,7 +24,7 @@ OBJS4=break.obj dosfns.obj fatdir.obj fatfs.obj fattab.obj fcbfns.obj \
 inthndlr.obj
 OBJS5=ioctl.obj memmgr.obj task.obj newstuff.obj nls.obj network.obj
 OBJS6=prf.obj misc.obj strings.obj syspack.obj lfnapi.obj iasmsupt.obj memdisk.obj
-OBJS7=main.obj config.obj initoem.obj inithma.obj dyninit.obj iprf.obj
+OBJS7=main.obj config.obj initoem.obj inithma.obj dyninit.obj iprf.obj prf.obj
 OBJS8=initdisk.obj initclk.obj cpu.obj
 OBJS=$(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5) $(OBJS6) $(OBJS7) $(OBJS8)
 
@@ -164,6 +164,10 @@ iasmsupt.obj: asmsupt.asm $(TARGET).lnk
 	$(NASM) -D$(COMPILER) -D_INIT $(NASMFLAGS) -f obj -o iasmsupt.obj asmsupt.asm
 
 #the printf for INIT_TEXT - yet another special case, this file includes prf.c
-iprf.obj: iprf.c prf.c $(HDR)portab.h $(TARGET).lnk
+iprf.obj: iprf.c $(HDR)portab.h $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
+
+prf.obj: prf.c $(HDR)portab.h $(TARGET).lnk
 	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
 	$(INITPATCH) $(filter %.obj,$^)
