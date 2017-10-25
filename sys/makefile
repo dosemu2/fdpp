@@ -4,9 +4,9 @@
 # $Id: makefile 1482 2009-07-11 16:59:43Z perditionc $
 #
 
-!include "../mkfiles/generic.mak"
+include ../mkfiles/generic.mak
 
-CFLAGS = -I$(INCLUDEPATH) -I..$(DIRSEP)hdr -DFORSYS -DWITHFAT32 $(CFLAGST)
+CFLAGS = -I..$(DIRSEP)hdr -DFORSYS -DWITHFAT32 $(CFLAGST)
 NASMFLAGS = -DSYS=1
 
 #		*List Macros*
@@ -21,7 +21,7 @@ SYS_EXE_dependencies =  \
 production:     bin2c.exe ../bin/sys.com
 
 bin2c.exe:      bin2c.c
-		$(CLC) bin2c.c
+		$(CLC) -o $@ $^
 
 ../bin/sys.com: sys.com
 		$(CP) sys.com ..$(DIRSEP)bin
@@ -62,5 +62,4 @@ clean:
 
 #		*Individual File Dependencies*
 sys.obj: sys.c ../hdr/portab.h ../hdr/device.h fat12com.h fat16com.h fat32chs.h fat32lba.h oemfat12.h oemfat16.h
-		$(CC) $(CFLAGS) $*.c
-
+		$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)

@@ -2,7 +2,10 @@
 # Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
 #
 
-!include "../mkfiles/generic.mak"
+COMPILER = gcc
+XNASM = nasm
+XCPU = 386
+include ../mkfiles/generic.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib ..$(DIRSEP)lib$(DIRSEP)libm.lib
 HDR=../hdr/
@@ -97,24 +100,24 @@ HDRS=\
 HEADERS=$(HDRS) globals.h proto.h
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
-blockio.obj: blockio.c    $(HEADERS) $(TARGET).lnk  
-break.obj: break.c        $(HEADERS) $(TARGET).lnk  
-chario.obj: chario.c      $(HEADERS) $(TARGET).lnk  
-dosfns.obj: dosfns.c      $(HEADERS) $(TARGET).lnk  
-dsk.obj: dsk.c            $(HEADERS) $(TARGET).lnk  
-error.obj: error.c        $(HEADERS) $(TARGET).lnk  
-fatdir.obj: fatdir.c      $(HEADERS) $(TARGET).lnk  
-fatfs.obj: fatfs.c        $(HEADERS) $(TARGET).lnk  
-fattab.obj: fattab.c      $(HEADERS) $(TARGET).lnk  
-fcbfns.obj: fcbfns.c      $(HEADERS) $(TARGET).lnk  
-inthndlr.obj: inthndlr.c  $(HEADERS) $(TARGET).lnk  
-ioctl.obj: ioctl.c        $(HEADERS) $(TARGET).lnk  
-memmgr.obj: memmgr.c      $(HEADERS) $(TARGET).lnk  
-misc.obj: misc.c          $(HEADERS) $(TARGET).lnk  
+blockio.obj: blockio.c    $(HEADERS) $(TARGET).lnk
+break.obj: break.c        $(HEADERS) $(TARGET).lnk
+chario.obj: chario.c      $(HEADERS) $(TARGET).lnk
+dosfns.obj: dosfns.c      $(HEADERS) $(TARGET).lnk
+dsk.obj: dsk.c            $(HEADERS) $(TARGET).lnk
+error.obj: error.c        $(HEADERS) $(TARGET).lnk
+fatdir.obj: fatdir.c      $(HEADERS) $(TARGET).lnk
+fatfs.obj: fatfs.c        $(HEADERS) $(TARGET).lnk
+fattab.obj: fattab.c      $(HEADERS) $(TARGET).lnk
+fcbfns.obj: fcbfns.c      $(HEADERS) $(TARGET).lnk
+inthndlr.obj: inthndlr.c  $(HEADERS) $(TARGET).lnk
+ioctl.obj: ioctl.c        $(HEADERS) $(TARGET).lnk
+memmgr.obj: memmgr.c      $(HEADERS) $(TARGET).lnk
+misc.obj: misc.c          $(HEADERS) $(TARGET).lnk
 lfnapi.obj: lfnapi.c      $(HEADERS) $(TARGET).lnk
-newstuff.obj: newstuff.c  $(HEADERS) $(TARGET).lnk  
-network.obj: network.c    $(HEADERS) $(TARGET).lnk  
-nls.obj: nls.c            $(HEADERS) $(TARGET).lnk  
+newstuff.obj: newstuff.c  $(HEADERS) $(TARGET).lnk
+network.obj: network.c    $(HEADERS) $(TARGET).lnk
+nls.obj: nls.c            $(HEADERS) $(TARGET).lnk
 prf.obj: prf.c  $(HDR)portab.h $(TARGET).lnk
 strings.obj: strings.c  $(TARGET).lnk
 sysclk.obj: sysclk.c    $(HEADERS) $(TARGET).lnk
@@ -128,33 +131,33 @@ task.obj: task.c        $(HEADERS) $(TARGET).lnk
 # XXX: Special handling for initialization modules -- this is required because
 # TC 2.01 cannot handle `#pragma option' like TC 3 can. -- ror4
 
-config.obj:   config.c  $(INITHEADERS) $(TARGET).lnk  
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+config.obj:   config.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
-initoem.obj:  initoem.c  $(INITHEADERS) $(TARGET).lnk  
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+initoem.obj:  initoem.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
-main.obj:     main.c  $(INITHEADERS) $(TARGET).lnk 
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+main.obj:     main.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
-inithma.obj:  inithma.c  $(INITHEADERS) $(TARGET).lnk  
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+inithma.obj:  inithma.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
-dyninit.obj:  dyninit.c  $(INITHEADERS) $(TARGET).lnk  
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+dyninit.obj:  dyninit.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
-initdisk.obj: initdisk.c  $(INITHEADERS) $(TARGET).lnk  
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+initdisk.obj: initdisk.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
-initclk.obj: initclk.c  $(INITHEADERS) $(TARGET).lnk  
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+initclk.obj: initclk.c  $(INITHEADERS) $(TARGET).lnk
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)
 
 #the string functions for INIT_TEXT
 iasmsupt.obj: asmsupt.asm $(TARGET).lnk
@@ -162,5 +165,5 @@ iasmsupt.obj: asmsupt.asm $(TARGET).lnk
 
 #the printf for INIT_TEXT - yet another special case, this file includes prf.c
 iprf.obj: iprf.c prf.c $(HDR)portab.h $(TARGET).lnk
-	$(CC) $(INITCFLAGS) $*.c
-	$(INITPATCH) $*.obj
+	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
+	$(INITPATCH) $(filter %.obj,$^)

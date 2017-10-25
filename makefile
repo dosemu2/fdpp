@@ -40,7 +40,7 @@ zipfat16: bin\kwc8616.sys
 	del doc\kernel\lfnapi.txt
 	copy bin\kwc8616.sys bin\kernel.sys
 	zip -r -k ../ke$(VERSION)16.zip $(BINLIST)
-	utils\rmfiles doc\kernel\*.txt doc\kernel\*.cvs doc\kernel\*.lsm doc\kernel\copying
+#	utils\rmfiles doc\kernel\*.txt doc\kernel\*.cvs doc\kernel\*.lsm doc\kernel\copying
 	rmdir doc\kernel
 	rmdir doc
 
@@ -55,7 +55,7 @@ zipfat32: bin\kwc8632.sys
 	del doc\kernel\lfnapi.txt
 	copy bin\kwc8632.sys bin\kernel.sys
 	zip -r -k ../ke$(VERSION)32.zip $(BINLIST)
-	utils\rmfiles doc\kernel\*.txt doc\kernel\*.cvs doc\kernel\*.lsm doc\kernel\copying
+#	utils\rmfiles doc\kernel\*.txt doc\kernel\*.cvs doc\kernel\*.lsm doc\kernel\copying
 	rmdir doc\kernel
 	rmdir doc
 
@@ -75,7 +75,7 @@ ifeq ($(BUILDENV),windows)
 COMPILER=owwin
 TEST_F=type >nul 2>nul
 else
-COMPILER=owlinux
+COMPILER=gcc
 TEST_F=test -f
 ifndef WATCOM
   WATCOM=$(HOME)/watcom
@@ -83,12 +83,12 @@ ifndef WATCOM
 endif
 endif
 
-XCPU=86
+XCPU=386
 XFAT=32
-XUPX=upx --8086 --best
+XUPX=
 XNASM=nasm
-MAKE=wmake -ms -h
-XLINK=wlink
+MAKE=make
+XLINK=ld
 #ALLCFLAGS=-DDEBUG
 
 -include config.mak
@@ -98,10 +98,10 @@ endif
 
 all:
 	cd utils && $(MAKE) production
-	cd lib && ( $(TEST_F) libm.lib || wtouch libm.lib )
+	cd lib && ( $(TEST_F) libm.lib || touch libm.lib )
 	cd drivers && $(MAKE) production
 	cd boot && $(MAKE) production
-	cd sys && $(MAKE) production
+#	cd sys && $(MAKE) production
 	cd kernel && $(MAKE) production
 
 clean:

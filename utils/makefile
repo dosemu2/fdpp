@@ -1,14 +1,14 @@
-!include "../mkfiles/generic.mak"
+include ../mkfiles/generic.mak
 
 CFLAGS = -I..$(DIRSEP)hdr
 
 production: patchobj.com exeflat.exe
 
 patchobj.com: patchobj.c
-	$(CLT) $(CFLAGS) patchobj.c
+	$(CLT) $(CFLAGS) -o $@ patchobj.c
 
 exeflat.exe: exeflat.c ../hdr/exe.h
-	$(CLC) $(CFLAGS) exeflat.c
+	$(CLC) $(CFLAGS) -o $@ exeflat.c
 
 
 clobber: clean

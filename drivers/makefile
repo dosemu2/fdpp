@@ -5,7 +5,10 @@
 #
 
 
-!include "../mkfiles/generic.mak"
+COMPILER = gcc
+XNASM = nasm
+XCPU = 386
+include ../mkfiles/generic.mak
 
 
 # MICROSOFT C
@@ -24,7 +27,7 @@
 
 OBJS   = floppy.obj rdpcclk.obj wrpcclk.obj wratclk.obj
 
-LIBOBJS= +floppy.obj +rdpcclk.obj +wrpcclk.obj +wratclk.obj
+LIBOBJS= $(OBJS)
 
 
 
@@ -45,5 +48,5 @@ clean:
 
 device.lib : $(OBJS)
 	-$(RM) device.lib
-	$(LIBUTIL) $(LIBFLAGS) device $(LIBOBJS) $(LIBTERM)
+	$(LIBUTIL) $(LIBFLAGS) $@ $(LIBOBJS) $(LIBTERM)
 

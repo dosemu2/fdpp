@@ -140,6 +140,8 @@ unsigned short getSS(void);
 #define MC68K
 
 #elif defined(__GNUC__)
+#define VA_CDECL
+#define _CS getCS()
 /* for warnings only ! */
 #define MC68K
 
