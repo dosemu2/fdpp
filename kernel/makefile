@@ -7,30 +7,21 @@ XNASM = nasm
 XCPU = 386
 include ../mkfiles/generic.mak
 
-LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib ..$(DIRSEP)lib$(DIRSEP)libm.lib
+LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
 HDR=../hdr/
 
 # *List Macros*
 # Only 8 files per definition; this is limitation of DOS batch
 # files (only 9 directly accessible parameters).
 
-OBJS1=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj dsk.obj \
-sysclk.obj
-OBJS2=asmsupt.obj execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
-nls_hc.obj
-OBJS3=apisupt.obj intr.obj irqstack.obj blockio.obj chario.obj systime.obj \
-error.obj
-OBJS4=break.obj dosfns.obj fatdir.obj fatfs.obj fattab.obj fcbfns.obj \
-inthndlr.obj
-OBJS5=ioctl.obj memmgr.obj task.obj newstuff.obj nls.obj network.obj
-OBJS6=prf.obj misc.obj strings.obj syspack.obj lfnapi.obj iasmsupt.obj memdisk.obj
-OBJS7=main.obj config.obj initoem.obj inithma.obj dyninit.obj iprf.obj prf.obj
-OBJS8=initdisk.obj initclk.obj cpu.obj
-OBJS=$(OBJS1) $(OBJS2) $(OBJS3) $(OBJS4) $(OBJS5) $(OBJS6) $(OBJS7) $(OBJS8)
+OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
+    asmsupt.obj execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
+    nls_hc.obj apisupt.obj intr.obj irqstack.obj iasmsupt.obj memdisk.obj \
+    cpu.obj
 
 #               *Explicit Rules*
 
-production:     ../bin/$(TARGET).sys ../bin/country.sys
+production:     ../bin/libfdkernel.so ../bin/$(TARGET).sys ../bin/country.sys
 
 ../bin/$(TARGET).sys: kernel.sys
 		$(CP) kernel.sys ..$(DIRSEP)bin
@@ -52,21 +43,14 @@ clobber:        clean
 		-$(RM) kernel.exe kernel.sys status.me
 
 clean:
-		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.lnk
+		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.lnk *.o *.so
 
 # XXX: This is a very ugly way of linking the kernel, forced upon us by the
 # inability of Turbo `make' 2.0 to perform command line redirection. -- ror4
 
 $(TARGET).lnk: turboc.cfg makefile ../mkfiles/generic.mak ../mkfiles/$(COMPILER).mak
 		-$(RM) *.lnk
-		$(ECHOTO) $(TARGET).lnk $(OBJS1)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS2)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS3)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS4)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS5)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS6)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS7)+
-		$(ECHOTO) $(TARGET).lnk $(OBJS8)
+		$(ECHOTO) $(TARGET).lnk $(OBJS)
 		$(ECHOTO) $(TARGET).lnk kernel.exe
 		$(ECHOTO) $(TARGET).lnk kernel.map
 		$(ECHOTO) $(TARGET).lnk $(LIBS)
@@ -100,74 +84,50 @@ HDRS=\
 HEADERS=$(HDRS) globals.h proto.h
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
-blockio.obj: blockio.c    $(HEADERS) $(TARGET).lnk
-break.obj: break.c        $(HEADERS) $(TARGET).lnk
-chario.obj: chario.c      $(HEADERS) $(TARGET).lnk
-dosfns.obj: dosfns.c      $(HEADERS) $(TARGET).lnk
-dsk.obj: dsk.c            $(HEADERS) $(TARGET).lnk
-error.obj: error.c        $(HEADERS) $(TARGET).lnk
-fatdir.obj: fatdir.c      $(HEADERS) $(TARGET).lnk
-fatfs.obj: fatfs.c        $(HEADERS) $(TARGET).lnk
-fattab.obj: fattab.c      $(HEADERS) $(TARGET).lnk
-fcbfns.obj: fcbfns.c      $(HEADERS) $(TARGET).lnk
-inthndlr.obj: inthndlr.c  $(HEADERS) $(TARGET).lnk
-ioctl.obj: ioctl.c        $(HEADERS) $(TARGET).lnk
-memmgr.obj: memmgr.c      $(HEADERS) $(TARGET).lnk
-misc.obj: misc.c          $(HEADERS) $(TARGET).lnk
-lfnapi.obj: lfnapi.c      $(HEADERS) $(TARGET).lnk
-newstuff.obj: newstuff.c  $(HEADERS) $(TARGET).lnk
-network.obj: network.c    $(HEADERS) $(TARGET).lnk
-nls.obj: nls.c            $(HEADERS) $(TARGET).lnk
-prf.obj: prf.c  $(HDR)portab.h $(TARGET).lnk
-strings.obj: strings.c  $(TARGET).lnk
-sysclk.obj: sysclk.c    $(HEADERS) $(TARGET).lnk
-syspack.obj: syspack.c  $(HEADERS) $(TARGET).lnk
-systime.obj: systime.c  $(HEADERS) $(TARGET).lnk
-task.obj: task.c        $(HEADERS) $(TARGET).lnk
-
-# now the funny stuff :-)
-# Files in the INIT segment
-
-# XXX: Special handling for initialization modules -- this is required because
-# TC 2.01 cannot handle `#pragma option' like TC 3 can. -- ror4
-
-config.obj:   config.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
-initoem.obj:  initoem.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
-main.obj:     main.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
-inithma.obj:  inithma.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
-dyninit.obj:  dyninit.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
-initdisk.obj: initdisk.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
-initclk.obj: initclk.c  $(INITHEADERS) $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
-
 #the string functions for INIT_TEXT
 iasmsupt.obj: asmsupt.asm $(TARGET).lnk
 	$(NASM) -D$(COMPILER) -D_INIT $(NASMFLAGS) -f obj -o iasmsupt.obj asmsupt.asm
 
-#the printf for INIT_TEXT - yet another special case, this file includes prf.c
-iprf.obj: iprf.c $(HDR)portab.h $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
+CFILES = blockio.c \
+    break.c \
+    chario.c \
+    dosfns.c \
+    dsk.c \
+    error.c \
+    fatdir.c \
+    fatfs.c \
+    fattab.c \
+    fcbfns.c \
+    inthndlr.c \
+    ioctl.c \
+    memmgr.c \
+    misc.c \
+    lfnapi.c \
+    newstuff.c \
+    network.c \
+    nls.c \
+    prf.c \
+    strings.c \
+    sysclk.c \
+    syspack.c \
+    systime.c \
+    task.c \
+    config.c \
+    initoem.c \
+    main.c \
+    inithma.c \
+    dyninit.c \
+    initdisk.c \
+    initclk.c \
+    iprf.c \
+    prf.c
 
-prf.obj: prf.c $(HDR)portab.h $(TARGET).lnk
-	$(CC) $(INITCFLAGS) -o $@ $(filter %.c,$^)
-	$(INITPATCH) $(filter %.obj,$^)
+OBJECTS = $(CFILES:.c=.o)
+
+$(CFILES): $(HEADERS)
+
+libfdkernel.so: $(OBJECTS)
+	$(CL) -shared -o $@ $^
+
+../bin/libfdkernel.so: libfdkernel.so
+		$(CP) $^ ..$(DIRSEP)bin
