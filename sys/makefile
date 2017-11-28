@@ -4,6 +4,9 @@
 # $Id: makefile 1482 2009-07-11 16:59:43Z perditionc $
 #
 
+COMPILER ?= gcc
+XNASM ?= nasm
+XCPU ?= 386
 include ../mkfiles/generic.mak
 
 CFLAGS = -I..$(DIRSEP)hdr -DFORSYS -DWITHFAT32 $(CFLAGST)
@@ -62,4 +65,4 @@ clean:
 
 #		*Individual File Dependencies*
 sys.obj: sys.c ../hdr/portab.h ../hdr/device.h fat12com.h fat16com.h fat32chs.h fat32lba.h oemfat12.h oemfat16.h
-		$(CC) $(CFLAGS) -o $@ $(filter %.c,$^)
+		$(CC) $(CFLAGS) -o $@ $<

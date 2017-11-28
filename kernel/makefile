@@ -2,9 +2,9 @@
 # Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
 #
 
-COMPILER = gcc
-XNASM = nasm
-XCPU = 386
+COMPILER ?= gcc
+XNASM ?= nasm
+XCPU ?= 386
 include ../mkfiles/generic.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
