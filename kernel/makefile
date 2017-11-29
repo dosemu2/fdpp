@@ -5,6 +5,7 @@
 COMPILER ?= gcc
 XNASM ?= nasm
 XCPU ?= 386
+XLINK = ../contrib/jwlink
 include ../mkfiles/generic.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
@@ -33,8 +34,8 @@ production:     ../bin/libfdkernel.so ../bin/$(TARGET).sys ../bin/country.sys
 kernel.sys:	kernel.exe ../utils/exeflat.exe
 		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe kernel.sys $(LOADSEG) -S0x10 -S0x78 -S0x79 $(UPXOPT) $(XUPX)
 
-kernel.exe:	$(TARGET).lnk $(OBJS) $(LIBS)
-		$(LINK) @$(TARGET).lnk;
+kernel.exe:	$(OBJS) $(LIBS)
+		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) } L ../lib/device.lib N $@
 
 ../bin/country.sys: country.asm
 		$(NASM) -o $*.sys country.asm

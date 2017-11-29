@@ -8,6 +8,8 @@
 COMPILER = gcc
 XNASM = nasm
 XCPU = 386
+LIBUTIL = ../contrib/JWlib
+LIBFLAGS = -fo -n
 include ../mkfiles/generic.mak
 
 
@@ -49,4 +51,3 @@ clean:
 device.lib : $(OBJS)
 	-$(RM) device.lib
 	$(LIBUTIL) $(LIBFLAGS) $@ $(LIBOBJS) $(LIBTERM)
-

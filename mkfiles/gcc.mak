@@ -8,7 +8,6 @@ CP=cp
 ECHOTO=../utils/echoto
 CC=gcc -c
 CL=gcc
-LIBUTIL=ar cr
 
 TARGETOPT=
 ifneq ($(XCPU),386)
