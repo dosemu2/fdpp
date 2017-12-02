@@ -125,7 +125,7 @@ CFILES = blockio.c \
 
 OBJECTS = $(CFILES:.c=.o)
 
-$(CFILES): $(HEADERS)
+$(OBJECTS): $(HEADERS)
 
 libfdkernel.so: $(OBJECTS)
 	$(CL) -shared -o $@ $^
