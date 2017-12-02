@@ -38,7 +38,7 @@ kernel.exe:	$(OBJS) $(LIBS)
 		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) } L ../lib/device.lib N $@
 
 ../bin/country.sys: country.asm
-		$(NASM) -o $*.sys country.asm
+		$(NASM) -o $@ country.asm
 
 clobber:        clean
 		-$(RM) kernel.exe kernel.sys status.me
