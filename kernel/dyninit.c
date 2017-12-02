@@ -1,6 +1,6 @@
 /*
     DYNINIT.C
-    
+
     this serves requests from the INIT modules to
     allocate dynamic data.
 
@@ -13,27 +13,27 @@ kernel layout:
  013A0H 019F3H 00654H _DATA              DATA
  019F4H 0240DH 00A1AH _BSS               BSS
 
-additionally: 
-                      DYN_DATA           DYN 
+additionally:
+                      DYN_DATA           DYN
 
- 
+
  02610H 0F40EH 0CDFFH HMA_TEXT           HMA
 
  FCBs, f_nodes, buffers,...
- drivers 
- 
- 
+ drivers
+
+
  0F410H 122DFH 02ED0H INIT_TEXT          INIT
  122E0H 12AA5H 007C6H ID                 ID
  12AA6H 12CBFH 0021AH IB                 IB
 
  purpose is to move the HMA_TEXT = resident kernel
- around, so that below it - after BSS, there is data 
+ around, so that below it - after BSS, there is data
  addressable near by the kernel, to hold some arrays
- like f_nodes    
- 
+ like f_nodes
+
  making f_nodes near saves ~2.150 code in HMA
-    
+
 */
 #include "portab.h"
 #include "init-mod.h"

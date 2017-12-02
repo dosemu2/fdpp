@@ -29,35 +29,35 @@
 
 /*
     current status:
-    
+
     load FreeDOS high, if DOS=HIGH detected
-    
+
     suppress High Loading, if any SHIFT status detected (for debugging)
-    
+
     if no XMS driver (HIMEM,FDXMS,...) loaded, should work
-    
+
     cooperation with XMS drivers as follows:
-    
+
     copy HMA_TEXT segment up.
 
     after each loaded DEVICE=SOMETHING.SYS, try to request the HMA
-    (XMS function 0x01). 
+    (XMS function 0x01).
     if no XMS driver detected, during ONFIG.SYS processing,
     create a dummy VDISK entry in high memory
-    
+
     this works with
-    
+
      FD FDXMS - no problems detected
-    
-    
+
+
      MS HIMEM.SYS (from DOS 6.2, 9-30-93)
-     
+
         works if and only if
-        
-            /TESTMEM:OFF 
-            
+
+            /TESTMEM:OFF
+
         is given
-            
+
         otherwise HIMEM will TEST AND ZERO THE HIGH MEMORY+HMA.
         so, in CONFIG.C, if "HIMEM.SYS" is detected, a "/TESTMEM:OFF"
         parameter is forced.
@@ -159,7 +159,7 @@ int EnableHMA(VOID)
 /*
     move the kernel up to high memory
     this is very unportable
-    
+
     if we thin we succeeded, we return TRUE, else FALSE
 */
 
@@ -181,8 +181,8 @@ int MoveKernelToHMA()
   XMSDriverAddress = xms_addr;
 
 #ifdef DEBUG
-  /* A) for debugging purpose, suppress this, 
-     if any shift key is pressed 
+  /* A) for debugging purpose, suppress this,
+     if any shift key is pressed
    */
   if (KeyboardShiftState() & 0x0f)
   {
@@ -215,11 +215,11 @@ int MoveKernelToHMA()
   MoveKernel(0xffff);
 
   {
-    /* E) up to now, nothing really bad was done. 
+    /* E) up to now, nothing really bad was done.
        but now, we reuse the HMA area. bad things will happen
 
-       to find bugs early,   
-       cause INT 3 on all accesses to this area 
+       to find bugs early,
+       cause INT 3 on all accesses to this area
      */
 
     DosLoadedInHMA = TRUE;
@@ -238,8 +238,8 @@ int MoveKernelToHMA()
 
 }
 
-/*   
-    now protect against HIMEM/FDXMS/... by simulating a VDISK 
+/*
+    now protect against HIMEM/FDXMS/... by simulating a VDISK
     FDXMS should detect us and not give HMA access to ohers
     unfortunately this also disables HIMEM completely
 
@@ -310,7 +310,7 @@ void MoveKernel(unsigned NewKernelSegment)
   UBYTE FAR *HMASource;
   unsigned len;
   unsigned jmpseg = CurrentKernelSegment;
- 
+
   if (CurrentKernelSegment == 0)
     CurrentKernelSegment = FP_SEG(_HMATextEnd);
 
@@ -342,11 +342,11 @@ void MoveKernel(unsigned NewKernelSegment)
   /* first free byte after HMA_TEXT on 16 byte boundary */
 
   {
-    /* D) but it only makes sense, if we can relocate 
+    /* D) but it only makes sense, if we can relocate
        all our entries to make use of HMA
      */
 
-    /* this is for a 
+    /* this is for a
        call near enableA20
        jmp far kernelentry
        style table

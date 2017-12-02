@@ -28,6 +28,6 @@ LOPT=-m -s -c
 SHARE.COM: SHARE.OBJ
 	$(TLINK) $(LOPT) $(LIBS)\c0t.obj share.obj,share.com,,$(LIBS)\cs.lib
 
-SHARE.OBJ: SHARE.C    
+SHARE.OBJ: SHARE.C
 	$(TCC) $(COPT) share.c
 

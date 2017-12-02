@@ -30,7 +30,7 @@
 
 ;       Code for stack switching during hardware interrupts.
 
-; Format of interrupt sharing protocol interrupt handler entry point: 
+; Format of interrupt sharing protocol interrupt handler entry point:
 ; Offset  Size    Description     (Table 02568)
 ;  00h  2 BYTEs   short jump to actual start of interrupt handler, immediately
 ;                   following this data block (EBh 10h)
@@ -106,7 +106,7 @@ general_irq_service:
                 mov     bx, sp
                 mov     bx, [ss:bx+2]   ; return address->old ivec
                 jmp     short common_irq
-        
+
 general_irq_service_share:
                 push    bx
                 mov     bx, sp
@@ -167,7 +167,7 @@ global  _init_stacks
 
 int_numbers:            db 2,8,9,70h,75h
 int_numbers_share:      db 0ah,0bh,0ch,0dh,0eh,72h,73h,74h,76h,77h
-        
+
 _init_stacks:
                 push    bp
                 mov     bp, sp
@@ -192,7 +192,7 @@ _init_stacks:
                 mul     cx
                 add     ax, bx
                 ; stack_top = stack_size * nStacks + stack_seg:stack_offs
-                mov     [stack_top], ax 
+                mov     [stack_top], ax
 
                 xor     ax, ax
                 mov     ds, ax

@@ -294,24 +294,24 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
 {
   psp FAR *p = MK_FP(ds, 0);
   psp FAR *q = MK_FP(cu_psp, 0);
-  
+
   /* Transfer control to the executable                   */
   p->ps_parent = cu_psp;
   p->ps_prevpsp = q;
   q->ps_stack = (BYTE FAR *)user_r;
   user_r->FLAGS &= ~FLG_CARRY;
-  
+
   cu_psp = ds;
   /* process dta                                          */
   dta = &p->ps_cmd;
-  
+
   if (mode == LOADNGO)
   {
     iregs FAR *irp;
-    
+
     /* build the user area on the stack                     */
     irp = (iregs FAR *)(exp->exec.stack - sizeof(iregs));
-    
+
     /* start allocating REGs (as in MS-DOS - some demos expect them so --LG) */
     /* see http://www.beroset.com/asm/showregs.asm */
     irp->DX = irp->ES = irp->DS = ds;
@@ -323,12 +323,12 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
     irp->AX = irp->BX = fcbcode;
     irp->CX = 0xFF;
     irp->FLAGS = 0x200;
-    
+
     if (InDOS)
       --InDOS;
     exec_user(irp, 1);
-    
-    /* We should never be here          
+
+    /* We should never be here
        fatal("KERNEL RETURNED!!!");                    */
   }
   /* mode == LOAD */
@@ -398,7 +398,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
 {
   UWORD mem;
   UWORD env, asize = 0;
-  
+
   {
     UWORD com_size;
     {
@@ -413,21 +413,21 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       COUNT rc;
       UBYTE UMBstate = uppermem_link;
       UBYTE orig_mem_access = mem_access_mode;
-      
+
       if (mode & 0x80)
       {
         mem_access_mode |= 0x80;
         DosUmbLink(1);            /* link in UMBs */
       }
-      
+
       rc = ChildEnv(exp, &env, namep);
-      
+
       /* COMFILES will always be loaded in largest area. is that true TE */
       /* yes, see RBIL, int21/ah=48 -- Bart */
 
       if (rc == SUCCESS)
         rc = ExecMemLargest(&asize, com_size);
-      
+
       if (rc == SUCCESS)
         /* Allocate our memory and pass back any errors         */
         rc = ExecMemAlloc(asize, &mem, &asize);
@@ -476,7 +476,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
 
   if (mode == OVERLAY)
     return SUCCESS;
-  
+
   {
     UWORD fcbcode;
     psp FAR *p;
@@ -576,51 +576,51 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
        memory if we are overlaying the current process, because the new
        process will simply re-use the block we already have allocated.
        Jun 11, 2000 - rbc */
-    
+
     if ((mode & 0x7f) != OVERLAY)
     {
       UBYTE UMBstate = uppermem_link;
       UBYTE orig_mem_access = mem_access_mode;
       COUNT rc;
-      
+
       /* and finally add in the psp size                      */
       image_size += sizeof(psp) / 16;        /* TE 03/20/01 */
       exe_size = image_size + ExeHeader.exMinAlloc;
-      
+
       /* Clone the environement and create a memory arena     */
       if (mode & 0x80)
       {
         DosUmbLink(1);          /* link in UMBs */
         mem_access_mode |= 0x80;
       }
-      
+
       rc = ChildEnv(exp, &env, namep);
-      
+
       if (rc == SUCCESS)
         /* Now find out how many paragraphs are available       */
         rc = ExecMemLargest(&asize, exe_size);
-      
+
       exe_size = image_size + ExeHeader.exMaxAlloc;
       /* second test is for overflow (avoiding longs) --
          exMaxAlloc can be high */
       if (exe_size > asize || exe_size < image_size)
         exe_size = asize;
-      
+
       /* TE if ExeHeader.exMinAlloc == ExeHeader.exMaxAlloc == 0,
          DOS will allocate the largest possible memory area
          and load the image as high as possible into it.
          discovered (and after that found in RBIL), when testing NET */
-      
+
       if ((ExeHeader.exMinAlloc | ExeHeader.exMaxAlloc) == 0)
         exe_size = asize;
-      
+
       /* Allocate our memory and pass back any errors         */
       if (rc == SUCCESS)
         rc = ExecMemAlloc(exe_size, &mem, &asize);
-      
+
       if (rc != SUCCESS)
         DosMemFree(env);
-      
+
       if (mode & 0x80)
       {
         mem_access_mode = orig_mem_access; /* restore old situation */
@@ -628,16 +628,16 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       }
       if (rc != SUCCESS)
         return rc;
-      
+
       mode &= 0x7f; /* forget about high loading from now on */
-      
+
 #ifdef DEBUG
       printf("DosExeLoader. Loading '%S' at %04x\n", namep, mem);
 #endif
-      
+
       /* memory found large enough - continue processing      */
       ++mem;
-      
+
 /* /// Added open curly brace and "else" clause.  We should not attempt
    to allocate memory if we are overlaying the current process, because
    the new process will simply re-use the block we already have allocated.
@@ -661,7 +661,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       }
       return DE_INVLDDATA;
     }
-    
+
     /* create the start seg for later computations          */
     start_seg = mem;
     exe_size = image_size;
@@ -672,7 +672,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       if (exe_size > 0 && (ExeHeader.exMinAlloc | ExeHeader.exMaxAlloc) == 0)
       {
         mcb FAR *mp = MK_FP(mem - 1, 0);
-        
+
         /* then the image should be placed as high as possible */
         start_seg += mp->m_size - image_size;
       }
@@ -766,7 +766,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
   COUNT fd;
 
   if ((mode & 0x7f) > 3 || (mode & 0x7f) == 2)
-    return DE_INVLDFMT; 
+    return DE_INVLDFMT;
 
   fmemcpy(&TempExeBlock, ep, sizeof(exec_blk));
   /* If file not found - free ram and return error        */
@@ -776,7 +776,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
   {
     return DE_FILENOTFND;
   }
-  
+
   rc = (int)DosRWSft(fd, sizeof(exe_header), (BYTE FAR *)&ExeHeader, XFR_READ);
 
   if (rc == sizeof(exe_header) &&

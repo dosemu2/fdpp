@@ -132,9 +132,9 @@ DriverSysCal:
 
 
 ;**********************************************************************
-; internal dos calls INT2F/12xx and INT2F/4A01,4A02 - handled through C 
+; internal dos calls INT2F/12xx and INT2F/4A01,4A02 - handled through C
 ;**********************************************************************
-IntDosCal:                
+IntDosCal:
                         ; set up register frame
 ;struct int2f12regs
 ;{
@@ -142,8 +142,8 @@ IntDosCal:
 ;  UWORD es,ds;
 ;  UWORD di,si,bp,bx,dx,cx,ax;
 ;  UWORD ip,cs,flags;
-;  UWORD callerARG1; 
-;}      
+;  UWORD callerARG1;
+;}
     push ax
     push cx
     push dx
@@ -159,11 +159,11 @@ IntDosCal:
 %if XCPU >= 386
   %ifdef WATCOM
     mov si,fs
-    mov di,gs 
-  %else 
-    Protect386Registers    
+    mov di,gs
+  %else
+    Protect386Registers
   %endif
-%endif          
+%endif
 
     mov ds,[cs:_DGROUP_]
     extern   _int2F_12_handler
@@ -174,10 +174,10 @@ IntDosCal:
     mov fs,si
     mov gs,di
   %else
-    Restore386Registers    
+    Restore386Registers
   %endif
-%endif      
-    
+%endif
+
     pop es
     pop ds
     pop di
@@ -187,7 +187,7 @@ IntDosCal:
     pop dx
     pop cx
     pop ax
-    
+
     iret
 
 		global	SHARE_CHECK
@@ -195,7 +195,7 @@ SHARE_CHECK:
 		mov	ax, 0x1000
 		int	0x2f
 		ret
-           
+
 ;           DOS calls this to see if it's okay to open the file.
 ;           Returns a file_table entry number to use (>= 0) if okay
 ;           to open.  Otherwise returns < 0 and may generate a critical
@@ -303,7 +303,7 @@ remote_lseek:   ; arg is a pointer to the long seek value
                 mov     cx, [bx+2]
                 ; "fall through"
 
-remote_getfattr:        
+remote_getfattr:
                 clc                    ; set to succeed
                 int     2fh
                 jc      ret_neg_ax
@@ -413,7 +413,7 @@ remote_rw:
 ret_min_dx_ax:  neg     ax
                 cwd
                 jmp     short ret_int2f
-                
+
 qremote_fn:
                 mov     bx, cx
                 lds     si, [bx]
@@ -498,7 +498,7 @@ segment INIT_TEXT
                 ; int ASMPASCAL UMB_get_largest(void FAR * driverAddress,
                 ;                UCOUNT * seg, UCOUNT * size);
                 global UMB_GET_LARGEST
-                
+
 UMB_GET_LARGEST:
                 push    bp
                 mov     bp,sp

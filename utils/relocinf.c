@@ -1,6 +1,6 @@
 /*****************************************************************************
 **    RelocInf.C
-**    
+**
 **    provide some info about relocation entries in an exe file
 **
 **    usage:
@@ -10,12 +10,12 @@
 ** Copyright 2001 by tom ehlert
 **
 ** GPL bla to be added, but intended as GPL
-**       
+**
 **
 ** 09/06/2001 - initial revision
-** not my biggest kind of software; anyone willing to add 
+** not my biggest kind of software; anyone willing to add
 ** comments, errormessages, usage info,...???
-** 
+**
 *****************************************************************************/
 
 * /

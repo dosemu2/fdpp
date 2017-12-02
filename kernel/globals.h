@@ -234,7 +234,7 @@ extern BYTE ASM NetDelay, ASM NetRetry;
 
 extern UWORD ASM first_mcb,         /* Start of user memory                 */
   ASM uppermem_root;                /* Start of umb chain (usually 9fff)    */
-extern char * ASM inputptr;         /* pointer to unread CON input          */ 
+extern char * ASM inputptr;         /* pointer to unread CON input          */
 extern sfttbl FAR * ASM sfthead;    /* System File Table head               */
 extern struct dhdr
 FAR * ASM clock,                    /* CLOCK$ device                        */
@@ -266,8 +266,8 @@ extern BYTE ASM ErrorMode,          /* Critical error flag                  */
   ASM InDOS,                        /* In DOS critical section              */
   ASM OpenMode,                     /* File Open Attributes                 */
   ASM SAttr,                        /* Attrib Mask for Dir Search           */
-  ASM dosidle_flag, ASM Server_Call, ASM CritErrLocus, ASM CritErrAction, 
-  ASM CritErrClass, ASM VgaSet, 
+  ASM dosidle_flag, ASM Server_Call, ASM CritErrLocus, ASM CritErrAction,
+  ASM CritErrClass, ASM VgaSet,
   ASM njoined;                      /* number of joined devices             */
 
 extern UWORD ASM Int21AX;

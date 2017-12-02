@@ -61,5 +61,5 @@ struct lfn_inode {
   struct dirent l_dir;          /* Directory entry image          */
   UWORD l_diroff;               /* Current directory entry offset */
 };
-  
+
 typedef struct lfn_inode FAR * lfn_inode_ptr;

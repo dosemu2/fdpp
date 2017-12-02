@@ -389,9 +389,9 @@ VOID ASMCFUNC exec_user(iregs FAR * irp, int disable_a20);
 
 /*
     assert at compile time, that something is true.
-    
-    use like 
-        ASSERT_CONST( SECSIZE == 512) 
+
+    use like
+        ASSERT_CONST( SECSIZE == 512)
         ASSERT_CONST( (BYTE FAR *)x->fcb_ext - (BYTE FAR *)x->fcbname == 8)
 */
 

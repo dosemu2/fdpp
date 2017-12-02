@@ -78,7 +78,7 @@ DEVICEHIGH
 Usage:  devicehigh=[d:][path]file [options]
 This is just like device= statement, except it attempts to load
 the device driver into high memory first (failing that it should
-load it in conventional memory).  
+load it in conventional memory).
 Note: The order you load devices may have a large impact on amount
 of free memory available.  In general try to load large (in memory
 usage) programs into high memory first.
@@ -91,7 +91,7 @@ DOS
 Usage:  dos=high|low,umb|noumb
 Indicates whether the kernel should try to load itself into
 high memory or only conventional (low), and whether to link
-upper memory blocks in with normal memory or not.  
+upper memory blocks in with normal memory or not.
 Note: only one set need be given, ie dos=high and dos=noumb are ok.
 Important: if you specify dos=high[,umb|noumb] then you must also
 load a high memory manager (first), ie FDXMS or HIMEM
@@ -111,7 +111,7 @@ Usage:  ECHO Message to be displayed to user.
 ECHO displays (echos) its arguments to the console during
 config.sys processing when device drivers are loaded (when
 DEVICE= lines are executed).
-Example:  
+Example:
       ECHO loading driver 1
       device=Driver1.sys
       ECHO driver1 successfully loaded
@@ -135,7 +135,7 @@ Example:  fcbs=4
 
 FILES
 FILESHIGH
-Usage:  files=nnn 
+Usage:  files=nnn
 where nnn is in range 8-255 (default 8)
 Specifies how many files allowed open at once (reserves
 memory necessary to support opening this many files).
@@ -186,7 +186,7 @@ A reasonably safe choice should be "keybuf=0x140,0x1c0".
 
 LASTDRIVE
 LASTDRIVEHIGH
-Usage:  lastdrive=x 
+Usage:  lastdrive=x
 where x is last drive letter available for use; A-Z
 Example: lastdrive=z
 
@@ -213,7 +213,7 @@ Example:
 
 MENUCOLOR
 Usage:  menucolor foreground[,background]
-Use Menucolor before the menu config command, to create a 
+Use Menucolor before the menu config command, to create a
 full screen menu which supports the arrow cursor keys.
 The following colors can be used for foreground and background:
 0=Black; 1=Blue; 2=Green; 3=Cyan; 4=Red; 5=Magenta;
@@ -225,7 +225,7 @@ If you do not use MENUCOLOR, the menu will not be full
 screen, so some of the BIOS, bootloader and kernel init
 messages (list of drives, version info...) stays visible.
 To change the colour to white text on blue, use the following:
-Example:  menucolor 15,1 
+Example:  menucolor 15,1
 
 MENUDEFAULT
 Usage:  menudefault=defaultoption,delay
@@ -305,12 +305,12 @@ Example:  switchar=-
 SWITCHES
 Usage: switches=/E[:xxx] /F /K /N /W
 Adjusts boot time processing behaviour.
-/E specifies how to handle moving of EBDA (Extended BIOS Data Area), 
+/E specifies how to handle moving of EBDA (Extended BIOS Data Area),
    if a size in bytes is specified [xxx, in range of 48-1024]
    then the EBDA will be moved from the top of conventional memory
    to a lower address (allowing for potentially larger free block
    of conventional memory if video memory at A0000 is available).
-   without a size, the EBDA will not be moved   
+   without a size, the EBDA will not be moved
 /F skips the delay checking for F5/F8 keystroke before processing
    config.sys [equivalent to SYS CONFIG skipconfigseconds=0]
    F5 and F8 are only processed if pressed before DOS boots but
@@ -326,7 +326,7 @@ Adjusts boot time processing behaviour.
 /W is NOT supported in FreeDOS. This option in MS DOS would set a flag
    for Windows 3.0 to skip loading wina20.386 from the root directory,
    used when \WINA20.386 is moved into a subdirectory, a device line
-   with proper path must be added to Microsoft (R) Windows SYSTEM.INI 
+   with proper path must be added to Microsoft (R) Windows SYSTEM.INI
    [386Enhanced] section.  ---  may be ignored for compatibility
 
 VERSION
@@ -379,13 +379,13 @@ rem NETWORK
 rem Menu items can only be selected if at least one line uses them:
 3?  echo Basic configuration selected
 
-Although this is different than MSDOS menuing possibilities, it 
+Although this is different than MSDOS menuing possibilities, it
 allows for selecting from multiple options during bootup while
 remaining simple.  It, however, does not allow for multi-level
 menuing based configuration schemes.
 
 
-It's also possible to combine menu options, to avoid writing thing every 
+It's also possible to combine menu options, to avoid writing thing every
 time again.
 constructions like 0?devicehigh?=cdrom.sys are also possible
 ("if menu option 0 chosen, ask if you want to load this driver")
@@ -469,7 +469,7 @@ MENU
 MENUDEFAULT=1,10		( configuration 1, wait 10 seconds)
 
 REM 1st choice
-1?ECHO You selected menu #1 
+1?ECHO You selected menu #1
 
 REM 2nd choice
 2?ECHO You selected menu #2

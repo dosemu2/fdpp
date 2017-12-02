@@ -172,7 +172,7 @@ CLUSTER link_fat(struct dpb FAR * dpbp, CLUSTER Cluster1,
   if (ISFAT32(dpbp))
     max_cluster = dpbp->dpb_xsize;
 #endif
- 
+
   if (clussec <= 1 || clussec > max_cluster) /* try to read out of range? */
   {
     clusterMessage("index: 0x",clussec); /* bad array offset */
@@ -249,10 +249,10 @@ CLUSTER link_fat(struct dpb FAR * dpbp, CLUSTER Cluster1,
       bp1 = getFATblock(dpbp, (unsigned)clussec + 1);
       if (bp1 == 0)
         return 1; /* the only error code possible here */
-      
+
       if (Cluster2 != READ_CLUSTER)
         bp1->b_flag |= BFR_DIRTY | BFR_VALID;
-      
+
       fbp1 = &bp1->b_buffer[0];
     }
 
@@ -301,7 +301,7 @@ CLUSTER link_fat(struct dpb FAR * dpbp, CLUSTER Cluster1,
     *fbp0 = (UBYTE)cluster;
     *fbp1 = (UBYTE)(cluster >> 8);
   }
-  else if (ISFAT16(dpbp)) 
+  else if (ISFAT16(dpbp))
   {
     /* form an index so that we can read the block as a     */
     /* byte array                                           */

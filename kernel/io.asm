@@ -42,7 +42,7 @@
                 extern   _reloc_call_blk_driver
                 extern   _reloc_call_clk_driver
 
-                extern   _TEXT_DGROUP:wrt LGROUP                
+                extern   _TEXT_DGROUP:wrt LGROUP
 
 ;---------------------------------------------------
 ;
@@ -63,13 +63,13 @@ huge    equ     26                      ; First block (32-bit) to transfer
 
 ;
 ; The following is the "array" of device driver headers for the internal
-; devices.  There is one header per device including special aux: and prn: 
-; pseudo devices.  These psuedo devices are necessary for printer 
+; devices.  There is one header per device including special aux: and prn:
+; pseudo devices.  These psuedo devices are necessary for printer
 ; redirection, i.e., serial or parallel ports, and com port aux selection.
 ;
-; The devices are linked into each other and terminate with a -1 next 
+; The devices are linked into each other and terminate with a -1 next
 ; pointer.  This saves some time on boot up and also allows us to throw all
-; device initialization into a single io_init function that may be placed 
+; device initialization into a single io_init function that may be placed
 ; into a discardable code segmemnt.
 ;
 segment	_IO_FIXED_DATA
@@ -207,7 +207,7 @@ uUnitNumber	dw	0
 ;       Store the pointer to the request packet passed in es:bx
 ;
 ; Description:
-;       Generic strategy routine.  Unlike the original multitasking versions, 
+;       Generic strategy routine.  Unlike the original multitasking versions,
 ;       this version assumes that no more thank one device driver is active
 ;       at any time.  The request is stored into memory in the one and only
 ;       location available for that purpose.
@@ -227,23 +227,23 @@ GenStrategy:
 ;       Individual Interrupt routines for each device driver
 ;
 ; Description:
-;       This is actually a single routine with entry points for each device. 
-;       The name used for the entry point is the device name with Intr 
+;       This is actually a single routine with entry points for each device.
+;       The name used for the entry point is the device name with Intr
 ;       appended to it.
 ;
-;       Funtionally, each device driver has an entry and an associated 
-;       table.  The table is a structure that consists of a control byte 
-;       followed by an array of pointers to C functions or assembly 
-;       subroutines that implement the individual device driver functions.  
-;       This allows the usage of common error dummy filler code to be used.  
-;       It also allows standardization of the calling procedure for these 
+;       Funtionally, each device driver has an entry and an associated
+;       table.  The table is a structure that consists of a control byte
+;       followed by an array of pointers to C functions or assembly
+;       subroutines that implement the individual device driver functions.
+;       This allows the usage of common error dummy filler code to be used.
+;       It also allows standardization of the calling procedure for these
 ;       internal device driver functions.
 ;
 ;       Assembler call/return convention:
-;       Each driver function is entered by a jump into the function and 
-;       exits by a jump to the appropriate success or error exit routine.  
-;       This speeds up the call and return and helps to minimize the stack 
-;       useage.  The contents of the request packet are passed to each 
+;       Each driver function is entered by a jump into the function and
+;       exits by a jump to the appropriate success or error exit routine.
+;       This speeds up the call and return and helps to minimize the stack
+;       useage.  The contents of the request packet are passed to each
 ;       routine in registers as follows:
 ;
 ;             Register  Function                Description
@@ -257,25 +257,25 @@ GenStrategy:
 ;               cs      kernel code segment
 ;               ds      kernel data segment
 ;
-;       The exit routines generally set the status based on the individual 
-;       routine.  For example, _IOSuccess will clear the count where 
-;       _IOErrCnt will subtract the remaining amount in cx from the original 
+;       The exit routines generally set the status based on the individual
+;       routine.  For example, _IOSuccess will clear the count where
+;       _IOErrCnt will subtract the remaining amount in cx from the original
 ;       count.  See each utility routine for expectations.
 ;
 ;       C call/return convention:
 ;       The C calling convention simply sets up the C stack and passes the
-;       request packet pointer as a far pointer to the function.  Although 
-;       the utility routine names are such that they are accesible from the 
-;       C name space, they are cannot used.  Instead, the common interrupt 
-;       code expects a return status to set in the request packet.  It is up 
-;       to the device driver function to set the appropriate fields such as 
+;       request packet pointer as a far pointer to the function.  Although
+;       the utility routine names are such that they are accesible from the
+;       C name space, they are cannot used.  Instead, the common interrupt
+;       code expects a return status to set in the request packet.  It is up
+;       to the device driver function to set the appropriate fields such as
 ;       count when an error occurs.
 ;
 ;       How to differntiate between the two calling conventions:
-;       This code is entirely table driven.  The table is a structure that 
-;       is generally in the _IO_FIXED_DATA segment.  It consists of a flag 
-;       byte followed by short pointers to the driver functions.  Selecting 
-;       a driver type is accomplished by setting the type bit in the flag 
+;       This code is entirely table driven.  The table is a structure that
+;       is generally in the _IO_FIXED_DATA segment.  It consists of a flag
+;       byte followed by short pointers to the driver functions.  Selecting
+;       a driver type is accomplished by setting the type bit in the flag
 ;       (see below).
 ;
 ;         7   6   5   4   3   2   1   0
@@ -416,13 +416,13 @@ AsmType:        mov     al,[bx+unit]
 ;       Exit routines for internal device drivers.
 ;
 ; Description:
-;       These routines are the exit for internal device drivers.  _IOSuccess 
-;       is for read/write functions and correctly returns for a successful 
-;       read/write operation by setting the remainng count to zero.  _IOExit 
-;       simply sets success bit and returns.  _IODone returns complete and 
-;       busy status.  _IOCommandError returns and error status for invalid 
-;       commands.  _IOErrCnt corrects the remaining bytes for errors that 
-;       occurred during partial read/write operation.  _IOErrorExit is a 
+;       These routines are the exit for internal device drivers.  _IOSuccess
+;       is for read/write functions and correctly returns for a successful
+;       read/write operation by setting the remainng count to zero.  _IOExit
+;       simply sets success bit and returns.  _IODone returns complete and
+;       busy status.  _IOCommandError returns and error status for invalid
+;       commands.  _IOErrCnt corrects the remaining bytes for errors that
+;       occurred during partial read/write operation.  _IOErrorExit is a
 ;       generic error exit that sets done and error.
 ;
                 global  _IOSuccess
@@ -460,7 +460,7 @@ _IOCommandError:
                 mov     al,3
 
                 global  _IOErrCnt
-_IOErrCnt: 
+_IOErrCnt:
                 lds     bx,[cs:_ReqPktPtr]
                 sub     [bx+count],cx
                 global  _IOErrorExit
@@ -476,8 +476,8 @@ _IOErrorExit:
 ;       Return the internally set unit number.
 ;
 ; Description:
-;       Simply return the contents of uUnitNumber.  This version relies on 
-;       no segment registers and makes a safe call regardless of driver 
+;       Simply return the contents of uUnitNumber.  This version relies on
+;       no segment registers and makes a safe call regardless of driver
 ;       state.
 ;
                 global  GetUnitNum
@@ -486,7 +486,7 @@ GetUnitNum:
                 ret
 
                 ;
-                ; These are still old style DOS-C drivers.  I'll replace 
+                ; These are still old style DOS-C drivers.  I'll replace
                 ; them in the next release
                 ;
 
@@ -512,9 +512,9 @@ clk_driver_params:
 clk_entry:
                 pushf
                 push    bx
-                
+
                 mov     bx, clk_driver_params
-                
+
                 jmp short clk_and_blk_common
 
 
@@ -522,16 +522,16 @@ clk_entry:
 blk_entry:
                 pushf
                 push    bx
-                
+
                 mov     bx, blk_driver_params
-                
-clk_and_blk_common:                
-                
+
+clk_and_blk_common:
+
                 push    ax
                 push    cx
                 push    dx
 
-                
+
                 ; small model
                 mov     ax,sp	                    	; use internal stack
                 mov     dx,ss
@@ -540,15 +540,15 @@ clk_and_blk_common:
                 cli                                     ; no interrupts
                 mov     ss,[cs:_TEXT_DGROUP]
                 mov     sp,[cs:bx]
-                
+
                 push    cx
                 popf                                    ; restore interrupt flag
-                
-                
+
+
 
                 push    ax                          ; save old SS/SP
                 push    dx
-                
+
                                                     ; push these registers on
                 push    ds                          ; BLK_STACK
                 push    bp                          ; to save stack space
@@ -557,30 +557,30 @@ clk_and_blk_common:
                 push    es
                 Protect386Registers
 
-                mov     ds,[cs:_TEXT_DGROUP]        ; 
-                
-                
+                mov     ds,[cs:_TEXT_DGROUP]        ;
+
+
                 push    word [cs:_ReqPktPtr+2]
                 push    word [cs:_ReqPktPtr]
                 call    far [cs:bx+2]
                 pop     cx
                 pop     cx
-                
+
                 les     bx,[cs:_ReqPktPtr]		; now return completion code
                 mov     word [es:bx+status],ax  ; mark operation complete
-                
-                
+
+
                 Restore386Registers
                 pop     es
                 pop     di
                 pop     si
                 pop     bp
                 pop     ds
-                
+
 
                 pop    dx                       ; get back old SS/SP
                 pop    ax
-                
+
                 cli                             ; no interrupts
                 mov     ss,dx           		; use dos stack
                 mov     sp,ax

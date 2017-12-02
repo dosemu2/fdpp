@@ -113,7 +113,7 @@ irp_hi    equ 26
 ; I386.inc - 10/25/01 by tom ehlert
 ;
 ; compiling the kernel for 386 will (sometimes) change the
-; high part of (some) registers, which will be (sometimes) be used 
+; high part of (some) registers, which will be (sometimes) be used
 ; later
 ;
 ; assumption:
@@ -135,15 +135,15 @@ irp_hi    equ 26
 ;	error 1 2 3
 	%macro  Protect386Registers 0
 	%endmacro
-	
+
 	%macro  RestoreSP 0
-		mov sp, bp  
+		mov sp, bp
 	%endmacro
 
 	%macro  Restore386Registers 0
 	%endmacro
 
-%ELSE           
+%ELSE
 	%ifdef WATCOM
 
 	%macro  Protect386Registers  0

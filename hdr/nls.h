@@ -347,12 +347,12 @@ struct CountrySpecificInfo {
   char  DecimalPoint[2];      /* '.'        # Decimal point        */
   char  DateSeparator[2];     /* '-'  */
   char  TimeSeparator[2];     /* ':'  */
-  char  CurrencyFormat;       /* = 0  # Currency format (bit array) 
+  char  CurrencyFormat;       /* = 0  # Currency format (bit array)
                                  0Fh    BYTE    currency format
                                  bit 2 = set if currency symbol replaces decimal point
                                  bit 1 = number of spaces between value and currency symbol
                                  bit 0 = 0 if currency symbol precedes value
-                                 1 if currency symbol follows value    
+                                 1 if currency symbol follows value
                               */
   char  CurrencyPrecision;    /* = 2  # Currency precision           */
   char  TimeFormat;           /* = 0  # time format: 0/1: 12/24 houres */

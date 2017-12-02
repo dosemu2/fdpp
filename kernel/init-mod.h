@@ -272,9 +272,9 @@ extern unsigned char FAR ASM kbdType;
 extern struct {
   char  ThisIsAConstantOne;
   short TableSize;
-  
+
   struct CountrySpecificInfo C;
-  
+
 } FAR ASM nlsCountryInfoHardcoded;
 
 /*

@@ -39,7 +39,7 @@ static BYTE *miscRcsId =
 char *strcpy(REG BYTE * d, REG CONST BYTE * s)
 {
   char *tmp = d;
-  
+
   while ((*d++ = *s++) != '\0')
     ;
 

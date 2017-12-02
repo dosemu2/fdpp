@@ -99,7 +99,7 @@
 ;	|LBA PKT |
 ;	|--------| 0000:7E00  (0:BP+200)
 ;	|BOOT SEC| contains BPB
-;	|ORIGIN  | 
+;	|ORIGIN  |
 ;	|--------| 0000:7C00  (0:BP)
 ;	|VARS    | only known is 1st data sector (start of cluster 2)
 ;	|--------| 0000:7BFC  (DS:[BP-4])
@@ -128,7 +128,7 @@ CPU 8086  ; enable assembler warnings to limit instruction set
 ;%define WINBOOT         1              ; use win9x kernel calling conventions (name & jmp addr)
 ;%define MSCOMPAT        1              ; sets default filename to MSDOS IO.SYS
 
-%ifdef WINBOOT                          ; if set also change from PC-DOS to 
+%ifdef WINBOOT                          ; if set also change from PC-DOS to
 %ifndef MSCOMPAT                        ; kernel name to MS-DOS kernel name
 %define MSCOMPAT
 %endif
@@ -452,13 +452,13 @@ cluster_next:   lodsw                   ; AX = next cluster to read
                 mov di, [first_cluster] ; set di (si:di on FAT32) to starting cluster #
 %ifdef WINBOOT
                 jmp     LOADSEG:0x0200  ; yes, pass control to kernel
-%else                
+%else
                 jmp     LOADSEG:0000    ; yes, pass control to kernel
 %endif
 
 
 ; failed to boot
-boot_error:     
+boot_error:
 call            show
 ;               db      "Error! Hit a key to reboot."
                 db      "):."
@@ -530,7 +530,7 @@ read_next:
 ;******************** LBA_READ *******************************
 
 						; check for LBA support
-										
+
 %ifdef TRYLBAREAD
                 mov     ah,041h                 ;
                 mov     bx,055aah               ;
@@ -550,15 +550,15 @@ read_next:
                                                 ; setup LBA disk block
                 mov     LBA_SECTOR_32,bx        ; bx is 0 if extended 13h mode supported
                 mov     LBA_SECTOR_48,bx
-	
+
 
                 mov     ah,042h
                 jmp short    do_int13_read
 %endif
 
-							
 
-read_normal_BIOS:      
+
+read_normal_BIOS:
 
 ;******************** END OF LBA_READ ************************
                 mov     cx, LBA_SECTOR_0
@@ -600,7 +600,7 @@ read_normal_BIOS:
 
                 les     bx,[LBA_OFF]
                 mov     ax, 0x0201
-do_int13_read:                
+do_int13_read:
                 mov     dl, [drive]
                 int     0x13
 
@@ -616,7 +616,7 @@ read_next_chained:
 %endif
 
 read_ok:
-                mov     ax, word [bsBytesPerSec]  
+                mov     ax, word [bsBytesPerSec]
                 mov     cl, 4                   ; adjust segment pointer by increasing
                 shr     ax, cl
                 add     word [LBA_SEG], ax      ; by paragraphs read in (per sector)

@@ -56,8 +56,8 @@ COUNT nUnits BSS_INIT(0);
  * Implementation note:
  * this module needs some interfacing to INT 13
  * how to implement them
- *    
- * a) using inline assembly 
+ *
+ * a) using inline assembly
  *        _ASM mov ax,0x1314
  *
  * b) using assembly routines in some external FLOPPY.ASM
@@ -71,7 +71,7 @@ COUNT nUnits BSS_INIT(0);
  *
  * a) this is my personal favorite, combining the best aof all worlds.
  *    TURBO-C does support inline assembly, but only by using TASM,
- *    which is not free. 
+ *    which is not free.
  *    so - unfortunately- its excluded.
  *
  * b) keeping funny memory model in sync with external assembly
@@ -79,7 +79,7 @@ COUNT nUnits BSS_INIT(0);
  *
  * c) you never know EXACT, what the compiler does, if its a bit
  *    more complicated. does
- *      _DL = drive & 0xff    
+ *      _DL = drive & 0xff
  *      _BL = driveParam.chs.Sector;
  *    destroy any other register? sure? _really_ sure?
  *    at least, it has it's surprises.
@@ -345,7 +345,7 @@ void init_LBA_to_CHS(struct CHS *chs, ULONG LBA_address,
 {
   unsigned hs = driveparam->chs.Sector * driveparam->chs.Head;
   unsigned hsrem = (unsigned)(LBA_address % hs);
-  
+
   LBA_address /= hs;
 
   chs->Cylinder = LBA_address >= 0x10000ul ? 0xffffu : (unsigned)LBA_address;
@@ -361,8 +361,8 @@ void printCHS(char *title, struct CHS *chs)
 
 /*
     reason for this modules existence:
-    
-    we have found a partition, and add them to the global 
+
+    we have found a partition, and add them to the global
     partition structure.
 
 */
@@ -598,7 +598,7 @@ void DosDefinePartition(struct DriveParamS *driveParam,
 
   push_ddt(pddt);
 
-  /* Alain whishes to keep this in later versions, too 
+  /* Alain whishes to keep this in later versions, too
      Tom likes this too, so he made it configurable by SYS CONFIG ...
    */
 
@@ -710,7 +710,7 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
   driveParam->descflags = DF_LBA;
   if (lba_bios_parameters.information & 8)
     driveParam->descflags |= DF_WRTVERIFY;
-  
+
 StandardBios:                  /* old way to get parameters */
 
   regs.a.b.h = 0x08;
@@ -725,8 +725,8 @@ StandardBios:                  /* old way to get parameters */
   driveParam->chs.Head = (regs.d.x >> 8) + 1; /* DH = max head value = # of heads - 1 (0-255) */
   driveParam->chs.Sector = (regs.c.x & 0x3f); /* CL bits 0-5 = max sector value = # (sectors/track) - 1 (1-63) */
   /* max cylinder value = # cylinders - 1 (0-1023) = [high two bits]CL7:6=cyls9:8, [low byte]CH=cyls7:0 */
-  driveParam->chs.Cylinder = (regs.c.x >> 8) | ((regs.c.x & 0xc0) << 2) + 1; 
-  
+  driveParam->chs.Cylinder = (regs.c.x >> 8) | ((regs.c.x & 0xc0) << 2) + 1;
+
   if (driveParam->chs.Sector == 0) {
     /* happens e.g. with Bochs 1.x if no harddisk defined */
     driveParam->chs.Sector = 63; /* avoid division by zero...! */
@@ -864,7 +864,7 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
     LBA_to_CHS(&chs, partitionStart, driveParam);
     LBA_to_CHS(&end, partitionStart + pEntry->NumSect - 1, driveParam);
 
-    /* some FDISKs enter for partitions 
+    /* some FDISKs enter for partitions
        > 8 GB cyl = 1023, other (cyl&1023)
      */
 
@@ -901,7 +901,7 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
         continue;
       }
 
-      if (!InitKernelConfig.ForceLBA && !ExtLBAForce 
+      if (!InitKernelConfig.ForceLBA && !ExtLBAForce
           && !IsLBAPartition(pEntry->FileSystem))
       {
         printf
@@ -1151,26 +1151,26 @@ void BIOS_drive_reset(unsigned drive)
   init_call_intr(0x13, &regs);
 }
 
-/* 
+/*
     thats what MSDN says:
 
     How Windows 2000 Assigns, Reserves, and Stores Drive Letters
-    ID: q234048 
- 
+    ID: q234048
+
   BASIC Disk - Drive Letter Assignment Rules
-The following are the basic disk drive letter assignment rules for Windows 2000: 
-Scan all fixed hard disks as they are enumerated, assign drive letters 
+The following are the basic disk drive letter assignment rules for Windows 2000:
+Scan all fixed hard disks as they are enumerated, assign drive letters
 starting with any active primary partitions (if there is one), otherwise,
-scan the first primary partition on each drive. Assign next available 
+scan the first primary partition on each drive. Assign next available
 letter starting with C:
 
-Repeat scan for all fixed hard disks and removable (JAZ, MO) disks 
-and assign drive letters to all logical drives in an extended partition, 
-or the removable disk(s) as enumerated. Assign next available letter 
-starting with C: 
+Repeat scan for all fixed hard disks and removable (JAZ, MO) disks
+and assign drive letters to all logical drives in an extended partition,
+or the removable disk(s) as enumerated. Assign next available letter
+starting with C:
 
-Finally, repeat scan for all fixed hard disk drives, and assign drive 
-letters to all remaining primary partitions. Assign next available letter 
+Finally, repeat scan for all fixed hard disk drives, and assign drive
+letters to all remaining primary partitions. Assign next available letter
 starting with C:
 
 Floppy drives. Assign letter starting with A:
@@ -1179,49 +1179,49 @@ CD-ROM drives. Assign next available letter starting with D:
 
 *************************************************************************
 Order in Which MS-DOS and Windows Assign Drive Letters
-ID: q51978 
- 
-MORE INFORMATION
-The following occurs at startup: 
+ID: q51978
 
-MS-DOS checks all installed disk devices, assigning the drive letter A 
+MORE INFORMATION
+The following occurs at startup:
+
+MS-DOS checks all installed disk devices, assigning the drive letter A
 to the first physical floppy disk drive that is found.
 
 If a second physical floppy disk drive is present, it is assigned drive letter B. If it is not present, a logical drive B is created that uses the first physical floppy disk drive.
 
-Regardless of whether a second floppy disk drive is present, 
-MS-DOS then assigns the drive letter C to the primary MS-DOS 
-partition on the first physical hard disk, and then goes on 
-to check for a second hard disk. 
+Regardless of whether a second floppy disk drive is present,
+MS-DOS then assigns the drive letter C to the primary MS-DOS
+partition on the first physical hard disk, and then goes on
+to check for a second hard disk.
 
-If a second physical hard disk is found, and a primary partition exists 
+If a second physical hard disk is found, and a primary partition exists
 on the second physical drive, the primary MS-DOS partition on the second
-physical hard drive is assigned the letter D. MS-DOS version 5.0, which 
-supports up to eight physical drives, will continue to search for more 
-physical hard disk drives at this point. For example, if a third physical 
-hard disk is found, and a primary partition exists on the third physical 
-drive, the primary MS-DOS partition on the third physical hard drive is 
+physical hard drive is assigned the letter D. MS-DOS version 5.0, which
+supports up to eight physical drives, will continue to search for more
+physical hard disk drives at this point. For example, if a third physical
+hard disk is found, and a primary partition exists on the third physical
+drive, the primary MS-DOS partition on the third physical hard drive is
 assigned the letter E.
 
-MS-DOS returns to the first physical hard disk drive and assigns drive 
-letters to any additional logical drives (in extended MS-DOS partitions) 
+MS-DOS returns to the first physical hard disk drive and assigns drive
+letters to any additional logical drives (in extended MS-DOS partitions)
 on that drive in sequence.
 
-MS-DOS repeats this process for the second physical hard disk drive, 
-if present. MS-DOS 5.0 will repeat this process for up to eight physical 
-hard drives, if present. After all logical drives (in extended MS-DOS 
-partitions) have been assigned drive letters, MS-DOS 5.0 returns to 
-the first physical drive and assigns drive letters to any other primary 
-MS-DOS partitions that exist, then searches other physical drives for 
-additional primary MS-DOS partitions. This support for multiple primary 
-MS-DOS partitions was added to version 5.0 for backward compatibility 
+MS-DOS repeats this process for the second physical hard disk drive,
+if present. MS-DOS 5.0 will repeat this process for up to eight physical
+hard drives, if present. After all logical drives (in extended MS-DOS
+partitions) have been assigned drive letters, MS-DOS 5.0 returns to
+the first physical drive and assigns drive letters to any other primary
+MS-DOS partitions that exist, then searches other physical drives for
+additional primary MS-DOS partitions. This support for multiple primary
+MS-DOS partitions was added to version 5.0 for backward compatibility
 with the previous OEM MS-DOS versions that support multiple primary partitions.
 
-After all logical drives on the hard disk(s) have been assigned drive 
-letters, drive letters are assigned to drives installed using DRIVER.SYS 
-or created using RAMDRIVE.SYS in the order in which the drivers are loaded 
-in the CONFIG.SYS file. Which drive letters are assigned to which devices 
-can be influenced by changing the order of the device drivers or, if necessary, 
+After all logical drives on the hard disk(s) have been assigned drive
+letters, drive letters are assigned to drives installed using DRIVER.SYS
+or created using RAMDRIVE.SYS in the order in which the drivers are loaded
+in the CONFIG.SYS file. Which drive letters are assigned to which devices
+can be influenced by changing the order of the device drivers or, if necessary,
 by creating "dummy" drive letters with DRIVER.SYS.
 
 ********************************************************

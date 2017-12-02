@@ -180,7 +180,7 @@ ff_next_clust:	push	eax			; save cluster
 		call	convert_cluster
 		jc	boot_error		; EOC encountered
 		; EDX is clust/sector, EAX is sector
-				
+
 ff_next_sector:	les	bx, [loadsegoff_60]	; load to loadseg:0
 		call	readDisk
 ;---		push	eax			; save sector
@@ -231,7 +231,7 @@ rk_in_cluster:	call	readDisk
 rk_walk_fat:	pop	eax
 		call	next_cluster
 		jmp	read_kernel
-		
+
 ;-----------------------------------------------------------------------
 
 boot_success:	mov	bl, [drive]
@@ -360,7 +360,7 @@ read_next:	push	eax	; would ax be enough?
 		mov	si, sp
 		mov	dl, [drive]
 		mov	ah, 42h	; disk read
-		int	0x13	
+		int	0x13
 
 		mov	sp, di	; remove parameter block from stack
 				; (without changing flags!)

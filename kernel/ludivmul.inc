@@ -1,5 +1,5 @@
 ;  this one adapted from elks, http://elks.sourceforge.net
-;  multiply cx:bx * dx:ax, result in dx:ax        
+;  multiply cx:bx * dx:ax, result in dx:ax
 
 %macro LMULU 0
 
@@ -28,11 +28,11 @@
 
 ; Dividing 64-bit unsigned integers Assembler / 80386
 
-;   Here is a division routine for dividing two 64-bit unsigned integers. 
+;   Here is a division routine for dividing two 64-bit unsigned integers.
 ;   I derived it by modifying some old
-;   16-bit code for dividing 32-bit integers that I did several years ago for a 
+;   16-bit code for dividing 32-bit integers that I did several years ago for a
 ;   Turbo-Pascal replacement library.
-;   If a 64-bit signed integer division is needed, appropriate shell code for 
+;   If a 64-bit signed integer division is needed, appropriate shell code for
 ;   this routine can easily be written.
 ;
 ;   (adapted back to 32-bit by Bart Oldeman ;-))
@@ -63,7 +63,7 @@
 	div     bx                 ; quotient-hi in eax
 	xchg    ax, cx             ; cx = quotient-hi, ax =dividend-lo
 
-%%one_div:    
+%%one_div:
 	div     bx                 ; ax = quotient-lo
 	mov     bx, dx             ; bx = remainder-lo
 	mov     dx, cx             ; dx = quotient-hi(quotient in dx:ax)
@@ -105,8 +105,8 @@
 	adc     cx, di             ;  and quotient if
 	add     ax, dx             ;   necessary
 	xor     dx, dx             ; clear hi-word of quot (ax<=FFFFFFFFh)
-	pop     di                 ; restore temp  
+	pop     di                 ; restore temp
 	pop     si                 ;  variables
 	ret
 
-%endmacro   
+%endmacro

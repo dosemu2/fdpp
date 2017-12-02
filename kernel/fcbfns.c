@@ -93,7 +93,7 @@ UWORD FcbParseFname(UBYTE *wTestMode, const BYTE FAR * lpFileName, fcb FAR * lpF
   WORD wRetCodeName = FALSE, wRetCodeExt = FALSE;
 
   /* pjv -- ExtFcbToFcb?                                          */
-  
+
   /* skip leading separators if requested                         */
   if (*wTestMode & PARSE_SKIP_LEAD_SEP)
   {
@@ -195,7 +195,7 @@ const BYTE FAR * GetNameField(const BYTE FAR * lpFileName, BYTE FAR * lpDestFiel
     /* include ? as-is but flag for return purposes wildcard used */
     if (*lpFileName == '?')
       *pbWildCard = TRUE;
-    
+
     /* store uppercased character, and advance to next char       */
     *lpDestField++ = DosUpFChar(*lpFileName++);
     ++nIndex;
@@ -415,7 +415,7 @@ UBYTE FcbOpen(xfcb FAR * lpXfcb, unsigned flags)
   lpFcb->fcb_curec = 0;
   lpFcb->fcb_rndm = 0;
   */
-  
+
   lpFcb->fcb_recsiz = 0;      /* true for devices   */
   if (!(sftp->sft_flags & SFT_FDEVICE)) /* check for a device */
   {
@@ -493,7 +493,7 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
     }
     else do
     {
-      SecPathName[0] = 'A' + FcbDrive - 1; 
+      SecPathName[0] = 'A' + FcbDrive - 1;
       SecPathName[1] = ':';
       strcpy(&SecPathName[2], Dmatch.dm_name);
       if (DosDelete(SecPathName, attr) != SUCCESS)
@@ -648,13 +648,13 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
 
   fmemcpy(Dmatch.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
   DosUpFMem((BYTE FAR *) Dmatch.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
-  
+
   Dmatch.dm_attr_srch = wAttr;
   Dmatch.dm_entry = lpFcb->fcb_strtclst;
   Dmatch.dm_dircluster = lpFcb->fcb_dirclst;
 
   wAttr = D_ALL;
-  
+
   if ((xfcb FAR *) lpFcb != lpXfcb)
   {
     wAttr = lpXfcb->xfcb_attrib;
@@ -671,10 +671,10 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
 
   *lpDir++ = FcbDrive;
   fmemcpy(lpDir, &SearchDir, sizeof(struct dirent));
-  
+
   lpFcb->fcb_dirclst = (UWORD) Dmatch.dm_dircluster;
   lpFcb->fcb_strtclst = Dmatch.dm_entry;
-  
+
 /*
   This is undocumented and seen using Pcwatch and Ramview.
   The First byte is the current directory count and the second seems

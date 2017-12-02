@@ -55,7 +55,7 @@ segment	_LOWTEXT
 uScanCode	db	0		; Scan code for con: device
 
 global          _kbdType
-_kbdType        db      0		; 00 for 84key, 10h for 102key        
+_kbdType        db      0		; 00 for 84key, 10h for 102key
 
                 global  ConInit
 ConInit:
@@ -90,7 +90,7 @@ ConRead2:
                 jmp     _IOExit
 
 
-readkey:        
+readkey:
        		mov     ah,[cs:_kbdType]
                 int     16h
 checke0:        cmp	al,0xe0                 ; must check for 0xe0 scan code
@@ -99,7 +99,7 @@ checke0:        cmp	al,0xe0                 ; must check for 0xe0 scan code
 		jz	.ret
 		mov	al,0			; otherwise destroy the 0xe0
 .ret:		retn
-        
+
 ;
 ; Name:
 ;       KbdRdChar
@@ -109,7 +109,7 @@ checke0:        cmp	al,0xe0                 ; must check for 0xe0 scan code
 ;
 ; Description:
 ;       This subroutine reads a character from the keyboard. It also handles
-;       a couple of special functions. 
+;       a couple of special functions.
 ;       It converts ctrl-printscreen to a control-P.
 ;       It also accounts for extended scan codes by saving off
 ;       the high byte of the return and returning it if it was non-zero on
@@ -193,7 +193,7 @@ ConInpFlush:    ; *** flush that keyboard queue
 KbdInpChar:	; *** get ??00 or the last waiting key after flushing the queue
 		xor	ax,ax
                 mov     byte [cs:uScanCode],al
-KbdInpCh1:	
+KbdInpCh1:
                 mov     ah,1
 		add	ah,[cs:_kbdType]
                 int     16h                     ; get status, if zf=0  al=char

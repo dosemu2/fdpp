@@ -20,25 +20,25 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
     * ensure top of RAM correctly adjusted after moving EBDA
     * fix reading from NULL
     * merge creation date & time from old dev branch
-    * use absolute not relative disk read/writes 
+    * use absolute not relative disk read/writes
       (allows syslinux DOS installer to work correctly)
     * Fix FCB parse filename (int21h func 29h)
     * Improve support for older BPB based volumes lacking extended fields.
       (Based on lpproj's nec98:Fix for DOS 3.x partitions)
     * Int 2F/AX=120Ah & AX=120Bh based on RBIL, untested
-    
+
 + Changes Sava (lpproj)
     * add cross-compile capability on Windows with OW and mingw32-make
     * Fix pointer of DBCS table (int 0x21, func 0x6300)
     * Enable to load DBCS table from COUNTRY.SYS
     * Return current country code (func 0x38)
     * Fix broken decompression on loading FAT16 kernel (compressed in dos/sys)
-    * On creating child PSP (func 0x55), copy command line parameters 
+    * On creating child PSP (func 0x55), copy command line parameters
       from the parent (required for some device loaders)
     * Fix incomplete loading of huge (more than 65280 bytes) binary device driver
-    * Fix an error at opening a character device prefixed with invalid 
+    * Fix an error at opening a character device prefixed with invalid
       drive letter (e.g. "@:NUL")
-    * Copy FCB-format filename from PriPathName (some redirectors require 
+    * Copy FCB-format filename from PriPathName (some redirectors require
       FCB-format filename stored in SDA+22Bh DirEntBuffer)
 
 2012 Feb 07 - Build 2041
@@ -47,9 +47,9 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 + Changes Jeremy
 	* r1637 fix out of range byte in country.asm
 	* r1685 add int 2f subfunc 122B and 122D from Eduardo Casino
-    * r1697 from Pete Batard, do not display CHS mismatch warning 
+    * r1697 from Pete Batard, do not display CHS mismatch warning
       during booting when forcing LBA mode option set
-    * r1702 improve handling for sectors not 512 bytes in size 
+    * r1702 improve handling for sectors not 512 bytes in size
       (up to 2048 bytes, larger sizes not yet working)
     * r1705 add cpu detection so memdisk args supported in 8086 build
 
@@ -162,11 +162,11 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 	  release kernels
 
 + Changes Bart
-	* r1491 hdr/debug.h, kernel/{init-mod.h,kernel/int2f.asm,nls.c,prf.c, 
+	* r1491 hdr/debug.h, kernel/{init-mod.h,kernel/int2f.asm,nls.c,prf.c,
 	  proto.h}, sys/{fdkrncfg.c,sys.c}: Use near pointers for printf()s
-	  where possible. Problematic is only the case where SS!=DS (which 
+	  where possible. Problematic is only the case where SS!=DS (which
 	  happens sometimes in resident code), in which case va_list/va_arg
-	  need to use FAR pointers. DS!=DGROUP never works, so I corrected 
+	  need to use FAR pointers. DS!=DGROUP never works, so I corrected
 	  that for NLS_DEBUG, by setting DS in int2f.asm.
 	* r1490 kernel/fatfs.c: Check the BPB instead of the DPB for FAT32
 	  after a BUILDBPB device call, as the DPB may still be uninitialized
@@ -192,7 +192,7 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 	  optimization (200 bytes).
 	* r1473 kernel{fatdir.c,fatfs.c,newstuff.c}: If the current directory
 	  is no longer valid, call dos_cd() for the root to update the CDS
-	  cluster. Call media_check explicitly in truename() as a central 
+	  cluster. Call media_check explicitly in truename() as a central
 	  first and only place in directory-using DOS calls (except
 	  DosFindNext) to call it.
 	* r1472 kernel/{dosfns.c,newstuff.c}: The original DosGetCuDir
@@ -221,7 +221,7 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 	* r1452 kernel/initdisk.c: Use a better formula for calculating FAT12
 	  clusters, by multiplying nominator and denominator by 3.
 	* r1451 kernel/{fatfs.c, initdisk.c}: initdisk: further	optimizations
-	  in CalculateFATData(): merging the FAT16 & FAT32 loops. 
+	  in CalculateFATData(): merging the FAT16 & FAT32 loops.
 	  fatfs: #if DEBUG fix.
 	* r1450 kernel/initdisk.c: Optimized initdisk.c by using constants
 	  instead of variables where possible.
@@ -248,7 +248,7 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 	  can be expanded as a shell variable when passed to system().
 	* r1442 kernel/{dosnames.c, fatfs.c, makefile, proto.h}:
 	  Remove dosnames.c and inline ParseDosName, because there is only one
-	  user left (split_path()) which only uses it to find out if the path 
+	  user left (split_path()) which only uses it to find out if the path
 	  ends in a backslash and the length of the directory part.
 	* r1441 kernel/{dosnames.c, fatdir.c, fatfs.c, proto.h}:
 	  dos_findfirst() now uses split_path(). The only thing
@@ -284,10 +284,10 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 	  into a new ConvertNameSZToName83 function, also used by dir_open().
 	* r1432 hdr/fnode.h, kernel/{fatdir.c, fatfs.c, globals.h, init-mod.h,
 	  kernel.asm}:
-	  Move the fnode fields f_diroff and f_dirstart into a referenced 
+	  Move the fnode fields f_diroff and f_dirstart into a referenced
 	  directory match structure with fields dm_entry and dm_dircluster.
 	* r1430 hdr/nls.h, kernel/{config.c, init-mod.h, inthndlr.c, intr.asm,
-	  kernel/nls.c, kernel/nls_hc.asm, kernel/proto.h}: 
+	  kernel/nls.c, kernel/nls_hc.asm, kernel/proto.h}:
 	  Ported COUNTRY.SYS support from the unstable branch.
 	  Simple country support is kept: COUNTRY=31 will look for country.sys
 	  but if it does not exist, not complain and load the built-in info.
@@ -404,14 +404,14 @@ Changelog items can list SVN revision rNUMBER and bugzilla bug NUMBER.
 	  containing dentry) and f_diridx (index within sector) fields to the
 	  fnode, to make fnodes more compatible with SFTs. Use them to simplify
 	  dir_read() and dir_write().
-	* r1389 kernel/{fatdir.c, fatfs.c, globals.h, inthndlr.c, lfnapi.c, 
-	  proto.h}: Force near fnode use to use either fnode[0] or fnode[1] 
+	* r1389 kernel/{fatdir.c, fatfs.c, globals.h, inthndlr.c, lfnapi.c,
+	  proto.h}: Force near fnode use to use either fnode[0] or fnode[1]
 	  instead of the allocation scheme. This eliminates the checks
 	  done in inthndlr.c because the f_count field is no longer checked.
 	* r1388 makefile, mkfiles/owlinux.mak: Change Linux makefiles to only
 	  update what is necessary for subsequent makes.
 	* r1387 config.m, docs/build.txt, drivers/makefile, kernel/{makefile,
-	  segs.inc}, makefile, mkfiles/{generic.mak, owlinux.mak, watcom.mak}, 
+	  segs.inc}, makefile, mkfiles/{generic.mak, owlinux.mak, watcom.mak},
 	  sys/makefile, utils/{exeflat.c, makefile}:
 	  Add Linux cross-compile capability, using Open Watcom:
 	  * Flip \ to /	where possible.
@@ -438,7 +438,7 @@ Patches are mostly from Bart and Eric, some from Jeremy and Tom.
 	  http://sf.net/tracker/?func=detail&aid=2253450&group_id=5109&atid=355109
 	* r1379 dosfns.c fatfs.c proto.h from Eric: only check for SHARE on
 	  open/close, avoid extra 2f.1000 calls.
-	* r1378 dsk.c from Lucho: Press any key, not Press the any key  ;-) 
+	* r1378 dsk.c from Lucho: Press any key, not Press the any key  ;-)
 	* r1377 initdisk.c from RayeR: Use total cyl count, not max cylinder
 	  (fixes off by one bug on non-LBA PC) & fix overflow by ULONG cast.
 	  Improve DebugPrintf calls, fix format string (only in debug kernels)
@@ -1756,7 +1756,7 @@ Most recent changes to source code (see version.h) are:
 	 asks for this single line
       fill the available HMA with buffers
     * added kernel configuration options to sys.com, small area at 60:xx
-      (in cooperation with Jeremy)	
+      (in cooperation with Jeremy)
     * readblock optimized to read as many data as possible in one
       int13 request - great speedups for large reads
     * some more SDA variables need to be updated for the network
@@ -1876,7 +1876,7 @@ Most recent changes to source code (see version.h) are:
       Ctrl-Q is ignored by DOS.
     * FCB "closing twice is legal" fix. Necessary for visicalc.
 + fixes Bart + Tom
-    * fixed shsucdx /u unloading problem	
+    * fixed shsucdx /u unloading problem
 
 
 2001 Jul 28 - Build 2024/f
@@ -2214,7 +2214,7 @@ from 2001 May 21: Build2024L
 	 as .com in the hope that we can make it a real .com again.
 	 DeviceHigh loads low if there are not enough UMB's available.
 	 Fixed another redirector problem.
-+ Update Optimized asmsupt.asm a bit with help of the glibc 2.2 source.	
++ Update Optimized asmsupt.asm a bit with help of the glibc 2.2 source.
 + Fixes  Tom Ehlert and Brian Reifsnyder: fix partition detection in dsk.c +
          other bug fixes (also: floppy.asm).
 + Update Tom Ehlert optimized blockio.c.

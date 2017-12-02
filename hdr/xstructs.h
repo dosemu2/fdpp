@@ -52,7 +52,7 @@ struct xdpbforformat {
     struct {
       DWORD nfreeclst;          /* # free clusters
                                    (-1 - unknown, 0 - don't change) */
-      DWORD cluster;            /* cluster # of first free          
+      DWORD cluster;            /* cluster # of first free
                                    (-1 - unknown, 0 - don't change) */
       UDWORD reserved[2];
     } setdpbcounts;

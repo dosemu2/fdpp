@@ -98,23 +98,23 @@ FL_FORMAT:
 FL_READ:
                 mov     ah,2            ; read sector(s)
                 jmp short fl_common
-                
+
 		global	FL_VERIFY
 FL_VERIFY:
                 mov     ah,4            ; verify sector(s)
                 jmp short fl_common
-                
+
 		global	FL_WRITE
 FL_WRITE:
                 mov     ah,3            ; write sector(s)
 
-fl_common:                
+fl_common:
                 push    bp              ; setup stack frame
                 mov     bp,sp
 
                 mov     cx,[bp+0Ch]     ; cylinder number
 
-                mov     al,1            ; this should be an error code                     
+                mov     al,1            ; this should be an error code
                 cmp     ch,3            ; this code can't write above 3FFh=1023
                 ja      fl_error        ; as cylinder # is limited to 10 bits.
 
@@ -148,7 +148,7 @@ fl_error:
 FL_LBA_READWRITE:
 		push    bp              ; setup stack frame
 		mov     bp,sp
-		
+
 		push    ds
 		push    si              ; wasn't in kernel < KE2024Bo6!!
 
@@ -156,14 +156,14 @@ FL_LBA_READWRITE:
 		mov     ax,[bp+8]       ; get the command
 		lds     si,[bp+4]       ; get far dap pointer
 		int     13h             ; read from/write to drive
-		
+
 		pop     si
 		pop     ds
 
 		pop     bp
 
 		mov     al,ah           ; place any error code into al
-		mov     ah,0            ; zero out ah           
+		mov     ah,0            ; zero out ah
 		ret     8
 
 ;
@@ -189,9 +189,9 @@ FL_SETDISKTYPE:
 		int	13h
 ret_AH:
 		mov     al,ah           ; place any error code into al
-		mov     ah,0            ; zero out ah           
+		mov     ah,0            ; zero out ah
 		ret
-                        
+
 ;
 ; COUNT ASMPASCAL fl_setmediatype (WORD drive, WORD tracks, WORD sectors);
 ;
@@ -206,10 +206,10 @@ FL_SETMEDIATYPE:
 
 		dec	cx		; number of cylinders - 1 (last cyl number)
 		xchg	ch,cl		; CH=low 8 bits of last cyl number
-               
+
 		ror	cl,1		; extract bits 8-9 of cylinder number...
 		ror	cl,1		; ...into cl bit 6-7
-                
+
 		or	cl,bl		; sectors/track (bits 0-5) or'd with high cyl bits 7-6
 
 		mov	ah,18h	; disk set media type for format
@@ -223,7 +223,7 @@ FL_SETMEDIATYPE:
                 pop     word [es:0x1e*4+2] ; set int 0x1e table to es:di
                 mov     [es:0x1e*4  ], di
 		sti
-skipint1e:		
+skipint1e:
                 pop     di
 		jmp	short ret_AH
-                
+

@@ -136,7 +136,7 @@ COUNT lfn_create_entries(COUNT handle, lfn_inode_ptr lip)
 
   entries_needed = (ufstrlen(lfn_name) + CHARS_IN_LFN_ENTRY - 1)
     / CHARS_IN_LFN_ENTRY + 1; /* We want to create SFN entry too */
-  
+
   /* Scan the directory from the very begining for the free directory entries */
   lfn_setup_inode(handle, fnp->f_dirstart, 0);
 
@@ -170,7 +170,7 @@ COUNT lfn_create_entries(COUNT handle, lfn_inode_ptr lip)
   /* Write SFN entry */
   fmemcpy(&fnp->f_dir, &lip->l_dir, sizeof(struct dirent));
   dir_write(fnp);
-  
+
   fnp->f_diroff--;
   /* Go in the reverse direction and create LFN entries */
   for (i = 0; i < entries_needed - 1; i++, id++)
@@ -186,7 +186,7 @@ COUNT lfn_create_entries(COUNT handle, lfn_inode_ptr lip)
       fnp->f_diroff--;
     }
   fnp->f_flags.f_dmod = FALSE;
-  
+
   fnp->f_diroff = sfn_offset;
 
   return SUCCESS;
@@ -223,8 +223,8 @@ COUNT lfn_dir_read(COUNT handle, lfn_inode_ptr lip)
           sfn_diroff = fnp->f_diroff;
           break;
         }
-    } 
-    
+    }
+
   /* Go in the reverse direction and find the LFN entries corresponding to
    * the found SFN entry */
   while (TRUE)
@@ -315,7 +315,7 @@ BOOL transfer_unicode(UNICODE FAR **dptr, UNICODE FAR **sptr, COUNT count)
 BOOL lfn_to_unicode(UNICODE FAR **name, struct lfn_entry FAR *lep)
 {
   UNICODE FAR *ptr;
-    
+
   ptr = lep->lfn_name0_4;
   if (transfer_unicode(name, &ptr, 5)) return TRUE;
   ptr = lep->lfn_name5_10;
@@ -331,7 +331,7 @@ BOOL lfn_to_unicode(UNICODE FAR **name, struct lfn_entry FAR *lep)
 VOID unicode_to_lfn(UNICODE FAR **name, struct lfn_entry FAR *lep)
 {
   UNICODE FAR *ptr;
-  
+
   ptr = lep->lfn_name0_4;
   transfer_unicode(&ptr, name, 5);
   ptr = lep->lfn_name5_10;

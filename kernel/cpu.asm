@@ -30,7 +30,7 @@ CPU 386
 ;
 ; UWORD query_cpu() based on Eric Auer's public domain cpulevel.asm
 ; input: none
-; output: ax = cpu, 0=8086/8088, 1=186/188, 2=286, 3=386+ 
+; output: ax = cpu, 0=8086/8088, 1=186/188, 2=286, 3=386+
     global _query_cpu
     _query_cpu:
         ; save registers, assumes enough space on stack & valid stack frame setup
@@ -64,7 +64,7 @@ is286:  mov  bx, 2  ; at least 286
         test ax, 0f000h
         jz cleanup  ; 4 msb stuck to 0: 80286
         mov bx, 3   ; at least 386
-        
+
     cleanup:
         mov  ax, bx ; return CPU family
         popf

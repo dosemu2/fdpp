@@ -73,7 +73,7 @@ KERNEL.SYS & COMMAND.COM and if not found then
 the root directory of the specified drive is tried.
 Alternatively, you may specify a path (either fully
 qualified or relative) to where KERNEL.SYS and
-COMMAND.COM may be found; note that this should 
+COMMAND.COM may be found; note that this should
 only search this directory and will fail if they
 are not found, ie it will not check for them on
 the root directory of the drive specified when
@@ -160,8 +160,8 @@ This option is for specifying whether Drive Letter
 Assignment should follow the normal MSDOS way of
 all primary partitions across drives and then
 extended partitions, or the more logical
-all partitions (primary & extended) on the 1st 
-drive, then repeat for all following drives 
+all partitions (primary & extended) on the 1st
+drive, then repeat for all following drives
 (all primary & extended, then try next drive).
 0 corresponds to MS way and 1 corresponds to first
 drive completely, then next ...
@@ -191,7 +191,7 @@ techniques to address all partitions if possible,
 even if these have a non-LBA partition type and
 are completely below cylinder 1023 (usually the 8GB
 boundary). This is 0 by default, for compatibility
-reasons. Setting this to 1 may bypass some buggy 
+reasons. Setting this to 1 may bypass some buggy
 BIOSes and gives slightly better performance.
 
 GLOBALENABLELBASUPPORT which maybe 0 or 1

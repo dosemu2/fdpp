@@ -32,7 +32,7 @@ CPU 386
 ;
 ; query_memdisk() based on similar subroutine in Eric Auer's public domain getargs.asm which is based on IFMEMDSK
 ; input: drive (in AL) to query if memdisk provided disk
-; output: a far * to a memdiskinfo structure as defined by memdisk (see config.c) 
+; output: a far * to a memdiskinfo structure as defined by memdisk (see config.c)
 ; struct memdiskinfo FAR * query_memdisk(UBYTE drive);
 	global _query_memdisk
 	_query_memdisk:
@@ -66,7 +66,7 @@ CPU 386
 	nomemdisk:
 		xor di, di              ; return NULL;
 		mov es, di
-		
+
 	cleanup:
 		pop eax
 		pop edx
