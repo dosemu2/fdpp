@@ -18,7 +18,7 @@ HDR=../hdr/
 OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
     asmsupt.obj execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
     nls_hc.obj apisupt.obj intr.obj irqstack.obj iasmsupt.obj memdisk.obj \
-    cpu.obj
+    cpu.obj plt.obj
 
 #               *Explicit Rules*
 
@@ -132,3 +132,19 @@ libfdkernel.so: $(OBJECTS)
 
 ../bin/libfdkernel.so: libfdkernel.so
 		$(CP) $^ ..$(DIRSEP)bin
+
+plt.obj: plt.asm plt.inc
+
+all_proto.tmp: $(CFILES)
+	cproto -I../hdr $^ >$@
+
+plt.inc.tmp: $(CFILES)
+	grep ASMCFUNC $(CFILES) | sed 's/.\+ \+\([^ ]\+\) *(.*/\1/' >$@
+
+plt.inc: $(CFILES) all_proto.tmp plt.inc.tmp makefile
+	>$@
+	while read line; do \
+	    if grep -q $$line all_proto.tmp; then \
+		echo asmcfunc $$line >>$@; \
+	    fi; \
+	done <plt.inc.tmp
