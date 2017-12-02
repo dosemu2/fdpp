@@ -44,7 +44,7 @@ clobber:        clean
 		-$(RM) kernel.exe kernel.sys status.me
 
 clean:
-		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.lnk *.o *.so
+		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.lnk *.o *.so *.tmp
 
 # XXX: This is a very ugly way of linking the kernel, forced upon us by the
 # inability of Turbo `make' 2.0 to perform command line redirection. -- ror4
@@ -57,24 +57,24 @@ $(TARGET).lnk: turboc.cfg makefile ../mkfiles/generic.mak ../mkfiles/$(COMPILER)
 		$(ECHOTO) $(TARGET).lnk $(LIBS)
 
 #               *Individual File Dependencies*
-apisupt.obj:	apisupt.asm segs.inc			$(TARGET).lnk
-asmsupt.obj:	asmsupt.asm segs.inc			$(TARGET).lnk
-console.obj:	console.asm io.inc			$(TARGET).lnk
-cpu.obj:	cpu.asm  segs.inc $(TARGET).lnk
-dosidle.obj:	dosidle.asm segs.inc			$(TARGET).lnk
-entry.obj:	entry.asm   segs.inc $(HDR)stacks.inc	$(TARGET).lnk
-execrh.obj:	execrh.asm  segs.inc 			$(TARGET).lnk
-int2f.obj:	int2f.asm   segs.inc $(HDR)stacks.inc	$(TARGET).lnk
-intr.obj:	intr.asm    segs.inc			$(TARGET).lnk
-io.obj:		io.asm	    segs.inc $(HDR)stacks.inc   $(TARGET).lnk
-irqstack.obj:   irqstack.asm segs.inc			$(TARGET).lnk
-kernel.obj:	kernel.asm  segs.inc ludivmul.inc 	$(TARGET).lnk
-memdisk.obj:	memdisk.asm  segs.inc $(TARGET).lnk
-nls_hc.obj:	nls_hc.asm  segs.inc			$(TARGET).lnk
-nlssupt.obj:	nlssupt.asm segs.inc $(HDR)stacks.inc   $(TARGET).lnk
-printer.obj:	printer.asm io.inc			$(TARGET).lnk
-procsupt.obj:	procsupt.asm segs.inc $(HDR)stacks.inc  $(TARGET).lnk
-serial.obj:	serial.asm  io.inc			$(TARGET).lnk
+apisupt.obj:	apisupt.asm segs.inc
+asmsupt.obj:	asmsupt.asm segs.inc
+console.obj:	console.asm io.inc
+cpu.obj:	cpu.asm  segs.inc
+dosidle.obj:	dosidle.asm segs.inc
+entry.obj:	entry.asm   segs.inc $(HDR)stacks.inc
+execrh.obj:	execrh.asm  segs.inc
+int2f.obj:	int2f.asm   segs.inc $(HDR)stacks.inc
+intr.obj:	intr.asm    segs.inc
+io.obj:		io.asm	    segs.inc $(HDR)stacks.inc
+irqstack.obj:   irqstack.asm segs.inc
+kernel.obj:	kernel.asm  segs.inc ludivmul.inc
+memdisk.obj:	memdisk.asm  segs.inc
+nls_hc.obj:	nls_hc.asm  segs.inc
+nlssupt.obj:	nlssupt.asm segs.inc $(HDR)stacks.inc
+printer.obj:	printer.asm io.inc
+procsupt.obj:	procsupt.asm segs.inc $(HDR)stacks.inc
+serial.obj:	serial.asm  io.inc
 
 HDRS=\
     $(HDR)portab.h $(HDR)device.h $(HDR)mcb.h $(HDR)pcb.h \
@@ -86,7 +86,7 @@ HEADERS=$(HDRS) globals.h proto.h
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
 #the string functions for INIT_TEXT
-iasmsupt.obj: asmsupt.asm $(TARGET).lnk
+iasmsupt.obj: asmsupt.asm
 	$(NASM) -D$(COMPILER) -D_INIT $(NASMFLAGS) -f obj -o iasmsupt.obj asmsupt.asm
 
 CFILES = blockio.c \
