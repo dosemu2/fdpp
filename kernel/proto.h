@@ -397,3 +397,14 @@ VOID ASMCFUNC exec_user(iregs FAR * irp, int disable_a20);
 
 #define ASSERT_CONST(x) { typedef struct { char _xx[x ? 1 : -1]; } xx ; }
 
+WORD ASMCFUNC FAR clk_driver(rqptr rp);
+COUNT ASMCFUNC FAR blk_driver(rqptr rp);
+VOID ASMCFUNC FreeDOSmain(void);
+VOID ASMCFUNC int21_syscall(iregs FAR * irp);
+VOID ASMCFUNC int21_service(iregs FAR * r);
+struct int25regs;
+VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r);
+struct config;
+VOID ASMCFUNC P_0(struct config FAR *Config);
+struct int2f12regs;
+VOID ASMCFUNC int2F_12_handler(struct int2f12regs r);

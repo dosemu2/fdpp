@@ -135,16 +135,13 @@ libfdkernel.so: $(OBJECTS)
 
 plt.obj: plt.asm plt.inc
 
-all_proto.tmp: $(CFILES)
-	cproto -I../hdr $^ >$@
-
 plt.inc.tmp: $(CFILES)
 	grep ASMCFUNC $(CFILES) | sed 's/.\+ \+\([^ ]\+\) *(.*/\1/' >$@
 
-plt.inc: $(CFILES) all_proto.tmp plt.inc.tmp makefile
+plt.inc: $(CFILES) proto.h plt.inc.tmp makefile
 	>$@
 	while read line; do \
-	    if grep -q $$line all_proto.tmp; then \
+	    if grep -q $$line proto.h; then \
 		echo asmcfunc $$line >>$@; \
 	    fi; \
 	done <plt.inc.tmp
