@@ -461,9 +461,8 @@ _rev_number     db      0
                 global  _version_flags
 _version_flags  db      0
 
-                global  os_release
-                extern  _os_release
-os_release      dw      _os_release
+                global  _HaltCpuWhileIdle
+_HaltCpuWhileIdle db    0
 
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced

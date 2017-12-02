@@ -126,3 +126,12 @@ _nlsDBCSHardcoded:
 	DB  000h, 000h
 	GLOBAL _hcTablesEnd
 _hcTablesEnd:
+
+                global  _nlsInfo
+_nlsInfo:
+  fname         dd      0       ; filename from COUNTRY=;
+                                ;   maybe tweaked by NLSFUNC
+  sysCodePage   dw      437     ; system code page
+  flags         dw      0       ; implementation flags
+  actPkg        dw      _nlsPackageHardcoded, SEG _nlsPackageHardcoded       ; current NLS package
+  chain         dw      _nlsPackageHardcoded, SEG _nlsPackageHardcoded       ; first item of info chain

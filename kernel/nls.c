@@ -55,6 +55,7 @@ static BYTE *RcsId =
 #endif
 #endif
 
+#if 0
 struct nlsInfoBlock ASM nlsInfo = {
   (char FAR *)0                 /* filename to COUNTRY.SYS */
       , 437                     /* system code page */
@@ -69,6 +70,7 @@ struct nlsInfoBlock ASM nlsInfo = {
       , &nlsPackageHardcoded    /* hardcoded first package */
       , &nlsPackageHardcoded    /* first item in chain */
 };
+#endif
 
         /* getTableX return the pointer to the X'th table; X==subfct */
         /* subfct 2: normal upcase table; 4: filename upcase table */
