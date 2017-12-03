@@ -289,28 +289,28 @@ void put_string(const char *s);
 void put_console(int);
 
 /* strings.c */
-size_t /* ASMCFUNC */ ASMPASCAL strlen(const char * s);
-size_t /* ASMCFUNC */ ASMPASCAL fstrlen(const char FAR * s);
-char FAR * /*ASMCFUNC*/ ASMPASCAL _fstrcpy(char FAR * d, const char FAR * s);
-int /*ASMCFUNC*/ ASMPASCAL strcmp(const char * d, const char * s);
-int /*ASMCFUNC*/ ASMPASCAL fstrcmp(const char FAR * d, const char FAR * s);
-int /*ASMCFUNC*/ ASMPASCAL fstrncmp(const char FAR * d, const char FAR * s, size_t l);
-int /*ASMCFUNC*/ ASMPASCAL strncmp(const char * d, const char * s, size_t l);
-char * /*ASMCFUNC*/ ASMPASCAL strchr(const char * s, int c);
-char FAR * /*ASMCFUNC*/ ASMPASCAL fstrchr(const char FAR * s, int c);
-void FAR * /*ASMCFUNC*/ ASMPASCAL fmemchr(const void FAR * s, int c, size_t n);
+size_t strlen(const char * s);
+size_t fstrlen(const char FAR * s);
+char FAR * _fstrcpy(char FAR * d, const char FAR * s);
+int strcmp(const char * d, const char * s);
+int fstrcmp(const char FAR * d, const char FAR * s);
+int fstrncmp(const char FAR * d, const char FAR * s, size_t l);
+int strncmp(const char * d, const char * s, size_t l);
+char * strchr(const char * s, int c);
+char FAR * fstrchr(const char FAR * s, int c);
+void FAR * fmemchr(const void FAR * s, int c, size_t n);
 
 /* misc.c */
-char * /*ASMCFUNC*/ ASMPASCAL strcpy(char * d, const char * s);
-void /*ASMCFUNC*/ ASMPASCAL fmemcpyBack(void FAR * d, const void FAR * s, size_t n);
-void /*ASMCFUNC*/ ASMPASCAL fmemcpy(void FAR * d, const void FAR * s, size_t n);
-void /*ASMCFUNC*/ ASMPASCAL fstrcpy(char FAR * d, const char FAR * s);
-void * /*ASMCFUNC*/ ASMPASCAL memcpy(void *d, const void * s, size_t n);
-void /*ASMCFUNC*/ ASMPASCAL fmemset(void FAR * s, int ch, size_t n);
-void * /*ASMCFUNC*/ ASMPASCAL memset(void * s, int ch, size_t n);
+char * strcpy(char * d, const char * s);
+//void ASMPASCAL fmemcpyBack(void FAR * d, const void FAR * s, size_t n);
+void fmemcpy(void FAR * d, const void FAR * s, size_t n);
+void fstrcpy(char FAR * d, const char FAR * s);
+void * memcpy(void *d, const void * s, size_t n);
+void fmemset(void FAR * s, int ch, size_t n);
+void * memset(void * s, int ch, size_t n);
 
-int /*ASMCFUNC*/ ASMPASCAL memcmp(const void *m1, const void *m2, size_t n);
-int /*ASMCFUNC*/ ASMPASCAL fmemcmp(const void FAR *m1, const void FAR *m2, size_t n);
+int memcmp(const void *m1, const void *m2, size_t n);
+int fmemcmp(const void FAR *m1, const void FAR *m2, size_t n);
 
 #ifdef __WATCOMC__
 /* bx, cx, dx and es not used or clobbered for all asmsupt.asm functions except

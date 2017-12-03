@@ -16,8 +16,8 @@ HDR=../hdr/
 # files (only 9 directly accessible parameters).
 
 OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
-    asmsupt.obj execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
-    nls_hc.obj apisupt.obj intr.obj irqstack.obj iasmsupt.obj memdisk.obj \
+    execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
+    nls_hc.obj apisupt.obj intr.obj irqstack.obj memdisk.obj \
     cpu.obj plt.obj
 
 #               *Explicit Rules*
@@ -58,7 +58,6 @@ $(TARGET).lnk: turboc.cfg makefile ../mkfiles/generic.mak ../mkfiles/$(COMPILER)
 
 #               *Individual File Dependencies*
 apisupt.obj:	apisupt.asm segs.inc
-asmsupt.obj:	asmsupt.asm segs.inc
 console.obj:	console.asm io.inc
 cpu.obj:	cpu.asm  segs.inc
 dosidle.obj:	dosidle.asm segs.inc
@@ -84,10 +83,6 @@ HDRS=\
     $(HDR)version.h dyndata.h
 HEADERS=$(HDRS) globals.h proto.h
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
-
-#the string functions for INIT_TEXT
-iasmsupt.obj: asmsupt.asm
-	$(NASM) -D$(COMPILER) -D_INIT $(NASMFLAGS) -f obj -o iasmsupt.obj asmsupt.asm
 
 CFILES = blockio.c \
     break.c \
