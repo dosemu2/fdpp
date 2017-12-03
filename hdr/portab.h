@@ -58,7 +58,40 @@ static char *portab_hRcsId =
 /*                                                              */
 /****************************************************************/
 
-                                                        /* commandline overflow - removing -DI86 TE */
+/* Types for `void *' pointers.  */
+#ifdef __x86_64__
+# ifndef __intptr_t_defined
+typedef long int                intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned long int       uintptr_t;
+#else
+# ifndef __intptr_t_defined
+typedef int                     intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned int            uintptr_t;
+#endif
+
+/*                                                              */
+/* Common byte, 16 bit and 32 bit types                         */
+/*                                                              */
+typedef char BYTE;
+typedef short WORD;
+typedef long DWORD;
+
+typedef unsigned char UBYTE;
+typedef unsigned short UWORD;
+typedef unsigned long UDWORD;
+
+typedef short SHORT;
+
+typedef unsigned int BITS;      /* for use in bit fields(!)     */
+
+typedef int COUNT;
+typedef unsigned int UCOUNT;
+typedef unsigned long ULONG;
+
 #if defined(__TURBOC__)
 
 #define I86
@@ -141,8 +174,22 @@ unsigned short getSS(void);
 
 #elif defined(__GNUC__)
 #define VA_CDECL
+UWORD getCS(void);
 #define _CS getCS()
+UWORD getSS(void);
 #define _SS getSS()
+UBYTE peekb(UWORD seg, UWORD ofs);
+UWORD peekw(UWORD seg, UWORD ofs);
+ULONG peekl(UWORD seg, UWORD ofs);
+void pokeb(UWORD seg, UWORD ofs, UBYTE b);
+void pokew(UWORD seg, UWORD ofs, UWORD w);
+void pokel(UWORD seg, UWORD ofs, ULONG l);
+void *short_ptr(UWORD offs);
+#define MK_SP(offs) short_ptr(offs)
+UWORD mk_offs(UBYTE *data, UWORD len);
+#define MK_OFFS(data) mk_offs(data, sizeof(data))
+void disable(void);
+void enable(void);
 /* for warnings only ! */
 #define MC68K
 
@@ -226,25 +273,6 @@ typedef int BOOL;
 #ifndef min
 #define min(a,b)       (((a) < (b)) ? (a) : (b))
 #endif
-
-/*                                                              */
-/* Common byte, 16 bit and 32 bit types                         */
-/*                                                              */
-typedef char BYTE;
-typedef short WORD;
-typedef long DWORD;
-
-typedef unsigned char UBYTE;
-typedef unsigned short UWORD;
-typedef unsigned long UDWORD;
-
-typedef short SHORT;
-
-typedef unsigned int BITS;      /* for use in bit fields(!)     */
-
-typedef int COUNT;
-typedef unsigned int UCOUNT;
-typedef unsigned long ULONG;
 
 #ifdef WITHFAT32
 typedef unsigned long CLUSTER;

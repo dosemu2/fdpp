@@ -725,7 +725,7 @@ StandardBios:                  /* old way to get parameters */
   driveParam->chs.Head = (regs.d.x >> 8) + 1; /* DH = max head value = # of heads - 1 (0-255) */
   driveParam->chs.Sector = (regs.c.x & 0x3f); /* CL bits 0-5 = max sector value = # (sectors/track) - 1 (1-63) */
   /* max cylinder value = # cylinders - 1 (0-1023) = [high two bits]CL7:6=cyls9:8, [low byte]CH=cyls7:0 */
-  driveParam->chs.Cylinder = (regs.c.x >> 8) | ((regs.c.x & 0xc0) << 2) + 1;
+  driveParam->chs.Cylinder = ((regs.c.x >> 8) | ((regs.c.x & 0xc0) << 2)) + 1;
 
   if (driveParam->chs.Sector == 0) {
     /* happens e.g. with Bochs 1.x if no harddisk defined */
@@ -804,9 +804,9 @@ BOOL is_suspect(struct CHS *chs, struct CHS *pEntry_chs)
   return !((pEntry_chs->Cylinder == chs->Cylinder &&
             pEntry_chs->Head     == chs->Head     &&
             pEntry_chs->Sector   == chs->Sector)        ||
-           chs->Cylinder > 1023u &&
+           (chs->Cylinder > 1023u &&
            (pEntry_chs->Cylinder == 1023 ||
-            pEntry_chs->Cylinder == (0x3ff & chs->Cylinder)));
+            pEntry_chs->Cylinder == (0x3ff & chs->Cylinder))));
 }
 
 void print_warning_suspect(char *partitionName, UBYTE fs, struct CHS *chs,

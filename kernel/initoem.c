@@ -47,19 +47,19 @@ unsigned init_oem(void)
 
 void movebda(size_t bytes, unsigned new_seg)
 {
-  unsigned old_seg = peek(0, EBDASEG);
+  unsigned old_seg = peekw(0, EBDASEG);
   fmemcpy(MK_FP(new_seg, 0), MK_FP(old_seg, 0), bytes);
-  poke(0, EBDASEG, new_seg);
-  poke(0, RAMSIZE, ram_top);
+  pokew(0, EBDASEG, new_seg);
+  pokew(0, RAMSIZE, ram_top);
 }
 
 unsigned ebdasize(void)
 {
-  unsigned ebdaseg = peek(0, EBDASEG);
+  unsigned ebdaseg = peekw(0, EBDASEG);
   unsigned ramsize = ram_top;
 
-  if (ramsize == peek(0, RAMSIZE))
-    if (ramsize * 64 == ebdaseg && ramsize < 640 && peek(0, RAMSIZE) == ramsize)
+  if (ramsize == peekw(0, RAMSIZE))
+    if (ramsize * 64 == ebdaseg && ramsize < 640 && peekw(0, RAMSIZE) == ramsize)
     {
     unsigned ebdasz = peekb(ebdaseg, 0);
 

@@ -217,7 +217,8 @@ STATIC BOOL isnum(char ch);
 #if 0
 STATIC COUNT tolower(COUNT c);
 #endif
-STATIC char toupper(char c);
+//STATIC char toupper(char c);
+#define toupper(c)      ((c) >= 'a' && (c) <= 'z' ? (c) + ('A' - 'a') : (c))
 STATIC VOID strupr(char *s);
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type);
 STATIC VOID mumcb_init(UCOUNT seg, UWORD size);
@@ -1552,7 +1553,7 @@ err:printf("%s has invalid format\n", filename);
   {
     if (read(fd, &entry, sizeof(entry)) != sizeof(entry) || entry.length != 12)
       goto err;
-    if (entry.country != ctryCode || entry.codepage != codePage && codePage)
+    if (entry.country != ctryCode || (entry.codepage != codePage && codePage))
       continue;
     if (lseek(fd, entry.offset) == 0xffffffffL
       || read(fd, &count, sizeof(count)) != sizeof(count)
@@ -1568,17 +1569,17 @@ err:printf("%s has invalid format\n", filename);
         continue;
       if (lseek(fd, hdr[i].offset) == 0xffffffffL
        || read(fd, &subf_data, 10) != 10
-       || memcmp(subf_data.signature, table[hdr[i].id].sig, 8) && (hdr[i].id !=4
-       || memcmp(subf_data.signature, table[2].sig, 8))  /* UCASE for FUCASE ^*/
+       || (memcmp(subf_data.signature, table[hdr[i].id].sig, 8) && (hdr[i].id !=4
+       || memcmp(subf_data.signature, table[2].sig, 8)))  /* UCASE for FUCASE ^*/
        || read(fd, subf_data.buffer, subf_data.length) != subf_data.length)
         goto err;
       if (hdr[i].id == 1)
       {
         if (((struct CountrySpecificInfo *)subf_data.buffer)->CountryID
                                                      != entry.country
-         || ((struct CountrySpecificInfo *)subf_data.buffer)->CodePage
+         || (((struct CountrySpecificInfo *)subf_data.buffer)->CodePage
                                                      != entry.codepage
-         && codePage)
+         && codePage))
           continue;
         nlsPackageHardcoded.cntry = entry.country;
         nlsPackageHardcoded.cp = entry.codepage;
@@ -2021,6 +2022,7 @@ STATIC BOOL isnum(char ch)
   return (ch >= '0' && ch <= '9');
 }
 
+#if 0
 /* Yet another change for true portability (PJV) */
 STATIC char toupper(char c)
 {
@@ -2028,6 +2030,7 @@ STATIC char toupper(char c)
     c -= 'a' - 'A';
   return c;
 }
+#endif
 
 /* Convert string s to uppercase */
 STATIC VOID strupr(char *s)
@@ -2661,7 +2664,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   }
 }
 
-STATIC void free(seg segment)
+STATIC void _free(seg segment)
 {
   iregs r;
 
@@ -2698,7 +2701,7 @@ VOID DoInstall(void)
   */
 
   set_strategy(LAST_FIT);
-  installMemory = ((unsigned)_init_end + ebda_size + 15) / 16;
+  installMemory = ((uintptr_t)_init_end + ebda_size + 15) / 16;
 #ifdef __WATCOMC__
   installMemory += (_InitTextEnd - _InitTextStart + 15) / 16;
 #endif
@@ -2713,7 +2716,7 @@ VOID DoInstall(void)
     InstallExec(cmd);
   }
   set_strategy(FIRST_FIT);
-  free(installMemory);
+  _free(installMemory);
 
   InstallPrintf(("Done with installing commands\n"));
   return;

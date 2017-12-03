@@ -122,6 +122,7 @@ char *strchr(const char * s, int c)
   return 0;
 }
 
+#if 0
 void *memchr(const void * s, int c)
 {
   REG unsigned char *p;
@@ -134,5 +135,6 @@ void *memchr(const void * s, int c)
   while (*p);
   return 0;
 }
+#endif
 #endif
 

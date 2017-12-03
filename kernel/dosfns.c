@@ -550,7 +550,7 @@ long DosOpenSft(char FAR * fname, unsigned flags, unsigned attrib)
       cmd = REM_OPEN;
       attrib = (BYTE)flags;
     }
-    status = (int)network_redirector_mx(cmd, sftp, (void *)attrib);
+    status = (int)network_redirector_mx(cmd, sftp, MK_SP(attrib));
     if (status >= SUCCESS)
     {
       if (sftp->sft_count == 0)

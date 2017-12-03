@@ -108,7 +108,7 @@ VOID getdirent(UBYTE FAR * vp, struct dirent FAR * dp)
 VOID putdirent(struct dirent FAR * dp, UBYTE FAR * vp)
 {
   REG COUNT i;
-  REG BYTE FAR *p;
+  REG UBYTE FAR *p;
 
   fmemcpy(&vp[DIR_NAME], dp->dir_name, FNAME_SIZE + FEXT_SIZE);
   fputbyte(&vp[DIR_ATTRIB], dp->dir_attrib);

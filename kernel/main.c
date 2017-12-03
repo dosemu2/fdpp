@@ -701,13 +701,13 @@ STATIC VOID InitSerialPorts(VOID)
 STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 {
   iregs r;
-  char buffer[0x13];
+  UBYTE buffer[0x13];
   buffer[0] = 0x13;
 
   r.a.b.h = 0x4b;               /* bootable CDROM - get status */
   r.a.b.l = statusOnly;
   r.d.b.l = (char)drive;
-  r.si  = (int)buffer;
+  r.si  = MK_OFFS(buffer);
   init_call_intr(0x13, &r);
 
   if (r.flags & 1)
