@@ -201,6 +201,7 @@ typedef unsigned       size_t;
 #define ASMCFUNC CDECL
 #define ASMPASCAL PASCAL
 #define ASM ASMCFUNC
+#define ASMFUNC ASMCFUNC
 /*                                                              */
 /* Boolean type & definitions of TRUE and FALSE boolean values  */
 /*                                                              */

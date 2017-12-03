@@ -123,8 +123,8 @@ struct cds FAR *get_cds1(unsigned dsk);
 COUNT DosTruename(const char FAR * src, char FAR * dest);
 
 /* dosidle.asm */
-VOID ASMCFUNC DosIdle_int(void);
-VOID ASMCFUNC DosIdle_hlt(void);
+VOID ASMFUNC DosIdle_int(void);
+VOID ASMFUNC DosIdle_hlt(void);
 #ifdef __WATCOMC__
 #pragma aux (cdecl) DosIdle_int modify exact []
 #pragma aux (cdecl) DosIdle_hlt modify exact []
@@ -383,7 +383,7 @@ UWORD get_machine_name(BYTE FAR * netname);
 VOID set_machine_name(BYTE FAR * netname, UWORD name_num);
 
 /* procsupt.asm */
-VOID ASMCFUNC exec_user(iregs FAR * irp, int disable_a20);
+VOID ASMFUNC exec_user(iregs FAR * irp, int disable_a20);
 
 /* new by TE */
 
