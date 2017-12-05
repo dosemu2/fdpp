@@ -64,7 +64,7 @@ struct xdpbforformat {
     } rebuilddpb;
 
     struct {
-      DWORD new;                /* new active FAT/mirroring state, or -1 to get
+      DWORD _new;                /* new active FAT/mirroring state, or -1 to get
                                    bits 3-0: the 0-based FAT number of the active FAT
                                    bits 6-4: reserved (0)
                                    bit 7: do not mirror active FAT to inactive FATs

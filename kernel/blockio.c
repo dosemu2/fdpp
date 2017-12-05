@@ -94,7 +94,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
   /* Search through buffers to see if the required block  */
   /* is already in a buffer                               */
 
-  bp = MK_FP(bufseg, firstbp);
+  bp = (struct buffer FAR *)MK_FP(bufseg, firstbp);
   do
   {
     if ((bp->b_blkno == blkno) &&
@@ -434,7 +434,7 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
      */
     if (FP_SEG(buf) >= 0xa000 && numblocks == 1 && bufloc != LOC_CONV)
     {
-      IoReqHdr.r_trans = deblock_buf;
+      IoReqHdr.r_trans = (BYTE FAR *)deblock_buf;
       if (mode == DSKWRITE)
         fmemcpy(deblock_buf, buf, dpbp->dpb_secsize);
       execrh((request FAR *) & IoReqHdr, dpbp->dpb_device);

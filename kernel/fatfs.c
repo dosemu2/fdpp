@@ -94,7 +94,7 @@ struct dpb FAR *get_dpb(COUNT dsk)
 
 /* initialize directory entry (creation/access stamps 0 as per MS-DOS 7.10) */
 STATIC void init_direntry(struct dirent *dentry, unsigned attrib,
-                          CLUSTER cluster, char *name)
+                          CLUSTER cluster, const char *name)
 {
   memset(dentry, 0, sizeof(struct dirent));
   memcpy(dentry->dir_name, name, FNAME_SIZE + FEXT_SIZE);

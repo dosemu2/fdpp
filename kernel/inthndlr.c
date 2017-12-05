@@ -510,7 +510,7 @@ dispatch:
     case 0x09:
       {
         unsigned char c;
-        unsigned char FAR *bp = FP_DS_DX;
+        unsigned char FAR *bp = (unsigned char FAR *)FP_DS_DX;
 
         while ((c = *bp++) != '$')
           write_char_stdout(c);
@@ -522,7 +522,7 @@ dispatch:
       /* Buffered Keyboard Input                                      */
     case 0x0a:
   DOS_0A:
-      read_line(get_sft_idx(STDIN), get_sft_idx(STDOUT), FP_DS_DX);
+      read_line(get_sft_idx(STDIN), get_sft_idx(STDOUT), (keyboard FAR *)FP_DS_DX);
       break;
 
       /* Check Stdin Status                                           */
@@ -561,41 +561,41 @@ dispatch:
       break;
 
     case 0x0f:
-      lr.AL = FcbOpen(FP_DS_DX, O_FCB | O_LEGACY | O_OPEN | O_RDWR);
+      lr.AL = FcbOpen((xfcb FAR *)FP_DS_DX, O_FCB | O_LEGACY | O_OPEN | O_RDWR);
       break;
 
     case 0x10:
-      lr.AL = FcbClose(FP_DS_DX);
+      lr.AL = FcbClose((xfcb FAR *)FP_DS_DX);
       break;
 
     case 0x11:
-      lr.AL = FcbFindFirstNext(FP_DS_DX, TRUE);
+      lr.AL = FcbFindFirstNext((xfcb FAR *)FP_DS_DX, TRUE);
       break;
 
     case 0x12:
-      lr.AL = FcbFindFirstNext(FP_DS_DX, FALSE);
+      lr.AL = FcbFindFirstNext((xfcb FAR *)FP_DS_DX, FALSE);
       break;
 
     case 0x13:
-      lr.AL = FcbDelete(FP_DS_DX);
+      lr.AL = FcbDelete((xfcb FAR *)FP_DS_DX);
       break;
 
     case 0x14:
       /* FCB read */
-      lr.AL = FcbReadWrite(FP_DS_DX, 1, XFR_READ);
+      lr.AL = FcbReadWrite((xfcb FAR *)FP_DS_DX, 1, XFR_READ);
       break;
 
     case 0x15:
       /* FCB write */
-      lr.AL = FcbReadWrite(FP_DS_DX, 1, XFR_WRITE);
+      lr.AL = FcbReadWrite((xfcb FAR *)FP_DS_DX, 1, XFR_WRITE);
       break;
 
     case 0x16:
-      lr.AL = FcbOpen(FP_DS_DX, O_FCB | O_LEGACY | O_CREAT | O_TRUNC | O_RDWR);
+      lr.AL = FcbOpen((xfcb FAR *)FP_DS_DX, O_FCB | O_LEGACY | O_CREAT | O_TRUNC | O_RDWR);
       break;
 
     case 0x17:
-      lr.AL = FcbRename(FP_DS_DX);
+      lr.AL = FcbRename((xfcb FAR *)FP_DS_DX);
       break;
 
     default:
@@ -652,22 +652,22 @@ dispatch:
       /* Random read using FCB: fields not updated
          (XFR_RANDOM should not be used here) */
     case 0x21:
-      lr.AL = FcbRandomIO(FP_DS_DX, XFR_READ);
+      lr.AL = FcbRandomIO((xfcb FAR *)FP_DS_DX, XFR_READ);
       break;
 
       /* Random write using FCB */
     case 0x22:
-      lr.AL = FcbRandomIO(FP_DS_DX, XFR_WRITE);
+      lr.AL = FcbRandomIO((xfcb FAR *)FP_DS_DX, XFR_WRITE);
       break;
 
       /* Get file size in records using FCB */
     case 0x23:
-      lr.AL = FcbGetFileSize(FP_DS_DX);
+      lr.AL = FcbGetFileSize((xfcb FAR *)FP_DS_DX);
       break;
 
       /* Set random record field in FCB */
     case 0x24:
-      FcbSetRandom(FP_DS_DX);
+      FcbSetRandom((xfcb FAR *)FP_DS_DX);
       break;
 
       /* Set Interrupt Vector                                         */
@@ -680,17 +680,17 @@ dispatch:
 
       /* Read random record(s) using FCB */
     case 0x27:
-      lr.AL = FcbRandomBlockIO(FP_DS_DX, &lr.CX, XFR_READ | XFR_FCB_RANDOM);
+      lr.AL = FcbRandomBlockIO((xfcb FAR *)FP_DS_DX, &lr.CX, XFR_READ | XFR_FCB_RANDOM);
       break;
 
       /* Write random record(s) using FCB */
     case 0x28:
-      lr.AL = FcbRandomBlockIO(FP_DS_DX, &lr.CX, XFR_WRITE | XFR_FCB_RANDOM);
+      lr.AL = FcbRandomBlockIO((xfcb FAR *)FP_DS_DX, &lr.CX, XFR_WRITE | XFR_FCB_RANDOM);
       break;
 
       /* Parse File Name                                              */
     case 0x29:
-      lr.SI = FcbParseFname(&lr.AL, MK_FP(lr.DS, lr.SI), FP_ES_DI);
+      lr.SI = FcbParseFname(&lr.AL, (BYTE FAR *)MK_FP(lr.DS, lr.SI), (fcb FAR *)FP_ES_DI);
       break;
 
       /* Get Date                                                     */
@@ -744,7 +744,7 @@ dispatch:
            exactly this XX.YY.
            this makes most MS programs more happy.
          */
-        UBYTE FAR *retp = MK_FP(r->cs, r->ip);
+        UBYTE FAR *retp = (UBYTE FAR *)MK_FP(r->cs, r->ip);
 
         if (retp[0] == 0x3d &&  /* cmp ax, xxyy */
             (retp[3] == 0x75 || retp[3] == 0x74))       /* je/jne error    */
@@ -880,22 +880,22 @@ dispatch:
     case 0x39:
       /* Dos Remove Directory                                         */
     case 0x3a:
-      rc = DosMkRmdir(FP_DS_DX, lr.AH);
+      rc = DosMkRmdir((char FAR *)FP_DS_DX, lr.AH);
       goto short_check;
 
       /* Dos Change Directory                                         */
     case 0x3b:
-      rc = DosChangeDir(FP_DS_DX);
+      rc = DosChangeDir((BYTE FAR *)FP_DS_DX);
       goto short_check;
 
       /* Dos Create File                                              */
     case 0x3c:
-      lrc = DosOpen(FP_DS_DX, O_LEGACY | O_RDWR | O_CREAT | O_TRUNC, lr.CL);
+      lrc = DosOpen((char FAR *)FP_DS_DX, O_LEGACY | O_RDWR | O_CREAT | O_TRUNC, lr.CL);
       goto long_check;
 
       /* Dos Open                                                     */
     case 0x3d:
-      lrc = DosOpen(FP_DS_DX, O_LEGACY | O_OPEN | lr.AL, 0);
+      lrc = DosOpen((char FAR *)FP_DS_DX, O_LEGACY | O_OPEN | lr.AL, 0);
       goto long_check;
 
       /* Dos Close                                                    */
@@ -961,12 +961,12 @@ dispatch:
                 case 0x39:
                 /* Dos Remove Directory                                         */
                 case 0x3a:
-                rc = DosMkRmdir(FP_DS_DX, lr.AH);
+                rc = DosMkRmdir((char FAR *)FP_DS_DX, lr.AH);
                 goto short_check;
 
                 /* Dos rename file */
                 case 0x56:
-                rc = DosRename(FP_DS_DX, FP_ES_DI);
+                rc = DosRename((char FAR *)FP_DS_DX, (BYTE FAR *)FP_ES_DI);
                 goto short_check;
 
               /* fall through to goto error_invaid */
@@ -1003,7 +1003,7 @@ dispatch:
 
       /* Get Current Directory                                        */
     case 0x47:
-      rc = DosGetCuDir(lr.DL, MK_FP(lr.DS, lr.SI));
+      rc = DosGetCuDir(lr.DL, (BYTE FAR *)MK_FP(lr.DS, lr.SI));
       lr.AX = 0x0100;         /*jpp: from interrupt list */
       goto short_check;
 
@@ -1054,7 +1054,7 @@ dispatch:
     case 0x4b:
       break_flg = FALSE;
 
-      rc = DosExec(lr.AL, MK_FP(lr.ES, lr.BX), FP_DS_DX);
+      rc = DosExec(lr.AL, (exec_blk FAR *)MK_FP(lr.ES, lr.BX), (BYTE FAR *)FP_DS_DX);
       goto short_check;
 
       /* Terminate Program                                            */
@@ -1095,7 +1095,7 @@ dispatch:
     case 0x4e:
       /* dta for this call is set on entry.  This     */
       /* needs to be changed for new versions.        */
-      rc = DosFindFirst(lr.CX, FP_DS_DX);
+      rc = DosFindFirst(lr.CX, (BYTE FAR *)FP_DS_DX);
       lr.AX = 0;
       goto short_check;
 
@@ -1144,7 +1144,7 @@ dispatch:
 
       /* Dos Rename                                                   */
     case 0x56:
-      rc = DosRename(FP_DS_DX, FP_ES_DI);
+      rc = DosRename((BYTE FAR *)FP_DS_DX, (BYTE FAR *)FP_ES_DI);
       goto short_check;
 
       /* Get/Set File Date and Time                                   */
@@ -1218,12 +1218,12 @@ dispatch:
 
       /* Create Temporary File */
     case 0x5a:
-      lrc = DosMkTmp(FP_DS_DX, lr.CX);
+      lrc = DosMkTmp((BYTE FAR *)FP_DS_DX, lr.CX);
       goto long_check;
 
       /* Create New File */
     case 0x5b:
-      lrc = DosOpen(FP_DS_DX, O_LEGACY | O_RDWR | O_CREAT, lr.CX);
+      lrc = DosOpen((char FAR *)FP_DS_DX, O_LEGACY | O_RDWR | O_CREAT, lr.CX);
       goto long_check;
 
 /* /// Added for SHARE.  - Ron Cemer */
@@ -1266,9 +1266,9 @@ dispatch:
           /* Set Extended Error */
         case 0x0a:
           {
-            lregs far *er      = FP_DS_DX;
+            lregs far *er      = (lregs far *)FP_DS_DX;
             CritErrCode        = er->AX;
-            CritErrDev         = MK_FP(er->ES, er->DI);
+            CritErrDev         = (BYTE FAR *)MK_FP(er->ES, er->DI);
             CritErrLocus       = er->CH;
             CritErrClass       = er->BH;
             CritErrAction      = er->BL;
@@ -1286,11 +1286,11 @@ dispatch:
       switch (lr.AL)
       {
         case 0x00:
-          lr.CX = get_machine_name(FP_DS_DX);
+          lr.CX = get_machine_name((BYTE FAR *)FP_DS_DX);
           break;
 
         case 0x01:
-          set_machine_name(FP_DS_DX, lr.CX);
+          set_machine_name((BYTE FAR *)FP_DS_DX, lr.CX);
           break;
 
         default:
@@ -1331,7 +1331,7 @@ dispatch:
       }
 
     case 0x60:                 /* TRUENAME */
-      rc = DosTruename(MK_FP(lr.DS, lr.SI), adjust_far(FP_ES_DI));
+      rc = DosTruename((char FAR *)MK_FP(lr.DS, lr.SI), (char FAR *)adjust_far(FP_ES_DI));
       lr.AX = rc;
       goto short_check;
 
@@ -1407,7 +1407,7 @@ dispatch:
           DosUpMem(FP_DS_DX, lr.CX);
           break;
         case 0x22:             /* upcase ASCIZ */
-          DosUpString(FP_DS_DX);
+          DosUpString((char FAR *)FP_DS_DX);
           break;
         case 0xA0:             /* upcase single character of filenames */
           lr.DL = DosUpFChar(lr.DL);
@@ -1416,7 +1416,7 @@ dispatch:
           DosUpFMem(FP_DS_DX, lr.CX);
           break;
         case 0xA2:             /* upcase ASCIZ of filenames */
-          DosUpFString(FP_DS_DX);
+          DosUpFString((char FAR *)FP_DS_DX);
           break;
         case 0x23:             /* check Yes/No response */
           lr.AX = DosYesNo(lr.DL);
@@ -1496,7 +1496,7 @@ dispatch:
       /* high nibble must be <= 1, low nibble must be <= 2 */
       if ((lr.DL & 0xef) > 0x2)
         goto error_invalid;
-      lrc = DosOpen(MK_FP(lr.DS, lr.SI),
+      lrc = DosOpen((char FAR *)MK_FP(lr.DS, lr.SI),
                     (lr.BX & 0x70ff) | ((lr.DL & 3) << 8) |
                     ((lr.DL & 0x10) << 6), lr.CL);
       if (lrc >= SUCCESS)
@@ -1661,7 +1661,7 @@ VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r)
   nblks = r->cx;
   blkno = r->dx;
 
-  buf = MK_FP(r->ds, r->bx);
+  buf = (BYTE FAR *)MK_FP(r->ds, r->bx);
 
   if (nblks == 0xFFFF)
   {
@@ -1776,12 +1776,12 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
       /* code, drive number, error, device header */
       r.AL = CriticalError(r.callerARG1 >> 8,
                            (r.callerARG1 & (EFLG_CHAR << 8)) ? 0 :
-                           r.callerARG1 & 0xff, r.DI, MK_FP(r.BP, r.SI));
+                           r.callerARG1 & 0xff, r.DI, (struct dhdr FAR *)MK_FP(r.BP, r.SI));
       break;
 
     case 0x08:                 /* decrease SFT reference count */
       {
-        sft FAR *p = MK_FP(r.ES, r.DI);
+        sft FAR *p = (sft FAR *)MK_FP(r.ES, r.DI);
 
         r.AX = p->sft_count;
 
@@ -1804,7 +1804,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
     case 0x0b:                 /* sharing violation occurred */
       {
         /* ES:DI = SFT for previous open of file */
-        sft FAR *sftp = MK_FP(r.ES, r.DI);
+        sft FAR *sftp = (sft FAR *)MK_FP(r.ES, r.DI);
         /* default to don't retry, ie fail/abort/etc other than retry */
         r.FLAGS |= FLG_CARRY;
         /* from RBIL if SFT for FCB or compatibility mode without NOINHERIT call int24h */
@@ -1847,8 +1847,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
     case 0x11:                 /* normalise ASCIIZ filename */
     {
       char c;
-      char FAR *s = MK_FP(r.DS, r.SI);
-      char FAR *t = MK_FP(r.ES, r.DI);
+      char FAR *s = (char FAR *)MK_FP(r.DS, r.SI);
+      char FAR *t = (char FAR *)MK_FP(r.ES, r.DI);
 
       do
       {
@@ -1867,7 +1867,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
 
     case 0x12:                 /* get length of asciiz string */
 
-      r.CX = fstrlen(MK_FP(r.ES, r.DI)) + 1;
+      r.CX = fstrlen((char FAR *)MK_FP(r.ES, r.DI)) + 1;
 
       break;
 
@@ -1940,7 +1940,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
 
     case 0x20:                 /* get job file table entry */
       {
-        psp FAR *p = MK_FP(cu_psp, 0);
+        psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
         unsigned char FAR *idx;
 
         if (r.BX >= p->ps_maxfiles)
@@ -1958,7 +1958,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
 
     case 0x21:                 /* truename */
 
-      DosTruename(MK_FP(r.DS, r.SI), MK_FP(r.ES, r.DI));
+      DosTruename((char FAR *)MK_FP(r.DS, r.SI), (char FAR *)MK_FP(r.ES, r.DI));
 
       break;
 
@@ -1980,13 +1980,13 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
 
     case 0x25:                 /* get length of asciiz string */
 
-      r.CX = fstrlen(MK_FP(r.DS, r.SI)) + 1;
+      r.CX = fstrlen((char FAR *)MK_FP(r.DS, r.SI)) + 1;
       break;
 
     case 0x26:                 /* open file */
       r.FLAGS &= ~FLG_CARRY;
       CritErrCode = SUCCESS;
-      lrc = DosOpen(MK_FP(r.DS, r.DX), O_LEGACY | O_OPEN | r.CL, 0);
+      lrc = DosOpen((char FAR *)MK_FP(r.DS, r.DX), O_LEGACY | O_OPEN | r.CL, 0);
       goto long_check;
 
     case 0x27:                 /* close file */

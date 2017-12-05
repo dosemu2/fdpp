@@ -99,13 +99,13 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, char far * pathname)
   UWORD nEnvSize;
   COUNT RetCode;
 /*  UWORD MaxEnvSize;                                                                                                                                           not used -- 1999/04/21 ska */
-  psp FAR *ppsp = MK_FP(cu_psp, 0);
+  psp FAR *ppsp = (psp FAR *)MK_FP(cu_psp, 0);
 
   /* create a new environment for the process             */
   /* copy parent's environment if exec.env_seg == 0       */
 
   pSrc = exp->exec.env_seg ?
-      MK_FP(exp->exec.env_seg, 0) : MK_FP(ppsp->ps_environ, 0);
+      (BYTE FAR *)MK_FP(exp->exec.env_seg, 0) : (BYTE FAR *)MK_FP(ppsp->ps_environ, 0);
 
 #if 0
   /* Every process requires an environment because of argv[0]
@@ -140,7 +140,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, char far * pathname)
                              mem_access_mode, pChildEnvSeg,
                              NULL /*(UWORD FAR *) MaxEnvSize ska */ )) < 0)
     return RetCode;
-  pDest = MK_FP(*pChildEnvSeg + 1, 0);
+  pDest = (BYTE FAR *)MK_FP(*pChildEnvSeg + 1, 0);
 
   /* fill the new env and inform the process of its       */
   /* location throught the psp                            */
@@ -176,7 +176,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, char far * pathname)
 /* The following code is 8086 dependant                         */
 void new_psp(seg para, seg cur_psp)
 {
-  psp FAR *p = MK_FP(para, 0);
+  psp FAR *p = (psp FAR *)MK_FP(para, 0);
 
   fmemcpy(p, MK_FP(cur_psp, 0), sizeof(psp));
 
@@ -192,8 +192,8 @@ void new_psp(seg para, seg cur_psp)
 
 void child_psp(seg para, seg cur_psp, int psize)
 {
-  psp FAR *p = MK_FP(para, 0);
-  psp FAR *q = MK_FP(cur_psp, 0);
+  psp FAR *p = (psp FAR *)MK_FP(para, 0);
+  psp FAR *q = (psp FAR *)MK_FP(cur_psp, 0);
   int i;
 
   new_psp(para, cur_psp);
@@ -236,21 +236,21 @@ void child_psp(seg para, seg cur_psp, int psize)
 STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, exec_blk FAR * exb,
                       BYTE FAR * fnam)
 {
-  psp FAR *psp;
+  psp FAR *_psp;
   mcb FAR *pspmcb;
   int i;
   BYTE FAR *np;
 
-  pspmcb = MK_FP(pspseg, 0);
+  pspmcb = (mcb FAR *)MK_FP(pspseg, 0);
   ++pspseg;
-  psp = MK_FP(pspseg, 0);
+  _psp = (psp FAR *)MK_FP(pspseg, 0);
 
   /* complete the psp by adding the command line and FCBs     */
-  fmemcpy(&psp->ps_cmd, exb->exec.cmd_line, sizeof(CommandTail));
+  fmemcpy(&_psp->ps_cmd, exb->exec.cmd_line, sizeof(CommandTail));
   if (FP_OFF(exb->exec.fcb_1) != 0xffff)
   {
-    fmemcpy(&psp->ps_fcb1, exb->exec.fcb_1, 16);
-    fmemcpy(&psp->ps_fcb2, exb->exec.fcb_2, 16);
+    fmemcpy(&_psp->ps_fcb1, exb->exec.fcb_1, 16);
+    fmemcpy(&_psp->ps_fcb2, exb->exec.fcb_2, 16);
   }
 
   /* identify the mcb as this functions'                  */
@@ -261,7 +261,7 @@ STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, exec_blk FAR * exb,
     ((mcb FAR *) MK_FP(envseg, 0))->m_psp = pspseg;
     envseg++;
   }
-  psp->ps_environ = envseg;
+  _psp->ps_environ = envseg;
 
   /* use the file name less extension - left adjusted and */
   np = fnam;
@@ -286,14 +286,14 @@ set_name:
     pspmcb->m_name[i] = '\0';
 
   /* return value: AX value to be passed based on FCB values */
-  return (get_cds1(psp->ps_fcb1.fcb_drive) ? 0 : 0xff) |
-    (get_cds1(psp->ps_fcb2.fcb_drive) ? 0 : 0xff00);
+  return (get_cds1(_psp->ps_fcb1.fcb_drive) ? 0 : 0xff) |
+    (get_cds1(_psp->ps_fcb2.fcb_drive) ? 0 : 0xff00);
 }
 
 STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
 {
-  psp FAR *p = MK_FP(ds, 0);
-  psp FAR *q = MK_FP(cu_psp, 0);
+  psp FAR *p = (psp FAR *)MK_FP(ds, 0);
+  psp FAR *q = (psp FAR *)MK_FP(cu_psp, 0);
 
   /* Transfer control to the executable                   */
   p->ps_parent = cu_psp;
@@ -459,9 +459,9 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     BYTE FAR *sp;
 
     if (mode == OVERLAY)  /* memory already allocated */
-      sp = MK_FP(mem, 0);
+      sp = (BYTE FAR *)MK_FP(mem, 0);
     else                  /* test the filesize against the allocated memory */
-      sp = MK_FP(mem, sizeof(psp));
+      sp = (BYTE FAR *)MK_FP(mem, sizeof(psp));
 
     /* MS DOS always only loads the very first 64KB - sizeof(psp) bytes.
        -- 1999/04/21 ska */
@@ -495,12 +495,12 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     /* CP/M compatibility--size of first segment for .COM files
        while preserving the far call to 0:00c0 +
        copy in HMA at ffff:00d0 */
-    p = MK_FP(mem, 0);
-    p->ps_reentry = MK_FP(0xc - asize, asize << 4);
+    p = (psp FAR *)MK_FP(mem, 0);
+    p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0xc - asize, asize << 4);
     asize <<= 4;
     asize += 0x10e;
-    exp->exec.stack = MK_FP(mem, asize);
-    exp->exec.start_addr = MK_FP(mem, 0x100);
+    exp->exec.stack = (BYTE FAR *)MK_FP(mem, asize);
+    exp->exec.start_addr = (BYTE FAR *)MK_FP(mem, 0x100);
     *((UWORD FAR *) MK_FP(mem, asize)) = (UWORD) 0;
     load_transfer(mem, exp, fcbcode, mode);
   }
@@ -515,7 +515,7 @@ VOID return_user(void)
 /*  long j;*/
 
   /* restore parent                                       */
-  p = MK_FP(cu_psp, 0);
+  p = (psp FAR *)MK_FP(cu_psp, 0);
 
   /* When process returns - restore the isv               */
   setvec(0x22, p->ps_isv22);
@@ -539,7 +539,7 @@ VOID return_user(void)
   }
 
   cu_psp = p->ps_parent;
-  q = MK_FP(cu_psp, 0);
+  q = (psp FAR *)MK_FP(cu_psp, 0);
 
   irp = (iregs FAR *) q->ps_stack;
 
@@ -671,7 +671,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       start_seg += sizeof(psp) / 16;
       if (exe_size > 0 && (ExeHeader.exMinAlloc | ExeHeader.exMaxAlloc) == 0)
       {
-        mcb FAR *mp = MK_FP(mem - 1, 0);
+        mcb FAR *mp = (mcb FAR *)MK_FP(mem - 1, 0);
 
         /* then the image should be placed as high as possible */
         start_seg += mp->m_size - image_size;
@@ -716,13 +716,13 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       }
       if (mode == OVERLAY)
       {
-        spot = MK_FP(reloc[1] + mem, reloc[0]);
+        spot = (seg FAR *)MK_FP(reloc[1] + mem, reloc[0]);
         *spot += exp->load.reloc;
       }
       else
       {
         /*      spot = MK_FP(reloc[1] + mem + 0x10, reloc[0]); */
-        spot = MK_FP(reloc[1] + start_seg, reloc[0]);
+        spot = (seg FAR *)MK_FP(reloc[1] + start_seg, reloc[0]);
         *spot += start_seg;
       }
     }
@@ -743,9 +743,9 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     child_psp(mem, cu_psp, mem + asize);
 
     fcbcode = patchPSP(mem - 1, env, exp, namep);
-    exp->exec.stack =
+    exp->exec.stack = (BYTE FAR *)
       MK_FP(ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
-    exp->exec.start_addr =
+    exp->exec.start_addr = (BYTE FAR *)
       MK_FP(ExeHeader.exInitCS + start_seg, ExeHeader.exInitIP);
 
     /* Transfer control to the executable                   */
@@ -809,9 +809,9 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   /* build exec block and save all parameters here as init part will vanish! */
   exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
   exb.exec.env_seg = DOS_PSP + 8;
-  fstrcpy(Shell, MK_FP(FP_SEG(Config), FP_OFF(Config->cfgInit)));
+  fstrcpy(Shell, (char FAR *)MK_FP(FP_SEG(Config), FP_OFF(Config->cfgInit)));
   /* join name and tail */
-  fstrcpy(Shell + strlen(Shell), MK_FP(FP_SEG(Config), FP_OFF(Config->cfgInitTail)));
+  fstrcpy(Shell + strlen(Shell), (char FAR *)MK_FP(FP_SEG(Config), FP_OFF(Config->cfgInitTail)));
   endp =  Shell + strlen(Shell);
 
   for ( ; ; )   /* endless shell load loop - reboot or shut down to exit it! */

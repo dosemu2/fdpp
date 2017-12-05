@@ -40,7 +40,7 @@ static BYTE *mainRcsId =
 int SetJFTSize(UWORD nHandles)
 {
   UWORD block, maxBlock, i;
-  psp FAR *ppsp = MK_FP(cu_psp, 0);
+  psp FAR *ppsp = (psp FAR *)MK_FP(cu_psp, 0);
   UBYTE FAR *newtab;
 
   if (nHandles <= ppsp->ps_maxfiles)
@@ -54,7 +54,7 @@ int SetJFTSize(UWORD nHandles)
     return DE_NOMEM;
 
   ++block;
-  newtab = MK_FP(block, 0);
+  newtab = (UBYTE FAR *)MK_FP(block, 0);
 
   i = ppsp->ps_maxfiles;
   /* copy existing part and fill up new part by "no open file" */
@@ -268,7 +268,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   tn_printf(("truename(%S)\n", src));
 
   /* First, adjust the source pointer */
-  src = adjust_far(src);
+  src = (const char FAR *)adjust_far(src);
 
   /* In opposite of the TRUENAME shell command, an empty string is
      rejected by MS DOS 6 */

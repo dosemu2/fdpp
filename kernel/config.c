@@ -128,6 +128,9 @@ static UBYTE ErrorAlreadyPrinted[128] BSS_INIT({0});
 char master_env[128] BSS_INIT({0});
 static char *envp = master_env;
 
+static char _cfgInit[] = "command.com";
+static char _cfgInitTail[] = " /P /E:256\r\n";
+
 struct config Config = {
   0,
   NUMBUFF,
@@ -135,8 +138,8 @@ struct config Config = {
   0,
   NFCBS,
   0,
-  "command.com",
-  " /P /E:256\r\n",
+  _cfgInit,
+  _cfgInitTail,
   NLAST,
   0,
   NSTACKS,
@@ -255,7 +258,7 @@ STATIC struct table * LookUp(struct table *p, BYTE * token);
 typedef void config_sys_func_t(BYTE * pLine);
 
 struct table {
-  BYTE *entry;
+  const BYTE *entry;
   signed char pass;
   config_sys_func_t *func;
 };
@@ -352,10 +355,10 @@ void PreConfig(void)
 /*  printf("Preliminary %d buffers allocated at 0x%p\n", Config.cfgBuffers, buffers);*/
 #endif
 
-  LoL->DPBp =
+  LoL->DPBp = (struct dpb FAR *)
       DynAlloc("DPBp", blk_dev.dh_name[0], sizeof(struct dpb));
 
-  LoL->sfthead = MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
+  LoL->sfthead = (sfttbl FAR *)MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = (sfttbl FAR *)
      KernelAlloc(sizeof(sftheader)
@@ -363,7 +366,7 @@ void PreConfig(void)
 
   config_init_buffers(Config.cfgBuffers);
 
-  LoL->CDSp = KernelAlloc(sizeof(struct cds) * LoL->lastdrive, 'L', 0);
+  LoL->CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->lastdrive, 'L', 0);
 
 #ifdef DEBUG
 /*  printf(" FCB table 0x%p\n",LoL->FCBp);*/
@@ -408,7 +411,7 @@ void PreConfig2(void)
   mcb_init(base_seg, ram_top * 64 - LoL->first_mcb - 1, MCB_LAST);
 
   sp = LoL->sfthead;
-  sp = sp->sftt_next = KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
+  sp = sp->sftt_next = (sfttbl FAR *)KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
   sp->sftt_next = (sfttbl FAR *) - 1;
   sp->sftt_count = 3;
 
@@ -462,7 +465,7 @@ void PostConfig(void)
   sp->sftt_next = (sfttbl FAR *) - 1;
   sp->sftt_count = Config.cfgFiles - 8;
 
-  LoL->CDSp = KernelAlloc(sizeof(struct cds) * LoL->lastdrive, 'L', Config.cfgLastdriveHigh);
+  LoL->CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
 /*  printf(" FCB table 0x%p\n",LoL->FCBp);*/
@@ -1510,7 +1513,7 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     UBYTE buffer[256];
   } subf_data;
   struct subf_tbl {
-    char sig[8];        /* signature for each subfunction data */
+    char sig[9];        /* signature for each subfunction data XXX was 8 */
     void FAR *p;        /* pointer to data in nls_hc.asm to be copied to */
   };
   static struct subf_tbl table[8] = {
@@ -1524,9 +1527,10 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     {"\377DBCS   ", &nlsDBCSHardcoded}      /* 7, not supported [yet] */
   };
   static struct subf_hdr hdr[8];
-  static int entries, count;
-  int fd, i;
-  char *filename = filenam == NULL ? "\\COUNTRY.SYS" : filenam;
+  static unsigned int entries, count;
+  int fd;
+  unsigned int i;
+  const char *filename = filenam == NULL ? "\\COUNTRY.SYS" : filenam;
   BOOL rc = FALSE;
 
   if ((fd = open(filename, 0)) < 0)
@@ -1571,7 +1575,7 @@ err:printf("%s has invalid format\n", filename);
        || read(fd, &subf_data, 10) != 10
        || (memcmp(subf_data.signature, table[hdr[i].id].sig, 8) && (hdr[i].id !=4
        || memcmp(subf_data.signature, table[2].sig, 8)))  /* UCASE for FUCASE ^*/
-       || read(fd, subf_data.buffer, subf_data.length) != subf_data.length)
+       || read(fd, subf_data.buffer, subf_data.length) != (unsigned)subf_data.length)
         goto err;
       if (hdr[i].id == 1)
       {
@@ -1584,7 +1588,7 @@ err:printf("%s has invalid format\n", filename);
         nlsPackageHardcoded.cntry = entry.country;
         nlsPackageHardcoded.cp = entry.codepage;
         subf_data.length =      /* MS-DOS "CTYINFO" is up to 38 bytes */
-                min(subf_data.length, sizeof(struct CountrySpecificInfo));
+                min((unsigned)subf_data.length, sizeof(struct CountrySpecificInfo));
       }
       if (hdr[i].id == 7)
       {
@@ -1734,7 +1738,7 @@ STATIC VOID DeviceHigh(BYTE * pLine)
 {
   if (UmbState == 1)
   {
-    if (LoadDevice(pLine, MK_FP(umb_start + UMB_top, 0), TRUE) == DE_NOMEM)
+    if (LoadDevice(pLine, (char FAR *)MK_FP(umb_start + UMB_top, 0), TRUE) == DE_NOMEM)
     {
       printf("Not enough free memory in UMBs: loading low\n");
       LoadDevice(pLine, lpTop, FALSE);
@@ -1803,7 +1807,7 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
   /* add \r\n to the command line */
   strcat(szBuf, " \r\n");
 
-  dhp = MK_FP(base, 0);
+  dhp = (struct dhdr FAR *)MK_FP(base, 0);
 
   /* NOTE - Modification for multisegmented device drivers:          */
   /*   In order to emulate the functionallity experienced with other */
@@ -1816,7 +1820,7 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
        (result = init_device(dhp, szBuf, mode, &top)) == SUCCESS;
        dhp = next_dhp)
   {
-    next_dhp = MK_FP(FP_SEG(dhp), FP_OFF(dhp->dh_next));
+    next_dhp = (struct dhdr FAR *)MK_FP(FP_SEG(dhp), FP_OFF(dhp->dh_next));
     /* Link in device driver and save LoL->nul_dev pointer to next */
     dhp->dh_next = LoL->nul_dev.dh_next;
     LoL->nul_dev.dh_next = dhp;
@@ -1916,7 +1920,7 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
   if (LoL->first_mcb == 0)
   {
     /* prealloc */
-    lpTop = MK_FP(FP_SEG(lpTop) - nPara, FP_OFF(lpTop));
+    lpTop = (BYTE FAR *)MK_FP(FP_SEG(lpTop) - nPara, FP_OFF(lpTop));
     p = AlignParagraph(lpTop);
   }
   else
@@ -2093,7 +2097,7 @@ STATIC char strcaseequal(const char * d, const char * s)
 STATIC void config_init_buffers(int wantedbuffers)
 {
   struct buffer FAR *pbuffer;
-  unsigned buffers = 0;
+  int buffers = 0;
 
   /* fill HMA with buffers if BUFFERS count >=0 and DOS in HMA        */
   if (wantedbuffers < 0)
@@ -2115,13 +2119,13 @@ STATIC void config_init_buffers(int wantedbuffers)
   LoL->inforecptr = &LoL->firstbuf;
   {
     size_t bytes = sizeof(struct buffer) * buffers;
-    pbuffer = HMAalloc(bytes);
+    pbuffer = (struct buffer FAR *)HMAalloc(bytes);
 
     if (pbuffer == NULL)
     {
-      pbuffer = KernelAlloc(bytes, 'B', 0);
+      pbuffer = (struct buffer FAR *)KernelAlloc(bytes, 'B', 0);
       if (HMAState == HMA_DONE)
-        firstAvailableBuf = MK_FP(0xffff, HMAFree);
+        firstAvailableBuf = (struct buffer FAR *)MK_FP(0xffff, HMAFree);
     }
     else
     {
@@ -2453,7 +2457,7 @@ STATIC void CfgMenuColor(BYTE * pLine)
 struct CountrySpecificInfoSmall {
   short CountryID;    /*  = W1 W437   # Country ID */
   char  DateFormat;           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
-  char  CurrencyString[3];    /* '$' ,'EUR'   */
+  char  CurrencyString[4];    /* '$' ,'EUR', XXX was 3   */
   char  ThousandSeparator;    /* ','          # Thousand's separator */
   char  DecimalPoint;         /* '.'        # Decimal point        */
   char  DateSeparator;        /* '-'  */
@@ -2570,7 +2574,7 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode)
 ** implementation of INSTALL=NANSI.COM /P /X /BLA
 */
 
-int  numInstallCmds BSS_INIT(0);
+unsigned int  numInstallCmds BSS_INIT(0);
 struct instCmds {
   char buffer[128];
   int mode;
@@ -2685,7 +2689,7 @@ STATIC void set_strategy(unsigned char strat)
 
 VOID DoInstall(void)
 {
-  int i;
+  unsigned int i;
   unsigned short installMemory;
   struct instCmds *cmd;
 

@@ -54,11 +54,11 @@ extern struct DynS DOSFAR ASM Dyn;
 extern struct DynS FAR ASM Dyn;
 #endif
 
-void far *DynAlloc(char *what, unsigned num, unsigned size)
+void far *DynAlloc(const char *what, unsigned num, unsigned size)
 {
   void far *now;
   unsigned total = num * size;
-  struct DynS far *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
+  struct DynS far *Dynp = (struct DynS far *)MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
 
 #ifndef DEBUG
   UNREFERENCED_PARAMETER(what);
@@ -84,13 +84,13 @@ void far *DynAlloc(char *what, unsigned num, unsigned size)
 
 void DynFree(void *ptr)
 {
-  struct DynS far *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
+  struct DynS far *Dynp = (struct DynS far *)MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
   Dynp->Allocated = (char *)ptr - (char *)Dynp->Buffer;
 }
 
 void FAR * DynLast()
 {
-  struct DynS far *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
+  struct DynS far *Dynp = (struct DynS far *)MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
   DebugPrintf(("dynamic data end at %p\n",
                (void FAR *)(Dynp->Buffer + Dynp->Allocated)));
 

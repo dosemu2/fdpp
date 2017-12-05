@@ -1045,7 +1045,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
       {
         dap.number_of_blocks = count;
 
-        dap.buffer_address = transfer_address;
+        dap.buffer_address = (UBYTE FAR *)transfer_address;
 
         dap.block_address_high = 0;     /* clear high part */
         dap.block_address = LBA_address;        /* clear high part */
@@ -1090,12 +1090,12 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
                                                           chs.Cylinder,
                                                           chs.Sector,
                                                           count,
-                                                          transfer_address);
+                                                          (UBYTE FAR *)transfer_address);
 
         if (error_code == 0 && mode == LBA_WRITE_VERIFY)
         {
           error_code = fl_verify(driveno, chs.Head, chs.Cylinder,
-                                 chs.Sector, count, transfer_address);
+                                 chs.Sector, count, (UBYTE FAR *)transfer_address);
         }
       }
       if (error_code == 0)

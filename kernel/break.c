@@ -76,7 +76,8 @@ unsigned char check_handle_break(struct dhdr FAR **pdev)
 
 void handle_break(struct dhdr FAR **pdev, int sft_out)
 {
-  char *buf = "^C\r\n";
+  /* XXX: was *buf = "^C\r\n" but const doesn't propagate to DosRWSft() */
+  char buf[] = "^C\r\n";
 
   CB_FLG &= ~CB_MSK;            /* reset the ^Break flag */
   con_flush(pdev);

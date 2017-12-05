@@ -183,7 +183,7 @@ sft FAR * idx_to_sft(int SftIndex)
 
 int get_sft_idx(unsigned hndl)
 {
-  psp FAR *p = MK_FP(cu_psp, 0);
+  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
   int idx;
 
   if (hndl >= p->ps_maxfiles)
@@ -248,7 +248,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
       if (mode == XFR_WRITE && rc > 0 && (s->sft_flags & SFT_FCONOUT))
       {
         size_t cnt = (size_t)rc;
-        const char FAR *p = bp;
+        const char FAR *p = (const char FAR *)bp;
         while (cnt--)
           update_scr_pos(*p++, 1);
       }
@@ -266,9 +266,9 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
         return 0;
 
       if (s->sft_flags & SFT_FCONIN)
-        rc = read_line_handle(sft_idx, n, bp);
+        rc = read_line_handle(sft_idx, n, (char *)bp);
       else
-        rc = cooked_read(&dev, n, bp);
+        rc = cooked_read(&dev, n, (char *)bp);
       if (*(char *)bp == CTL_Z)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
@@ -282,7 +282,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
       if (s->sft_flags & SFT_FNUL)
         return n;
       else
-        return cooked_write(&dev, n, bp);
+        return cooked_write(&dev, n, (char *)bp);
     }
   }
 
@@ -356,9 +356,9 @@ ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, int *rc)
 
 STATIC long get_free_hndl(void)
 {
-  psp FAR *p = MK_FP(cu_psp, 0);
+  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
   UBYTE FAR *q = p->ps_filetab;
-  UBYTE FAR *r = fmemchr(q, 0xff, p->ps_maxfiles);
+  UBYTE FAR *r = (UBYTE FAR *)fmemchr(q, 0xff, p->ps_maxfiles);
   if (FP_SEG(r) == 0) return DE_TOOMANY;
   return (unsigned)(r - q);
 }
@@ -652,7 +652,7 @@ long DosDup(unsigned Handle)
 
 COUNT DosForceDup(unsigned OldHandle, unsigned NewHandle)
 {
-  psp FAR *p = MK_FP(cu_psp, 0);
+  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
   sft FAR *Sftp;
 
   /* Get the SFT block that contains the SFT                      */
@@ -729,7 +729,7 @@ COUNT DosCloseSft(int sft_idx, BOOL commitonly)
 
 COUNT DosClose(COUNT hndl)
 {
-  psp FAR *p = MK_FP(cu_psp, 0);
+  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
   int sft_idx = get_sft_idx(hndl);
 
   if (FP_OFF(idx_to_sft(sft_idx)) == (size_t) - 1)
@@ -985,7 +985,7 @@ STATIC int pop_dmp(int rc, dmatch FAR * dmp)
 COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
 {
   int rc;
-  register dmatch FAR *dmp = dta;
+  register dmatch FAR *dmp = (dmatch FAR *)dta;
 
   rc = truename(name, PriPathName,
                 CDS_MODE_CHECK_DEV_PATH | CDS_MODE_ALLOW_WILDCARDS);
@@ -1040,7 +1040,7 @@ COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
 COUNT DosFindNext(void)
 {
   COUNT rc;
-  register dmatch FAR *dmp = dta;
+  register dmatch FAR *dmp = (dmatch FAR *)dta;
 
 /*
  *  The new version of SHSUCDX 1.0 looks at the dm_drive byte to

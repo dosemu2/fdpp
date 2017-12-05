@@ -72,7 +72,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp);
 void write_char(int c, int sft_idx);
 void write_char_stdout(int c);
 void update_scr_pos(unsigned char c, unsigned char count);
-long cooked_write(struct dhdr FAR **pdev, size_t n, char FAR *bp);
+long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp);
 
 sft FAR *get_sft(UCOUNT);
 
@@ -132,8 +132,8 @@ VOID ASMFUNC DosIdle_hlt(void);
 
 /* error.c */
 VOID dump(void);
-VOID panic(BYTE * s);
-VOID fatal(BYTE * err_msg);
+VOID panic(const BYTE * s);
+VOID fatal(const BYTE * err_msg);
 
 /* fatdir.c */
 VOID dir_init_fnode(f_node_ptr fnp, CLUSTER dirstart);
@@ -283,7 +283,7 @@ UWORD ASMCFUNC syscall_MUX14(DIRECT_IREGS);
 int VA_CDECL printf(CONST char * fmt, ...);
 int VA_CDECL sprintf(char * buff, CONST char * fmt, ...);
 #endif
-VOID hexd(char *title, VOID FAR * p, COUNT numBytes);
+VOID hexd(const char *title, VOID FAR * p, COUNT numBytes);
 void put_unsigned(unsigned n, int base, int width);
 void put_string(const char *s);
 void put_console(int);

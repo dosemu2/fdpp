@@ -71,7 +71,7 @@ long BinaryCharIO(struct dhdr FAR **pdev, size_t n, void FAR * bp,
   do
   {
     CharReqHdr.r_count = n;
-    CharReqHdr.r_trans = bp;
+    CharReqHdr.r_trans = (BYTE FAR *)bp;
     err = CharRequest(pdev, command);
   } while (err == 1);
   return err == SUCCESS ? (long)CharReqHdr.r_count : err;
@@ -176,7 +176,7 @@ void update_scr_pos(unsigned char c, unsigned char count)
 
 STATIC int raw_get_char(struct dhdr FAR **pdev, BOOL check_break);
 
-long cooked_write(struct dhdr FAR **pdev, size_t n, char FAR *bp)
+long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp)
 {
   size_t xfer;
 
@@ -411,7 +411,7 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
           }
           else
           {
-            char FAR *sp = fmemchr(&kp->kb_buf[stored_pos],
+            char FAR *sp = (char FAR *)fmemchr(&kp->kb_buf[stored_pos],
                                    c2, stored_size - stored_pos);
             if (sp != NULL)
                 new_pos = (FP_OFF(sp) - FP_OFF(&kp->kb_buf[stored_pos])) + 1;

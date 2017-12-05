@@ -277,20 +277,20 @@ extern BYTE FAR * ASM CritErrDev;
 extern struct dirent
   ASM SearchDir;
 
-extern struct {
+extern struct FcbSearchBuffer {
   COUNT nDrive;
   BYTE szName[FNAME_SIZE + 1];
   BYTE szExt[FEXT_SIZE + 1];
 } ASM FcbSearchBuffer;
 
-extern struct                   /* Path name parsing buffer             */
+extern struct _PriPathBuffer                  /* Path name parsing buffer             */
 {
   BYTE _PriPathName[128];
 } ASM _PriPathBuffer;
 
 #define PriPathName _PriPathBuffer._PriPathName
 
-extern struct                   /* Alternate path name parsing buffer   */
+extern struct _SecPathBuffer                  /* Alternate path name parsing buffer   */
 {
   BYTE _SecPathName[128];
 } ASM _SecPathBuffer;

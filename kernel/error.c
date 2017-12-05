@@ -49,7 +49,7 @@ VOID dump(void)
 #endif
 
 /* issue a panic message for corrupted data structures          */
-VOID panic(BYTE * s)
+VOID panic(const BYTE * s)
 {
   put_string("\nPANIC: ");
   put_string(s);
@@ -59,7 +59,7 @@ VOID panic(BYTE * s)
 
 #ifdef IPL
 /* issue an internal error message                              */
-VOID fatal(BYTE * err_msg)
+VOID fatal(const BYTE * err_msg)
 {
   printf("\nInternal IPL error - %s\nSystem halted\n", err_msg);
   exit(-1);

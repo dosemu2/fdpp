@@ -317,9 +317,9 @@ void MoveKernel(unsigned NewKernelSegment)
   if (CurrentKernelSegment == 0xffff)
     return;
 
-  HMASource =
+  HMASource = (UBYTE FAR *)
       MK_FP(CurrentKernelSegment, (FP_OFF(_HMATextStart) & 0xfff0));
-  HMADest = MK_FP(NewKernelSegment, 0x0000);
+  HMADest = (UBYTE FAR *)MK_FP(NewKernelSegment, 0x0000);
 
   len = (FP_OFF(_HMATextEnd) | 0x000f) - (FP_OFF(_HMATextStart) & 0xfff0);
 

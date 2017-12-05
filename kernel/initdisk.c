@@ -353,7 +353,7 @@ void init_LBA_to_CHS(struct CHS *chs, ULONG LBA_address,
   chs->Sector = hsrem % driveparam->chs.Sector + 1;
 }
 
-void printCHS(char *title, struct CHS *chs)
+void printCHS(const char *title, struct CHS *chs)
 {
   /* has no fixed size for head/sect: is often 1/1 in our context */
   printf("%s%4u-%u-%u", title, chs->Cylinder, chs->Head, chs->Sector);
@@ -535,7 +535,7 @@ VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
 
 STATIC void push_ddt(ddt *pddt)
 {
-  ddt FAR *fddt = DynAlloc("ddt", 1, sizeof(ddt));
+  ddt FAR *fddt = (ddt FAR *)DynAlloc("ddt", 1, sizeof(ddt));
   fmemcpy(fddt, pddt, sizeof(ddt));
   if (pddt->ddt_logdriveno != 0) {
     (fddt - 1)->ddt_next = fddt;
@@ -558,7 +558,7 @@ void DosDefinePartition(struct DriveParamS *driveParam,
     return;                     /* we are done */
   }
 
-  pddt->ddt_next = MK_FP(0, 0xffff);
+  pddt->ddt_next = (struct ddtstruct FAR *)MK_FP(0, 0xffff);
   pddt->ddt_driveno = driveParam->driveno;
   pddt->ddt_logdriveno = nUnits;
   pddt->ddt_descflags = driveParam->descflags;
@@ -604,7 +604,7 @@ void DosDefinePartition(struct DriveParamS *driveParam,
 
   if (InitKernelConfig.InitDiskShowDriveAssignment)
   {
-    char *ExtPri;
+    const char *ExtPri;
     int num;
 
     LBA_to_CHS(&chs, StartSector, driveParam);
@@ -985,7 +985,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         (InitKernelConfig.ForceLBA || ExtLBAForce || chs.Cylinder > 1023))
     {
       dap.number_of_blocks = 1;
-      dap.buffer_address = buffer;
+      dap.buffer_address = (UBYTE FAR *)buffer;
       dap.block_address_high = 0;       /* clear high part */
       dap.block_address = LBA_address;  /* clear high part */
 
@@ -1243,7 +1243,7 @@ I don't know, if I did it right, but I tried to do it that way. TE
 
 STATIC void make_ddt (ddt *pddt, int Unit, int driveno, int flags)
 {
-  pddt->ddt_next = MK_FP(0, 0xffff);
+  pddt->ddt_next = (struct ddtstruct FAR *)MK_FP(0, 0xffff);
   pddt->ddt_logdriveno = Unit;
   pddt->ddt_driveno = driveno;
   pddt->ddt_type = init_getdriveparm(driveno, &pddt->ddt_defbpb);
@@ -1260,8 +1260,8 @@ void ReadAllPartitionTables(void)
 {
   UBYTE foundPartitions[MAX_HARD_DRIVE];
 
-  int HardDrive;
-  int nHardDisk;
+  unsigned int HardDrive;
+  unsigned int nHardDisk;
   ddt nddt;
   static iregs regs;
 

@@ -638,7 +638,7 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
 
   /* First, move the dta to a local and change it around to match */
   /* our functions.                                               */
-  lpDir = dta;
+  lpDir = (BYTE FAR *)dta;
   dta = &Dmatch;
 
   /* Next initialze local variables by moving them from the fcb   */

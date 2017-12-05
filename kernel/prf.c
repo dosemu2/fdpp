@@ -370,7 +370,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 extern void put_string(const char *);
 extern void put_unsigned(unsigned, int, int);
 
-void hexd(char *title, UBYTE FAR * p, COUNT numBytes)
+void hexd(const char *title, UBYTE FAR * p, COUNT numBytes)
 {
   int loop, start = 0;
   put_string(title);

@@ -91,7 +91,7 @@ VOID ASMCFUNC FreeDOSmain(void)
                         */
 
   drv = LoL->BootDrive + 1;
-  p = MK_FP(0, 0x5e0);
+  p = (unsigned char FAR *)MK_FP(0, 0x5e0);
   if (fmemcmp(p+2,"CONFIG",6) == 0)      /* UPX */
   {
     fmemcpy(&InitKernelConfig, p+2, sizeof(InitKernelConfig));
@@ -154,7 +154,7 @@ void InitializeAllBPBs(VOID)
 
 STATIC void PSPInit(void)
 {
-  psp far *p = MK_FP(DOS_PSP, 0);
+  psp far *p = (psp far *)MK_FP(DOS_PSP, 0);
 
   /* Clear out new psp first                              */
   fmemset(p, 0, sizeof(psp));
@@ -165,7 +165,7 @@ STATIC void PSPInit(void)
 
   /* CP/M-like entry point - call far to special entry    */
   p->ps_farcall = 0x9a;
-  p->ps_reentry = MK_FP(0, 0x30 * 4);
+  p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0, 0x30 * 4);
   /* unix style call - 0xcd 0x21 0xcb (int 21, retf)      */
   p->ps_unix[0] = 0xcd;
   p->ps_unix[1] = 0x21;
@@ -289,11 +289,11 @@ STATIC void init_kernel(void)
 #ifdef __WATCOMC__
   lpTop = MK_FP(_CS, 0);
 #else
-  lpTop = MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
+  lpTop = (BYTE FAR *)MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
 #endif
 
   MoveKernel(FP_SEG(lpTop));
-  lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
+  lpTop = (BYTE FAR *)MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
 
   /* Initialize IO subsystem                                      */
   InitIO();
@@ -462,7 +462,7 @@ STATIC void kernel()
   /* 3 for string + 2 for "\r\n" */
   if (Cmd.ctCount < sizeof(Cmd.ctBuffer) - 5)
   {
-    char *insertString = NULL;
+    const char *insertString = NULL;
 
     if (singleStep)
       insertString = " /Y";     /* single step AUTOEXEC */
@@ -498,35 +498,35 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
 {
   REG COUNT Index;
   COUNT nunits = dhp->dh_name[0];
-  struct dpb FAR *dpb;
+  struct dpb FAR *_dpb;
 
   if (LoL->nblkdev == 0)
-    dpb = LoL->DPBp;
+    _dpb = LoL->DPBp;
   else
   {
-    for (dpb = LoL->DPBp; (ULONG) dpb->dpb_next != 0xffffffffl;
-         dpb = dpb->dpb_next)
+    for (_dpb = LoL->DPBp; (ULONG) _dpb->dpb_next != 0xffffffffl;
+         _dpb = _dpb->dpb_next)
       ;
-    dpb = dpb->dpb_next =
+    _dpb = _dpb->dpb_next = (struct dpb FAR *)
       KernelAlloc(nunits * sizeof(struct dpb), 'E', Config.cfgDosDataUmb);
   }
 
   for (Index = 0; Index < nunits; Index++)
   {
-    dpb->dpb_next = dpb + 1;
-    dpb->dpb_unit = LoL->nblkdev;
-    dpb->dpb_subunit = Index;
-    dpb->dpb_device = dhp;
-    dpb->dpb_flags = M_CHANGED;
+    _dpb->dpb_next = _dpb + 1;
+    _dpb->dpb_unit = LoL->nblkdev;
+    _dpb->dpb_subunit = Index;
+    _dpb->dpb_device = dhp;
+    _dpb->dpb_flags = M_CHANGED;
     if ((LoL->CDSp != 0) && (LoL->nblkdev < LoL->lastdrive))
     {
-      LoL->CDSp[LoL->nblkdev].cdsDpb = dpb;
+      LoL->CDSp[LoL->nblkdev].cdsDpb = _dpb;
       LoL->CDSp[LoL->nblkdev].cdsFlags = CDSPHYSDRV;
     }
-    ++dpb;
+    ++_dpb;
     ++LoL->nblkdev;
   }
-  (dpb - 1)->dpb_next = (void FAR *)0xFFFFFFFFl;
+  (_dpb - 1)->dpb_next = (struct dpb FAR *)0xFFFFFFFFl;
 }
 
 /* If cmdLine is NULL, this is an internal driver */
@@ -565,7 +565,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_command = C_INIT;
   rq.r_length = sizeof(request);
   rq.r_endaddr = *r_top;
-  rq.r_bpbptr = (void FAR *)(cmdLine ? cmdLine : "\n");
+  rq.r_bpbptr = (bpb FAR **)(cmdLine ? cmdLine : "\n");  // XXX is typecase correct?
   rq.r_firstunit = LoL->nblkdev;
 
   execrh((request FAR *) & rq, dhp);
@@ -718,7 +718,7 @@ STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 
 STATIC void CheckContinueBootFromHarddisk(void)
 {
-  char *bootedFrom = "Floppy/CD";
+  const char *bootedFrom = "Floppy/CD";
   iregs r;
   int key;
 

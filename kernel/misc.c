@@ -55,8 +55,8 @@ VOID fstrcpy(REG BYTE FAR * d, REG CONST BYTE FAR * s)
 
 VOID * memcpy(REG VOID * d, REG CONST VOID * s, REG size_t n)
 {
-  char *cd = d;
-  CONST char *cs = s;
+  char *cd = (char *)d;
+  CONST char *cs = (CONST char *)s;
 
   while (n--)
     *cd++ = *cs++;

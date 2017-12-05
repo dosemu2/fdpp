@@ -34,8 +34,8 @@ static BYTE *memmgrRcsId =
     "$Id: memmgr.c 1338 2007-07-20 20:52:33Z mceric $";
 #endif
 
-#define nxtMCBsize(mcb,size) MK_FP(FP_SEG(mcb) + (size) + 1, FP_OFF(mcb))
-#define nxtMCB(mcb) nxtMCBsize((mcb), (mcb)->m_size)
+#define nxtMCBsize(m,size) (mcb FAR *)MK_FP(FP_SEG(m) + (size) + 1, FP_OFF(m))
+#define nxtMCB(m) nxtMCBsize((m), (m)->m_size)
 
 #define mcbFree(mcb) ((mcb)->m_psp == FREE_PSP)
 #define mcbValid(mcb)	( ((mcb)->m_size != 0xffff) && \
