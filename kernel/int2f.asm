@@ -102,10 +102,13 @@ Int2f?14:      ;; MUX-14 -- NLSFUNC API
                push bp                 ; Preserve BP later on
                Protect386Registers
                PUSH$ALL
+               mov bp, sp              ; Save pointer to iregs struct
+               push ss
+               push bp                 ; Pass pointer to iregs struct to C
                mov ds, [cs:_DGROUP_]
                call _syscall_MUX14
-               pop bp                  ; Discard incoming AX
-               push ax                 ; Correct stack for POP$ALL
+               add sp, 6               ; Remove SS,SP and old AX
+               push ax                 ; Save return value for POP$ALL
                POP$ALL
                Restore386Registers
                mov bp, sp
