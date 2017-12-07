@@ -87,6 +87,27 @@ typedef struct {
   UWORD si, di, ds, es;
 } lregs;
 
+struct int2f12regs {
+#ifdef I386
+#ifdef __WATCOMC__
+  /* UWORD gs, fs;  ** GS/FS are protected through SI/DI */
+#else
+  UWORD high_edx,
+#ifdef _MSC_VER
+        high_ecx,
+#else /* __BORLANDC__ */
+        high_ebx,
+#endif
+        high_eax;
+#endif
+#endif
+  UWORD es, ds;
+  UWORD di, si, bp;
+  xreg b, d, c, a;
+  UWORD ip, cs, flags;
+  UWORD callerARG1;             /* used if called from INT2F/12 */
+};
+
 /* Process control block for task switching                             */
 typedef struct {
   UWORD pc_ss;

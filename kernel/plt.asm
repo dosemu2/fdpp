@@ -1,4 +1,4 @@
-%macro asmcfunc 1
+%macro asmcfunc 2
     global _%1
     _%1:
     nop

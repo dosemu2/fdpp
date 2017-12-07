@@ -1,8 +1,10 @@
+COMPILER ?= gcc
+XCPU ?= 386
 include ../mkfiles/generic.mak
 
 CFLAGS = -I..$(DIRSEP)hdr
 
-production: patchobj.com exeflat.exe
+production: patchobj.com exeflat.exe thunk_gen
 
 patchobj.com: patchobj.c
 	$(CLT) $(CFLAGS) -o $@ patchobj.c
@@ -10,6 +12,14 @@ patchobj.com: patchobj.c
 exeflat.exe: exeflat.c ../hdr/exe.h
 	$(CLC) $(CFLAGS) -o $@ exeflat.c
 
+thunk_gen: lex.yy.c thunk_gen.tab.c
+	$(CLC) -o $@ $^
+
+thunk_gen.tab.c: thunk_gen.y
+	bison -d $^
+
+lex.yy.c: thunk_gen.l
+	lex $^
 
 clobber: clean
 
