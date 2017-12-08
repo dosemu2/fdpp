@@ -81,7 +81,7 @@ HDRS=\
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h dyndata.h
-HEADERS=$(HDRS) globals.h proto.h thunk_calls.h
+HEADERS=$(HDRS) globals.h proto.h thunk_calls.h thunk_asms.h
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
 CFILES = blockio.c \
@@ -138,3 +138,6 @@ plt.inc thunk_calls.tmp: proto.h makefile
 
 thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
+
+thunk_asms.h: proto.h makefile
+	grep ASMFUNC $< | nl -n ln -v 0 | ../utils/thunk_gen 1 >$@

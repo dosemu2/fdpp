@@ -24,6 +24,7 @@
 ","		{ return COMMA; }
 "\n"		{ return NEWLINE; }
 "ASMCFUNC"	{ return ASMCFUNC; }
+"ASMFUNC"	{ }
 "FAR"		{ return FAR; }
 "*"		{ return ASTER; }
 "VOID"		{ return VOID; }
