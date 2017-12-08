@@ -125,6 +125,7 @@ $(OBJECTS): $(HEADERS)
 
 libfdkernel.so: $(OBJECTS)
 	$(CL) -shared -o $@ $^
+	@echo "Have `nm -u $@ | wc -l` undefined symbols"
 
 ../bin/libfdkernel.so: libfdkernel.so
 		$(CP) $^ ..$(DIRSEP)bin
