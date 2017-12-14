@@ -44,7 +44,8 @@ clobber:        clean
 		-$(RM) kernel.exe kernel.sys status.me
 
 clean:
-		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.lnk *.o *.so *.tmp
+		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
+			*.lnk *.o *.so *.tmp $(GEN_HEADERS)
 
 # XXX: This is a very ugly way of linking the kernel, forced upon us by the
 # inability of Turbo `make' 2.0 to perform command line redirection. -- ror4
@@ -81,7 +82,8 @@ HDRS=\
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h dyndata.h
-HEADERS=$(HDRS) globals.h proto.h thunk_calls.h thunk_asms.h
+GEN_HEADERS=thunk_calls.h thunk_asms.h
+HEADERS=$(HDRS) globals.h proto.h $(GEN_HEADERS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
 CFILES = blockio.c \
@@ -132,9 +134,11 @@ libfdkernel.so: $(OBJECTS)
 
 plt.obj: plt.asm plt.inc
 
-plt.inc thunk_calls.tmp: proto.h makefile
-	grep ASMCFUNC $< | nl -n ln -v 0 | tee thunk_calls.tmp | \
-		sed 's/\([0-9]\+\).\+ \([^ ]\+\) *(.*/asmcfunc \2,\t\t\1/' >plt.inc
+thunk_calls.tmp: proto.h makefile
+	grep ASMCFUNC $< | nl -n ln -v 0 >$@
+
+plt.inc: thunk_calls.tmp
+	sed 's/\([0-9]\+\).\+ \([^ ]\+\) *(.*/asmcfunc \2,\t\t\1/' $^ >$@
 
 thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
