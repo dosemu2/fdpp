@@ -39,53 +39,6 @@ static BYTE *dosfnsRcsId =
 
 BYTE share_installed = 0;
 
-        /* DOS calls this to see if it's okay to open the file.
-           Returns a file_table entry number to use (>= 0) if okay
-           to open.  Otherwise returns < 0 and may generate a critical
-           error.  If < 0 is returned, it is the negated error return
-           code, so DOS simply negates this value and returns it in
-           AX. */
-extern int ASMPASCAL
-           share_open_check(char * filename,            /* pointer to fully qualified filename */
-                            unsigned short pspseg,      /* psp segment address of owner process */
-                            int openmode,       /* 0=read-only, 1=write-only, 2=read-write */
-                            int sharemode);     /* SHARE_COMPAT, etc... */
-
-        /* DOS calls this to record the fact that it has successfully
-           closed a file, or the fact that the open for this file failed. */
-extern void ASMPASCAL
-            share_close_file(int fileno);       /* file_table entry number */
-
-        /* DOS calls this to determine whether it can access (read or
-           write) a specific section of a file.  We call it internally
-           from lock_unlock (only when locking) to see if any portion
-           of the requested region is already locked.  If pspseg is zero,
-           then it matches any pspseg in the lock table.  Otherwise, only
-           locks which DO NOT belong to pspseg will be considered.
-           Returns zero if okay to access or lock (no portion of the
-           region is already locked).  Otherwise returns non-zero and
-           generates a critical error (if allowcriter is non-zero).
-           If non-zero is returned, it is the negated return value for
-           the DOS call. */
-extern int ASMPASCAL
-            share_access_check(unsigned short pspseg,    /* psp segment address of owner process */
-                              int fileno,       /* file_table entry number */
-                              unsigned long ofs,        /* offset into file */
-                              unsigned long len,        /* length (in bytes) of region to access */
-                              int allowcriter); /* allow a critical error to be generated */
-
-        /* DOS calls this to lock or unlock a specific section of a file.
-           Returns zero if successfully locked or unlocked.  Otherwise
-           returns non-zero.
-           If the return value is non-zero, it is the negated error
-           return code for the DOS 0x5c call. */
-extern int ASMPASCAL
-            share_lock_unlock(unsigned short pspseg,     /* psp segment address of owner process */
-                             int fileno,        /* file_table entry number */
-                             unsigned long ofs, /* offset into file */
-                             unsigned long len, /* length (in bytes) of region to lock or unlock */
-                             int unlock);       /* one to unlock; zero to lock */
-
 /* /// End of additions for SHARE.  - Ron Cemer */
 
 STATIC int remote_lock_unlock(sft FAR *sftp,    /* SFT for file */

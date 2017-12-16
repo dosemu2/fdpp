@@ -429,3 +429,35 @@ UWORD ASMPASCAL floppy_change(UWORD);
 #pragma aux (pascal) fl_lba_ReadWrite modify exact [ax dx]
 #pragma aux (pascal) floppy_change modify exact [ax cx dx]
 #endif
+
+        /* DOS calls this to see if it's okay to open the file.
+           Returns a file_table entry number to use (>= 0) if okay
+           to open.  Otherwise returns < 0 and may generate a critical
+           error.  If < 0 is returned, it is the negated error return
+           code, so DOS simply negates this value and returns it in
+           AX. */
+int ASMPASCAL share_open_check(char * filename, unsigned short pspseg, int openmode, int sharemode);     /* SHARE_COMPAT, etc... */
+
+        /* DOS calls this to record the fact that it has successfully
+           closed a file, or the fact that the open for this file failed. */
+void ASMPASCAL share_close_file(int fileno);       /* file_table entry number */
+
+        /* DOS calls this to determine whether it can access (read or
+           write) a specific section of a file.  We call it internally
+           from lock_unlock (only when locking) to see if any portion
+           of the requested region is already locked.  If pspseg is zero,
+           then it matches any pspseg in the lock table.  Otherwise, only
+           locks which DO NOT belong to pspseg will be considered.
+           Returns zero if okay to access or lock (no portion of the
+           region is already locked).  Otherwise returns non-zero and
+           generates a critical error (if allowcriter is non-zero).
+           If non-zero is returned, it is the negated return value for
+           the DOS call. */
+int ASMPASCAL share_access_check(unsigned short pspseg, int fileno, unsigned long ofs, unsigned long len, int allowcriter); /* allow a critical error to be generated */
+
+        /* DOS calls this to lock or unlock a specific section of a file.
+           Returns zero if successfully locked or unlocked.  Otherwise
+           returns non-zero.
+           If the return value is non-zero, it is the negated error
+           return code for the DOS 0x5c call. */
+int ASMPASCAL share_lock_unlock(unsigned short pspseg, int fileno, unsigned long ofs, unsigned long len, int unlock);       /* one to unlock; zero to lock */

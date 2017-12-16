@@ -42,7 +42,10 @@
 "BYTE"		{ return BYTE; }
 "UBYTE"		{ return UBYTE; }
 "unsigned char"	{ return UBYTE; }
+"unsigned short"	{ return UWORD; }
+"unsigned long"	{ return ULONG; }
 "struct"	{ return STRUCT; }
+"/*".*"*/"	{ /* comments */ }
 [\t ]+		{ /* skip spaces */ }
 [_A-Za-z][_A-Za-z0-9]*	{ return STRING; }
 
