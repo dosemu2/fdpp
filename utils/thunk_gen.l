@@ -33,6 +33,7 @@
 "void"		{ return VOID; }
 "WORD"		{ return WORD; }
 "COUNT"		{ return INT; }
+"BOOL"		{ return INT; }
 "int"		{ return INT; }
 "unsigned"	{ return UINT; }
 "long"		{ return LONG; }
@@ -43,6 +44,6 @@
 "unsigned char"	{ return UBYTE; }
 "struct"	{ return STRUCT; }
 [\t ]+		{ /* skip spaces */ }
-[A-Za-z][_A-Za-z0-9]*	{ return STRING; }
+[_A-Za-z][_A-Za-z0-9]*	{ return STRING; }
 
 %%

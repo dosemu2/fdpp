@@ -41,29 +41,6 @@ static BYTE *dskRcsId =
 
 /* #define STATIC  */
 
-BOOL ASMPASCAL fl_reset(WORD);
-COUNT ASMPASCAL fl_diskchanged(WORD);
-
-COUNT ASMPASCAL fl_format(WORD, WORD, WORD, WORD, WORD, UBYTE FAR *);
-COUNT ASMPASCAL fl_read(WORD, WORD, WORD, WORD, WORD, UBYTE FAR *);
-COUNT ASMPASCAL fl_write(WORD, WORD, WORD, WORD, WORD, UBYTE FAR *);
-COUNT ASMPASCAL fl_verify(WORD, WORD, WORD, WORD, WORD, UBYTE FAR *);
-COUNT ASMPASCAL fl_setdisktype(WORD, WORD);
-COUNT ASMPASCAL fl_setmediatype(WORD, WORD, WORD);
-VOID ASMPASCAL fl_readkey(VOID);
-extern COUNT ASMPASCAL fl_lba_ReadWrite(BYTE drive, WORD mode,
-                                       struct _bios_LBA_address_packet FAR
-                                       * dap_p);
-UWORD ASMPASCAL floppy_change(UWORD);
-#ifdef __WATCOMC__
-#pragma aux (pascal) fl_reset modify exact [ax dx]
-#pragma aux (pascal) fl_diskchanged modify exact [ax dx]
-#pragma aux (pascal) fl_setdisktype modify exact [ax bx dx]
-#pragma aux (pascal) fl_readkey modify exact [ax]
-#pragma aux (pascal) fl_lba_ReadWrite modify exact [ax dx]
-#pragma aux (pascal) floppy_change modify exact [ax cx dx]
-#endif
-
 STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
                  ULONG LBA_address, unsigned total, UWORD * transferred);
 

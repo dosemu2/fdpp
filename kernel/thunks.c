@@ -56,6 +56,31 @@ void f(t1 a1, t2 a2) \
     asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
+#define _THUNK_P_0_v(n, f) \
+void f(void) \
+{ \
+    asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+}
+
+#define _THUNK_P_1(n, r, f, t1, at1) \
+r f(t1 a1) \
+{ \
+    struct { \
+	at1 a1; \
+    } PACKED _args = { a1 }; \
+    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+}
+
+#define _THUNK_P_2(n, r, f, t1, at1, t2, at2) \
+r f(t1 a1, t2 a2) \
+{ \
+    struct { \
+	at2 a2; \
+	at1 a1; \
+    } PACKED _args = { a2, a1 }; \
+    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+}
+
 #define _THUNK_P_3(n, r, f, t1, at1, t2, at2, t3, at3) \
 r f(t1 a1, t2 a2, t3 a3) \
 { \
@@ -64,6 +89,20 @@ r f(t1 a1, t2 a2, t3 a3) \
 	at2 a2; \
 	at1 a1; \
     } PACKED _args = { a3, a2, a1 }; \
+    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+}
+
+#define _THUNK_P_6(n, r, f, t1, at1, t2, at2, t3, at3, t4, at4, t5, at5, t6, at6) \
+r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
+{ \
+    struct { \
+	at6 a6; \
+	at5 a5; \
+	at4 a4; \
+	at3 a3; \
+	at2 a2; \
+	at1 a1; \
+    } PACKED _args = { a6, a5, a4, a3, a2, a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
