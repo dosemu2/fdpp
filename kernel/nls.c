@@ -95,7 +95,6 @@ struct nlsInfoBlock ASM nlsInfo = {
  ***** MUX calling functions ****************************************
  ********************************************************************/
 
-extern long ASMPASCAL call_nls(UWORD, VOID FAR *, UWORD, UWORD, UWORD, UWORD);
 /*== DS:SI _always_ points to global NLS info structure <-> no
  * subfct can use these registers for anything different. ==ska*/
 STATIC long muxGo(int subfct, UWORD bp, UWORD cp, UWORD cntry, UWORD bufsize,

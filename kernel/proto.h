@@ -461,3 +461,16 @@ int ASMPASCAL share_access_check(unsigned short pspseg, int fileno, unsigned lon
            If the return value is non-zero, it is the negated error
            return code for the DOS 0x5c call. */
 int ASMPASCAL share_lock_unlock(unsigned short pspseg, int fileno, unsigned long ofs, unsigned long len, int unlock);       /* one to unlock; zero to lock */
+
+unsigned char ASMPASCAL share_check(void);
+
+long ASMPASCAL call_nls(UWORD, VOID FAR *, UWORD, UWORD, UWORD, UWORD);
+
+ULONG ASMPASCAL ReadPCClock(VOID);
+VOID ASMPASCAL WriteATClock(BYTE *, BYTE, BYTE, BYTE);
+VOID ASMPASCAL WritePCClock(ULONG);
+#ifdef __WATCOMC__
+#pragma aux (pascal) ReadPCClock modify exact [ax cx dx]
+#pragma aux (pascal) WriteATClock modify exact [ax bx cx dx]
+#pragma aux (pascal) WritePCClock modify exact [ax cx dx]
+#endif

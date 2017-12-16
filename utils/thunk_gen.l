@@ -44,6 +44,7 @@
 "unsigned char"	{ return UBYTE; }
 "unsigned short"	{ return UWORD; }
 "unsigned long"	{ return ULONG; }
+"ULONG"		{ return ULONG; }
 "struct"	{ return STRUCT; }
 "/*".*"*/"	{ /* comments */ }
 [\t ]+		{ /* skip spaces */ }

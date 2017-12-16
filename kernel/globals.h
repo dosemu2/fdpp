@@ -367,15 +367,7 @@ VOID ASMCFUNC FAR restore_stack(VOID);
 #endif
 /*VOID INRPT FAR handle_break(VOID); */
 
-ULONG ASMPASCAL ReadPCClock(VOID);
-VOID ASMPASCAL WriteATClock(BYTE *, BYTE, BYTE, BYTE);
-VOID ASMPASCAL WritePCClock(ULONG);
 intvec getvec(unsigned char);
-#ifdef __WATCOMC__
-#pragma aux (pascal) ReadPCClock modify exact [ax cx dx]
-#pragma aux (pascal) WriteATClock modify exact [ax bx cx dx]
-#pragma aux (pascal) WritePCClock modify exact [ax cx dx]
-#endif
 
 /*                                                              */
 /* special word packing prototypes                              */
