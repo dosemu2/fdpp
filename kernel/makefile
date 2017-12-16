@@ -144,4 +144,5 @@ thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
 
 thunk_asms.h: proto.h makefile
-	grep ASMFUNC $< | nl -n ln -v 0 | ../utils/thunk_gen 1 >$@
+	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | nl -n ln -v 0 | \
+		../utils/thunk_gen 1 >$@ || (rm -f $@ ; false)

@@ -34,13 +34,11 @@ UDWORD FdThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     return ret;
 }
 
-#undef _ARG
-#undef _ARG_PTR
-#undef _ARG_PTR_FAR
+#define __ARG(t) t
+#define __ARG_PTR(t) t *
+#define __ARG_PTR_FAR(t) t FAR *
 
-#define _ARG(n, t, ap) t
-#define _ARG_PTR(n, t, ap) t *
-#define _ARG_PTR_FAR(n, t, ap) t FAR *
+#define PACKED __attribute__((packed))
 
 #define _THUNK0_v(n, f) \
 void f(void) \
@@ -48,18 +46,25 @@ void f(void) \
     asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
 }
 
-#define _THUNK2_v(n, f, t1, t2) \
+#define _THUNK2_v(n, f, t1, at1, t2, at2) \
 void f(t1 a1, t2 a2) \
 { \
     struct { \
-	t1 a1; \
-	t2 a2; \
-    } _args = { a1, a2 }; \
+	at1 a1; \
+	at2 a2; \
+    } PACKED _args = { a1, a2 }; \
     asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
-#include "thunk_asms.h"
+#define _THUNK_P_3(n, r, f, t1, at1, t2, at2, t3, at3) \
+r f(t1 a1, t2 a2, t3 a3) \
+{ \
+    struct { \
+	at3 a3; \
+	at2 a2; \
+	at1 a1; \
+    } PACKED _args = { a3, a2, a1 }; \
+    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+}
 
-#undef _ARG
-#undef _ARG_PTR
-#undef _ARG_PTR_FAR
+#include "thunk_asms.h"

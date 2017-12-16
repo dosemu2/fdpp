@@ -245,9 +245,9 @@ typedef unsigned       size_t;
            /* functions, that are shared between C and ASM _must_
               have a certain calling standard. These are declared
               as 'ASMCFUNC', and is (and will be ?-) cdecl */
-#define ASMCFUNC CDECL
-#define ASMPASCAL PASCAL
-#define ASM ASMCFUNC
+#define ASMCFUNC
+#define ASMPASCAL
+#define ASM
 #define ASMFUNC
 /*                                                              */
 /* Boolean type & definitions of TRUE and FALSE boolean values  */

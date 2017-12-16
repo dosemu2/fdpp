@@ -24,13 +24,19 @@
 ","		{ return COMMA; }
 "\n"		{ return NEWLINE; }
 "ASMCFUNC"	{ return ASMCFUNC; }
+"ASMPASCAL"	{ return ASMPASCAL; }
 "ASMFUNC"	{ }
 "FAR"		{ return FAR; }
+"far"		{ return FAR; }
 "*"		{ return ASTER; }
 "VOID"		{ return VOID; }
 "void"		{ return VOID; }
 "WORD"		{ return WORD; }
-"COUNT"		{ return WORD; }
+"COUNT"		{ return INT; }
+"int"		{ return INT; }
+"unsigned"	{ return UINT; }
+"long"		{ return LONG; }
+"UCOUNT"	{ return UINT; }
 "UWORD"		{ return UWORD; }
 "BYTE"		{ return BYTE; }
 "UBYTE"		{ return UBYTE; }

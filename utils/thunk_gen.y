@@ -23,9 +23,12 @@ static int arg_offs;
 static int arg_size;
 static int is_ptr;
 static int is_far;
+static int is_void;
+static int is_pas;
 static char rbuf[256];
 static char abuf[256];
 static char atype[256];
+static char atype2[256];
 static char rtbuf[256];
 
 
@@ -33,13 +36,15 @@ static void beg_arg(void)
 {
     is_far = 0;
     is_ptr = 0;
+    is_void = 0;
     atype[0] = 0;
+    atype2[0] = 0;
 }
 
-static void fin_arg(int last)
+static void do_start_arg(void)
 {
-    if (!atype[0])
-	return;
+    if (thunk_type == 1)
+	strcat(abuf, "_");
     if (is_ptr) {
 	if (is_far) {
 	    strcat(abuf, "_ARG_PTR_FAR(");
@@ -51,7 +56,26 @@ static void fin_arg(int last)
     } else {
 	strcat(abuf, "_ARG(");
     }
-    sprintf(abuf + strlen(abuf), "%i, %s, _SP)", arg_offs, atype);
+}
+
+static void fin_arg(int last)
+{
+    if (!atype[0])
+	return;
+    if (!is_ptr && is_void)
+	return;
+    do_start_arg();
+    switch (thunk_type) {
+    case 0:
+	sprintf(abuf + strlen(abuf), "%i, %s, _SP)", arg_offs, atype);
+	break;
+    case 1:
+	sprintf(abuf + strlen(abuf), "%s)", atype);
+	strcat(abuf, ", ");
+	do_start_arg();
+	sprintf(abuf + strlen(abuf), "%s)", atype2[0] ? atype2 : atype);
+	break;
+    }
     if (!last) {
         assert(arg_size != -1);
         arg_offs += arg_size;
@@ -62,8 +86,8 @@ static void fin_arg(int last)
 
 %}
 
-%token LB RB SEMIC COMMA ASMCFUNC FAR ASTER NEWLINE STRING NUM
-%token VOID WORD UWORD BYTE UBYTE STRUCT
+%token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM
+%token VOID WORD UWORD BYTE UBYTE INT UINT LONG STRUCT
 
 %define api.value.type union
 %type <int> num lnum
@@ -84,9 +108,9 @@ line:		lnum rdecls fname lb args rb SEMIC
 			    break;
 			  case 1:
 			    if (rtbuf[0])
-			      printf("_THUNK%i(%i, %s, %s", arg_num, $1, rtbuf, $3);
+			      printf("_THUNK%s%i(%i, %s, %s", is_pas ? "_P_" : "", arg_num, $1, rtbuf, $3);
 			    else
-			      printf("_THUNK%i_v(%i, %s", arg_num, $1, $3);
+			      printf("_THUNK%s%i_v(%i, %s", is_pas ? "_P_" : "", arg_num, $1, $3);
 			    if (arg_num)
 			      printf(", %s", abuf);
 			    printf(")\n");
@@ -100,7 +124,7 @@ lb:		LB	{ arg_offs = 0; arg_num = 0; }
 rb:		RB	{ fin_arg(1); }
 ;
 
-lnum:		num
+lnum:		num	{ is_pas = 0; }
 ;
 num:		NUM	{ $$ = atoi(yytext); }
 
@@ -114,6 +138,7 @@ str:		STRING	{ $$ = strdup(yytext); }
 ;
 
 decls:		  ASMCFUNC decls
+		| ASMPASCAL decls	{ is_pas = 1; }
 		| FAR decls	{ is_far = 1; }
 		| ASTER decls	{ is_ptr = 1; }
 		|
@@ -121,6 +146,15 @@ decls:		  ASMCFUNC decls
 
 rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
 				  rtbuf[0] = 0;
+				}
+		| LONG		{ strcpy(rbuf, "\t\t_RSZ = 4;\n\t\t_RET = ");
+				  strcpy(rtbuf, "long");
+				}
+		| INT		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
+				  strcpy(rtbuf, "int");
+				}
+		| UINT		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
+				  strcpy(rtbuf, "unsigned");
 				}
 		| WORD		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
 				  strcpy(rtbuf, "WORD");
@@ -136,13 +170,50 @@ rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
 				}
 ;
 
-atype:		  VOID		{ beg_arg(); arg_size = 0; }
-		| WORD		{ beg_arg(); arg_size = 2; strcpy(atype, "WORD"); }
-		| UWORD		{ beg_arg(); arg_size = 2; strcpy(atype, "UWORD"); }
-		| BYTE		{ beg_arg(); arg_size = 1; strcpy(atype, "BYTE"); }
-		| UBYTE		{ beg_arg(); arg_size = 1; strcpy(atype, "UBYTE"); }
-		| STRUCT sname	{ beg_arg(); arg_size = -1; sprintf(atype, "struct %s", $2); }
-		| tname		{ beg_arg(); arg_size = -1; sprintf(atype, "%s", $1); }
+atype:		  VOID		{ beg_arg();
+				   arg_size = 0;
+				   strcpy(atype, "VOID");
+				   is_void = 1;
+				}
+		| WORD		{ beg_arg();
+				  arg_size = 2;
+				  strcpy(atype, "WORD");
+				}
+		| UWORD		{ beg_arg();
+				  arg_size = 2;
+				  strcpy(atype, "UWORD");
+				}
+		| INT		{ beg_arg();
+				  arg_size = 2;
+				  strcpy(atype, "int");
+				  strcpy(atype2, "WORD");
+				}
+		| UINT		{ beg_arg();
+				  arg_size = 2;
+				  strcpy(atype, "unsigned");
+				  strcpy(atype2, "UWORD");
+				}
+		| LONG		{ beg_arg();
+				  arg_size = 4;
+				  strcpy(atype, "long");
+				  strcpy(atype2, "DWORD");
+				}
+		| BYTE		{ beg_arg();
+				  arg_size = 1;
+				  strcpy(atype, "BYTE");
+				}
+		| UBYTE		{ beg_arg();
+				  arg_size = 1;
+				  strcpy(atype, "UBYTE");
+				}
+		| STRUCT sname	{ beg_arg();
+				  arg_size = -1;
+				  sprintf(atype, "struct %s", $2);
+				}
+		| tname		{ beg_arg();
+				  arg_size = -1;
+				  sprintf(atype, "%s", $1);
+				}
 ;
 
 rdecls:		rtype decls	{ abuf[0] = 0; }
