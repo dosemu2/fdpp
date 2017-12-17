@@ -52,7 +52,7 @@ void f(t1 a1, t2 a2) \
     struct { \
 	at1 a1; \
 	at2 a2; \
-    } PACKED _args = { a1, a2 }; \
+    } PACKED _args = { (at1)a1, (at2)a2 }; \
     asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -73,7 +73,7 @@ void f(t1 a1) \
 { \
     struct { \
 	at1 a1; \
-    } PACKED _args = { a1 }; \
+    } PACKED _args = { (at1)a1 }; \
     asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -82,7 +82,7 @@ r f(t1 a1) \
 { \
     struct { \
 	at1 a1; \
-    } PACKED _args = { a1 }; \
+    } PACKED _args = { (at1)a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -92,7 +92,7 @@ r f(t1 a1, t2 a2) \
     struct { \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { a2, a1 }; \
+    } PACKED _args = { (at2)a2, (at1)a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -103,7 +103,7 @@ r f(t1 a1, t2 a2, t3 a3) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { a3, a2, a1 }; \
+    } PACKED _args = { (at3)a3, (at2)a2, (at1)a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -115,7 +115,7 @@ void f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { a4, a3, a2, a1 }; \
+    } PACKED _args = { (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -127,7 +127,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { a4, a3, a2, a1 }; \
+    } PACKED _args = { (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -140,7 +140,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { a5, a4, a3, a2, a1 }; \
+    } PACKED _args = { (at5)a5, (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
@@ -154,7 +154,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { a6, a5, a4, a3, a2, a1 }; \
+    } PACKED _args = { (at6)a6, (at5)a5, (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
