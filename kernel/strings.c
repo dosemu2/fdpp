@@ -71,7 +71,7 @@ int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
   return *d - *s;
 }
 
-COUNT fstrcmp(REG BYTE FAR * d, REG BYTE FAR * s)
+COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
 {
   while (*s != '\0' && *d != '\0')
   {
@@ -122,6 +122,19 @@ char *strchr(const char * s, int c)
   return 0;
 }
 
+char FAR * fstrchr(const char FAR * s, int c)
+{
+  CONST BYTE FAR *p;
+  p = s - 1;
+  do
+  {
+    if (*++p == (char)c)
+      return (char FAR *)p;
+  }
+  while (*p);
+  return 0;
+}
+
 #if 0
 void *memchr(const void * s, int c)
 {
@@ -136,5 +149,48 @@ void *memchr(const void * s, int c)
   return 0;
 }
 #endif
-#endif
 
+void FAR * fmemchr(const void FAR * s, int c, size_t n)
+{
+  unsigned char FAR *p;
+  p = (unsigned char *)s - 1;
+  do
+  {
+    if (*++p == (unsigned char)c)
+      return (void FAR *)p;
+  }
+  while (*p);
+  return 0;
+}
+
+int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)
+{
+  CONST BYTE * d = (CONST BYTE *)c_d;
+  CONST BYTE * s = (CONST BYTE *)c_s;
+
+  while (n--)
+  {
+    if (*d == *s)
+      ++s, ++d;
+    else
+      return *d - *s;
+  }
+  return *d - *s;
+}
+
+int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
+{
+  CONST BYTE FAR *d = (CONST BYTE FAR *)c_d;
+  CONST BYTE FAR *s = (CONST BYTE FAR *)c_s;
+
+  while (n--)
+  {
+    if (*d == *s)
+      ++s, ++d;
+    else
+      return *d - *s;
+  }
+  return *d - *s;
+}
+
+#endif
