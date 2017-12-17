@@ -474,3 +474,7 @@ VOID ASMPASCAL WritePCClock(ULONG);
 #pragma aux (pascal) WriteATClock modify exact [ax bx cx dx]
 #pragma aux (pascal) WritePCClock modify exact [ax cx dx]
 #endif
+
+VOID ASMFUNC FAR cpm_entry(VOID);
+COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError, struct dhdr FAR * lpDevice);
+VOID ASMFUNC FAR CharMapSrvc(VOID);

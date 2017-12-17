@@ -354,13 +354,6 @@ GLOBAL WORD dump_regs;          /* dump registers of bad call           */
 
 /* Process related functions - not under automatic generation.  */
 /* Typically, these are in ".asm" files.                        */
-VOID ASMCFUNC FAR cpm_entry(VOID)
-/*INRPT FAR handle_break(VOID) */ ;
-COUNT ASMCFUNC
-    CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,
-                           struct dhdr FAR * lpDevice);
-
-VOID ASMCFUNC FAR CharMapSrvc(VOID);
 #if 0
 VOID ASMCFUNC FAR set_stack(VOID);
 VOID ASMCFUNC FAR restore_stack(VOID);
