@@ -39,6 +39,7 @@
 "long"		{ return LONG; }
 "UCOUNT"	{ return UINT; }
 "UWORD"		{ return UWORD; }
+"seg"		{ return UWORD; }
 "BYTE"		{ return BYTE; }
 "UBYTE"		{ return UBYTE; }
 "unsigned char"	{ return UBYTE; }
@@ -46,6 +47,7 @@
 "unsigned long"	{ return ULONG; }
 "ULONG"		{ return ULONG; }
 "struct"	{ return STRUCT; }
+"const"		{ return CONST; }
 "/*".*"*/"	{ /* comments */ }
 [\t ]+		{ /* skip spaces */ }
 [_A-Za-z][_A-Za-z0-9]*	{ return STRING; }

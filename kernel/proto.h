@@ -478,3 +478,13 @@ VOID ASMPASCAL WritePCClock(ULONG);
 VOID ASMFUNC FAR cpm_entry(VOID);
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError, struct dhdr FAR * lpDevice);
 VOID ASMFUNC FAR CharMapSrvc(VOID);
+
+unsigned ASMPASCAL init_call_intr(int nr, iregs * rp);
+unsigned ASMPASCAL read(int fd, void *buf, unsigned count);
+int ASMPASCAL open(const char *pathname, int flags);
+int ASMPASCAL close(int fd);
+int ASMPASCAL dup2(int oldfd, int newfd);
+ULONG ASMPASCAL lseek(int fd, long position);
+seg ASMPASCAL allocmem(UWORD size);
+void ASMPASCAL keycheck(void);
+void ASMPASCAL set_DTA(void far *dta);

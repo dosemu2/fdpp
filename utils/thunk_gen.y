@@ -24,6 +24,7 @@ static int arg_size;
 static int is_ptr;
 static int is_far;
 static int is_void;
+static int is_const;
 static int is_pas;
 static char rbuf[256];
 static char abuf[256];
@@ -37,6 +38,7 @@ static void beg_arg(void)
     is_far = 0;
     is_ptr = 0;
     is_void = 0;
+    is_const = 0;
     atype[0] = 0;
     atype2[0] = 0;
 }
@@ -65,6 +67,8 @@ static void fin_arg(int last)
     if (!is_ptr && is_void)
 	return;
     do_start_arg();
+    if (is_const)
+	strcat(abuf, "const ");
     switch (thunk_type) {
     case 0:
 	sprintf(abuf + strlen(abuf), "%i, %s, _SP)", arg_offs, atype);
@@ -87,7 +91,7 @@ static void fin_arg(int last)
 %}
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM
-%token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG STRUCT
+%token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG STRUCT CONST
 
 %define api.value.type union
 %type <int> num lnum
@@ -227,7 +231,8 @@ atype:		  VOID		{ beg_arg();
 rdecls:		rtype decls	{ abuf[0] = 0; }
 ;
 
-adecls:		atype decls
+adecls:		  atype decls
+		| CONST atype decls	{ is_const = 1; }
 ;
 
 argsep:		COMMA		{ fin_arg(0); strcat(abuf, ", "); }
