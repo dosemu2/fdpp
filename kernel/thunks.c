@@ -74,6 +74,12 @@ void f(void) \
     asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
 }
 
+#define _THUNK_P_0_vp(n, f) \
+void FAR *f(void) \
+{ \
+    return (void FAR *)asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+}
+
 #define _THUNK_P_0(n, r, f) \
 r f(void) \
 { \

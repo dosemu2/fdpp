@@ -469,11 +469,6 @@ long ASMPASCAL call_nls(UWORD, VOID FAR *, UWORD, UWORD, UWORD, UWORD);
 ULONG ASMPASCAL ReadPCClock(VOID);
 VOID ASMPASCAL WriteATClock(BYTE *, BYTE, BYTE, BYTE);
 VOID ASMPASCAL WritePCClock(ULONG);
-#ifdef __WATCOMC__
-#pragma aux (pascal) ReadPCClock modify exact [ax cx dx]
-#pragma aux (pascal) WriteATClock modify exact [ax bx cx dx]
-#pragma aux (pascal) WritePCClock modify exact [ax cx dx]
-#endif
 
 VOID ASMFUNC FAR cpm_entry(VOID);
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError, struct dhdr FAR * lpDevice);
@@ -488,3 +483,8 @@ ULONG ASMPASCAL lseek(int fd, long position);
 seg ASMPASCAL allocmem(UWORD size);
 void ASMPASCAL keycheck(void);
 void ASMPASCAL set_DTA(void far *dta);
+WORD ASMPASCAL execrh(request FAR *, struct dhdr FAR *);
+VOID ASMPASCAL FAR _EnableA20(VOID);
+VOID ASMPASCAL FAR _DisableA20(VOID);
+void FAR * ASMPASCAL DetectXMSDriver(VOID);
+int ASMPASCAL init_call_XMScall(void FAR * driverAddress, UWORD ax, UWORD dx);

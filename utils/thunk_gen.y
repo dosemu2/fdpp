@@ -22,8 +22,10 @@ static int arg_num;
 static int arg_offs;
 static int arg_size;
 static int is_ptr;
+static int is_rptr;
 static int is_far;
 static int is_void;
+static int is_rvoid;
 static int is_const;
 static int is_pas;
 static char rbuf[256];
@@ -111,10 +113,13 @@ line:		lnum rdecls fname lb args rb SEMIC
 				$1, rbuf, $3, abuf);
 			    break;
 			  case 1:
-			    if (rtbuf[0])
-			      printf("_THUNK%s%i(%i, %s, %s", is_pas ? "_P_" : "", arg_num, $1, rtbuf, $3);
+			    if (!is_rvoid)
+			      printf("_THUNK%s%i(%i, %s, %s", is_pas ? "_P_" : "", arg_num, $1,
+			          rtbuf, $3);
 			    else
-			      printf("_THUNK%s%i_v(%i, %s", is_pas ? "_P_" : "", arg_num, $1, $3);
+			      printf("_THUNK%s%i_v%s(%i, %s",
+			          is_pas ? "_P_" : "", arg_num,
+			          is_rptr ? "p" : "", $1, $3);
 			    if (arg_num)
 			      printf(", %s", abuf);
 			    printf(")\n");
@@ -123,12 +128,12 @@ line:		lnum rdecls fname lb args rb SEMIC
 			}
 ;
 
-lb:		LB	{ arg_offs = 0; arg_num = 0; }
+lb:		LB	{ arg_offs = 0; arg_num = 0; is_rptr = is_ptr; beg_arg(); }
 ;
 rb:		RB	{ fin_arg(1); }
 ;
 
-lnum:		num	{ is_pas = 0; }
+lnum:		num	{ is_pas = 0; is_rvoid = 0; is_rptr = 0; beg_arg(); }
 ;
 num:		NUM	{ $$ = atoi(yytext); }
 
@@ -149,7 +154,8 @@ decls:		  ASMCFUNC decls
 ;
 
 rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
-				  rtbuf[0] = 0;
+				  strcpy(rtbuf, "void");
+				  is_rvoid = 1;
 				}
 		| LONG		{ strcpy(rbuf, "\t\t_RSZ = 4;\n\t\t_RET = ");
 				  strcpy(rtbuf, "long");
@@ -177,52 +183,52 @@ rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
 				}
 ;
 
-atype:		  VOID		{ beg_arg();
+atype:		  VOID		{
 				   arg_size = 0;
 				   strcpy(atype, "VOID");
 				   is_void = 1;
 				}
-		| WORD		{ beg_arg();
+		| WORD		{
 				  arg_size = 2;
 				  strcpy(atype, "WORD");
 				}
-		| UWORD		{ beg_arg();
+		| UWORD		{
 				  arg_size = 2;
 				  strcpy(atype, "UWORD");
 				}
-		| INT		{ beg_arg();
+		| INT		{
 				  arg_size = 2;
 				  strcpy(atype, "int");
 				  strcpy(atype2, "WORD");
 				}
-		| UINT		{ beg_arg();
+		| UINT		{
 				  arg_size = 2;
 				  strcpy(atype, "unsigned");
 				  strcpy(atype2, "UWORD");
 				}
-		| LONG		{ beg_arg();
+		| LONG		{
 				  arg_size = 4;
 				  strcpy(atype, "long");
 				  strcpy(atype2, "DWORD");
 				}
-		| ULONG		{ beg_arg();
+		| ULONG		{
 				  arg_size = 4;
 				  strcpy(atype, "unsigned long");
 				  strcpy(atype2, "UDWORD");
 				}
-		| BYTE		{ beg_arg();
+		| BYTE		{
 				  arg_size = 1;
 				  strcpy(atype, "BYTE");
 				}
-		| UBYTE		{ beg_arg();
+		| UBYTE		{
 				  arg_size = 1;
 				  strcpy(atype, "UBYTE");
 				}
-		| STRUCT sname	{ beg_arg();
+		| STRUCT sname	{
 				  arg_size = -1;
 				  sprintf(atype, "struct %s", $2);
 				}
-		| tname		{ beg_arg();
+		| tname		{
 				  arg_size = -1;
 				  sprintf(atype, "%s", $1);
 				}
@@ -235,7 +241,7 @@ adecls:		  atype decls
 		| CONST atype decls	{ is_const = 1; }
 ;
 
-argsep:		COMMA		{ fin_arg(0); strcat(abuf, ", "); }
+argsep:		COMMA		{ fin_arg(0); strcat(abuf, ", "); beg_arg(); }
 
 args:		  args argsep arg
 		| arg
