@@ -493,3 +493,7 @@ void ASMPASCAL init_PSPSet(seg psp_seg);
 int ASMPASCAL init_DosExec(int mode, exec_blk * ep, char * lp);
 int ASMPASCAL init_setdrive(int drive);
 int ASMPASCAL init_switchar(int chr);
+COUNT ASMPASCAL Umb_Test(void);
+COUNT ASMPASCAL UMB_get_largest(void FAR * driverAddress, UCOUNT * __seg, UCOUNT * size);
+VOID ASMFUNC init_stacks(VOID FAR * stack_base, COUNT nStacks, WORD stackSize);
+void ASMFUNC spawn_int23(void);        /* procsupt.asm */

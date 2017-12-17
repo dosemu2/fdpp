@@ -199,7 +199,7 @@ void ASMPASCAL set_DTA(void far *dta);
 #endif
 
 /* irqstack.asm */
-VOID ASMCFUNC init_stacks(VOID FAR * stack_base, COUNT nStacks,
+VOID ASMFUNC init_stacks(VOID FAR * stack_base, COUNT nStacks,
                           WORD stackSize);
 
 /* inthndlr.c */

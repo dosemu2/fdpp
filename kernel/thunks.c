@@ -56,6 +56,17 @@ void f(t1 a1, t2 a2) \
     asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
+#define _THUNK3_v(n, f, t1, at1, t2, at2, t3, at3) \
+void f(t1 a1, t2 a2, t3 a3) \
+{ \
+    struct { \
+	at1 a1; \
+	at2 a2; \
+	at2 a3; \
+    } PACKED _args = { (at1)a1, (at2)a2, (at3)a3 }; \
+    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+}
+
 #define _THUNK4(n, r, f, t1, at1, t2, at2, t3, at3, t4, at4) \
 r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 { \

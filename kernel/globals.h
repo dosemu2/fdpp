@@ -397,8 +397,8 @@ void setvec(unsigned char intno, intvec vector);
 #ifdef __WATCOMC__
 #pragma aux (cdecl) spawn_int23 aborts;
 #endif
-void ASMCFUNC spawn_int23(void);        /* procsupt.asm */
-void ASMCFUNC DosIdle_hlt(void);        /* dosidle.asm */
+void ASMFUNC spawn_int23(void);        /* procsupt.asm */
+void ASMFUNC DosIdle_hlt(void);        /* dosidle.asm */
 
 GLOBAL BYTE ASM ReturnAnyDosVersionExpected;
 GLOBAL BYTE ASM HaltCpuWhileIdle;
