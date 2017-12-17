@@ -47,6 +47,7 @@ extern struct _KernelConfig InitKernelConfig;
  */
 #define printf      init_printf
 #define sprintf     init_sprintf
+#if 0
 #ifndef __WATCOMC__
 #define execrh      init_execrh
 #define  memcpy     init_memcpy
@@ -61,6 +62,7 @@ extern struct _KernelConfig InitKernelConfig;
 #define fstrlen     init_fstrlen
 #endif
 #define open        init_DosOpen
+#endif
 
 /* execrh.asm */
 #ifndef __WATCOMC__

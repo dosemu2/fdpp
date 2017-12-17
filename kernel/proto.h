@@ -488,3 +488,8 @@ VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
 void FAR * ASMPASCAL DetectXMSDriver(VOID);
 int ASMPASCAL init_call_XMScall(void FAR * driverAddress, UWORD ax, UWORD dx);
+
+void ASMPASCAL init_PSPSet(seg psp_seg);
+int ASMPASCAL init_DosExec(int mode, exec_blk * ep, char * lp);
+int ASMPASCAL init_setdrive(int drive);
+int ASMPASCAL init_switchar(int chr);
