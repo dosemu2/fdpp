@@ -369,7 +369,7 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
     return;
 
   /* the stored line is invalid unless it ends with a CR */
-  if (kp->kb_buf[stored_size] != CR)
+  if (kp->_kb_buf[stored_size] != CR)
     stored_size = 0;
 
   do
@@ -396,7 +396,7 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
       case RIGHT:
       case F1:
         if (stored_pos < stored_size && count < size - 1)
-          local_buffer[count++] = echo_char(kp->kb_buf[stored_pos++], sft_out);
+          local_buffer[count++] = echo_char(kp->_kb_buf[stored_pos++], sft_out);
         break;
 
       case F2:
@@ -411,10 +411,10 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
           }
           else
           {
-            char FAR *sp = (char FAR *)fmemchr(&kp->kb_buf[stored_pos],
+            char FAR *sp = (char FAR *)fmemchr(&kp->_kb_buf[stored_pos],
                                    c2, stored_size - stored_pos);
             if (sp != NULL)
-                new_pos = (FP_OFF(sp) - FP_OFF(&kp->kb_buf[stored_pos])) + 1;
+                new_pos = (FP_OFF(sp) - FP_OFF(&kp->_kb_buf[stored_pos])) + 1;
           }
         }
         /* fall through */
@@ -422,13 +422,13 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
         if (c != F4) /* not delete */
         {
           while (stored_pos < new_pos && count < size - 1)
-              local_buffer[count++] = echo_char(kp->kb_buf[stored_pos++], sft_out);
+              local_buffer[count++] = echo_char(kp->_kb_buf[stored_pos++], sft_out);
         }
         stored_pos = new_pos;
         break;
 
       case F5:
-        fmemcpy(kp->kb_buf, local_buffer, count);
+        fmemcpy(kp->_kb_buf, local_buffer, count);
         stored_size = count;
         write_char('@', sft_out);
         goto start_new_line;
@@ -503,7 +503,7 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
     }
     first = FALSE;
   } while (c != CR);
-  fmemcpy(kp->kb_buf, local_buffer, count);
+  fmemcpy(kp->_kb_buf, local_buffer, count);
   /* if local_buffer overflows into the CON default buffer we
      must invalidate it */
   if (count > LINEBUFSIZECON)
@@ -526,8 +526,8 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp)
       kb_buf.kb_size = LINEBUFSIZECON;
     }
     read_line(sft_idx, sft_idx, &kb_buf);
-    kb_buf.kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
-    inputptr = kb_buf.kb_buf;
+    kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
+    inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)
     {
       inputptr = NULL;
@@ -535,7 +535,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp)
     }
   }
 
-  chars_left = &kb_buf.kb_buf[kb_buf.kb_count + 2] - inputptr;
+  chars_left = &kb_buf._kb_buf[kb_buf.kb_count + 2] - inputptr;
   if (n > chars_left)
     n = chars_left;
 

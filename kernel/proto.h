@@ -482,7 +482,7 @@ int ASMPASCAL dup2(int oldfd, int newfd);
 ULONG ASMPASCAL lseek(int fd, long position);
 seg ASMPASCAL allocmem(UWORD size);
 void ASMPASCAL keycheck(void);
-void ASMPASCAL set_DTA(void far *dta);
+void ASMPASCAL set_DTA(void far *_dta);
 WORD ASMPASCAL execrh(request FAR *, struct dhdr FAR *);
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);

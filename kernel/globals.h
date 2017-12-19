@@ -227,41 +227,33 @@ Freeman Publishing, Lawrence KS, USA (ISBN 0-87930-436-7).\n\
 /* ARE DOCUMENTED AS UNDOCUMENTED (?) AND HAVE MANY  PROGRAMS AND TSRs  */
 /* ACCESSING THEM                                                       */
 
-extern UWORD ASM NetBios;
-extern BYTE * ASM net_name;
-extern BYTE ASM net_set_count;
+#define __ASM(t, v) extern t * __##v
+#define __ASM_ARR(t, v, l) extern t (* __##v)[l]
+#include "glob_asm.h"
+#undef __ASM
+#undef __ASM_ARR
+#include "glob_asmdefs.h"
+
 extern BYTE ASM NetDelay, ASM NetRetry;
 
 extern UWORD ASM first_mcb,         /* Start of user memory                 */
   ASM uppermem_root;                /* Start of umb chain (usually 9fff)    */
-extern char * ASM inputptr;         /* pointer to unread CON input          */
-extern sfttbl FAR * ASM sfthead;    /* System File Table head               */
 extern struct dhdr
 FAR * ASM clock,                    /* CLOCK$ device                        */
   FAR * ASM syscon;                 /* console device                       */
-extern WORD ASM maxsecsize;         /* largest sector size in use (can use) */
 extern struct buffer
 FAR *ASM firstbuf;                  /* head of buffers linked list          */
 enum {LOC_CONV=0, LOC_HMA=1};
-extern unsigned char ASM bufloc;    /* 0=conv, 1=HMA                        */
-extern void far * ASM deblock_buf;  /* pointer to workspace buffer      */
 GLOBAL char FAR *firstAvailableBuf;
-extern struct cds FAR * ASM CDSp;   /* Current Directory Structure          */
 extern
 struct cds FAR * ASM current_ldt;
-extern LONG ASM current_filepos;    /* current file position                */
-extern sfttbl FAR * ASM FCBp;       /* FCB table pointer                    */
-extern WORD ASM nprotfcb;           /* number of protected fcbs             */
 extern UBYTE ASM nblkdev,           /* number of block devices              */
   ASM lastdrive,                    /* value of last drive                  */
   ASM uppermem_link,                /* UMB Link flag */
   ASM PrinterEcho;                  /* Printer Echo Flag                    */
 
-extern UWORD ASM LoL_nbuffers;      /* Number of buffers                    */
-
 extern struct dhdr
   ASM nul_dev;
-extern UBYTE ASM mem_access_mode;   /* memory allocation scheme             */
 extern BYTE ASM ErrorMode,          /* Critical error flag                  */
   ASM InDOS,                        /* In DOS critical section              */
   ASM OpenMode,                     /* File Open Attributes                 */
@@ -269,10 +261,6 @@ extern BYTE ASM ErrorMode,          /* Critical error flag                  */
   ASM dosidle_flag, ASM Server_Call, ASM CritErrLocus, ASM CritErrAction,
   ASM CritErrClass, ASM VgaSet,
   ASM njoined;                      /* number of joined devices             */
-
-extern UWORD ASM Int21AX;
-extern COUNT ASM CritErrCode;
-extern BYTE FAR * ASM CritErrDev;
 
 extern struct dirent
   ASM SearchDir;
@@ -297,12 +285,6 @@ extern struct _SecPathBuffer                  /* Alternate path name parsing buf
 
 #define SecPathName _SecPathBuffer._SecPathName
 
-extern UWORD ASM wAttr;
-
-extern BYTE ASM default_drive;      /* default drive for dos                */
-
-extern dmatch ASM sda_tmp_dm;       /* Temporary directory match buffer     */
-extern dmatch ASM sda_tmp_dm_ren;   /* 2nd Temporary directory match buffer */
 extern BYTE
   ASM internal_data[],              /* sda areas                            */
   ASM swap_always[],                /*  "    "                              */
@@ -310,20 +292,12 @@ extern BYTE
   ASM tsr,                          /* true if program is TSR               */
   ASM break_flg,                    /* true if break was detected           */
   ASM break_ena;                    /* break enabled flag                   */
-extern void FAR * ASM dta;          /* Disk transfer area (kludge)          */
-extern seg ASM cu_psp;              /* current psp segment                  */
-extern iregs FAR * ASM user_r;      /* User registers for int 21h call      */
 
 extern struct dirent            /* Temporary directory entry            */
   ASM DirEntBuffer;
 
-extern fcb FAR * ASM sda_lpFcb;     /* Pointer to users fcb                 */
-
-extern sft FAR * ASM lpCurSft;
-
 extern BYTE ASM verify_ena,         /* verify enabled flag                  */
   ASM switchar;                     /* switch char                          */
-extern UWORD ASM return_code;       /* Process termination rets             */
 
 extern UBYTE ASM BootDrive,         /* Drive we came up from                */
   ASM CPULevel,                     /* CPU family, 0=8086, 1=186, ...       */
@@ -331,8 +305,6 @@ extern UBYTE ASM BootDrive,         /* Drive we came up from                */
 /*extern WORD
   NumFloppies; !!*//* How many floppies we have            */
 
-extern keyboard ASM kb_buf;
-extern char ASM local_buffer[LINEBUFSIZE0A];
 extern UBYTE DiskTransferBuffer[/*SEC_SIZE*/];
 
 extern struct cds

@@ -16,6 +16,10 @@ void FdSetAsmThunks(void *tab, FdAsmCall_t call)
     asm_call = call;
 }
 
+#define __ASM(t, v) t * __##v
+#define __ASM_ARR(t, v, l) t (* __##v)[l]
+#include "glob_asm.h"
+
 #define _ARG(n, t, ap) (*(t *)(ap + n))
 #define _ARG_PTR(n, t, ap) // unimplemented, will create syntax error
 #define _ARG_PTR_FAR(n, t, ap)  ((t FAR *)(uintptr_t)*(UDWORD *)(ap + n))

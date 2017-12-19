@@ -182,7 +182,7 @@ int ASMPASCAL init_DosExec(int mode, exec_blk * ep, char * lp);
 int ASMPASCAL init_setdrive(int drive);
 int ASMPASCAL init_switchar(int chr);
 void ASMPASCAL keycheck(void);
-void ASMPASCAL set_DTA(void far *dta);
+void ASMPASCAL set_DTA(void far *_dta);
 #ifdef __WATCOMC__
 #pragma aux (pascal) init_call_intr modify exact [ax]
 #pragma aux (pascal) read modify exact [ax bx cx dx]
