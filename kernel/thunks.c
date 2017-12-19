@@ -10,15 +10,49 @@ struct far_s {
 };
 static struct far_s *asm_tab;
 
-void FdSetAsmThunks(void *tab, FdAsmCall_t call)
+void FdSetAsmCalls(void *tab, FdAsmCall_t call)
 {
     asm_tab = (struct far_s *)tab;
     asm_call = call;
 }
 
+#define SEMIC ;
 #define __ASM(t, v) t * __##v
 #define __ASM_ARR(t, v, l) t (* __##v)[l]
 #include "glob_asm.h"
+#undef __ASM
+#undef __ASM_ARR
+
+static union asm_thunks_u {
+  struct {
+#define __ASM(t, v) t ** __##v
+#define __ASM_ARR(t, v, l) t (** __##v)[l]
+#include "glob_asm.h"
+#undef __ASM
+#undef __ASM_ARR
+  } thunks;
+  void ** arr[0];
+} asm_thunks = {{
+#undef SEMIC
+#define SEMIC ,
+#define __ASM(t, v) &__##v
+#define __ASM_ARR(t, v, l) &__##v
+#include "glob_asm.h"
+#undef __ASM
+#undef __ASM_ARR
+#undef SEMIC
+}};
+
+void FdSetAsmThunks(void **ptrs, int len)
+{
+#define _countof(a) (sizeof(a)/sizeof(*(a)))
+    int i;
+
+    if (len != _countof(asm_thunks.arr))
+        return;
+    for (i = 0; i < len; i++)
+        *asm_thunks.arr[i] = ptrs[i];
+}
 
 #define _ARG(n, t, ap) (*(t *)(ap + n))
 #define _ARG_PTR(n, t, ap) // unimplemented, will create syntax error

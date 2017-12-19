@@ -149,6 +149,6 @@ thunk_asms.h: proto.h makefile
 
 glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\));/#define \1 (*__\1)/' >$@
+		sed 's/.\+, \(.\+\)).*/#define \1 (*__\1)/' >$@
 	grep "__ASM_ARR(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\),.\+);/#define \1 (*__\1)/' >>$@
+		sed 's/.\+, \(.\+\),.\+).*/#define \1 (*__\1)/' >>$@

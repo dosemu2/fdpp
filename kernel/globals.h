@@ -229,9 +229,11 @@ Freeman Publishing, Lawrence KS, USA (ISBN 0-87930-436-7).\n\
 
 #define __ASM(t, v) extern t * __##v
 #define __ASM_ARR(t, v, l) extern t (* __##v)[l]
+#define SEMIC ;
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef SEMIC
 #include "glob_asmdefs.h"
 
 extern BYTE ASM NetDelay, ASM NetRetry;
