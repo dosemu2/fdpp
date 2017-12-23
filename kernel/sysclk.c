@@ -37,7 +37,7 @@ static char *RcsId =
 /*                                                                      */
 /* WARNING - THIS DRIVER IS NON-PORTABLE!!!!                            */
 /*                                                                      */
-UWORD ASM DaysSinceEpoch = 0;
+static UWORD DaysSinceEpoch = 0;
 typedef UDWORD ticks_t;
 
 STATIC int ByteToBcd(int x)

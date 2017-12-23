@@ -96,3 +96,16 @@ __ASM(BYTE FAR *, _InitTextEnd) SEMIC
 __ASM(BYTE FAR, ReturnAnyDosVersionExpected) SEMIC
 __ASM(BYTE FAR, HaltCpuWhileIdle) SEMIC
 __ASM(unsigned char FAR, kbdType) SEMIC
+__ASM(struct _nlsCountryInfoHardcoded FAR, nlsCountryInfoHardcoded) SEMIC
+__ASM_ARR(struct lowvec FAR, intvec_table, 5) SEMIC
+/* floppy parameter table, at 70:xxxx */
+__ASM_ARR(unsigned char FAR, int1e_table, 0xe) SEMIC
+__ASM(struct DynS FAR, Dyn) SEMIC
+__ASM(struct RelocationTable FAR *, _HMARelocationTableStart) SEMIC
+__ASM(struct RelocationTable FAR *, _HMARelocationTableEnd) SEMIC
+__ASM(void FAR *, XMSDriverAddress) SEMIC
+__ASM(request, ClkReqHdr) SEMIC
+__ASM(WORD, current_sft_idx) SEMIC
+__ASM(UWORD, ext_open_mode) SEMIC
+__ASM(UWORD, ext_open_attrib) SEMIC
+__ASM(UWORD, ext_open_action) SEMIC

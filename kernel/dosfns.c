@@ -335,7 +335,6 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
 
         /* MS NET uses this on open/creat TE */
         {
-          extern WORD ASM current_sft_idx;
           current_sft_idx = sys_idx;
         }
 
@@ -492,7 +491,6 @@ long DosOpenSft(char FAR * fname, unsigned flags, unsigned attrib)
     cmd = REM_CREATE;
     if (!(flags & O_LEGACY))
     {
-      extern UWORD ASM ext_open_mode, ASM ext_open_attrib, ASM ext_open_action;
       ext_open_mode = flags & 0x70ff;
       ext_open_attrib = attrib & 0xff;
       ext_open_action = ((flags & 0x0300) >> 8) | ((flags & O_CREAT) >> 6);

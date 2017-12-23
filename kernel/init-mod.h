@@ -222,28 +222,19 @@ extern char master_env[128];
 
 extern struct lol FAR *LoL;
 
-extern struct nlsCountryInfoHardcoded {
+struct _nlsCountryInfoHardcoded {
   char  ThisIsAConstantOne;
   short TableSize;
 
   struct CountrySpecificInfo C;
 
-} FAR ASM nlsCountryInfoHardcoded;
+};
 
 /*
     data shared between DSK.C and INITDISK.C
 */
 
 extern UWORD DOSFAR LBA_WRITE_VERIFY;
-
-/* original interrupt vectors, at 70:xxxx */
-extern struct lowvec {
-  unsigned char intno;
-  intvec isv;
-} DOSTEXTFAR ASM intvec_table[5];
-
-/* floppy parameter table, at 70:xxxx */
-extern unsigned char DOSTEXTFAR ASM int1e_table[0xe];
 
 struct RelocationTable {
   UBYTE jmpFar;
@@ -261,11 +252,6 @@ struct RelocatedEntry {
   UWORD jmpSegment;
 };
 
-extern struct RelocationTable
-   DOSFAR ASM _HMARelocationTableStart[],
-   DOSFAR ASM _HMARelocationTableEnd[];
-
-extern void FAR *DOSFAR ASM XMSDriverAddress;
 extern VOID ASMPASCAL FAR _EnableA20(VOID);
 extern VOID ASMPASCAL FAR _DisableA20(VOID);
 

@@ -66,8 +66,6 @@ struct FS_info {
   BYTE fstype[8];
 };
 
-extern struct DynS ASM Dyn;
-
 /*TE - array access functions */
 ddt *getddt(int dev)
 {

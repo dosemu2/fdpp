@@ -201,6 +201,12 @@ Freeman Publishing, Lawrence KS, USA (ISBN 0-87930-436-7).\n\
 /* ARE DOCUMENTED AS UNDOCUMENTED (?) AND HAVE MANY  PROGRAMS AND TSRs  */
 /* ACCESSING THEM                                                       */
 
+/* original interrupt vectors, at 70:xxxx */
+struct lowvec {
+  unsigned char intno;
+  intvec isv;
+};
+
 #define __ASM(t, v) extern t * __##v
 #define __ASM_ARR(t, v, l) extern t (* __##v)[l]
 #define SEMIC ;
