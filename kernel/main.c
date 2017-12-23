@@ -69,7 +69,8 @@ __segment DosTextSeg = 0;
 
 #endif
 
-struct lol FAR *LoL = &DATASTART;
+struct lol FAR **_LoL = &__DATASTART;
+#define LoL (*_LoL)
 
 VOID ASMCFUNC FreeDOSmain(void)
 {

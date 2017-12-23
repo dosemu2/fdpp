@@ -83,3 +83,16 @@ __ASM(BYTE, os_major) SEMIC                     /* major version number         
 __ASM(BYTE, os_minor) SEMIC                     /* minor version number                 */
 __ASM(BYTE, rev_number) SEMIC                   /* minor version number                 */
 __ASM(BYTE, version_flags) SEMIC                /* minor version number                 */
+__ASM(struct _KernelConfig FAR, LowKernelConfig) SEMIC
+__ASM(BYTE *, _ib_start) SEMIC
+__ASM(BYTE *, _ib_end) SEMIC
+__ASM(BYTE *, _init_end) SEMIC
+__ASM(struct lol FAR, DATASTART) SEMIC
+__ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
+__ASM(BYTE FAR *, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
+__ASM(BYTE FAR *, _HMATextEnd) SEMIC
+__ASM(BYTE FAR *, _InitTextStart) SEMIC     /* first available byte of ram          */
+__ASM(BYTE FAR *, _InitTextEnd) SEMIC
+__ASM(BYTE FAR, ReturnAnyDosVersionExpected) SEMIC
+__ASM(BYTE FAR, HaltCpuWhileIdle) SEMIC
+__ASM(unsigned char FAR, kbdType) SEMIC

@@ -132,11 +132,6 @@ unsigned init_oem(void);
 void movebda(size_t bytes, unsigned new_seg);
 unsigned ebdasize(void);
 
-/* dosidle.asm */
-extern void ASM DosIdle_hlt(VOID);
-
-/* intr.asm */
-
 /*
  * Invoke interrupt "nr" with all registers from *rp loaded
  * into the processor registers (except: SS, SP,& flags)
@@ -218,30 +213,14 @@ extern void Init_clk_driver(void);
 extern UWORD HMAFree;            /* first byte in HMA not yet used      */
 
 extern unsigned CurrentKernelSegment;
-extern struct _KernelConfig FAR ASM LowKernelConfig;
 extern WORD days[2][13];
 extern BYTE FAR *lpTop;
-extern BYTE ASM _ib_start[], ASM _ib_end[], ASM _init_end[];
 extern UWORD ram_top;               /* How much ram in Kbytes               */
 extern char singleStep;
 extern char SkipAllConfig;
 extern char master_env[128];
 
 extern struct lol FAR *LoL;
-
-extern struct dhdr DOSTEXTFAR ASM blk_dev; /* Block device (Disk) driver           */
-
-extern struct lol ASM FAR DATASTART;
-
-extern BYTE DOSFAR ASM _HMATextAvailable,    /* first byte of available CODE area    */
-  FAR ASM _HMATextStart[],          /* first byte of HMAable CODE area      */
-  FAR ASM _HMATextEnd[], DOSFAR ASM break_ena;  /* break enabled flag                   */
-extern BYTE DOSFAR ASM _InitTextStart[],     /* first available byte of ram          */
-  DOSFAR ASM _InitTextEnd[],
-  DOSFAR ReturnAnyDosVersionExpected,
-  DOSFAR ASM HaltCpuWhileIdle;
-
-extern unsigned char FAR ASM kbdType;
 
 extern struct nlsCountryInfoHardcoded {
   char  ThisIsAConstantOne;

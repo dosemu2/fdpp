@@ -300,8 +300,7 @@ void setvec(unsigned char intno, intvec vector);
 void ASMFUNC spawn_int23(void);        /* procsupt.asm */
 void ASMFUNC DosIdle_hlt(void);        /* dosidle.asm */
 
-GLOBAL BYTE ASM ReturnAnyDosVersionExpected;
-GLOBAL BYTE ASM HaltCpuWhileIdle;
+GLOBAL BYTE ReturnAnyDosVersionExpected;
 
 /* near fnodes:
  * fnode[0] is used internally for almost all cases.
