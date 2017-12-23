@@ -36,6 +36,7 @@ additionally:
 
 */
 #include "portab.h"
+#include "globals.h"
 #include "init-mod.h"
 #include "dyndata.h"
 

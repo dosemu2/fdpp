@@ -28,6 +28,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "globals.h"
 #include "init-mod.h"
 #include "dyndata.h"
 #include "debug.h"
@@ -90,7 +91,7 @@ VOID ASMCFUNC FreeDOSmain(void)
                             at 50:e0
                         */
 
-  drv = LoL->BootDrive + 1;
+  drv = LoL->_BootDrive + 1;
   p = (unsigned char FAR *)MK_FP(0, 0x5e0);
   if (fmemcmp(p+2,"CONFIG",6) == 0)      /* UPX */
   {
@@ -107,7 +108,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   if (drv >= 0x80)
     drv = 3; /* C: */
-  LoL->BootDrive = drv;
+  LoL->_BootDrive = drv;
 
   /* install DOS API and other interrupt service routines, basic kernel functionality works */
   setup_int_vectors();
@@ -122,7 +123,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
 #ifdef DEBUG
   /* Non-portable message kludge alert!   */
-  printf("KERNEL: Boot drive = %c\n", 'A' + LoL->BootDrive - 1);
+  printf("KERNEL: Boot drive = %c\n", 'A' + LoL->_BootDrive - 1);
 #endif
 
   DoInstall();
@@ -144,7 +145,7 @@ void InitializeAllBPBs(VOID)
 {
   static char filename[] = "A:-@JUNK@-.TMP";
   int drive, fileno;
-  for (drive = 'C'; drive < 'A' + LoL->nblkdev; drive++)
+  for (drive = 'C'; drive < 'A' + LoL->_nblkdev; drive++)
   {
     filename[0] = drive;
     if ((fileno = open(filename, O_RDONLY)) >= 0)
@@ -279,8 +280,8 @@ STATIC void init_kernel(void)
 {
   COUNT i;
 
-  LoL->os_setver_major = LoL->os_major = MAJOR_RELEASE;
-  LoL->os_setver_minor = LoL->os_minor = MINOR_RELEASE;
+  LoL->_os_setver_major = LoL->_os_major = MAJOR_RELEASE;
+  LoL->_os_setver_minor = LoL->_os_minor = MINOR_RELEASE;
 
   /* Init oem hook - returns memory size in KB    */
   ram_top = init_oem();
@@ -310,7 +311,7 @@ STATIC void init_kernel(void)
   /* we can read config.sys later.  */
 
   /* use largest possible value for the initial CDS */
-  LoL->lastdrive = 26;
+  LoL->_lastdrive = 26;
 
   /*  init_device((struct dhdr FAR *)&blk_dev, NULL, 0, &ram_top); */
   blk_dev.dh_name[0] = dsk_init();
@@ -351,19 +352,19 @@ STATIC void init_kernel(void)
 
 STATIC VOID FsConfig(VOID)
 {
-  struct dpb FAR *dpb = LoL->DPBp;
+  struct dpb FAR *dpb = LoL->_DPBp;
   int i;
 
   /* Initialize the current directory structures    */
-  for (i = 0; i < LoL->lastdrive; i++)
+  for (i = 0; i < LoL->_lastdrive; i++)
   {
-    struct cds FAR *pcds_table = &LoL->CDSp[i];
+    struct cds FAR *pcds_table = &LoL->_CDSp[i];
 
     fmemcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
 
     pcds_table->cdsCurrentPath[0] += i;
 
-    if (i < LoL->nblkdev && (ULONG) dpb != 0xffffffffl)
+    if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
     {
       pcds_table->cdsDpb = dpb;
       pcds_table->cdsFlags = CDSPHYSDRV;
@@ -380,7 +381,7 @@ STATIC VOID FsConfig(VOID)
   }
 
   /* Log-in the default drive. */
-  init_setdrive(LoL->BootDrive - 1);
+  init_setdrive(LoL->_BootDrive - 1);
 
   /* The system file tables need special handling and are "hand   */
   /* built. Included is the stdin, stdout, stdaux and stdprn. */
@@ -500,11 +501,11 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
   COUNT nunits = dhp->dh_name[0];
   struct dpb FAR *_dpb;
 
-  if (LoL->nblkdev == 0)
-    _dpb = LoL->DPBp;
+  if (LoL->_nblkdev == 0)
+    _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->DPBp; (ULONG) _dpb->dpb_next != 0xffffffffl;
+    for (_dpb = LoL->_DPBp; (ULONG) _dpb->dpb_next != 0xffffffffl;
          _dpb = _dpb->dpb_next)
       ;
     _dpb = _dpb->dpb_next = (struct dpb FAR *)
@@ -514,17 +515,17 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
   for (Index = 0; Index < nunits; Index++)
   {
     _dpb->dpb_next = _dpb + 1;
-    _dpb->dpb_unit = LoL->nblkdev;
+    _dpb->dpb_unit = LoL->_nblkdev;
     _dpb->dpb_subunit = Index;
     _dpb->dpb_device = dhp;
     _dpb->dpb_flags = M_CHANGED;
-    if ((LoL->CDSp != 0) && (LoL->nblkdev < LoL->lastdrive))
+    if ((LoL->_CDSp != 0) && (LoL->_nblkdev < LoL->_lastdrive))
     {
-      LoL->CDSp[LoL->nblkdev].cdsDpb = _dpb;
-      LoL->CDSp[LoL->nblkdev].cdsFlags = CDSPHYSDRV;
+      LoL->_CDSp[LoL->_nblkdev].cdsDpb = _dpb;
+      LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
     }
     ++_dpb;
-    ++LoL->nblkdev;
+    ++LoL->_nblkdev;
   }
   (_dpb - 1)->dpb_next = (struct dpb FAR *)0xFFFFFFFFl;
 }
@@ -566,7 +567,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_length = sizeof(request);
   rq.r_endaddr = *r_top;
   rq.r_bpbptr = (bpb FAR **)(cmdLine ? cmdLine : "\n");  // XXX is typecase correct?
-  rq.r_firstunit = LoL->nblkdev;
+  rq.r_firstunit = LoL->_nblkdev;
 
   execrh((request FAR *) & rq, dhp);
 
@@ -619,16 +620,16 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   }
 
   if (dhp->dh_attr & ATTR_CONIN)
-    LoL->syscon = dhp;
+    LoL->_syscon = dhp;
   else if (dhp->dh_attr & ATTR_CLOCK)
-    LoL->clock = dhp;
+    LoL->_clock = dhp;
 
   return FALSE;
 }
 
 STATIC void InitIO(void)
 {
-  struct dhdr far *device = &LoL->nul_dev;
+  struct dhdr far *device = &LoL->_nul_dev;
 
   /* Initialize driver chain                                      */
   do {
@@ -725,7 +726,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
   if (InitKernelConfig.BootHarddiskSeconds == 0)
     return;
 
-  if (LoL->BootDrive >= 3)
+  if (LoL->_BootDrive >= 3)
   {
 #if 0
     if (!EmulatedDriveStatus(0x80,1))

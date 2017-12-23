@@ -1,6 +1,7 @@
 /* Included by initialisation functions */
 #define IN_INIT_MOD
 
+#if 0
 #include "version.h"
 #include "date.h"
 #include "time.h"
@@ -16,10 +17,11 @@
 #include "tail.h"
 #include "process.h"
 #include "pcb.h"
-#include "nls.h"
 #include "buffer.h"
 #include "dcb.h"
+#endif
 #include "lol.h"
+#include "nls.h"
 
 #include "init-dat.h"
 
@@ -67,34 +69,6 @@ extern struct _KernelConfig InitKernelConfig;
 /* execrh.asm */
 #ifndef __WATCOMC__
 WORD   ASMPASCAL execrh(request FAR *, struct dhdr FAR *);
-#endif
-
-/* asmsupt.asm */
-VOID   ASMPASCAL  memset(      void     *s,  int ch,             size_t n);
-VOID   ASMPASCAL fmemset(      void FAR *s,  int ch,             size_t n);
-int    ASMPASCAL  memcmp(const void     *m1, const void     *m2, size_t n);
-int    ASMPASCAL fmemcmp(const void FAR *m1, const void FAR *m2, size_t n);
-VOID   ASMPASCAL  memcpy(      void     *d,  const void     *s,  size_t n);
-VOID   ASMPASCAL fmemcpy(      void FAR *d,  const void FAR *s,  size_t n);
-VOID   ASMPASCAL  strcpy(char           *d,  const char     *s);
-size_t ASMPASCAL  strlen(const char     *s);
-size_t ASMPASCAL fstrlen(const char FAR *s);
-char * ASMPASCAL  strchr(const char     *s,  int ch);
-
-#ifdef __WATCOMC__
-/* bx, cx, dx and es not used or clobbered for all asmsupt.asm functions except
-   (f)memchr/(f)strchr (which clobber dx) */
-#pragma aux (pascal) pascal_ax modify exact [ax]
-#pragma aux (pascal_ax) memset
-#pragma aux (pascal_ax) fmemset
-#pragma aux (pascal_ax) memcpy
-#pragma aux (pascal_ax) fmemcpy
-#pragma aux (pascal_ax) memcmp modify nomemory
-#pragma aux (pascal_ax) fmemcmp modify nomemory
-#pragma aux (pascal_ax) strcpy
-#pragma aux (pascal_ax) strlen modify nomemory
-#pragma aux (pascal_ax) fstrlen modify nomemory
-#pragma aux (pascal) strchr modify exact [ax dx] nomemory
 #endif
 
 #undef LINESIZE
@@ -257,7 +231,6 @@ extern struct lol FAR *LoL;
 
 extern struct dhdr DOSTEXTFAR ASM blk_dev; /* Block device (Disk) driver           */
 
-extern struct buffer FAR *DOSFAR firstAvailableBuf; /* first 'available' buffer   */
 extern struct lol ASM FAR DATASTART;
 
 extern BYTE DOSFAR ASM _HMATextAvailable,    /* first byte of available CODE area    */
@@ -268,7 +241,6 @@ extern BYTE DOSFAR ASM _InitTextStart[],     /* first available byte of ram     
   DOSFAR ReturnAnyDosVersionExpected,
   DOSFAR ASM HaltCpuWhileIdle;
 
-extern BYTE FAR ASM internal_data[];
 extern unsigned char FAR ASM kbdType;
 
 extern struct nlsCountryInfoHardcoded {
@@ -293,8 +265,6 @@ extern struct lowvec {
 
 /* floppy parameter table, at 70:xxxx */
 extern unsigned char DOSTEXTFAR ASM int1e_table[0xe];
-
-extern char DOSFAR DiskTransferBuffer[/*MAX_SEC_SIZE*/]; /* in dsk.c */
 
 struct RelocationTable {
   UBYTE jmpFar;

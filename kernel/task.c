@@ -65,6 +65,7 @@ static BYTE *RcsId =
            + 1 byte: '\0'
            -- 1999/04/21 ska */
 
+#ifdef __WATCOMC__
 intvec getvec(unsigned char intno)
 {
   intvec iv;
@@ -80,6 +81,7 @@ void setvec(unsigned char intno, intvec vector)
   *(intvec FAR *)MK_FP(0,4 * intno) = vector;
   enable();
 }
+#endif
 
 ULONG SftGetFsize(int sft_idx)
 {

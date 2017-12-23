@@ -27,6 +27,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "globals.h"
 #include "init-mod.h"
 
 #ifdef VERSION_STRINGS

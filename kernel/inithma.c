@@ -64,6 +64,7 @@
 */
 
 #include "portab.h"
+#include "globals.h"
 #include "init-mod.h"
 
 #ifdef VERSION_STRINGS
@@ -232,7 +233,7 @@ int MoveKernelToHMA()
   InstallVDISK();
 
   /* report the fact we are running high through int 21, ax=3306 */
-  LoL->version_flags |= 0x10;
+  LoL->_version_flags |= 0x10;
 
   return TRUE;
 

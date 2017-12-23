@@ -28,6 +28,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "globals.h"
 #include "init-mod.h"
 #include "dyndata.h"
 
@@ -355,10 +356,10 @@ void PreConfig(void)
 /*  printf("Preliminary %d buffers allocated at 0x%p\n", Config.cfgBuffers, buffers);*/
 #endif
 
-  LoL->DPBp = (struct dpb FAR *)
+  LoL->_DPBp = (struct dpb FAR *)
       DynAlloc("DPBp", blk_dev.dh_name[0], sizeof(struct dpb));
 
-  LoL->sfthead = (sfttbl FAR *)MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
+  LoL->_sfthead = (sfttbl FAR *)MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = (sfttbl FAR *)
      KernelAlloc(sizeof(sftheader)
@@ -366,13 +367,13 @@ void PreConfig(void)
 
   config_init_buffers(Config.cfgBuffers);
 
-  LoL->CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->lastdrive, 'L', 0);
+  LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
 #ifdef DEBUG
 /*  printf(" FCB table 0x%p\n",LoL->FCBp);*/
-  printf(" sft table 0x%p\n", LoL->sfthead);
-  printf(" CDS table 0x%p\n", LoL->CDSp);
-  printf(" DPB table 0x%p\n", LoL->DPBp);
+  printf(" sft table 0x%p\n", LoL->_sfthead);
+  printf(" CDS table 0x%p\n", LoL->_CDSp);
+  printf(" DPB table 0x%p\n", LoL->_DPBp);
 #endif
 
   /* Done.  Now initialize the MCB structure                      */
@@ -397,7 +398,7 @@ void PreConfig2(void)
      and allocation starts after the kernel.
    */
 
-  base_seg = LoL->first_mcb = FP_SEG(AlignParagraph((BYTE FAR *) DynLast() + 0x0f));
+  base_seg = LoL->_first_mcb = FP_SEG(AlignParagraph((BYTE FAR *) DynLast() + 0x0f));
 
   if (Config.ebda2move)
   {
@@ -408,9 +409,9 @@ void PreConfig2(void)
   }
 
   /* We expect ram_top as Kbytes, so convert to paragraphs */
-  mcb_init(base_seg, ram_top * 64 - LoL->first_mcb - 1, MCB_LAST);
+  mcb_init(base_seg, ram_top * 64 - LoL->_first_mcb - 1, MCB_LAST);
 
-  sp = LoL->sfthead;
+  sp = LoL->_sfthead;
   sp = sp->sftt_next = (sfttbl FAR *)KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
   sp->sftt_next = (sfttbl FAR *) - 1;
   sp->sftt_count = 3;
@@ -440,9 +441,9 @@ void PostConfig(void)
   }
 
   /* compute lastdrive ... */
-  LoL->lastdrive = Config.cfgLastdrive;
-  if (LoL->lastdrive < LoL->nblkdev)
-    LoL->lastdrive = LoL->nblkdev;
+  LoL->_lastdrive = Config.cfgLastdrive;
+  if (LoL->_lastdrive < LoL->_nblkdev)
+    LoL->_lastdrive = LoL->_nblkdev;
 
   DebugPrintf(("starting FAR allocations at %x\n", base_seg));
 
@@ -454,24 +455,24 @@ void PostConfig(void)
 
   config_init_buffers(Config.cfgBuffers);
 
-/* LoL->sfthead = (sfttbl FAR *)&basesft; */
+/* LoL->_sfthead = (sfttbl FAR *)&basesft; */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
-  sp = LoL->sfthead->sftt_next;
+  sp = LoL->_sfthead->sftt_next;
   sp = sp->sftt_next = (sfttbl FAR *)
     KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 8) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
   sp->sftt_next = (sfttbl FAR *) - 1;
   sp->sftt_count = Config.cfgFiles - 8;
 
-  LoL->CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->lastdrive, 'L', Config.cfgLastdriveHigh);
+  LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
 /*  printf(" FCB table 0x%p\n",LoL->FCBp);*/
-  printf(" sft table 0x%p\n", LoL->sfthead->sftt_next);
-  printf(" CDS table 0x%p\n", LoL->CDSp);
-  printf(" DPB table 0x%p\n", LoL->DPBp);
+  printf(" sft table 0x%p\n", LoL->_sfthead->sftt_next);
+  printf(" CDS table 0x%p\n", LoL->_CDSp);
+  printf(" DPB table 0x%p\n", LoL->_DPBp);
 #endif
   if (Config.cfgStacks)
   {
@@ -546,12 +547,12 @@ STATIC void umb_init(void)
     /* reset root */
     /* Note: since device drivers can change what is considered top of memory (e.g. move XBDA) we must requery */
     ram_top = init_oem();
-    LoL->uppermem_root = ram_top * 64 - 1;
+    LoL->_uppermem_root = ram_top * 64 - 1;
 
     /* create link mcb (below) */
     para2far(base_seg)->m_type = MCB_NORMAL;
     para2far(base_seg)->m_size--;
-    mumcb_init(LoL->uppermem_root, umb_seg - LoL->uppermem_root - 1);
+    mumcb_init(LoL->_uppermem_root, umb_seg - LoL->_uppermem_root - 1);
 
     /* setup the real mcb for the devicehigh block */
     mcb_init(umb_seg, umb_size - 2, MCB_NORMAL);
@@ -574,7 +575,7 @@ STATIC void umb_init(void)
       mcb_init(umb_seg, umb_size - 2, MCB_NORMAL);
 
       /* determine prev and next umbs */
-      umb_prev = prev_mcb(umb_seg, LoL->uppermem_root);
+      umb_prev = prev_mcb(umb_seg, LoL->_uppermem_root);
       umb_next = umb_prev + para2far(umb_prev)->m_size + 1;
 
       if (umb_seg < umb_max)
@@ -600,7 +601,7 @@ STATIC void umb_init(void)
       if (umb_seg - umb_prev - 1 == 0)
         /* should the UMB driver return
            adjacent memory in several pieces */
-        para2far(prev_mcb(umb_prev, LoL->uppermem_root))->m_size += umb_size;
+        para2far(prev_mcb(umb_prev, LoL->_uppermem_root))->m_size += umb_size;
       else
       {
         /* create link mcb (below) */
@@ -1241,8 +1242,8 @@ STATIC VOID sysVersion(BYTE * pLine)
 
   printf("Changing reported version to %d.%d\n", major, minor);
 
-  LoL->os_setver_major = major; /* not the internal os_major */
-  LoL->os_setver_minor = minor; /* not the internal os_minor */
+  LoL->_os_setver_major = major; /* not the internal os_major */
+  LoL->_os_setver_minor = minor; /* not the internal os_minor */
 }
 
 STATIC VOID Files(BYTE * pLine)
@@ -1327,8 +1328,8 @@ STATIC VOID Dosmem(BYTE * pLine)
 
   if (UmbState == 0)
   {
-    LoL->uppermem_link = 0;
-    LoL->uppermem_root = 0xffff;
+    LoL->_uppermem_link = 0;
+    LoL->_uppermem_root = 0xffff;
     UmbState = UMBwanted ? 2 : 0;
   }
   /* Check if HMA is available straight away */
@@ -1772,7 +1773,7 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
   else
   {
     base = base_seg;
-    start = LoL->first_mcb;
+    start = LoL->_first_mcb;
   }
 
   if (base == start)
@@ -1821,9 +1822,9 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
        dhp = next_dhp)
   {
     next_dhp = (struct dhdr FAR *)MK_FP(FP_SEG(dhp), FP_OFF(dhp->dh_next));
-    /* Link in device driver and save LoL->nul_dev pointer to next */
-    dhp->dh_next = LoL->nul_dev.dh_next;
-    LoL->nul_dev.dh_next = dhp;
+    /* Link in device driver and save LoL->_nul_dev pointer to next */
+    dhp->dh_next = LoL->_nul_dev.dh_next;
+    LoL->_nul_dev.dh_next = dhp;
   }
 
   /* might have been the UMB driver or DOS=UMB */
@@ -1879,7 +1880,7 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
   else
   {
     base = base_seg;
-    start = LoL->first_mcb;
+    start = LoL->_first_mcb;
   }
 
   /* create the special DOS data MCB if it doesn't exist yet */
@@ -1917,7 +1918,7 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
   void FAR *p;
   size_t nPara = (nBytes + 15)/16;
 
-  if (LoL->first_mcb == 0)
+  if (LoL->_first_mcb == 0)
   {
     /* prealloc */
     lpTop = (BYTE FAR *)MK_FP(FP_SEG(lpTop) - nPara, FP_OFF(lpTop));
@@ -2116,7 +2117,7 @@ STATIC void config_init_buffers(int wantedbuffers)
     buffers = wantedbuffers;
 
   LoL->nbuffers = buffers;
-  LoL->inforecptr = &LoL->firstbuf;
+  LoL->inforecptr = &LoL->_firstbuf;
   {
     size_t bytes = sizeof(struct buffer) * buffers;
     pbuffer = (struct buffer FAR *)HMAalloc(bytes);
@@ -2125,20 +2126,20 @@ STATIC void config_init_buffers(int wantedbuffers)
     {
       pbuffer = (struct buffer FAR *)KernelAlloc(bytes, 'B', 0);
       if (HMAState == HMA_DONE)
-        firstAvailableBuf = (struct buffer FAR *)MK_FP(0xffff, HMAFree);
+        firstAvailableBuf = (char FAR *)MK_FP(0xffff, HMAFree);
     }
     else
     {
-      LoL->bufloc = LOC_HMA;
+      LoL->_bufloc = LOC_HMA;
       /* space in HMA beyond requested buffers available as user space */
-      firstAvailableBuf = pbuffer + wantedbuffers;
+      firstAvailableBuf = (char FAR *)(pbuffer + wantedbuffers);
     }
   }
-  LoL->deblock_buf = DiskTransferBuffer;
-  LoL->firstbuf = pbuffer;
+  LoL->_deblock_buf = DiskTransferBuffer;
+  LoL->_firstbuf = pbuffer;
 
   DebugPrintf(("init_buffers (size %u) at", sizeof(struct buffer)));
-  DebugPrintf((" (%p)", LoL->firstbuf));
+  DebugPrintf((" (%p)", LoL->_firstbuf));
 
   buffers--;
   pbuffer->b_prev = FP_OFF(pbuffer + buffers);
