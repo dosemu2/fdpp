@@ -29,3 +29,57 @@ __ASM(sft FAR *, lpCurSft) SEMIC
 __ASM(UWORD, return_code) SEMIC       /* Process termination rets             */
 __ASM(keyboard, kb_buf) SEMIC
 __ASM_ARR(char, local_buffer, LINEBUFSIZE0A) SEMIC
+__ASM(BYTE, NetDelay) SEMIC
+__ASM(BYTE, NetRetry) SEMIC
+__ASM(UWORD, first_mcb) SEMIC         /* Start of user memory                 */
+__ASM(UWORD, uppermem_root) SEMIC
+__ASM(struct dhdr FAR *, clock) SEMIC /* CLOCK$ device                        */
+__ASM(struct dhdr FAR *, syscon) SEMIC /* console device                      */
+__ASM(struct buffer FAR *, firstbuf) SEMIC /* head of buffers linked list     */
+__ASM(struct cds FAR *, current_ldt) SEMIC
+__ASM(UBYTE, nblkdev) SEMIC            /* number of block devices              */
+__ASM(UBYTE, lastdrive) SEMIC          /* value of last drive                  */
+__ASM(UBYTE, uppermem_link) SEMIC      /* UMB Link flag */
+__ASM(UBYTE, PrinterEcho) SEMIC        /* Printer Echo Flag                    */
+__ASM(struct dhdr, nul_dev) SEMIC
+__ASM(BYTE, ErrorMode) SEMIC           /* Critical error flag                  */
+__ASM(BYTE, InDOS) SEMIC               /* In DOS critical section              */
+__ASM(BYTE, OpenMode) SEMIC            /* File Open Attributes                 */
+__ASM(BYTE, SAttr) SEMIC               /* Attrib Mask for Dir Search           */
+__ASM(BYTE, dosidle_flag) SEMIC
+__ASM(BYTE, Server_Call) SEMIC
+__ASM(BYTE, CritErrLocus) SEMIC
+__ASM(BYTE, CritErrAction) SEMIC
+__ASM(BYTE, CritErrClass) SEMIC
+__ASM(BYTE, VgaSet) SEMIC
+__ASM(BYTE, njoined) SEMIC             /* number of joined devices             */
+__ASM(struct dirent, SearchDir) SEMIC
+__ASM(struct _FcbSearchBuffer, FcbSearchBuffer) SEMIC
+__ASM(struct __PriPathBuffer, _PriPathBuffer) SEMIC
+__ASM(struct __SecPathBuffer, _SecPathBuffer) SEMIC
+__ASM(BYTE *, internal_data) SEMIC              /* sda areas                            */
+__ASM(BYTE *, swap_always) SEMIC                /*  "    "                              */
+__ASM(BYTE *, swap_indos) SEMIC                 /*  "    "                              */
+__ASM(BYTE, tsr) SEMIC                          /* true if program is TSR               */
+__ASM(BYTE, break_flg) SEMIC                    /* true if break was detected           */
+__ASM(BYTE, break_ena) SEMIC                    /* break enabled flag                   */
+__ASM(struct dirent, DirEntBuffer) SEMIC
+__ASM(BYTE, verify_ena) SEMIC                   /* verify enabled flag                  */
+__ASM(BYTE, switchar) SEMIC                     /* switch char                          */
+__ASM(UBYTE, BootDrive) SEMIC                   /* Drive we came up from                */
+__ASM(UBYTE, CPULevel) SEMIC                    /* CPU family, 0=8086, 1=186, ...       */
+__ASM(UBYTE, scr_pos) SEMIC                     /* screen position for bs, ht, etc      */
+__ASM(struct cds, TempCDS) SEMIC
+__ASM(struct dpb FAR *, DPBp) SEMIC             /* First drive Parameter Block          */
+__ASM(struct dhdr FAR, clk_dev) SEMIC           /* Clock device driver                  */
+__ASM(struct dhdr FAR, con_dev) SEMIC           /* Console device driver                */
+__ASM(struct dhdr FAR, prn_dev) SEMIC           /* Generic printer device driver        */
+__ASM(struct dhdr FAR, aux_dev) SEMIC           /* Generic aux device driver            */
+__ASM(struct dhdr FAR, blk_dev) SEMIC
+__ASM(struct ClockRecord, ClkRecord) SEMIC
+__ASM(BYTE, os_setver_major) SEMIC              /* editable major version number        */
+__ASM(BYTE, os_setver_minor) SEMIC              /* editable minor version number        */
+__ASM(BYTE, os_major) SEMIC                     /* major version number                 */
+__ASM(BYTE, os_minor) SEMIC                     /* minor version number                 */
+__ASM(BYTE, rev_number) SEMIC                   /* minor version number                 */
+__ASM(BYTE, version_flags) SEMIC                /* minor version number                 */

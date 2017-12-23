@@ -69,9 +69,6 @@ VOID bpb_to_dpb(bpb FAR * bpbp, REG struct dpb FAR * dpbp);
 struct dpb FAR *GetDriveDPB(UBYTE drive, COUNT * rc);
 #endif
 
-extern struct dpb
-FAR * ASM DPBp;                      /* First drive Parameter Block          */
-
 
 /* JPP: for testing/debuging disk IO */
 /*#define DISPLAY_GETBLOCK */
@@ -152,16 +149,6 @@ FAR * ASM DPBp;                      /* First drive Parameter Block          */
 
 /* NLS character table type                                             */
 typedef BYTE *UPMAP;
-
-/*                                                                      */
-/* External Assembly variables                                          */
-/*                                                                      */
-extern struct dhdr
-FAR ASM clk_dev,                    /* Clock device driver                  */
-  FAR ASM con_dev,                  /* Console device driver                */
-  FAR ASM prn_dev,                  /* Generic printer device driver        */
-  FAR ASM aux_dev,                  /* Generic aux device driver            */
-  FAR ASM blk_dev;                  /* Block device (Disk) driver           */
 extern COUNT *error_tos,        /* error stack                          */
   disk_api_tos,                 /* API handler stack - disk fns         */
   char_api_tos;                 /* API handler stack - char fns         */
@@ -170,19 +157,6 @@ extern BYTE FAR _HMATextAvailable,      /* first byte of available CODE area    
   FAR _HMATextEnd[];            /* and the last byte of it              */
 extern
 BYTE DosLoadedInHMA;            /* if InitHMA has moved DOS up          */
-
-extern struct ClockRecord
-  ASM ClkRecord;
-
-/*                                                                      */
-/* Global variables                                                     */
-/*                                                                      */
-extern BYTE ASM os_setver_major,/* editable major version number        */
-  ASM os_setver_minor,          /* editable minor version number        */
-  ASM os_major,                 /* major version number                 */
-  ASM os_minor,                 /* minor version number                 */
-  ASM rev_number,               /* minor version number                 */
-  ASM version_flags;            /* minor version number                 */
 
 #ifdef DEBUG
 GLOBAL WORD bDumpRegs
@@ -236,81 +210,33 @@ Freeman Publishing, Lawrence KS, USA (ISBN 0-87930-436-7).\n\
 #undef SEMIC
 #include "glob_asmdefs.h"
 
-extern BYTE ASM NetDelay, ASM NetRetry;
-
-extern UWORD ASM first_mcb,         /* Start of user memory                 */
-  ASM uppermem_root;                /* Start of umb chain (usually 9fff)    */
-extern struct dhdr
-FAR * ASM clock,                    /* CLOCK$ device                        */
-  FAR * ASM syscon;                 /* console device                       */
-extern struct buffer
-FAR *ASM firstbuf;                  /* head of buffers linked list          */
 enum {LOC_CONV=0, LOC_HMA=1};
 GLOBAL char FAR *firstAvailableBuf;
-extern
-struct cds FAR * ASM current_ldt;
-extern UBYTE ASM nblkdev,           /* number of block devices              */
-  ASM lastdrive,                    /* value of last drive                  */
-  ASM uppermem_link,                /* UMB Link flag */
-  ASM PrinterEcho;                  /* Printer Echo Flag                    */
 
-extern struct dhdr
-  ASM nul_dev;
-extern BYTE ASM ErrorMode,          /* Critical error flag                  */
-  ASM InDOS,                        /* In DOS critical section              */
-  ASM OpenMode,                     /* File Open Attributes                 */
-  ASM SAttr,                        /* Attrib Mask for Dir Search           */
-  ASM dosidle_flag, ASM Server_Call, ASM CritErrLocus, ASM CritErrAction,
-  ASM CritErrClass, ASM VgaSet,
-  ASM njoined;                      /* number of joined devices             */
-
-extern struct dirent
-  ASM SearchDir;
-
-extern struct FcbSearchBuffer {
+struct _FcbSearchBuffer {
   COUNT nDrive;
   BYTE szName[FNAME_SIZE + 1];
   BYTE szExt[FEXT_SIZE + 1];
-} ASM FcbSearchBuffer;
+};
 
-extern struct _PriPathBuffer                  /* Path name parsing buffer             */
+struct __PriPathBuffer                  /* Path name parsing buffer             */
 {
   BYTE _PriPathName[128];
-} ASM _PriPathBuffer;
+};
 
 #define PriPathName _PriPathBuffer._PriPathName
 
-extern struct _SecPathBuffer                  /* Alternate path name parsing buffer   */
+struct __SecPathBuffer                  /* Alternate path name parsing buffer   */
 {
   BYTE _SecPathName[128];
-} ASM _SecPathBuffer;
+};
 
 #define SecPathName _SecPathBuffer._SecPathName
 
-extern BYTE
-  ASM internal_data[],              /* sda areas                            */
-  ASM swap_always[],                /*  "    "                              */
-  ASM swap_indos[],                 /*  "    "                              */
-  ASM tsr,                          /* true if program is TSR               */
-  ASM break_flg,                    /* true if break was detected           */
-  ASM break_ena;                    /* break enabled flag                   */
-
-extern struct dirent            /* Temporary directory entry            */
-  ASM DirEntBuffer;
-
-extern BYTE ASM verify_ena,         /* verify enabled flag                  */
-  ASM switchar;                     /* switch char                          */
-
-extern UBYTE ASM BootDrive,         /* Drive we came up from                */
-  ASM CPULevel,                     /* CPU family, 0=8086, 1=186, ...       */
-  ASM scr_pos;                      /* screen position for bs, ht, etc      */
 /*extern WORD
   NumFloppies; !!*//* How many floppies we have            */
 
 extern UBYTE DiskTransferBuffer[/*SEC_SIZE*/];
-
-extern struct cds
-  ASM TempCDS;
 
 /* start of uncontrolled variables                                      */
 
