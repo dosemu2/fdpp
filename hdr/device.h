@@ -479,9 +479,6 @@ typedef bpb FAR *bpbptr;
 typedef BYTE FAR *byteptr;
 typedef struct dhdr FAR *dhdrptr;
 
-extern request                  /* I/O Request packets                  */
-  ASM CharReqHdr, ASM IoReqHdr, ASM MediaReqHdr;
-
 /* dsk.c */
 COUNT ASMCFUNC FAR blk_driver(rqptr rp);
 ddt * getddt(int dev);

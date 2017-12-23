@@ -478,17 +478,6 @@ struct nlsInfoBlock {           /* This block contains all information
                                    hardcoded U.S.A./CP437 */
 };
 
-extern struct nlsInfoBlock ASM nlsInfo;
-extern struct nlsPackage      FAR ASM nlsPackageHardcoded;
-        /* These are the "must have" tables within the hard coded NLS pkg */
-extern struct nlsFnamTerm     FAR ASM nlsFnameTermHardcoded;
-extern struct nlsDBCS         FAR ASM nlsDBCSHardcoded;
-extern struct nlsCharTbl      FAR ASM nlsUpcaseHardcoded;
-extern struct nlsCharTbl      FAR ASM nlsFUpcaseHardcoded;
-extern struct nlsCharTbl      FAR ASM nlsCollHardcoded;
-extern struct nlsExtCntryInfo FAR ASM nlsCntryInfoHardcoded;
-extern BYTE FAR hcTablesStart[], hcTablesEnd[];
-
 /***********************************************************************
  ***** Definitions & Declarations for COUNTRY.SYS **********************
  ***********************************************************************/

@@ -1519,13 +1519,13 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
   };
   static struct subf_tbl table[8] = {
     {"\377       ", NULL},                  /* 0, unused */
-    {"\377CTYINFO", &nlsCntryInfoHardcoded},/* 1 */
-    {"\377UCASE  ", &nlsUpcaseHardcoded},   /* 2 */
+    {"\377CTYINFO", &__nlsCntryInfoHardcoded},/* 1 */
+    {"\377UCASE  ", &__nlsUpcaseHardcoded},   /* 2 */
     {"\377LCASE  ", NULL},                  /* 3, not supported [yet] */
-    {"\377FUCASE ", &nlsFUpcaseHardcoded},  /* 4 */
-    {"\377FCHAR  ", &nlsFnameTermHardcoded},/* 5 */
-    {"\377COLLATE", &nlsCollHardcoded},     /* 6 */
-    {"\377DBCS   ", &nlsDBCSHardcoded}      /* 7, not supported [yet] */
+    {"\377FUCASE ", &__nlsFUpcaseHardcoded},  /* 4 */
+    {"\377FCHAR  ", &__nlsFnameTermHardcoded},/* 5 */
+    {"\377COLLATE", &__nlsCollHardcoded},     /* 6 */
+    {"\377DBCS   ", &__nlsDBCSHardcoded}      /* 7, not supported [yet] */
   };
   static struct subf_hdr hdr[8];
   static unsigned int entries, count;
@@ -1597,19 +1597,19 @@ err:printf("%s has invalid format\n", filename);
         {
           /* if DBCS table (in country.sys) is empty, clear internal table */
           *(DWORD *)(subf_data.buffer) = 0L;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 4);
+          fmemcpy(*(BYTE FAR **)(table[hdr[i].id].p), subf_data.buffer, 4);
         }
         else
         {
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer, subf_data.length);
+          fmemcpy(*(BYTE FAR **)(table[hdr[i].id].p) + 2, subf_data.buffer, subf_data.length);
           /* write length */
           *(UWORD *)(subf_data.buffer) = subf_data.length;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 2);
+          fmemcpy(*(BYTE FAR **)(table[hdr[i].id].p), subf_data.buffer, 2);
         }
         continue;
       }
 
-      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer,
+      fmemcpy(*(BYTE FAR **)(table[hdr[i].id].p) + 2, subf_data.buffer,
                                 /* skip length ^*/  subf_data.length);
     }
     rc = TRUE;

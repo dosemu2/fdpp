@@ -109,3 +109,17 @@ __ASM(WORD, current_sft_idx) SEMIC
 __ASM(UWORD, ext_open_mode) SEMIC
 __ASM(UWORD, ext_open_attrib) SEMIC
 __ASM(UWORD, ext_open_action) SEMIC
+__ASM(struct nlsInfoBlock, nlsInfo) SEMIC
+__ASM(struct nlsPackage FAR, nlsPackageHardcoded) SEMIC
+        /* These are the "must have" tables within the hard coded NLS pkg */
+__ASM(struct nlsFnamTerm FAR, nlsFnameTermHardcoded) SEMIC
+__ASM(struct nlsDBCS FAR, nlsDBCSHardcoded) SEMIC
+__ASM(struct nlsCharTbl FAR, nlsUpcaseHardcoded) SEMIC
+__ASM(struct nlsCharTbl FAR, nlsFUpcaseHardcoded) SEMIC
+__ASM(struct nlsCharTbl FAR, nlsCollHardcoded) SEMIC
+__ASM(struct nlsExtCntryInfo FAR, nlsCntryInfoHardcoded) SEMIC
+__ASM(BYTE FAR *, hcTablesStart) SEMIC
+__ASM(BYTE FAR *, hcTablesEnd) SEMIC
+__ASM(request, CharReqHdr) SEMIC
+__ASM(request, IoReqHdr) SEMIC
+__ASM(request, MediaReqHdr) SEMIC
