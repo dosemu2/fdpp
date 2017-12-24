@@ -267,3 +267,33 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 }
 
 #include "thunk_asms.h"
+
+
+static struct thunk_api *api_calls;
+
+void FdSetApiCalls(struct thunk_api *calls)
+{
+    api_calls = calls;
+}
+
+#define _THUNK_API_v(n) \
+void n(void) \
+{ \
+    api_calls->n(); \
+}
+
+#define _THUNK_API_2(r, n, t1, a1, t2, a2) \
+r n(t1 a1, t2 a2) \
+{ \
+    return api_calls->n(a1, a2); \
+}
+
+#define _THUNK_API_3v(n, t1, a1, t2, a2, t3, a3) \
+void n(t1 a1, t2 a2, t3 a3) \
+{ \
+    api_calls->n(a1, a2, a3); \
+}
+
+#define SEMIC ;
+#include "thunkapi.h"
+#undef SEMIC
