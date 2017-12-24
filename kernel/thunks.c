@@ -310,4 +310,4 @@ void n(t1 a1, t2 a2, t3 a3) \
     api_calls->n(a1, a2, a3); \
 }
 
-#include "thunkapi.h"
+#include "thunkapi_tmpl.h"

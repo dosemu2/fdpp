@@ -82,7 +82,7 @@ HDRS=\
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h dyndata.h
-GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
+GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h thunkapi.h
 HEADERS=$(HDRS) globals.h proto.h $(GEN_HEADERS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
@@ -148,6 +148,9 @@ thunk_calls.h: thunk_calls.tmp
 thunk_asms.h: proto.h makefile
 	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | nl -n ln -v 0 | \
 		../utils/thunk_gen 1 >$@ || (rm -f $@ ; false)
+
+thunkapi.h: thunkapi_gen.h thunkapi_tmpl.h makefile
+	cpp -P $< | sed 's/\(^[^s}]\+\)/\t\1/' >$@
 
 glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM(" $< | grep -v '^/' | \
