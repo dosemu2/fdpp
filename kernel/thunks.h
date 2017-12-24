@@ -1,13 +1,15 @@
 #ifndef THUNKS_H
 #define THUNKS_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-UDWORD FdThunkCall(int fn, UBYTE *sp, UBYTE *r_len);
+uint32_t FdThunkCall(int fn, uint8_t *sp, uint8_t *r_len);
 
-typedef UDWORD (*FdAsmCall_t)(UWORD seg, UWORD off, UBYTE *sp, UBYTE len);
+typedef uintptr_t (*FdAsmCall_t)(uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len);
 void FdSetAsmCalls(FdAsmCall_t call, void *tab, int len);
 int FdSetAsmThunks(void **ptrs, int len);
 void FdSetAbortHandler(void (*handler)(const char *, int));

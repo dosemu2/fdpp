@@ -82,7 +82,7 @@ typedef long DWORD;
 
 typedef unsigned char UBYTE;
 typedef unsigned short UWORD;
-typedef unsigned long UDWORD;
+//typedef unsigned long UDWORD;
 
 typedef short SHORT;
 
@@ -173,6 +173,7 @@ unsigned short getSS(void);
 #define MC68K
 
 #elif defined(__GNUC__)
+#include <stdint.h>
 #define VA_CDECL
 UWORD getCS(void);
 #define _CS getCS()
@@ -180,10 +181,11 @@ UWORD getSS(void);
 #define _SS getSS()
 UBYTE peekb(UWORD seg, UWORD ofs);
 UWORD peekw(UWORD seg, UWORD ofs);
-ULONG peekl(UWORD seg, UWORD ofs);
+typedef uint32_t UDWORD;
+UDWORD peekl(UWORD seg, UWORD ofs);
 void pokeb(UWORD seg, UWORD ofs, UBYTE b);
 void pokew(UWORD seg, UWORD ofs, UWORD w);
-void pokel(UWORD seg, UWORD ofs, ULONG l);
+void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
 UWORD mk_offs(UBYTE *data, UWORD len);
