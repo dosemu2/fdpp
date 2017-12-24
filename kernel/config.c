@@ -163,9 +163,9 @@ STATIC BYTE szBuf[256] BSS_INIT({0});
 struct CfgFile {
   COUNT nFileDesc;
   COUNT nCfgLine;
-} cfgFile[MAX_CHAINS];
-COUNT nCurChain = 0;
-COUNT nFileDesc;
+} cfgFile[MAX_CHAINS] BSS_INIT({0});
+COUNT nCurChain BSS_INIT(0);
+COUNT nFileDesc BSS_INIT(0);
 
 BYTE singleStep BSS_INIT(FALSE);        /* F8 processing */
 BYTE SkipAllConfig BSS_INIT(FALSE);     /* F5 processing */
@@ -419,8 +419,9 @@ void PreConfig2(void)
   if (ebda_size)  /* move the Extended BIOS Data Area from top of RAM here */
     movebda(ebda_size, FP_SEG(KernelAlloc(ebda_size, 'I', 0)));
 
-//  if (UmbState == 2)
-//    umb_init();
+/*  if (UmbState == 2)
+      umb_init();
+*/
 }
 
 /* Do third pass initialization.                                        */

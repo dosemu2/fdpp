@@ -149,7 +149,6 @@ struct _nlsCountryInfoHardcoded {
   short TableSize;
 
   struct CountrySpecificInfo C;
-
 };
 
 /*
