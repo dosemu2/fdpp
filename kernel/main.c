@@ -235,7 +235,7 @@ void setvec(unsigned char intno, intvec vector)
 
 STATIC void setup_int_vectors(void)
 {
-  static struct vec
+  struct vec
   {
     unsigned char intno;
     size_t handleroff;

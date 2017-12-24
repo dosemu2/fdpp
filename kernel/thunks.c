@@ -21,17 +21,21 @@ void FdSetAsmCalls(FdAsmCall_t call, void *tab, int len)
 #define SEMIC ;
 #define __ASM(t, v) t * __##v
 #define __ASM_ARR(t, v, l) t (* __##v)[l]
+#define __ASM_FUNC(v) void * v
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef __ASM_FUNC
 
 static union asm_thunks_u {
   struct {
 #define __ASM(t, v) t ** __##v
 #define __ASM_ARR(t, v, l) t (** __##v)[l]
+#define __ASM_FUNC(v) void ** v
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef __ASM_FUNC
   } thunks;
   void ** arr[0];
 } asm_thunks = {{
@@ -39,9 +43,11 @@ static union asm_thunks_u {
 #define SEMIC ,
 #define __ASM(t, v) &__##v
 #define __ASM_ARR(t, v, l) &__##v
+#define __ASM_FUNC(v) &v
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef __ASM_FUNC
 #undef SEMIC
 }};
 
@@ -93,6 +99,16 @@ void f(void) \
 { \
     _ASSERT(n < asm_tab_len); \
     asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+}
+
+#define _THUNK1_v(n, f, t1, at1) \
+void f(t1 a1) \
+{ \
+    struct { \
+	at1 a1; \
+    } PACKED _args = { (at1)a1 }; \
+    _ASSERT(n < asm_tab_len); \
+    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK2_v(n, f, t1, at1, t2, at2) \

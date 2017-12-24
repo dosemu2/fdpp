@@ -497,3 +497,5 @@ COUNT ASMPASCAL Umb_Test(void);
 COUNT ASMPASCAL UMB_get_largest(void FAR * driverAddress, UCOUNT * __seg, UCOUNT * size);
 VOID ASMFUNC init_stacks(VOID FAR * stack_base, COUNT nStacks, WORD stackSize);
 void ASMFUNC spawn_int23(void);        /* procsupt.asm */
+/* kernel.asm */
+VOID ASMFUNC FAR init_call_p_0(struct config FAR *Config); /* P_0, actually */

@@ -123,3 +123,19 @@ __ASM(BYTE FAR *, hcTablesEnd) SEMIC
 __ASM(request, CharReqHdr) SEMIC
 __ASM(request, IoReqHdr) SEMIC
 __ASM(request, MediaReqHdr) SEMIC
+__ASM_FUNC(int0_handler) SEMIC
+__ASM_FUNC(int6_handler) SEMIC
+__ASM_FUNC(int19_handler) SEMIC
+__ASM_FUNC(empty_handler) SEMIC
+__ASM_FUNC(int20_handler) SEMIC
+__ASM_FUNC(int21_handler) SEMIC
+__ASM_FUNC(int22_handler) SEMIC
+__ASM_FUNC(int24_handler) SEMIC
+__ASM_FUNC(low_int25_handler) SEMIC
+__ASM_FUNC(low_int26_handler) SEMIC
+__ASM_FUNC(int27_handler) SEMIC
+__ASM_FUNC(int28_handler) SEMIC
+__ASM_FUNC(int29_handler) SEMIC
+__ASM_FUNC(int2a_handler) SEMIC
+__ASM_FUNC(int2f_handler) SEMIC
+__ASM_FUNC(got_cbreak) SEMIC

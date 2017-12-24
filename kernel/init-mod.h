@@ -66,11 +66,6 @@ extern struct _KernelConfig InitKernelConfig;
 #define open        init_DosOpen
 #endif
 
-/* execrh.asm */
-#ifndef __WATCOMC__
-WORD   ASMPASCAL execrh(request FAR *, struct dhdr FAR *);
-#endif
-
 #undef LINESIZE
 #define LINESIZE KBD_MAXLENGTH
 
@@ -115,14 +110,6 @@ UWORD GetBiosKey(int timeout);
 /* diskinit.c */
 COUNT dsk_init(VOID);
 
-/* int2f.asm */
-COUNT ASMPASCAL Umb_Test(void);
-COUNT ASMPASCAL UMB_get_largest(void FAR * driverAddress,
-                                UCOUNT * seg, UCOUNT * size);
-#ifdef __WATCOMC__
-#pragma aux (pascal) UMB_get_largest modify exact [ax bx cx dx]
-#endif
-
 /* inithma.c */
 int MoveKernelToHMA(void);
 VOID FAR * HMAalloc(COUNT bytesToAllocate);
@@ -132,70 +119,7 @@ unsigned init_oem(void);
 void movebda(size_t bytes, unsigned new_seg);
 unsigned ebdasize(void);
 
-/*
- * Invoke interrupt "nr" with all registers from *rp loaded
- * into the processor registers (except: SS, SP,& flags)
- * On return, all processor registers are stored into *rp (including
- * flags).
- */
-unsigned ASMPASCAL init_call_intr(int nr, iregs * rp);
-
-unsigned ASMPASCAL read(int fd, void *buf, unsigned count);
-int ASMPASCAL open(const char *pathname, int flags);
-int ASMPASCAL close(int fd);
-int ASMPASCAL dup2(int oldfd, int newfd);
-ULONG ASMPASCAL lseek(int fd, long position);
-seg ASMPASCAL allocmem(UWORD size);
-void ASMPASCAL init_PSPSet(seg psp_seg);
-int ASMPASCAL init_DosExec(int mode, exec_blk * ep, char * lp);
-int ASMPASCAL init_setdrive(int drive);
-int ASMPASCAL init_switchar(int chr);
-void ASMPASCAL keycheck(void);
-void ASMPASCAL set_DTA(void far *_dta);
-#ifdef __WATCOMC__
-#pragma aux (pascal) init_call_intr modify exact [ax]
-#pragma aux (pascal) read modify exact [ax bx cx dx]
-#pragma aux (pascal) init_DosOpen modify exact [ax bx dx]
-#pragma aux (pascal) close modify exact [ax bx]
-#pragma aux (pascal) dup2 modify exact [ax bx cx]
-#pragma aux (pascal) allocmem modify exact [ax bx]
-#pragma aux (pascal) init_PSPSet modify exact [ax bx]
-#pragma aux (pascal) init_DosExec modify exact [ax bx dx es]
-#pragma aux (pascal) init_setdrive modify exact [ax bx dx]
-#pragma aux (pascal) init_switchar modify exact [ax bx dx]
-#pragma aux (pascal) keycheck modify exact [ax]
-#pragma aux (pascal) set_DTA modify exact [ax bx dx]
-#endif
-
-/* irqstack.asm */
-VOID ASMFUNC init_stacks(VOID FAR * stack_base, COUNT nStacks,
-                          WORD stackSize);
-
-/* inthndlr.c */
-VOID ASMCFUNC FAR int21_entry(iregs UserRegs);
-VOID ASMCFUNC int21_service(iregs far * r);
-VOID ASMCFUNC FAR int0_handler(void);
-VOID ASMCFUNC FAR int6_handler(void);
-VOID ASMCFUNC FAR int19_handler(void);
-VOID ASMCFUNC FAR empty_handler(void);
-VOID ASMCFUNC FAR int20_handler(void);
-VOID ASMCFUNC FAR int21_handler(void);
-VOID ASMCFUNC FAR int22_handler(void);
-VOID ASMCFUNC FAR int24_handler(void);
-VOID ASMCFUNC FAR low_int25_handler(void);
-VOID ASMCFUNC FAR low_int26_handler(void);
-VOID ASMCFUNC FAR int27_handler(void);
-VOID ASMCFUNC FAR int28_handler(void);
-VOID ASMCFUNC FAR int29_handler(void);
-VOID ASMCFUNC FAR int2a_handler(void);
-VOID ASMCFUNC FAR int2f_handler(void);
-VOID ASMCFUNC FAR cpm_entry(void);
-
-/* kernel.asm */
-VOID ASMCFUNC FAR init_call_p_0(struct config FAR *Config); /* P_0, actually */
-
 /* main.c */
-VOID ASMCFUNC FreeDOSmain(void);
 BOOL init_device(struct dhdr FAR * dhp, char * cmdLine,
                       COUNT mode, char FAR **top);
 VOID init_fatal(BYTE * err_msg);
@@ -203,9 +127,6 @@ VOID init_fatal(BYTE * err_msg);
 /* prf.c */
 int VA_CDECL init_printf(CONST char * fmt, ...);
 int VA_CDECL init_sprintf(char * buff, CONST char * fmt, ...);
-
-/* procsupt.asm */
-VOID ASMCFUNC FAR got_cbreak(void);
 
 /* initclk.c */
 extern void Init_clk_driver(void);
@@ -251,18 +172,6 @@ struct RelocatedEntry {
   UWORD jmpOffset;
   UWORD jmpSegment;
 };
-
-extern VOID ASMPASCAL FAR _EnableA20(VOID);
-extern VOID ASMPASCAL FAR _DisableA20(VOID);
-
-extern void FAR * ASMPASCAL DetectXMSDriver(VOID);
-extern int ASMPASCAL init_call_XMScall(void FAR * driverAddress, UWORD ax,
-                                      UWORD dx);
-#ifdef __WATCOMC__
-#pragma aux (pascal) DetectXMSDriver modify exact [ax dx]
-#pragma aux (pascal) _EnableA20 modify exact [ax]
-#pragma aux (pascal) _DisableA20 modify exact [ax]
-#endif
 
 #if defined(WATCOM) && 0
 ULONG ASMCFUNC FAR MULULUS(ULONG mul1, UWORD mul2);     /* MULtiply ULong by UShort */
