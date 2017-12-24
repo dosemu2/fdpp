@@ -10,8 +10,9 @@ UDWORD FdThunkCall(int fn, UBYTE *sp, UBYTE *r_len);
 typedef UDWORD (*FdAsmCall_t)(UWORD seg, UWORD off, UBYTE *sp, UBYTE len);
 void FdSetAsmCalls(FdAsmCall_t call, void *tab, int len);
 int FdSetAsmThunks(void **ptrs, int len);
+void FdSetAbortHandler(void (*handler)(const char *, int));
 
-struct thunk_api {
+struct fdthunk_api {
 #define _THUNK_API_v(n) void (* n)(void)
 #define _THUNK_API_0(r, n) r (* n)(void)
 #define _THUNK_API_1(r, n, t1, a1) r (* n)(t1 a1)
@@ -25,7 +26,7 @@ struct thunk_api {
 #undef _THUNK_API_3v
 };
 
-void FdSetApiCalls(struct thunk_api *calls);
+void FdSetApiCalls(struct fdthunk_api *calls);
 
 #ifdef __cplusplus
 }

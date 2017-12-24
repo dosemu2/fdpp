@@ -86,7 +86,11 @@ static void abort_handler_dummy(const char *file, int line)
 {
 }
 static void (*abort_handler)(const char *file, int line) = abort_handler_dummy;
-/* TODO: abort handler API here */
+
+void FdSetAbortHandler(void (*handler)(const char *, int))
+{
+    abort_handler = handler;
+}
 
 #define __ARG(t) t
 #define __ARG_PTR(t) t *
@@ -269,9 +273,9 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 #include "thunk_asms.h"
 
 
-static struct thunk_api *api_calls;
+static struct fdthunk_api *api_calls;
 
-void FdSetApiCalls(struct thunk_api *calls)
+void FdSetApiCalls(struct fdthunk_api *calls)
 {
     api_calls = calls;
 }
