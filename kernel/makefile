@@ -133,6 +133,8 @@ libfdkernel.so: $(OBJECTS)
 		$(CP) $^ ..$(DIRSEP)bin
 
 plt.obj: plt.asm plt.inc
+plt.asm: plt.S
+	cpp -P $^ | sed 's/" "//g' >$@
 
 thunk_calls.tmp: proto.h makefile
 	grep ASMCFUNC $< | nl -n ln -v 0 >$@

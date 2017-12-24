@@ -81,7 +81,7 @@ struct lol {
   unsigned char _os_major;     /* 6d major DOS version                    */
   unsigned char rev_number;    /* 6e DOS revision#, only 3 bits           */
   unsigned char _version_flags;/* 6f DOS version flags                    */
-  char *os_release;            /* 70 near pointer to os_release string    */
+  char *_os_release;           /* 70 near pointer to os_release string    */
 #ifdef WIN31SUPPORT
   unsigned short winInstanced; /* WinInit called                          */
   unsigned long  winStartupInfo[4];

@@ -184,18 +184,6 @@ GLOBAL BYTE copyright[] =
 
 #endif
 
-GLOBAL const BYTE ASM os_release[]
-#ifdef MAIN
-    = KERNEL_VERSION_STRING
-#if 0
-    "For technical information and description of the DOS-C operating system\n\
-consult \"FreeDOS Kernel\" by Pat Villani, published by Miller\n\
-Freeman Publishing, Lawrence KS, USA (ISBN 0-87930-436-7).\n\
-\n"
-#endif
-#endif
- ;
-
 /* Globally referenced variables - WARNING: ORDER IS DEFINED IN         */
 /* KERNEL.ASM AND MUST NOT BE CHANGED. DO NOT CHANGE ORDER BECAUSE THEY */
 /* ARE DOCUMENTED AS UNDOCUMENTED (?) AND HAVE MANY  PROGRAMS AND TSRs  */
