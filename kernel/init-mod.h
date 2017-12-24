@@ -75,7 +75,7 @@ void MoveKernel(unsigned NewKernelSegment);
 
 void setvec(unsigned char intno, intvec vector);
 #ifndef __WATCOMC__
-#define getvec init_getvec
+//#define getvec init_getvec
 #endif
 intvec getvec(unsigned char intno);
 
@@ -141,7 +141,8 @@ extern char singleStep;
 extern char SkipAllConfig;
 extern char master_env[128];
 
-extern struct lol FAR *LoL;
+extern struct lol FAR **_LoL;
+#define LoL (*_LoL)
 
 struct _nlsCountryInfoHardcoded {
   char  ThisIsAConstantOne;
