@@ -197,7 +197,7 @@ struct lowvec {
 
 #define __ASM(t, v) extern t * __##v
 #define __ASM_ARR(t, v, l) extern t (* __##v)[l]
-#define __ASM_FUNC(v) extern void * v
+#define __ASM_FUNC(v) extern void (* v)(void)
 #define SEMIC ;
 #include "glob_asm.h"
 #undef __ASM
@@ -296,7 +296,7 @@ void setvec(unsigned char intno, intvec vector);
 void ASMFUNC spawn_int23(void);        /* procsupt.asm */
 void ASMFUNC DosIdle_hlt(void);        /* dosidle.asm */
 
-GLOBAL BYTE ReturnAnyDosVersionExpected;
+extern BYTE ReturnAnyDosVersionExpected;
 
 /* near fnodes:
  * fnode[0] is used internally for almost all cases.

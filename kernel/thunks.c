@@ -21,7 +21,7 @@ void FdSetAsmCalls(FdAsmCall_t call, void *tab, int len)
 #define SEMIC ;
 #define __ASM(t, v) t * __##v
 #define __ASM_ARR(t, v, l) t (* __##v)[l]
-#define __ASM_FUNC(v) void * v
+#define __ASM_FUNC(v) void (* v)(void)
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
@@ -31,7 +31,7 @@ static union asm_thunks_u {
   struct {
 #define __ASM(t, v) t ** __##v
 #define __ASM_ARR(t, v, l) t (** __##v)[l]
-#define __ASM_FUNC(v) void ** v
+#define __ASM_FUNC(v) void (** v)(void)
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
