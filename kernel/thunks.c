@@ -282,6 +282,18 @@ void n(void) \
     api_calls->n(); \
 }
 
+#define _THUNK_API_0(r, n) \
+r n(void) \
+{ \
+    return api_calls->n(); \
+}
+
+#define _THUNK_API_1(r, n, t1, a1) \
+r n(t1 a1) \
+{ \
+    return api_calls->n(a1); \
+}
+
 #define _THUNK_API_2(r, n, t1, a1, t2, a2) \
 r n(t1 a1, t2 a2) \
 { \
