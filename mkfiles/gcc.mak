@@ -16,7 +16,7 @@ endif
 
 TARGET=KMS
 
-ALLCFLAGS:=-I../hdr $(TARGETOPT) $(ALLCFLAGS) -Wall -fpic -ffreestanding
+ALLCFLAGS:=-I../hdr $(TARGETOPT) $(ALLCFLAGS) -Wall -fpic -ffreestanding -O2
 
 INITCFLAGS=$(ALLCFLAGS)
 CFLAGS=$(ALLCFLAGS)
