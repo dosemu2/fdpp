@@ -70,14 +70,17 @@ int FdSetAsmThunks(void **ptrs, int len)
 UDWORD FdThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
     UDWORD ret = 0;
+    UBYTE rsz = 0;
 #define _RET ret
-#define _RSZ (*r_len)
+#define _RSZ rsz
 #define _SP sp
 
     switch (fn) {
         #include "thunk_calls.h"
     }
 
+    if (r_len)
+        *r_len = rsz;
     return ret;
 }
 
