@@ -92,7 +92,7 @@ static void fin_arg(int last)
 
 %}
 
-%token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM
+%token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
 %token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG STRUCT CONST
 
 %define api.value.type union
@@ -147,6 +147,7 @@ str:		STRING	{ $$ = strdup(yytext); }
 ;
 
 decls:		  ASMCFUNC decls
+		| SEGM LB STRING RB decls
 		| ASMPASCAL decls	{ is_pas = 1; }
 		| FAR decls	{ is_far = 1; }
 		| ASTER decls	{ is_ptr = 1; }

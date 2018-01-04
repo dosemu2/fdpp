@@ -248,6 +248,7 @@ typedef unsigned       size_t;
               have a certain calling standard. These are declared
               as 'ASMCFUNC', and is (and will be ?-) cdecl */
 #define ASMCFUNC
+#define SEGM(x)
 #define ASMPASCAL
 #define ASM
 #define ASMFUNC

@@ -26,6 +26,7 @@
 "ASMCFUNC"	{ return ASMCFUNC; }
 "ASMPASCAL"	{ return ASMPASCAL; }
 "ASMFUNC"	{ }
+"SEGM"		{ return SEGM; }
 "FAR"		{ return FAR; }
 "far"		{ return FAR; }
 "*"		{ return ASTER; }

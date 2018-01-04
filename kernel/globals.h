@@ -251,8 +251,8 @@ GLOBAL WORD dump_regs;          /* dump registers of bad call           */
 /* Process related functions - not under automatic generation.  */
 /* Typically, these are in ".asm" files.                        */
 #if 0
-VOID ASMCFUNC FAR set_stack(VOID);
-VOID ASMCFUNC FAR restore_stack(VOID);
+VOID ASMCFUNC SEGM(HMA_TEXT) FAR set_stack(VOID);
+VOID ASMCFUNC SEGM(HMA_TEXT) FAR restore_stack(VOID);
 #endif
 /*VOID INRPT FAR handle_break(VOID); */
 

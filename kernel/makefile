@@ -140,7 +140,7 @@ thunk_calls.tmp: proto.h makefile
 	grep ASMCFUNC $< | nl -n ln -v 0 >$@
 
 plt.inc: thunk_calls.tmp
-	sed 's/\([0-9]\+\).\+ \([^ ]\+\) *(.*/asmcfunc \2,\t\t\1/' $^ >$@
+	sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ ]\+\) *(.*/asmcfunc \4,\t\t\1,\t\3/' $^ >$@
 
 thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)

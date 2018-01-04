@@ -260,7 +260,7 @@ BYTE DosYesNo(UWORD ch);
 #ifndef DosUpMem
 VOID DosUpMem(VOID FAR * str, unsigned len);
 #endif
-unsigned char ASMCFUNC DosUpChar(unsigned char ch);
+unsigned char ASMCFUNC SEGM(HMA_TEXT) DosUpChar(unsigned char ch);
 VOID DosUpString(char FAR * str);
 VOID DosUpFMem(VOID FAR * str, unsigned len);
 unsigned char DosUpFChar(unsigned char ch);
@@ -276,7 +276,7 @@ COUNT DosSetCountry(UWORD cntry);
 COUNT DosGetCodepage(UWORD * actCP, UWORD * sysCP);
 COUNT DosSetCodepage(UWORD actCP, UWORD sysCP);
 VOID FAR *DosGetDBCS(void);
-UWORD ASMCFUNC syscall_MUX14(iregs FAR * regs);
+UWORD ASMCFUNC SEGM(HMA_TEXT) syscall_MUX14(iregs FAR * regs);
 
 /* prf.c */
 #ifdef DEBUG
@@ -397,17 +397,17 @@ VOID ASMFUNC exec_user(iregs FAR * irp, int disable_a20);
 
 #define ASSERT_CONST(x) { typedef struct { char _xx[x ? 1 : -1]; } xx ; }
 
-WORD ASMCFUNC FAR clk_driver(rqptr rp);
-COUNT ASMCFUNC FAR blk_driver(rqptr rp);
-VOID ASMCFUNC FreeDOSmain(void);
-VOID ASMCFUNC int21_syscall(iregs FAR * irp);
-VOID ASMCFUNC int21_service(iregs FAR * r);
+WORD ASMCFUNC SEGM(HMA_TEXT) FAR clk_driver(rqptr rp);
+COUNT ASMCFUNC SEGM(HMA_TEXT) FAR blk_driver(rqptr rp);
+VOID ASMCFUNC SEGM(INIT_TEXT) FreeDOSmain(void);
+VOID ASMCFUNC SEGM(HMA_TEXT) int21_syscall(iregs FAR * irp);
+VOID ASMCFUNC SEGM(HMA_TEXT) int21_service(iregs FAR * r);
 struct int25regs;
-VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r);
+VOID ASMCFUNC SEGM(HMA_TEXT) int2526_handler(WORD mode, struct int25regs FAR * r);
 struct config;
-VOID ASMCFUNC P_0(struct config FAR *Config);
+VOID ASMCFUNC SEGM(HMA_TEXT) FAR P_0(struct config FAR *Config);
 struct int2f12regs;
-VOID ASMCFUNC int2F_12_handler(struct int2f12regs r);
+VOID ASMCFUNC SEGM(HMA_TEXT) int2F_12_handler(struct int2f12regs r);
 
 BOOL ASMPASCAL fl_reset(WORD);
 COUNT ASMPASCAL fl_diskchanged(WORD);
