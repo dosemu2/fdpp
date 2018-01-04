@@ -22,7 +22,7 @@ OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
 
 #               *Explicit Rules*
 
-production:     ../bin/libfdkernel.so ../bin/$(TARGET).sys ../bin/country.sys
+production:     libfdkernel.so ../bin/$(TARGET).sys ../bin/country.sys
 
 ../bin/$(TARGET).sys: kernel.sys
 		$(CP) kernel.sys ..$(DIRSEP)bin
@@ -129,9 +129,6 @@ libfdkernel.so: $(OBJECTS)
 	$(CL) -shared -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-../bin/libfdkernel.so: libfdkernel.so
-		$(CP) $^ ..$(DIRSEP)bin
-
 plt.obj: plt.asm plt.inc
 plt.asm: plt.S
 	cpp -P $^ | sed 's/" "//g' >$@
@@ -157,3 +154,7 @@ glob_asmdefs.h: glob_asm.h makefile
 		sed 's/.\+, \(.\+\)).*/#define \1 (*__\1)/' >$@
 	grep "__ASM_ARR(" $< | grep -v '^/' | \
 		sed 's/.\+, \(.\+\),.\+).*/#define \1 (*__\1)/' >>$@
+
+install: libfdkernel.so thunkapi.h
+	install -t /usr/local/lib libfdkernel.so
+	install -D -m 0644 -t /usr/local/include/fdpp thunkapi.h thunks.h
