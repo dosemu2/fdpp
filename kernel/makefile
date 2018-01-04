@@ -10,6 +10,7 @@ include ../mkfiles/generic.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
 HDR=../hdr/
+FDPPLIB = libfdpp.so
 
 # *List Macros*
 # Only 8 files per definition; this is limitation of DOS batch
@@ -22,7 +23,7 @@ OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
 
 #               *Explicit Rules*
 
-production:     libfdkernel.so ../bin/$(TARGET).sys ../bin/country.sys
+production:     $(FDPPLIB) ../bin/$(TARGET).sys ../bin/country.sys
 
 ../bin/$(TARGET).sys: kernel.sys
 		$(CP) kernel.sys ..$(DIRSEP)bin
@@ -125,7 +126,7 @@ OBJECTS = $(CFILES:.c=.o)
 
 $(OBJECTS): $(HEADERS)
 
-libfdkernel.so: $(OBJECTS)
+$(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
@@ -155,6 +156,6 @@ glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM_ARR(" $< | grep -v '^/' | \
 		sed 's/.\+, \(.\+\),.\+).*/#define \1 (*__\1)/' >>$@
 
-install: libfdkernel.so thunkapi.h
-	install -t /usr/local/lib libfdkernel.so
+install: $(FDPPLIB) thunkapi.h
+	install -t /usr/local/lib $(FDPPLIB)
 	install -D -m 0644 -t /usr/local/include/fdpp thunkapi.h thunks.h
