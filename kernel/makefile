@@ -105,7 +105,6 @@ CFILES = blockio.c \
     newstuff.c \
     network.c \
     nls.c \
-    prf.c \
     strings.c \
     sysclk.c \
     syspack.c \
