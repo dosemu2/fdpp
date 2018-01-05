@@ -4,18 +4,19 @@
 #include "thunks.h"
 
 static FdAsmCall_t asm_call;
-struct far_s {
+struct asm_dsc_s {
+    UWORD num;
     UWORD off;
     UWORD seg;
 };
-static struct far_s *asm_tab;
+static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
 
-void FdSetAsmCalls(FdAsmCall_t call, void *tab, int len)
+void FdSetAsmCalls(FdAsmCall_t call, struct asm_dsc_s *tab, int size)
 {
     asm_call = call;
-    asm_tab = (struct far_s *)tab;
-    asm_tab_len = len;
+    asm_tab = tab;
+    asm_tab_len = size / sizeof(struct asm_dsc_s);
 }
 
 #define SEMIC ;
@@ -95,6 +96,18 @@ void FdSetAbortHandler(void (*handler)(const char *, int))
     abort_handler = handler;
 }
 
+static uintptr_t do_asm_call(int num, uint8_t *sp, uint8_t len)
+{
+    int i;
+
+    for (i = 0; i < asm_tab_len; i++) {
+        if (asm_tab[i].num == num)
+            return asm_call(asm_tab[i].seg, asm_tab[i].off, sp, len);
+    }
+    _ASSERT(0);
+    return -1;
+}
+
 #define __ARG(t) t
 #define __ARG_PTR(t) t *
 #define __ARG_PTR_FAR(t) t FAR *
@@ -105,7 +118,7 @@ void FdSetAbortHandler(void (*handler)(const char *, int))
 void f(void) \
 { \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+    do_asm_call(n, NULL, 0); \
 }
 
 #define _THUNK1_v(n, f, t1, at1) \
@@ -115,7 +128,7 @@ void f(t1 a1) \
 	at1 a1; \
     } PACKED _args = { (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK2_v(n, f, t1, at1, t2, at2) \
@@ -126,7 +139,7 @@ void f(t1 a1, t2 a2) \
 	at2 a2; \
     } PACKED _args = { (at1)a1, (at2)a2 }; \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK3_v(n, f, t1, at1, t2, at2, t3, at3) \
@@ -138,7 +151,7 @@ void f(t1 a1, t2 a2, t3 a3) \
 	at2 a3; \
     } PACKED _args = { (at1)a1, (at2)a2, (at3)a3 }; \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK4(n, r, f, t1, at1, t2, at2, t3, at3, t4, at4) \
@@ -151,28 +164,28 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at4 a4; \
     } PACKED _args = { (at1)a1, (at2)a2, (at3)a3, (at4)a4 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_0_v(n, f) \
 void f(void) \
 { \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+    do_asm_call(n, NULL, 0); \
 }
 
 #define _THUNK_P_0_vp(n, f) \
 void FAR *f(void) \
 { \
     _ASSERT(n < asm_tab_len); \
-    return (void FAR *)asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+    return (void FAR *)do_asm_call(n, NULL, 0); \
 }
 
 #define _THUNK_P_0(n, r, f) \
 r f(void) \
 { \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, NULL, 0); \
+    return do_asm_call(n, NULL, 0); \
 }
 
 #define _THUNK_P_1_v(n, f, t1, at1) \
@@ -182,7 +195,7 @@ void f(t1 a1) \
 	at1 a1; \
     } PACKED _args = { (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_1(n, r, f, t1, at1) \
@@ -192,7 +205,7 @@ r f(t1 a1) \
 	at1 a1; \
     } PACKED _args = { (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_2(n, r, f, t1, at1, t2, at2) \
@@ -203,7 +216,7 @@ r f(t1 a1, t2 a2) \
 	at1 a1; \
     } PACKED _args = { (at2)a2, (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_3(n, r, f, t1, at1, t2, at2, t3, at3) \
@@ -215,7 +228,7 @@ r f(t1 a1, t2 a2, t3 a3) \
 	at1 a1; \
     } PACKED _args = { (at3)a3, (at2)a2, (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_4_v(n, f, t1, at1, t2, at2, t3, at3, t4, at4) \
@@ -228,7 +241,7 @@ void f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at1 a1; \
     } PACKED _args = { (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_4(n, r, f, t1, at1, t2, at2, t3, at3, t4, at4) \
@@ -241,7 +254,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at1 a1; \
     } PACKED _args = { (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_5(n, r, f, t1, at1, t2, at2, t3, at3, t4, at4, t5, at5) \
@@ -255,7 +268,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5) \
 	at1 a1; \
     } PACKED _args = { (at5)a5, (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_6(n, r, f, t1, at1, t2, at2, t3, at3, t4, at4, t5, at5, t6, at6) \
@@ -270,7 +283,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 	at1 a1; \
     } PACKED _args = { (at6)a6, (at5)a5, (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
     _ASSERT(n < asm_tab_len); \
-    return asm_call(asm_tab[n].seg, asm_tab[n].off, (UBYTE *)&_args, sizeof(_args)); \
+    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #include "thunk_asms.h"

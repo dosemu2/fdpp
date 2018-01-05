@@ -10,7 +10,8 @@ extern "C" {
 uint32_t FdThunkCall(int fn, uint8_t *sp, uint8_t *r_len);
 
 typedef uintptr_t (*FdAsmCall_t)(uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len);
-void FdSetAsmCalls(FdAsmCall_t call, void *tab, int len);
+struct asm_dsc_s;
+void FdSetAsmCalls(FdAsmCall_t call, struct asm_dsc_s *tab, int size);
 int FdSetAsmThunks(void **ptrs, int len);
 void FdSetAbortHandler(void (*handler)(const char *, int));
 
