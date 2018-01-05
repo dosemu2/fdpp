@@ -3,7 +3,9 @@
 #include "proto.h"
 #include "thunks.h"
 
-static FdAsmCall_t asm_call;
+static struct fdpp_api *fdpp;
+
+static FdppAsmCall_t asm_call;
 struct asm_dsc_s {
     UWORD num;
     UWORD off;
@@ -11,8 +13,13 @@ struct asm_dsc_s {
 };
 static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
+struct far_s {
+    UWORD off;
+    UWORD seg;
+};
+static void fdprintf(const char *format, ...);
 
-void FdSetAsmCalls(FdAsmCall_t call, struct asm_dsc_s *tab, int size)
+void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 {
     asm_call = call;
     asm_tab = tab;
@@ -52,15 +59,18 @@ static union asm_thunks_u {
 #undef SEMIC
 }};
 
-int FdSetAsmThunks(void **ptrs, int len)
+int FdppSetAsmThunks(struct far_s *ptrs, int size)
 {
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
     int i;
+    int len = size / (sizeof(struct far_s));
 
-    if (len != _countof(asm_thunks.arr))
+    if (len != _countof(asm_thunks.arr)) {
+        fdprintf("len=%i expected %i\n", len, _countof(asm_thunks.arr));
         return -1;
+    }
     for (i = 0; i < len; i++)
-        *asm_thunks.arr[i] = ptrs[i];
+        *asm_thunks.arr[i] = fdpp->resolve_segoff(ptrs[i].seg, ptrs[i].off);
     return 0;
 }
 
@@ -68,7 +78,7 @@ int FdSetAsmThunks(void **ptrs, int len)
 #define _ARG_PTR(n, t, ap) // unimplemented, will create syntax error
 #define _ARG_PTR_FAR(n, t, ap)  ((t FAR *)(uintptr_t)*(UDWORD *)(ap + n))
 
-UDWORD FdThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
+UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
     UDWORD ret = 0;
     UBYTE rsz = 0;
@@ -85,15 +95,20 @@ UDWORD FdThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     return ret;
 }
 
-#define _ASSERT(c) if (!(c)) abort_handler(__FILE__, __LINE__)
-static void abort_handler_dummy(const char *file, int line)
-{
-}
-static void (*abort_handler)(const char *file, int line) = abort_handler_dummy;
+#define _ASSERT(c) if (!(c)) fdpp->abort_handler(__FILE__, __LINE__)
 
-void FdSetAbortHandler(void (*handler)(const char *, int))
+void FdppInit(struct fdpp_api *api)
 {
-    abort_handler = handler;
+    fdpp = api;
+}
+
+static void fdprintf(const char *format, ...)
+{
+    va_list vl;
+
+    va_start(vl, format);
+    fdpp->print_handler(format, vl);
+    va_end(vl);
 }
 
 static uintptr_t do_asm_call(int num, uint8_t *sp, uint8_t len)

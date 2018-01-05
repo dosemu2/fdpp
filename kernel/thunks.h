@@ -2,18 +2,25 @@
 #define THUNKS_H
 
 #include <stdint.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-uint32_t FdThunkCall(int fn, uint8_t *sp, uint8_t *r_len);
+uint32_t FdppThunkCall(int fn, uint8_t *sp, uint8_t *r_len);
 
-typedef uintptr_t (*FdAsmCall_t)(uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len);
+typedef uintptr_t (*FdppAsmCall_t)(uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len);
 struct asm_dsc_s;
-void FdSetAsmCalls(FdAsmCall_t call, struct asm_dsc_s *tab, int size);
-int FdSetAsmThunks(void **ptrs, int len);
-void FdSetAbortHandler(void (*handler)(const char *, int));
+void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size);
+struct far_s;
+int FdppSetAsmThunks(struct far_s *ptrs, int size);
+struct fdpp_api {
+    void (*abort_handler)(const char *, int);
+    void (*print_handler)(const char *format, va_list ap);
+    void *(*resolve_segoff)(uint16_t seg, uint16_t off);
+};
+void FdppInit(struct fdpp_api *api);
 
 #include "thunkapi.h"
 
