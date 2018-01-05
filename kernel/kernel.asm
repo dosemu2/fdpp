@@ -111,6 +111,7 @@ segment INIT_TEXT
 
                 extern  _FreeDOSmain
                 extern  _query_cpu
+                extern  plt_init
 
                 ;
                 ; kernel start-up
@@ -213,6 +214,7 @@ cont:           ; Now set up call frame
                 mov     ax,ss
                 mov     ds,ax
                 mov     es,ax
+                call    plt_init
                 jmp     _FreeDOSmain
 
 %if XCPU != 86
