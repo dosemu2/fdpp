@@ -19,7 +19,7 @@ FDPPLIB = libfdpp.so
 OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
     execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
     nls_hc.obj apisupt.obj intr.obj irqstack.obj memdisk.obj \
-    cpu.obj plt.obj
+    cpu.obj plt.obj cdata.obj
 
 #               *Explicit Rules*
 
@@ -130,8 +130,12 @@ $(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc
-plt.asm: plt.S
+plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc segs.inc
+
+plt.asm: plt.S glob_asm.h
+	cpp -P $< >$@
+
+cdata.asm: cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
 thunk_calls.tmp: proto.h makefile

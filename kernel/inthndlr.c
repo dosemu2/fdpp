@@ -42,6 +42,8 @@ STATIC VOID StartTrace(VOID);
 STATIC bTraceNext = FALSE;
 #endif
 
+BYTE ReturnAnyDosVersionExpected;
+
 #if 0                           /* Very suspicious, passing structure by value??
                                    Deactivated -- 2000/06/16 ska */
 /* Special entry for far call into the kernel                           */
