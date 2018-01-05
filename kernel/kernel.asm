@@ -627,6 +627,8 @@ daysSince1980   dw      0FFFFh          ; 34 - number of days since epoch
                                         ; force rebuild on first clock read
                 global  _DayOfWeek
 _DayOfWeek      db      2               ; 36 - day of week
+                global  _DaysSinceEpoch
+_DaysSinceEpoch dw      0
 _console_swap   db      0               ; 37 console swapped during read from dev
                 global  _dosidle_flag
 _dosidle_flag   db      1               ; 38 - safe to call int28 if nonzero

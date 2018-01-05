@@ -140,3 +140,4 @@ __ASM_FUNC(int2a_handler) SEMIC
 __ASM_FUNC(int2f_handler) SEMIC
 __ASM_FUNC(got_cbreak) SEMIC
 __ASM(const BYTE FAR *, os_release) SEMIC
+__ASM(UWORD, DaysSinceEpoch) SEMIC
