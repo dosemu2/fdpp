@@ -130,7 +130,7 @@ $(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-plt.obj: plt.asm plt.inc
+plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc
 plt.asm: plt.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
@@ -138,14 +138,22 @@ thunk_calls.tmp: proto.h makefile
 	grep ASMCFUNC $< | nl -n ln -v 0 >$@
 
 plt.inc: thunk_calls.tmp
-	sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ ]\+\) *(.*/asmcfunc \4,\t\t\1,\t\3/' $^ >$@
+	sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc \4,\t\t\1,\t\3/' $^ >$@
 
 thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
 
-thunk_asms.h: proto.h makefile
-	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | nl -n ln -v 0 | \
-		../utils/thunk_gen 1 >$@ || (rm -f $@ ; false)
+thunk_asms.tmp: proto.h makefile
+	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | nl -n ln -v 0 >$@
+
+thunk_asms.h: thunk_asms.tmp makefile
+	cat $< | ../utils/thunk_gen 1 >$@ || (rm -f $@ ; false)
+
+plt_asmc.inc: thunk_asms.tmp makefile
+	grep ASMFUNC $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmcsym \2,\t\t\1/' >$@
+
+plt_asmp.inc: thunk_asms.tmp makefile
+	grep ASMPASCAL $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmpsym \U\2,\t\t\1/' >$@
 
 thunkapi.h: thunkapi_gen.h thunkapi_tmpl.h makefile
 	cpp -P $< | sed 's/\(^[^s}]\+\)/\t\1/' >$@

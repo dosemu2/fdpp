@@ -19,6 +19,25 @@ segment %3
 
 %include "plt.inc"
 
+%macro asmcsym 2
+_%1_num dw %2
+_%1_ptr:
+    extern _%1
+    dw _%1, SEG _%1
+%endmacro
+
+%macro asmpsym 2
+_%1_num dw %2
+_%1_ptr:
+    extern %1
+    dw %1, SEG %1
+%endmacro
+
+__asm_symtab_start:
+%include "plt_asmc.inc"
+%include "plt_asmp.inc"
+__asm_symtab_end:
+
 #include "../hdr/version.h"
 
     global _os_release
