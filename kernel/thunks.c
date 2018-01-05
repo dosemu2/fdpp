@@ -36,7 +36,7 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 #undef __ASM_FUNC
 
 static union asm_thunks_u {
-  struct {
+  struct _thunks {
 #define __ASM(t, v) t ** __##v
 #define __ASM_ARR(t, v, l) t (** __##v)[l]
 #define __ASM_FUNC(v) void (** v)(void)
@@ -45,7 +45,7 @@ static union asm_thunks_u {
 #undef __ASM_ARR
 #undef __ASM_FUNC
   } thunks;
-  void ** arr[0];
+  void ** arr[sizeof(struct _thunks) / sizeof(void *)];
 } asm_thunks = {{
 #undef SEMIC
 #define SEMIC ,
@@ -64,9 +64,10 @@ int FdppSetAsmThunks(struct far_s *ptrs, int size)
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
     int i;
     int len = size / (sizeof(struct far_s));
+    int exp = _countof(asm_thunks.arr);
 
-    if (len != _countof(asm_thunks.arr)) {
-        fdprintf("len=%i expected %i\n", len, _countof(asm_thunks.arr));
+    if (len != exp) {
+        fdprintf("len=%i expected %i\n", len, exp);
         return -1;
     }
     for (i = 0; i < len; i++)
