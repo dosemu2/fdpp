@@ -359,7 +359,7 @@ void MoveKernel(unsigned NewKernelSegment)
 
     for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
     {
-      if (rp->jmpFar != 0xea || /* jmp FAR */
+      if (rp->jmpFar != 0xea || /* jmp FaR */
           rp->jmpSegment != jmpseg ||     /* will only relocate HMA_TEXT */
           rp->callNear != 0xe8 ||       /* call NEAR */
           0)

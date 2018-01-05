@@ -46,6 +46,6 @@ endif
 
 TARGET:=$(TARGET)$(XCPU)$(XFAT)
 
-.SUFFIXES: .c .cpp .obj .asm .o
+.SUFFIXES: .c .cpp .cc .obj .asm .o
 .asm.obj:
 	$(NASM) -D$(COMPILER) $(NASMFLAGS) -f obj -o $@ $<

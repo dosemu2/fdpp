@@ -192,7 +192,7 @@ UWORD mk_offs(UBYTE *data, UWORD len);
 #define MK_OFFS(data) mk_offs(data, sizeof(data))
 void disable(void);
 void enable(void);
-/* for warnings only ! */
+#define __FAR(t) t FAR *
 #define MC68K
 
 #else

@@ -6,7 +6,7 @@ DIRSEP=/
 RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
-CC=gcc -c
+CC=gcc -c -x c
 CL=gcc
 
 TARGETOPT=

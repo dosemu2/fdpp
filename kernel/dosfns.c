@@ -1031,7 +1031,6 @@ COUNT DosFindNext(void)
 COUNT DosGetFtime(COUNT hndl, date * dp, time * tp)
 {
   sft FAR *s;
-/*sfttbl FAR *sp;*/
 
   /* Get the SFT block that contains the SFT      */
   if (FP_OFF(s = get_sft(hndl)) == (size_t) - 1)

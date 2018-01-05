@@ -1667,7 +1667,6 @@ VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r)
 
   if (nblks == 0xFFFF)
   {
-    /*struct HugeSectorBlock FAR *lb = MK_FP(r->ds, r->bx); */
     blkno = ((struct HugeSectorBlock FAR *)buf)->blkno;
     nblks = ((struct HugeSectorBlock FAR *)buf)->nblks;
     buf = ((struct HugeSectorBlock FAR *)buf)->buf;

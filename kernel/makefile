@@ -46,7 +46,7 @@ clobber:        clean
 
 clean:
 		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
-			*.lnk *.o *.so *.tmp $(GEN_HEADERS)
+			*.lnk *.o *.cc *.so *.tmp $(GEN_HEADERS)
 
 # XXX: This is a very ugly way of linking the kernel, forced upon us by the
 # inability of Turbo `make' 2.0 to perform command line redirection. -- ror4
@@ -123,7 +123,13 @@ CFILES = blockio.c \
 
 OBJECTS = $(CFILES:.c=.o)
 
-$(OBJECTS): $(HEADERS)
+$(filter-out thunks.o,$(OBJECTS)): %.o: %.cc $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ $<
+
+.c.cc:
+	sed -e ':loop' \
+		-e 's/\([ \t]*\(STATIC \)*\(static \)*\(.*[,(]\)*\) *\(.*[^(]\+\) FAR *\*\(\**\)/\1__FAR(\5\6)/' \
+		-e 't loop' $< >$@
 
 $(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^
