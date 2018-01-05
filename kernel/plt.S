@@ -48,6 +48,7 @@ __asm_callsymtab_end:
 
 #define __ASM(t, n) asmsym n
 #define __ASM_ARR(t, n, l) asmsym n
+#define __ASM_ARRI(t, n) asmsym n
 #define __ASM_FUNC(n) asmsym n
 #define SEMIC
 __asm_symtab_start:

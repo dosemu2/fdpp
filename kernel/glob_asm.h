@@ -57,9 +57,9 @@ __ASM(struct dirent, SearchDir) SEMIC
 //__ASM(struct _FcbSearchBuffer, FcbSearchBuffer) SEMIC
 __ASM(struct __PriPathBuffer, _PriPathBuffer) SEMIC
 __ASM(struct __SecPathBuffer, _SecPathBuffer) SEMIC
-__ASM(BYTE *, internal_data) SEMIC              /* sda areas                            */
-__ASM(BYTE *, swap_always) SEMIC                /*  "    "                              */
-__ASM(BYTE *, swap_indos) SEMIC                 /*  "    "                              */
+__ASM_ARRI(BYTE, internal_data) SEMIC              /* sda areas                            */
+__ASM_ARRI(BYTE, swap_always) SEMIC                /*  "    "                              */
+__ASM_ARRI(BYTE, swap_indos) SEMIC                 /*  "    "                              */
 __ASM(BYTE, tsr) SEMIC                          /* true if program is TSR               */
 __ASM(BYTE, break_flg) SEMIC                    /* true if break was detected           */
 __ASM(BYTE, break_ena) SEMIC                    /* break enabled flag                   */
@@ -84,25 +84,25 @@ __ASM(BYTE, os_minor) SEMIC                     /* minor version number         
 //__ASM(BYTE, rev_number) SEMIC                   /* minor version number                 */
 __ASM(BYTE, version_flags) SEMIC                /* minor version number                 */
 __ASM(struct _KernelConfig FAR, LowKernelConfig) SEMIC
-__ASM(BYTE *, _ib_start) SEMIC
-__ASM(BYTE *, _ib_end) SEMIC
-__ASM(BYTE *, _init_end) SEMIC
+__ASM_ARRI(BYTE, _ib_start) SEMIC
+__ASM_ARRI(BYTE, _ib_end) SEMIC
+__ASM_ARRI(BYTE, _init_end) SEMIC
 __ASM(struct lol FAR, DATASTART) SEMIC
 __ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
-__ASM(BYTE FAR *, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
-__ASM(BYTE FAR *, _HMATextEnd) SEMIC
-__ASM(BYTE FAR *, _InitTextStart) SEMIC     /* first available byte of ram          */
-__ASM(BYTE FAR *, _InitTextEnd) SEMIC
+__ASM_ARRI(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
+__ASM_ARRI(BYTE, _HMATextEnd) SEMIC
+__ASM_ARRI(BYTE, _InitTextStart) SEMIC     /* first available byte of ram          */
+__ASM_ARRI(BYTE, _InitTextEnd) SEMIC
 //__ASM(BYTE FAR, ReturnAnyDosVersionExpected) SEMIC
 __ASM(BYTE FAR, HaltCpuWhileIdle) SEMIC
 __ASM(unsigned char FAR, kbdType) SEMIC
 __ASM(struct _nlsCountryInfoHardcoded FAR, nlsCountryInfoHardcoded) SEMIC
-__ASM_ARR(struct lowvec FAR, intvec_table, 5) SEMIC
+__ASM_ARR(struct lowvec, intvec_table, 5) SEMIC
 /* floppy parameter table, at 70:xxxx */
-__ASM_ARR(unsigned char FAR, int1e_table, 0xe) SEMIC
+__ASM_ARR(unsigned char, int1e_table, 0xe) SEMIC
 __ASM(struct DynS FAR, Dyn) SEMIC
-__ASM(struct RelocationTable FAR *, _HMARelocationTableStart) SEMIC
-__ASM(struct RelocationTable FAR *, _HMARelocationTableEnd) SEMIC
+__ASM_ARRI(struct RelocationTable, _HMARelocationTableStart) SEMIC
+__ASM_ARRI(struct RelocationTable, _HMARelocationTableEnd) SEMIC
 __ASM(void FAR *, XMSDriverAddress) SEMIC
 __ASM(request, ClkReqHdr) SEMIC
 __ASM(WORD, current_sft_idx) SEMIC
@@ -139,5 +139,5 @@ __ASM_FUNC(int29_handler) SEMIC
 __ASM_FUNC(int2a_handler) SEMIC
 __ASM_FUNC(int2f_handler) SEMIC
 __ASM_FUNC(got_cbreak) SEMIC
-__ASM(const BYTE FAR *, os_release) SEMIC
+__ASM_ARRI(const BYTE, os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC

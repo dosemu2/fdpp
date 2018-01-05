@@ -29,20 +29,24 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 #define SEMIC ;
 #define __ASM(t, v) t * __##v
 #define __ASM_ARR(t, v, l) t (* __##v)[l]
+#define __ASM_ARRI(t, v) UBYTE (* __##v)[0]
 #define __ASM_FUNC(v) void (* v)(void)
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef __ASM_ARRI
 #undef __ASM_FUNC
 
 static union asm_thunks_u {
   struct _thunks {
 #define __ASM(t, v) t ** __##v
 #define __ASM_ARR(t, v, l) t (** __##v)[l]
+#define __ASM_ARRI(t, v) UBYTE (** __##v)[0]
 #define __ASM_FUNC(v) void (** v)(void)
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef __ASM_ARRI
 #undef __ASM_FUNC
   } thunks;
   void ** arr[sizeof(struct _thunks) / sizeof(void *)];
@@ -51,10 +55,12 @@ static union asm_thunks_u {
 #define SEMIC ,
 #define __ASM(t, v) &__##v
 #define __ASM_ARR(t, v, l) &__##v
+#define __ASM_ARRI(t, v) &__##v
 #define __ASM_FUNC(v) &v
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_ARR
+#undef __ASM_ARRI
 #undef __ASM_FUNC
 #undef SEMIC
 }};

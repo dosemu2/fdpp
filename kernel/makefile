@@ -167,6 +167,8 @@ glob_asmdefs.h: glob_asm.h makefile
 		sed 's/.\+, \(.\+\)).*/#define \1 (*__\1)/' >$@
 	grep "__ASM_ARR(" $< | grep -v '^/' | \
 		sed 's/.\+, \(.\+\),.\+).*/#define \1 (*__\1)/' >>$@
+	grep "__ASM_ARRI(" $< | grep -v '^/' | \
+		sed 's/.\+(\(.\+\), \(.\+\)).*/#define \2 ((\1 \*)__\2)/' >>$@
 
 install: $(FDPPLIB) thunkapi.h
 	install -t /usr/local/lib $(FDPPLIB)
