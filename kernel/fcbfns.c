@@ -602,7 +602,7 @@ UBYTE FcbClose(xfcb FAR * lpXfcb)
     return FCB_SUCCESS;
 
   /* Get the SFT block that contains the SFT      */
-  if ((s = idx_to_sft(lpFcb->fcb_sftno)) == (sft FAR *) - 1)
+  if ((s = idx_to_sft(lpFcb->fcb_sftno)) == (sft FAR *)MK_FP(-1, -1))
     return FCB_ERROR;
 
   /* change time and set file size                */
@@ -624,7 +624,7 @@ VOID FcbCloseAll()
   COUNT idx = 0;
   sft FAR *sftp;
 
-  for (idx = 0; (sftp = idx_to_sft(idx)) != (sft FAR *) - 1; idx++)
+  for (idx = 0; (sftp = idx_to_sft(idx)) != (sft FAR *)MK_FP(-1, -1); idx++)
     if ((sftp->sft_mode & O_FCB) && sftp->sft_psp == cu_psp)
       DosCloseSft(idx, FALSE);
 }
