@@ -127,11 +127,7 @@ $(filter-out thunks.o,$(OBJECTS)): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 .c.cc:
-	sed -e ':loop' \
-		-e 's/\([^(, ]\+\) FAR *\*\(\**\)/__FAR(\1\2)/' \
-		-e 's/struct __FAR(/__FAR(struct /' \
-		-e 's/const __FAR(/__FAR(const /' \
-		-e 't loop' $< >$@
+	../utils/mkfar.sh FAR __FAR $< >$@
 
 $(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^
