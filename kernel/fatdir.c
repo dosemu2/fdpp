@@ -58,7 +58,7 @@ VOID dir_init_fnode(f_node_ptr fnp, CLUSTER dirstart)
   fnp->f_cluster = fnp->f_dmp->dm_dircluster = dirstart;
 }
 
-f_node_ptr dir_open(register const char *dirname, BOOL split, f_node_ptr fnp)
+f_node_ptr dir_open(REG const char *dirname, BOOL split, f_node_ptr fnp)
 {
   int i;
   char *fcbname;

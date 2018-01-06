@@ -349,7 +349,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
 const char FAR *get_root(const char FAR * fname)
 {
   /* find the end                                 */
-  register unsigned length = fstrlen(fname);
+  REG unsigned length = fstrlen(fname);
   char c;
 
   /* now back up to first path seperator or start */
@@ -936,7 +936,7 @@ STATIC int pop_dmp(int rc, dmatch FAR * dmp)
 COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
 {
   int rc;
-  register dmatch FAR *dmp = (dmatch FAR *)dta;
+  REG dmatch FAR *dmp = (dmatch FAR *)dta;
 
   rc = truename(name, PriPathName,
                 CDS_MODE_CHECK_DEV_PATH | CDS_MODE_ALLOW_WILDCARDS);
@@ -991,7 +991,7 @@ COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
 COUNT DosFindNext(void)
 {
   COUNT rc;
-  register dmatch FAR *dmp = (dmatch FAR *)dta;
+  REG dmatch FAR *dmp = (dmatch FAR *)dta;
 
 /*
  *  The new version of SHSUCDX 1.0 looks at the dm_drive byte to

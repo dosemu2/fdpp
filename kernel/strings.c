@@ -83,7 +83,7 @@ COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
   return *d - *s;
 }
 
-int strncmp(register const char *d, register const char *s, size_t l)
+int strncmp(REG const char *d, REG const char *s, size_t l)
 {
   size_t index = 1;
   while (*s != '\0' && *d != '\0' && index++ <= l)

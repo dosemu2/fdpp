@@ -85,7 +85,7 @@ ULONG clus2phys(CLUSTER cl_no, struct dpb FAR * dpbp)
 
 struct dpb FAR *get_dpb(COUNT dsk)
 {
-  register struct cds FAR *cdsp = get_cds(dsk);
+  REG struct cds FAR *cdsp = get_cds(dsk);
 
   if (cdsp == NULL || cdsp->cdsFlags & CDSNETWDRV)
     return NULL;
@@ -448,7 +448,7 @@ COUNT dos_rmdir(BYTE * path)
   REG f_node_ptr fnp;
 
   /* prevent removal of the current directory of that drive */
-  register struct cds FAR *cdsp = get_cds(path[0] - 'A');
+  REG struct cds FAR *cdsp = get_cds(path[0] - 'A');
   if (!fstrcmp(path, cdsp->cdsCurrentPath))
     return DE_RMVCUDIR;
 
@@ -506,7 +506,7 @@ COUNT dos_rename(BYTE * path1, BYTE * path2, int attrib)
   char *fcbname;
 
   /* prevent renaming of the current directory of that drive */
-  register struct cds FAR *cdsp = get_cds(path1[0] - 'A');
+  REG struct cds FAR *cdsp = get_cds(path1[0] - 'A');
   if (!fstrcmp(path1, cdsp->cdsCurrentPath))
     return DE_RMVCUDIR;
 

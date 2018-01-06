@@ -373,7 +373,7 @@ BOOL flush(void)
 UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
               COUNT mode)
 {
-  register struct dpb FAR *dpbp = get_dpb(dsk);
+  REG struct dpb FAR *dpbp = get_dpb(dsk);
   if (dpbp == NULL)
   {
     return 0x0201;              /* illegal command */

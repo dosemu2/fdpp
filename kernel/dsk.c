@@ -388,7 +388,7 @@ STATIC WORD getbpb(ddt * pddt)
   */
   {
     struct FS_info *fs = (struct FS_info *)&DiskTransferBuffer[0x27];
-    register BYTE extended_BPB_signature;
+    REG BYTE extended_BPB_signature;
 #ifdef WITHFAT32
     if (pbpbarray->bpb_nfsect == 0)
     {
@@ -691,7 +691,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
 
         /* return error if media lacks extended BPB with serial # */
         {
-          register BYTE extended_BPB_signature =
+          REG BYTE extended_BPB_signature =
             DiskTransferBuffer[(pddt->ddt_bpb.bpb_nfsect != 0 ? 0x26 : 0x42)];
           if ((extended_BPB_signature != 0x29) || (extended_BPB_signature != 0x28))
             return failure(E_MEDIA);

@@ -2069,7 +2069,7 @@ STATIC VOID mumcb_init(UCOUNT seg, UWORD size)
 }
 #endif
 
-char *strcat(register char * d, register const char * s)
+char *strcat(REG char * d, REG const char * s)
 {
   strcpy(d + strlen(d), s);
   return d;
