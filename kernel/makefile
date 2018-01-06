@@ -128,7 +128,9 @@ $(filter-out thunks.o,$(OBJECTS)): %.o: %.cc $(HEADERS)
 
 .c.cc:
 	sed -e ':loop' \
-		-e 's/\([ \t]*\(STATIC \)*\(const \)*\(.*[,(]\)*\) *\(.*[^(]\+\) FAR *\*\(\**\)/\1__FAR(\5\6)/' \
+		-e 's/\([^(, ]\+\) FAR *\*\(\**\)/__FAR(\1\2)/' \
+		-e 's/struct __FAR(/__FAR(struct /' \
+		-e 's/const __FAR(/__FAR(const /' \
 		-e 't loop' $< >$@
 
 $(FDPPLIB): $(OBJECTS)
