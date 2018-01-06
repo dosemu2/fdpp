@@ -4,28 +4,28 @@ __ASM(UWORD, NetBios) SEMIC
 __ASM(BYTE *, net_name) SEMIC
 __ASM(BYTE, net_set_count) SEMIC
 __ASM(char *, inputptr) SEMIC         /* pointer to unread CON input          */
-__ASM(sfttbl FAR *, sfthead) SEMIC    /* System File Table head               */
+__ASM(__FAR(sfttbl), sfthead) SEMIC    /* System File Table head               */
 __ASM(WORD, maxsecsize) SEMIC
 __ASM(unsigned char, bufloc) SEMIC    /* 0=conv, 1=HMA                        */
-__ASM(void FAR *, deblock_buf) SEMIC  /* pointer to workspace buffer      */
-__ASM(struct cds FAR *, CDSp) SEMIC   /* Current Directory Structure          */
+__ASM(__FAR(void), deblock_buf) SEMIC  /* pointer to workspace buffer      */
+__ASM(__FAR(struct cds), CDSp) SEMIC   /* Current Directory Structure          */
 __ASM(LONG, current_filepos) SEMIC    /* current file position                */
-__ASM(sfttbl FAR *, FCBp) SEMIC       /* FCB table pointer                    */
+__ASM(__FAR(sfttbl), FCBp) SEMIC       /* FCB table pointer                    */
 __ASM(WORD, nprotfcb) SEMIC           /* number of protected fcbs             */
 __ASM(UWORD, LoL_nbuffers) SEMIC      /* Number of buffers                    */
 __ASM(UBYTE, mem_access_mode) SEMIC   /* memory allocation scheme             */
 __ASM(UWORD, Int21AX) SEMIC
 __ASM(COUNT, CritErrCode) SEMIC
-__ASM(BYTE FAR *, CritErrDev) SEMIC
+__ASM(__FAR(BYTE), CritErrDev) SEMIC
 __ASM(UWORD, wAttr) SEMIC
 __ASM(BYTE, default_drive) SEMIC      /* default drive for dos                */
 __ASM(dmatch, sda_tmp_dm) SEMIC       /* Temporary directory match buffer     */
 __ASM(dmatch, sda_tmp_dm_ren) SEMIC   /* 2nd Temporary directory match buffer */
-__ASM(void FAR *, dta) SEMIC
+__ASM(__FAR(void), dta) SEMIC
 __ASM(seg, cu_psp) SEMIC              /* current psp segment                  */
-__ASM(iregs FAR *, user_r) SEMIC      /* User registers for int 21h call      */
-__ASM(fcb FAR *, sda_lpFcb) SEMIC     /* Pointer to users fcb                 */
-__ASM(sft FAR *, lpCurSft) SEMIC
+__ASM(__FAR(iregs), user_r) SEMIC      /* User registers for int 21h call      */
+__ASM(__FAR(fcb), sda_lpFcb) SEMIC     /* Pointer to users fcb                 */
+__ASM(__FAR(sft), lpCurSft) SEMIC
 __ASM(UWORD, return_code) SEMIC       /* Process termination rets             */
 __ASM(keyboard, kb_buf) SEMIC
 __ASM_ARR(char, local_buffer, LINEBUFSIZE0A) SEMIC
@@ -33,10 +33,10 @@ __ASM(BYTE, NetDelay) SEMIC
 __ASM(BYTE, NetRetry) SEMIC
 __ASM(UWORD, first_mcb) SEMIC         /* Start of user memory                 */
 __ASM(UWORD, uppermem_root) SEMIC
-__ASM(struct dhdr FAR *, clock) SEMIC /* CLOCK$ device                        */
-__ASM(struct dhdr FAR *, syscon) SEMIC /* console device                      */
-__ASM(struct buffer FAR *, firstbuf) SEMIC /* head of buffers linked list     */
-__ASM(struct cds FAR *, current_ldt) SEMIC
+__ASM(__FAR(struct dhdr), clock) SEMIC /* CLOCK$ device                        */
+__ASM(__FAR(struct dhdr), syscon) SEMIC /* console device                      */
+__ASM(__FAR(struct buffer), firstbuf) SEMIC /* head of buffers linked list     */
+__ASM(__FAR(struct cds), current_ldt) SEMIC
 __ASM(UBYTE, nblkdev) SEMIC            /* number of block devices              */
 __ASM(UBYTE, lastdrive) SEMIC          /* value of last drive                  */
 __ASM(UBYTE, uppermem_link) SEMIC      /* UMB Link flag */
@@ -70,7 +70,7 @@ __ASM(UBYTE, BootDrive) SEMIC                   /* Drive we came up from        
 __ASM(UBYTE, CPULevel) SEMIC                    /* CPU family, 0=8086, 1=186, ...       */
 __ASM(UBYTE, scr_pos) SEMIC                     /* screen position for bs, ht, etc      */
 __ASM(struct cds, TempCDS) SEMIC
-__ASM(struct dpb FAR *, DPBp) SEMIC             /* First drive Parameter Block          */
+__ASM(__FAR(struct dpb), DPBp) SEMIC             /* First drive Parameter Block          */
 __ASM(struct dhdr FAR, clk_dev) SEMIC           /* Clock device driver                  */
 __ASM(struct dhdr FAR, con_dev) SEMIC           /* Console device driver                */
 __ASM(struct dhdr FAR, prn_dev) SEMIC           /* Generic printer device driver        */
@@ -103,7 +103,7 @@ __ASM_ARR(unsigned char, int1e_table, 0xe) SEMIC
 __ASM(struct DynS FAR, Dyn) SEMIC
 __ASM_ARRI(struct RelocationTable, _HMARelocationTableStart) SEMIC
 __ASM_ARRI(struct RelocationTable, _HMARelocationTableEnd) SEMIC
-__ASM(void FAR *, XMSDriverAddress) SEMIC
+__ASM(__FAR(void), XMSDriverAddress) SEMIC
 __ASM(request, ClkReqHdr) SEMIC
 __ASM(WORD, current_sft_idx) SEMIC
 __ASM(UWORD, ext_open_mode) SEMIC
@@ -118,8 +118,8 @@ __ASM(struct nlsCharTbl FAR, nlsUpcaseHardcoded) SEMIC
 __ASM(struct nlsCharTbl FAR, nlsFUpcaseHardcoded) SEMIC
 __ASM(struct nlsCharTbl FAR, nlsCollHardcoded) SEMIC
 __ASM(struct nlsExtCntryInfo FAR, nlsCntryInfoHardcoded) SEMIC
-__ASM(BYTE FAR *, hcTablesStart) SEMIC
-__ASM(BYTE FAR *, hcTablesEnd) SEMIC
+__ASM(__FAR(BYTE), hcTablesStart) SEMIC
+__ASM(__FAR(BYTE), hcTablesEnd) SEMIC
 __ASM(request, CharReqHdr) SEMIC
 __ASM(request, IoReqHdr) SEMIC
 __ASM(request, MediaReqHdr) SEMIC
