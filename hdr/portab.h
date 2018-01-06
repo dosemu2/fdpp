@@ -348,7 +348,7 @@ typedef signed long LONG;
 #define FP_OFF(fp)             ((size_t)(fp))
 #endif
 
-typedef VOID (FAR ASMCFUNC * intvec) (void);
+typedef __FAR(VOID ASMCFUNC) intvec;
 
 #define MK_PTR(type,seg,ofs) ((type FAR*) MK_FP (seg, ofs))
 #if __TURBOC__ > 0x202
