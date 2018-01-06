@@ -414,7 +414,7 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
             char FAR *sp = (char FAR *)fmemchr(&kp->_kb_buf[stored_pos],
                                    c2, stored_size - stored_pos);
             if (sp != NULL)
-                new_pos = (FP_OFF(sp) - FP_OFF(&kp->_kb_buf[stored_pos])) + 1;
+                new_pos = (FP_OFF(sp) - FP_OFF((char FAR *)&kp->_kb_buf[stored_pos])) + 1;
           }
         }
         /* fall through */
