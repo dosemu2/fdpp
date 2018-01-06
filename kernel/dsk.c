@@ -952,7 +952,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
                  UWORD * transferred)
 {
   static struct _bios_LBA_address_packet dap = {
-    16, 0, 0, 0, 0, 0, 0
+    16, 0, 0, 0, NULL, 0, 0
   };
 
   unsigned count;
