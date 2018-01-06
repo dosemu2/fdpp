@@ -174,6 +174,7 @@ unsigned short getSS(void);
 
 #elif defined(__GNUC__)
 #include <stdint.h>
+#include <stddef.h>
 #define VA_CDECL
 UWORD getCS(void);
 #define _CS getCS()
@@ -195,7 +196,14 @@ void enable(void);
 #define __FAR(t) t FAR *
 #define FP_SEG(fp)            ((unsigned)((ULONG)(VOID FAR *)(fp)>>16))
 #define FP_OFF(fp)            ((uintptr_t)(fp))
-#define MK_FP(seg,ofs)        ((void FAR *)(((ULONG)(seg)<<16)|(UWORD)(ofs)))
+#define MK_FP(seg,ofs)        ((__FAR(void))(((ULONG)(seg)<<16)|(UWORD)(ofs)))
+
+#define FAR                     /* linear architecture  */
+#define REG
+#define VOID           void
+#define far                     /* No far type          */
+#define CONST          const
+#define PROTO
 
 #else
 #error Unknown compiler
@@ -210,7 +218,7 @@ We might even deal with a pre-ANSI compiler. This will certainly not compile.
 #endif
 #endif
 
-#if defined(MC68K) || defined(__GNUC__)
+#if defined(MC68K)
 #define far                     /* No far type          */
 #define interrupt               /* No interrupt type    */
 #define VOID           void
@@ -223,15 +231,9 @@ We might even deal with a pre-ANSI compiler. This will certainly not compile.
 #define PARASIZE       4096     /* "paragraph" size     */
 #define CDECL
 #define PASCAL
-#ifdef __GNUC__
-#define CONST          const
-#define PROTO
-typedef __SIZE_TYPE__  size_t;
-#else
 #define CONST
 #if !(defined(_SIZE_T) || defined(_SIZE_T_DEFINED) || defined(__SIZE_T_DEFINED))
 typedef unsigned       size_t;
-#endif
 #endif
 #endif
 #if defined(I86) && !defined(MC68K)
