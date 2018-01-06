@@ -72,12 +72,12 @@ size_t read_line_handle(int sft_idx, size_t n,__FAR(char) bp);
 void write_char(int c, int sft_idx);
 void write_char_stdout(int c);
 void update_scr_pos(unsigned char c, unsigned char count);
-long cooked_write(__FAR(struct dhdr*)pdev, size_t n,const __FAR(char)bp);
+long cooked_write(__FAR(struct dhdr*)pdev, size_t n,__FAR(const char)bp);
 
 __FAR(sft)get_sft(UCOUNT);
 
 /* dosfns.c */
-const __FAR(char)get_root(const __FAR(char));
+__FAR(const char)get_root(__FAR(const char));
 BOOL check_break(void);
 UCOUNT GenericReadSft(sft FAR * sftp, UCOUNT n,__FAR(void) bp,
                       COUNT * err, BOOL force_binary);
@@ -111,8 +111,8 @@ UBYTE DosSelectDrv(UBYTE drv);
 COUNT DosDelete(__FAR(BYTE) path, int attrib);
 COUNT DosRename(__FAR(BYTE) path1,__FAR(BYTE) path2);
 COUNT DosRenameTrue(BYTE * path1, BYTE * path2, int attrib);
-COUNT DosMkRmdir(const __FAR(char) dir, int action);
-__FAR(struct dhdr)IsDevice(const __FAR(char) FileName);
+COUNT DosMkRmdir(__FAR(const char) dir, int action);
+__FAR(struct dhdr)IsDevice(__FAR(const char) FileName);
 BOOL IsShareInstalled(BOOL recheck);
 COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock);
 int idx_to_sft_(int SftIndex);
@@ -120,7 +120,7 @@ __FAR(sft)idx_to_sft(int SftIndex);
 int get_sft_idx(UCOUNT hndl);
 __FAR(struct cds)get_cds(unsigned dsk);
 __FAR(struct cds)get_cds1(unsigned dsk);
-COUNT DosTruename(const __FAR(char) src,__FAR(char) dest);
+COUNT DosTruename(__FAR(const char) src,__FAR(char) dest);
 
 /* dosidle.asm */
 VOID ASMFUNC DosIdle_int(void);
@@ -164,7 +164,7 @@ BOOL last_link(f_node_ptr fnp);
 COUNT map_cluster(REG f_node_ptr fnp, COUNT mode);
 long rwblock(COUNT fd,__FAR(VOID) buffer, UCOUNT count, int mode);
 COUNT dos_read(COUNT fd,__FAR(VOID) buffer, UCOUNT count);
-COUNT dos_write(COUNT fd,const __FAR(VOID) buffer, UCOUNT count);
+COUNT dos_write(COUNT fd,__FAR(const VOID) buffer, UCOUNT count);
 CLUSTER dos_free(__FAR(struct dpb) dpbp);
 BOOL dir_exists(char * path);
 VOID dpb16to32(__FAR(struct dpb)dpbp);
@@ -198,11 +198,11 @@ VOID DosCharOutput(COUNT c);
 VOID DosDisplayOutput(COUNT c);
 __FAR(BYTE)FatGetDrvData(UBYTE drive, UBYTE * spc, UWORD * bps,
                    UWORD * nc);
-UWORD FcbParseFname(UBYTE *wTestMode,const __FAR(BYTE)lpFileName,__FAR(fcb) lpFcb);
-const __FAR(BYTE)ParseSkipWh(const __FAR(BYTE) lpFileName);
+UWORD FcbParseFname(UBYTE *wTestMode,__FAR(const BYTE)lpFileName,__FAR(fcb) lpFcb);
+__FAR(const BYTE)ParseSkipWh(__FAR(const BYTE) lpFileName);
 BOOL TestCmnSeps(__FAR(BYTE) lpFileName);
 BOOL TestFieldSeps(__FAR(BYTE) lpFileName);
-const __FAR(BYTE)GetNameField(const __FAR(BYTE) lpFileName,__FAR(BYTE) lpDestField,
+__FAR(const BYTE)GetNameField(__FAR(const BYTE) lpFileName,__FAR(BYTE) lpDestField,
                        COUNT nFieldSize, BOOL * pbWildCard);
 UBYTE FcbReadWrite(__FAR(xfcb), UCOUNT, int);
 UBYTE FcbGetFileSize(__FAR(xfcb) lpXfcb);
@@ -231,7 +231,7 @@ COUNT DosDevIOctl(lregs * r);
 seg far2para(__FAR(VOID) p);
 seg long2para(ULONG size);
 __FAR(void)add_far(__FAR(void) fp, unsigned off);
-__FAR(VOID)adjust_far(const __FAR(void) fp);
+__FAR(VOID)adjust_far(__FAR(const void) fp);
 COUNT DosMemAlloc(UWORD size, COUNT mode, seg * para, UWORD * asize);
 COUNT DosMemLargest(UWORD * size);
 COUNT DosMemFree(UWORD para);
@@ -290,27 +290,27 @@ void put_console(int);
 
 /* strings.c */
 size_t strlen(const char * s);
-size_t fstrlen(const __FAR(char) s);
-__FAR(char) _fstrcpy(__FAR(char) d,const __FAR(char) s);
+size_t fstrlen(__FAR(const char) s);
+__FAR(char) _fstrcpy(__FAR(char) d,__FAR(const char) s);
 int strcmp(const char * d, const char * s);
-int fstrcmp(const __FAR(char) d,const __FAR(char) s);
-int fstrncmp(const __FAR(char) d,const __FAR(char) s, size_t l);
+int fstrcmp(__FAR(const char) d,__FAR(const char) s);
+int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
 int strncmp(const char * d, const char * s, size_t l);
 char * strchr(const char * s, int c);
-__FAR(char) fstrchr(const __FAR(char) s, int c);
-__FAR(void) fmemchr(const __FAR(void) s, int c, size_t n);
+__FAR(char) fstrchr(__FAR(const char) s, int c);
+__FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);
 
 /* misc.c */
 char * strcpy(char * d, const char * s);
-//void ASMPASCAL fmemcpyBack(__FAR(void) d,const __FAR(void) s, size_t n);
-void fmemcpy(__FAR(void) d,const __FAR(void) s, size_t n);
-void fstrcpy(__FAR(char) d,const __FAR(char) s);
+//void ASMPASCAL fmemcpyBack(__FAR(void) d,__FAR(const void) s, size_t n);
+void fmemcpy(__FAR(void) d,__FAR(const void) s, size_t n);
+void fstrcpy(__FAR(char) d,__FAR(const char) s);
 void * memcpy(void *d, const void * s, size_t n);
 void fmemset(__FAR(void) s, int ch, size_t n);
 void * memset(void * s, int ch, size_t n);
 
 int memcmp(const void *m1, const void *m2, size_t n);
-int fmemcmp(const __FAR(void)m1,const __FAR(void)m2, size_t n);
+int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 
 #ifdef __WATCOMC__
 /* bx, cx, dx and es not used or clobbered for all asmsupt.asm functions except
@@ -366,7 +366,7 @@ VOID InitPSP(VOID);
 /* newstuff.c */
 int SetJFTSize(UWORD nHandles);
 long DosMkTmp(__FAR(BYTE) pathname, UWORD attr);
-COUNT truename(const __FAR(char) src, char * dest, COUNT t);
+COUNT truename(__FAR(const char) src, char * dest, COUNT t);
 
 /* network.c */
 int network_redirector(unsigned cmd);
