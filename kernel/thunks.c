@@ -336,6 +336,12 @@ r n(t1 a1) \
     return api_calls->n(a1); \
 }
 
+#define _THUNK_API_2v(n, t1, a1, t2, a2) \
+void n(t1 a1, t2 a2) \
+{ \
+    api_calls->n(a1, a2); \
+}
+
 #define _THUNK_API_2(r, n, t1, a1, t2, a2) \
 r n(t1 a1, t2 a2) \
 { \
