@@ -465,7 +465,7 @@ VOID mcb_print(mcb FAR * mcbp)
 void DosUmbLink(unsigned n)
 {
   REG mcb FAR *p;
-  REG mcb FAR *q;
+  REG mcb FAR *q = NULL;
 
   if (uppermem_root == 0xffff)
     return;

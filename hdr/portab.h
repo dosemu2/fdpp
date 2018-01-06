@@ -193,7 +193,9 @@ UWORD mk_offs(UBYTE *data, UWORD len);
 void disable(void);
 void enable(void);
 #define __FAR(t) t FAR *
-#define MC68K
+#define FP_SEG(fp)            ((unsigned)((ULONG)(VOID FAR *)(fp)>>16))
+#define FP_OFF(fp)            ((uintptr_t)(fp))
+#define MK_FP(seg,ofs)        ((void FAR *)(((ULONG)(seg)<<16)|(UWORD)(ofs)))
 
 #else
 #error Unknown compiler
@@ -208,7 +210,7 @@ We might even deal with a pre-ANSI compiler. This will certainly not compile.
 #endif
 #endif
 
-#ifdef MC68K
+#if defined(MC68K) || defined(__GNUC__)
 #define far                     /* No far type          */
 #define interrupt               /* No interrupt type    */
 #define VOID           void
