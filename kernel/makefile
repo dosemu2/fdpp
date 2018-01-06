@@ -128,7 +128,7 @@ $(filter-out thunks.o,$(OBJECTS)): %.o: %.cc $(HEADERS)
 
 .c.cc:
 	sed -e ':loop' \
-		-e 's/\([ \t]*\(STATIC \)*\(static \)*\(.*[,(]\)*\) *\(.*[^(]\+\) FAR *\*\(\**\)/\1__FAR(\5\6)/' \
+		-e 's/\([ \t]*\(STATIC \)*\(const \)*\(.*[,(]\)*\) *\(.*[^(]\+\) FAR *\*\(\**\)/\1__FAR(\5\6)/' \
 		-e 't loop' $< >$@
 
 $(FDPPLIB): $(OBJECTS)
@@ -144,7 +144,7 @@ cdata.asm: cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
 thunk_calls.tmp: proto.h makefile
-	grep ASMCFUNC $< | nl -n ln -v 0 >$@
+	grep ASMCFUNC $< | sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 
 plt.inc: thunk_calls.tmp
 	sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc \4,\t\t\1,\t\3/' $^ >$@
@@ -153,7 +153,8 @@ thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
 
 thunk_asms.tmp: proto.h makefile
-	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | nl -n ln -v 0 >$@
+	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | \
+		sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 
 thunk_asms.h: thunk_asms.tmp makefile
 	cat $< | ../utils/thunk_gen 1 >$@ || (rm -f $@ ; false)

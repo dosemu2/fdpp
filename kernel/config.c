@@ -246,11 +246,7 @@ STATIC void umb_init(void);
 void HMAconfig(int finalize);
 STATIC void config_init_buffers(int anzBuffers);     /* from BLOCKIO.C */
 
-#ifdef I86
 STATIC VOID FAR * AlignParagraph(VOID FAR * lpPtr);
-#else
-#define AlignParagraph(x) ((VOID *)x)
-#endif
 
 #define EOF 0x1a
 
@@ -1933,7 +1929,6 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
   return p;
 }
 
-#ifdef I86
 #if 0
 STATIC BYTE FAR * KernelAllocDma(WORD bytes, char type)
 {
@@ -1958,7 +1953,6 @@ STATIC void FAR * AlignParagraph(VOID FAR * lpPtr)
   /* boundary.                                                    */
   return MK_FP(uSegVal, 0);
 }
-#endif
 
 STATIC int iswh(unsigned char c)
 {
