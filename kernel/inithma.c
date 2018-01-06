@@ -169,7 +169,7 @@ int EnableHMA(VOID)
 
 int MoveKernelToHMA()
 {
-  void far *xms_addr;
+  void FAR *xms_addr;
 
   if (DosLoadedInHMA)
   {
@@ -349,7 +349,7 @@ void MoveKernel(unsigned NewKernelSegment)
 
     /* this is for a
        call near enableA20
-       jmp far kernelentry
+       jmp FAR kernelentry
        style table
      */
 
@@ -396,7 +396,7 @@ void MoveKernel(unsigned NewKernelSegment)
 
     if (NewKernelSegment == 0xffff)
     {
-      /* jmp far cpm_entry (copy from 0:c0) */
+      /* jmp FAR cpm_entry (copy from 0:c0) */
       pokeb(0xffff, 0x30 * 4 + 0x10, 0xea);
       pokel(0xffff, 0x30 * 4 + 0x11, (ULONG)cpm_entry);
     }

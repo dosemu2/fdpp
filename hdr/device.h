@@ -191,7 +191,7 @@ struct _bios_LBA_address_packet
   unsigned char reserved_1;     /* set to 0...unused                */
   unsigned char number_of_blocks;       /* 0 < number_of_blocks < 128       */
   unsigned char reserved_2;     /* set to 0...unused                */
-  UBYTE far *buffer_address;    /* addr of transfer buffer          */
+  UBYTE FAR *buffer_address;    /* addr of transfer buffer          */
   unsigned long block_address;  /* LBA address                      */
   unsigned long block_address_high;     /* high bytes of LBA addr...unused  */
 };

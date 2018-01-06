@@ -1268,7 +1268,7 @@ dispatch:
           /* Set Extended Error */
         case 0x0a:
           {
-            lregs far *er      = (lregs far *)FP_DS_DX;
+            lregs FAR *er      = (lregs FAR *)FP_DS_DX;
             CritErrCode        = er->AX;
             CritErrDev         = (BYTE FAR *)MK_FP(er->ES, er->DI);
             CritErrLocus       = er->CH;

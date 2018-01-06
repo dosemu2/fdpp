@@ -9,8 +9,8 @@
     moveable and Dyn.Buffer resizable, but not before
 */
 
-void far *DynAlloc(const char *what, unsigned num, unsigned size);
-void far *DynLast(void);
+void FAR *DynAlloc(const char *what, unsigned num, unsigned size);
+void FAR *DynLast(void);
 void DynFree(void *ptr);
 
 struct DynS {

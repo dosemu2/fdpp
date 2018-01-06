@@ -155,7 +155,7 @@ void InitializeAllBPBs(VOID)
 
 STATIC void PSPInit(void)
 {
-  psp far *p = (psp far *)MK_FP(DOS_PSP, 0);
+  psp FAR *p = (psp FAR *)MK_FP(DOS_PSP, 0);
 
   /* Clear out new psp first                              */
   fmemset(p, 0, sizeof(psp));
@@ -164,7 +164,7 @@ STATIC void PSPInit(void)
   /* CP/M-like exit point                                 */
   p->ps_exit = 0x20cd;
 
-  /* CP/M-like entry point - call far to special entry    */
+  /* CP/M-like entry point - call FAR to special entry    */
   p->ps_farcall = 0x9a;
   p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0, 0x30 * 4);
   /* unix style call - 0xcd 0x21 0xcb (int 21, retf)      */
@@ -629,7 +629,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
 
 STATIC void InitIO(void)
 {
-  struct dhdr far *device = &LoL->_nul_dev;
+  struct dhdr FAR *device = &LoL->_nul_dev;
 
   /* Initialize driver chain                                      */
   do {
@@ -776,7 +776,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
   init_call_intr(0x13, &r);
 
   {
-    void (far *reboot)(void) = (void (far*)(void)) MK_FP(0x0,0x7c00);
+    void (FAR *reboot)(void) = (void (FAR *)(void)) MK_FP(0x0,0x7c00);
 
     (*reboot)();
   }

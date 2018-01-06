@@ -532,7 +532,7 @@ STATIC void umb_init(void)
 {
   UCOUNT umb_seg, umb_size;
   seg umb_max;
-  void far *xms_addr;
+  void FAR *xms_addr;
 
   if ((xms_addr = DetectXMSDriver()) == NULL)
     return;

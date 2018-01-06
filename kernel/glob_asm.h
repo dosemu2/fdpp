@@ -7,7 +7,7 @@ __ASM(char *, inputptr) SEMIC         /* pointer to unread CON input          */
 __ASM(sfttbl FAR *, sfthead) SEMIC    /* System File Table head               */
 __ASM(WORD, maxsecsize) SEMIC
 __ASM(unsigned char, bufloc) SEMIC    /* 0=conv, 1=HMA                        */
-__ASM(void far *, deblock_buf) SEMIC  /* pointer to workspace buffer      */
+__ASM(void FAR *, deblock_buf) SEMIC  /* pointer to workspace buffer      */
 __ASM(struct cds FAR *, CDSp) SEMIC   /* Current Directory Structure          */
 __ASM(LONG, current_filepos) SEMIC    /* current file position                */
 __ASM(sfttbl FAR *, FCBp) SEMIC       /* FCB table pointer                    */

@@ -201,7 +201,6 @@ void enable(void);
 #define FAR                     /* linear architecture  */
 #define REG
 #define VOID           void
-#define far                     /* No far type          */
 #define CONST          const
 #define PROTO
 

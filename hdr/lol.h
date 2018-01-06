@@ -35,21 +35,21 @@ struct lol {
   char filler[0x22];
   char *inputptr;              /* -4 Pointer to unread CON input          */
   unsigned short _first_mcb;   /* -2 Start of user memory                 */
-  struct dpb far *_DPBp;       /*  0 First drive Parameter Block          */
-  struct sfttbl far *_sfthead; /*  4 System File Table head               */
-  struct dhdr far *_clock;     /*  8 CLOCK$ device                        */
-  struct dhdr far *_syscon;    /*  c console device                       */
+  struct dpb FAR *_DPBp;       /*  0 First drive Parameter Block          */
+  struct sfttbl FAR *_sfthead; /*  4 System File Table head               */
+  struct dhdr FAR *_clock;     /*  8 CLOCK$ device                        */
+  struct dhdr FAR *_syscon;    /*  c console device                       */
   unsigned short maxsecsize;   /* 10 max bytes per sector for any blkdev  */
-  void far *inforecptr;        /* 12 pointer to disk buffer info record   */
-  struct cds far *_CDSp;       /* 16 Current Directory Structure          */
-  struct sfttbl far *FCBp;     /* 1a FCB table pointer                    */
+  void FAR *inforecptr;        /* 12 pointer to disk buffer info record   */
+  struct cds FAR *_CDSp;       /* 16 Current Directory Structure          */
+  struct sfttbl FAR *FCBp;     /* 1a FCB table pointer                    */
   unsigned short nprotfcb;     /* 1e number of protected fcbs             */
   unsigned char _nblkdev;      /* 20 number of block devices              */
   unsigned char _lastdrive;    /* 21 value of last drive                  */
   struct dhdr _nul_dev;        /* 22 NUL device driver header(no pointer!)*/
   unsigned char njoined;       /* 34 number of joined devices             */
   unsigned short specialptr;   /* 35 pointer to list of spec. prog(unused)*/
-  void far *setverPtr;         /* 37 pointer to SETVER list               */
+  void FAR *setverPtr;         /* 37 pointer to SETVER list               */
   void (*a20ptr)(void);        /* 3b pointer to fix A20 ctrl              */
   unsigned short recentpsp;    /* 3d PSP of most recently exec'ed prog    */
   unsigned short nbuffers;     /* 3f Number of buffers                    */
@@ -57,12 +57,12 @@ struct lol {
   unsigned char _BootDrive;    /* 43 bootdrive (1=A:)                     */
   unsigned char cpu;           /* 44 CPU family [was unused dword moves]  */
   unsigned short xmssize;      /* 45 extended memory size in KB           */
-  struct buffer far *_firstbuf;/* 47 head of buffers linked list          */
+  struct buffer FAR *_firstbuf;/* 47 head of buffers linked list          */
   unsigned short dirtybuf;     /* 4b number of dirty buffers              */
-  struct buffer far *lookahead;/* 4d pointer to lookahead buffer          */
+  struct buffer FAR *lookahead;/* 4d pointer to lookahead buffer          */
   unsigned short slookahead;   /* 51 number of lookahead sectors          */
   unsigned char _bufloc;       /* 53 BUFFERS loc (1=HMA)                  */
-  unsigned char far *_deblock_buf;      /* 54 pointer to workspace buffer          */
+  unsigned char FAR *_deblock_buf;      /* 54 pointer to workspace buffer          */
   char filler2[5];             /* 58 ???/unused                           */
   unsigned char int24fail;     /* 5d int24 fail while making i/o stat call*/
   unsigned char memstrat;      /* 5e memory allocation strat during exec  */

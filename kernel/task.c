@@ -94,7 +94,7 @@ ULONG SftGetFsize(int sft_idx)
   return s->sft_size;
 }
 
-STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, char far * pathname)
+STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, char FAR * pathname)
 {
   BYTE FAR *pSrc;
   BYTE FAR *pDest;
@@ -495,7 +495,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       return DE_NOMEM;
     asize -= 0x11;
     /* CP/M compatibility--size of first segment for .COM files
-       while preserving the far call to 0:00c0 +
+       while preserving the FAR call to 0:00c0 +
        copy in HMA at ffff:00d0 */
     p = (psp FAR *)MK_FP(mem, 0);
     p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0xc - asize, asize << 4);
