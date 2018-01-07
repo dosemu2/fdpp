@@ -29,6 +29,7 @@ public:
     FarPtr<T> operator --();
     void operator +=(int);
     FarPtr<T> operator +(int);
+    explicit operator struct far_s &();
     uint16_t seg();
     uint16_t off();
 };

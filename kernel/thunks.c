@@ -134,7 +134,10 @@ static uintptr_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 
 #define __ARG(t) t
 #define __ARG_PTR(t) t *
-#define __ARG_PTR_FAR(t) t FAR *
+#define __ARG_PTR_FAR(t) __FAR(t)
+#define __ARG_A(t) t
+#define __ARG_PTR_A(t) t *
+#define __ARG_PTR_FAR_A(t) __DOSFAR(t)
 
 #define PACKED __attribute__((packed))
 
