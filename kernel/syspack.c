@@ -117,7 +117,7 @@ VOID putdirent(struct dirent FAR * dp, UBYTE FAR * vp)
   fputword(&vp[DIR_START], dp->dir_start);
   fputlong(&vp[DIR_SIZE], dp->dir_size);
   for (i = 0, p = (UBYTE FAR *) & vp[DIR_RESERVED]; i < 10; i++)
-    *p++ = NULL;
+    *p++ = 0;
 }
 #endif
 

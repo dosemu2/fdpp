@@ -229,6 +229,7 @@ far_t mk_dosobj(void *data, UWORD len);
 #define VOID           void
 #define CONST          const
 #define PROTO
+#define NONNATIVE
 
 #else
 #error Unknown compiler
