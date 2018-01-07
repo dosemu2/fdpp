@@ -132,7 +132,7 @@ char FAR * fstrchr(const char FAR * s, int c)
       return (char FAR *)p;
   }
   while (*p);
-  return 0;
+  return NULL;
 }
 
 #if 0
@@ -160,7 +160,7 @@ void FAR * fmemchr(const void FAR * s, int c, size_t n)
       return (void FAR *)p;
   }
   while (*p);
-  return 0;
+  return NULL;
 }
 
 int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)

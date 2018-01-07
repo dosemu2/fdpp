@@ -142,7 +142,7 @@ int get_sft_idx(unsigned hndl)
   if (hndl >= p->ps_maxfiles)
     return DE_INVLDHNDL;
 
-  idx = p->ps_filetab[hndl];
+  idx = _MK_FP(UBYTE, p->ps_filetab)[hndl];
   return idx == 0xff ? DE_INVLDHNDL : idx;
 }
 
@@ -310,7 +310,7 @@ ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, int *rc)
 STATIC long get_free_hndl(void)
 {
   psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
-  UBYTE FAR *q = p->ps_filetab;
+  UBYTE FAR *q = _MK_FP(UBYTE, p->ps_filetab);
   UBYTE FAR *r = (UBYTE FAR *)fmemchr(q, 0xff, p->ps_maxfiles);
   if (FP_SEG(r) == 0) return DE_TOOMANY;
   return (unsigned)(r - q);
@@ -569,7 +569,7 @@ long DosOpen(char FAR * fname, unsigned mode, unsigned attrib)
   if (result < SUCCESS)
     return result;
 
-  ((psp FAR *)MK_FP(cu_psp, 0))->ps_filetab[hndl] = (UBYTE)result;
+  _MK_FP(UBYTE, ((psp FAR *)MK_FP(cu_psp, 0))->ps_filetab)[hndl] = (UBYTE)result;
   return hndl | (result & 0xffff0000l);
 }
 
@@ -611,7 +611,7 @@ COUNT DosForceDup(unsigned OldHandle, unsigned NewHandle)
     return DE_INVLDHNDL;
 
   /* now close the new handle if it's open                        */
-  if ((UBYTE) p->ps_filetab[NewHandle] != 0xff)
+  if (_MK_FP(UBYTE, p->ps_filetab)[NewHandle] != 0xff)
   {
     COUNT ret;
 
@@ -620,7 +620,7 @@ COUNT DosForceDup(unsigned OldHandle, unsigned NewHandle)
   }
 
   /* If everything looks ok, bump it up.                          */
-  p->ps_filetab[NewHandle] = p->ps_filetab[OldHandle];
+  _MK_FP(UBYTE, p->ps_filetab)[NewHandle] = _MK_FP(UBYTE, p->ps_filetab)[OldHandle];
   /* possible hazard: integer overflow ska*/
   Sftp->sft_count += 1;
   return SUCCESS;
@@ -689,7 +689,7 @@ COUNT DosClose(COUNT hndl)
   /* We must close the (valid) file handle before any critical error */
   /* may occur, else e.g. ABORT will try to close the file twice,    */
   /* the second time after stdout is already closed */
-  p->ps_filetab[hndl] = 0xff;
+  _MK_FP(UBYTE, p->ps_filetab)[hndl] = 0xff;
 
   /* Get the SFT block that contains the SFT      */
   return DosCloseSft(sft_idx, FALSE);

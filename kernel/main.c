@@ -176,7 +176,7 @@ STATIC void PSPInit(void)
   /* parent psp segment                                   */
   p->ps_parent = FP_SEG(p);
   /* previous psp pointer                                 */
-  p->ps_prevpsp = MK_FP(0xffff,0xffff);
+  p->ps_prevpsp = _MK_DOS_FP(void, 0xffff,0xffff);
 
   /* Environment and memory useage parameters             */
   /* memory size in paragraphs                            */
@@ -199,7 +199,7 @@ STATIC void PSPInit(void)
   fmemset(p->ps_files, 0xff, 20);
 
   /* open file table pointer                              */
-  p->ps_filetab = p->ps_files;
+  p->ps_filetab = _DOS_FP((UBYTE FAR *)p->ps_files);
 
   /* first command line argument                          */
   /* p->ps_fcb1.fcb_drive = 0; already set                */

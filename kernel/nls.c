@@ -128,7 +128,7 @@ STATIC COUNT muxLoadPkg(int subfct, UWORD cp, UWORD cntry)
      version in NLSFUNC, on return it will set BX (cp on entry) to FreeDOS
      NLSFUNC ID.  call_nls will set the high word = BX on return.
   */
-  ret = muxGo(0, 0, NLS_FREEDOS_NLSFUNC_VERSION, 0, NLS_FREEDOS_NLSFUNC_ID, 0);
+  ret = muxGo(0, 0, NLS_FREEDOS_NLSFUNC_VERSION, 0, NLS_FREEDOS_NLSFUNC_ID, NULL);
   if ((int)ret != 0x14ff)
     return DE_FILENOTFND;       /* No NLSFUNC --> no load */
   if ((int)(ret >> 16) != NLS_FREEDOS_NLSFUNC_ID) /* FreeDOS NLSFUNC will return */
@@ -137,7 +137,7 @@ STATIC COUNT muxLoadPkg(int subfct, UWORD cp, UWORD cntry)
   /* OK, the correct NLSFUNC is available --> load pkg */
   /* If cp == -1 on entry, NLSFUNC updates cp to the codepage loaded
      into memory. The system must then change to this one later */
-  return (int)muxGo(subfct, 0, cp, cntry, 0, 0);
+  return (int)muxGo(subfct, 0, cp, cntry, 0, NULL);
 }
 
 STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
@@ -151,7 +151,7 @@ STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
 
 #define mux65(s,cp,cc,bs,b)	muxBufGo(2, (s), (cp), (cc), (bs), (b))
 #define mux38(cp,cc,bs,b)	muxBufGo(4, 0, (cp), (cc), (bs), (b))
-#define muxYesNo(ch)		muxBufGo(NLSFUNC_YESNO,0, NLS_DEFAULT, NLS_DEFAULT, (ch), 0)
+#define muxYesNo(ch)		muxBufGo(NLSFUNC_YESNO,0, NLS_DEFAULT, NLS_DEFAULT, (ch), NULL)
 #define muxUpMem(s,b,bs)	muxBufGo((s),0, NLS_DEFAULT,NLS_DEFAULT, (bs), (b))
 
 /********************************************************************
@@ -457,7 +457,7 @@ STATIC int nlsYesNo(struct nlsPackage FAR * nls, UWORD ch)
   if (!nlsIsDBCS(ch & 0xFF)) {
     ch &= 0xFF;
     log(("NLS: nlsYesNo(): in ch=%u (%c)\n", ch, ch > 32 ? (char)ch : ' '));
-    xUpMem(nls, MK_FP(_SS, FP_OFF(&ch)), 1);          /* Upcase character */
+    xUpMem(nls, _MK_FP(void, MK_FAR(&ch)), 1);          /* Upcase character */
     /* Cannot use DosUpChar(), because
        maybe: nls != current NLS pkg
        However: Upcase character within lowlevel
@@ -506,7 +506,7 @@ unsigned char ASMCFUNC DosUpChar(unsigned char ch)
  /* upcase a single character */
 {
   log(("NLS: DosUpChar(): in ch=%u (%c)\n", ch, ch > 32 ? ch : ' '));
-  DosUpMem(MK_FP(_SS, FP_OFF(&ch)), 1);
+  DosUpMem(_MK_FP(void, MK_FAR(&ch)), 1);
   log(("NLS: DosUpChar(): upcased ch=%u (%c)\n", ch, ch > 32 ? ch : ' '));
   return ch;
 }
@@ -537,7 +537,7 @@ VOID DosUpFMem(VOID FAR * str, unsigned len)
 unsigned char DosUpFChar(unsigned char ch)
  /* upcase a single character for file names */
 {
-  DosUpFMem(MK_FP(_SS, FP_OFF(&ch)), 1);
+  DosUpFMem(_MK_FP(void, MK_FAR(&ch)), 1);
   return ch;
 }
 

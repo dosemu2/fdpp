@@ -391,7 +391,7 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
 
-  ((psp FAR *) MK_FP(cu_psp, 0))->ps_stack = (BYTE FAR *) r;
+  ((psp FAR *) MK_FP(cu_psp, 0))->ps_stack = _DOS_FP(r);
 
   fmemcpy(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
@@ -1932,7 +1932,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
           r.FLAGS |= FLG_CARRY;
           break;
         }
-        idx = &p->ps_filetab[r.BX];
+        idx = &_MK_FP(UBYTE, p->ps_filetab)[r.BX];
         r.FLAGS &= ~FLG_CARRY;
         r.ES = FP_SEG(idx);
         r.DI = FP_OFF(idx);

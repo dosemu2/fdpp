@@ -204,7 +204,7 @@ void child_psp(seg para, seg cur_psp, int psize)
   /* parent psp segment                                   */
   p->ps_parent = cu_psp;
   /* previous psp pointer                                 */
-  p->ps_prevpsp = q;
+  p->ps_prevpsp = _DOS_FP(q);
 
   /* Environment and memory useage parameters             */
   /* memory size in paragraphs                            */
@@ -216,12 +216,12 @@ void child_psp(seg para, seg cur_psp, int psize)
   fmemset(p->ps_files, 0xff, 20);
 
   /* open file table pointer                              */
-  p->ps_filetab = p->ps_files;
+  p->ps_filetab = _DOS_FP((UBYTE FAR *)p->ps_files);
 
   /* clone the file table -- 0xff is unused               */
   for (i = 0; i < 20; i++)
     if (CloneHandle(i) >= 0)
-      p->ps_files[i] = q->ps_filetab[i];
+      p->ps_files[i] = _MK_FP(UBYTE, q->ps_filetab)[i];
 
   /* first command line argument                          */
   p->ps_fcb1.fcb_drive = 0;
@@ -248,11 +248,11 @@ STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, exec_blk FAR * exb,
   _psp = (psp FAR *)MK_FP(pspseg, 0);
 
   /* complete the psp by adding the command line and FCBs     */
-  fmemcpy(&_psp->ps_cmd, exb->exec.cmd_line, sizeof(CommandTail));
-  if (FP_OFF(exb->exec.fcb_1) != 0xffff)
+  fmemcpy(&_psp->ps_cmd, _MK_FP(CommandTail, exb->exec.cmd_line), sizeof(CommandTail));
+  if (_FP_OFF(exb->exec.fcb_1) != 0xffff)
   {
-    fmemcpy(&_psp->ps_fcb1, exb->exec.fcb_1, 16);
-    fmemcpy(&_psp->ps_fcb2, exb->exec.fcb_2, 16);
+    fmemcpy(&_psp->ps_fcb1, _MK_FP(fcb, exb->exec.fcb_1), 16);
+    fmemcpy(&_psp->ps_fcb2, _MK_FP(fcb, exb->exec.fcb_2), 16);
   }
 
   /* identify the mcb as this functions'                  */
@@ -299,8 +299,8 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
 
   /* Transfer control to the executable                   */
   p->ps_parent = cu_psp;
-  p->ps_prevpsp = q;
-  q->ps_stack = (BYTE FAR *)user_r;
+  p->ps_prevpsp = _DOS_FP(q);
+  q->ps_stack = _DOS_FP((BYTE FAR *)user_r);
   user_r->FLAGS &= ~FLG_CARRY;
 
   cu_psp = ds;
@@ -312,14 +312,14 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
     iregs FAR *irp;
 
     /* build the user area on the stack                     */
-    irp = (iregs FAR *)(exp->exec.stack - sizeof(iregs));
+    irp = (iregs FAR *)(_MK_FP(BYTE, exp->exec.stack) - sizeof(iregs));
 
     /* start allocating REGs (as in MS-DOS - some demos expect them so --LG) */
     /* see http://www.beroset.com/asm/showregs.asm */
     irp->DX = irp->ES = irp->DS = ds;
-    irp->CS = FP_SEG(exp->exec.start_addr);
-    irp->SI = irp->IP = FP_OFF(exp->exec.start_addr);
-    irp->DI = FP_OFF(exp->exec.stack);
+    irp->CS = _FP_SEG(exp->exec.start_addr);
+    irp->SI = irp->IP = _FP_OFF(exp->exec.start_addr);
+    irp->DI = _FP_OFF(exp->exec.stack);
     irp->BP = 0x91e; /* this is more or less random but some programs
                         expect 0x9 in the high byte of BP!! */
     irp->AX = irp->BX = fcbcode;
@@ -334,8 +334,8 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
        fatal("KERNEL RETURNED!!!");                    */
   }
   /* mode == LOAD */
-  exp->exec.stack -= 2;
-  *((UWORD FAR *)(exp->exec.stack)) = fcbcode;
+  _FP_OFF(exp->exec.stack) -= 2;
+  *_MK_FP(UWORD, exp->exec.stack) = fcbcode;
   return SUCCESS;
 }
 
@@ -501,8 +501,8 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0xc - asize, asize << 4);
     asize <<= 4;
     asize += 0x10e;
-    exp->exec.stack = (BYTE FAR *)MK_FP(mem, asize);
-    exp->exec.start_addr = (BYTE FAR *)MK_FP(mem, 0x100);
+    exp->exec.stack = _MK_DOS_FP(BYTE, mem, asize);
+    exp->exec.start_addr = _MK_DOS_FP(BYTE, mem, 0x100);
     *((UWORD FAR *) MK_FP(mem, asize)) = (UWORD) 0;
     load_transfer(mem, exp, fcbcode, mode);
   }
@@ -544,7 +544,7 @@ VOID return_user(void)
   cu_psp = p->ps_parent;
   q = (psp FAR *)MK_FP(cu_psp, 0);
 
-  irp = (iregs FAR *) q->ps_stack;
+  irp = _MK_FP(iregs, q->ps_stack);
 
   irp->CS = FP_SEG(p->ps_isv22);
   irp->IP = FP_OFF(p->ps_isv22);
@@ -552,7 +552,7 @@ VOID return_user(void)
 
   if (InDOS)
     --InDOS;
-  exec_user((iregs FAR *) q->ps_stack, 0);
+  exec_user(_MK_FP(iregs, q->ps_stack), 0);
 }
 
 COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
@@ -746,10 +746,10 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     child_psp(mem, cu_psp, mem + asize);
 
     fcbcode = patchPSP(mem - 1, env, exp, namep);
-    exp->exec.stack = (BYTE FAR *)
-      MK_FP(ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
-    exp->exec.start_addr = (BYTE FAR *)
-      MK_FP(ExeHeader.exInitCS + start_seg, ExeHeader.exInitIP);
+    exp->exec.stack = _MK_DOS_FP(BYTE,
+      ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
+    exp->exec.start_addr = _MK_DOS_FP(BYTE,
+      ExeHeader.exInitCS + start_seg, ExeHeader.exInitIP);
 
     /* Transfer control to the executable                   */
     load_transfer(mem, exp, fcbcode, mode);
@@ -810,11 +810,11 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   UBYTE mode = Config->cfgP_0_startmode;
 
   /* build exec block and save all parameters here as init part will vanish! */
-  exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
+  exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, -1, -1);
   exb.exec.env_seg = DOS_PSP + 8;
-  fstrcpy(Shell, (char FAR *)MK_FP(FP_SEG(Config), FP_OFF(Config->cfgInit)));
+  fstrcpy(Shell, (char FAR *)MK_FP(FP_SEG(Config), FP_OFF((BYTE FAR *)Config->cfgInit)));
   /* join name and tail */
-  fstrcpy(Shell + strlen(Shell), (char FAR *)MK_FP(FP_SEG(Config), FP_OFF(Config->cfgInitTail)));
+  fstrcpy(Shell + strlen(Shell), (char FAR *)MK_FP(FP_SEG(Config), FP_OFF((BYTE FAR *)Config->cfgInitTail)));
   endp =  Shell + strlen(Shell);
 
   for ( ; ; )   /* endless shell load loop - reboot or shut down to exit it! */
@@ -830,8 +830,8 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     /* terminate name and tail */
     *tailp =  *(endp + 2) = '\0';
     /* ctCount: just past '\0' do not count the "\r\n" */
-    exb.exec.cmd_line = (CommandTail *)(tailp + 1);
-    exb.exec.cmd_line->ctCount = endp - tailp - 2;
+    exb.exec.cmd_line = _DOS_FP((CommandTail FAR *)(tailp + 1));
+    _MK_FP(CommandTail, exb.exec.cmd_line)->ctCount = endp - tailp - 2;
 #ifdef DEBUG
     printf("Process 0 starting: %s%s\n\n", Shell, tailp + 2);
 #endif

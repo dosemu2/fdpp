@@ -43,11 +43,11 @@ typedef struct {
     } _load;
     struct {
       UWORD env_seg;
-      CommandTail FAR *cmd_line;
-      fcb FAR *fcb_1;
-      fcb FAR *fcb_2;
-      BYTE FAR *stack;
-      BYTE FAR *start_addr;
+      __DOSFAR(CommandTail)cmd_line;
+      __DOSFAR(fcb)fcb_1;
+      __DOSFAR(fcb)fcb_2;
+      __DOSFAR(BYTE)stack;
+      __DOSFAR(BYTE)start_addr;
     } _exec;
   } ldata;
 } exec_blk;
@@ -75,10 +75,10 @@ typedef struct {
   UWORD ps_parent;              /* 16 parent psp segment           */
   UBYTE ps_files[20];           /* 18 file table - 0xff is unused  */
   UWORD ps_environ;             /* 2c environment paragraph        */
-  BYTE FAR *ps_stack;           /* 2e user stack pointer - int 21  */
+  __DOSFAR(BYTE)ps_stack;           /* 2e user stack pointer - int 21  */
   UWORD ps_maxfiles;            /* 32 maximum open files           */
-  UBYTE FAR *ps_filetab;        /* 34 open file table pointer      */
-  VOID FAR *ps_prevpsp;         /* 38 previous psp pointer         */
+  __DOSFAR(UBYTE)ps_filetab;        /* 34 open file table pointer      */
+  __DOSFAR(VOID)ps_prevpsp;         /* 38 previous psp pointer         */
   UBYTE ps_fill2;               /* 3c unused                       */
   UBYTE ps_truename;            /* 3d [unused] append truename flag int2f/B711h */
   UBYTE ps_netx_taskid[2];      /* 3e [Novell only field] task id  */

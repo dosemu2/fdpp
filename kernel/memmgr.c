@@ -380,7 +380,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
 COUNT DosMemCheck(void)
 {
   REG mcb FAR *p;
-  REG mcb FAR *pprev = 0;
+  REG mcb FAR *pprev = NULL;
 
   /* Initialize                                           */
   p = para2far(first_mcb);

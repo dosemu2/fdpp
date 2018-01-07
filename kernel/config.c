@@ -355,7 +355,7 @@ void PreConfig(void)
   LoL->_DPBp = (struct dpb FAR *)
       DynAlloc("DPBp", blk_dev.dh_name[0], sizeof(struct dpb));
 
-  LoL->_sfthead = (sfttbl FAR *)MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
+  LoL->_sfthead = (sfttbl FAR *)MK_FP(FP_SEG((struct lol FAR *)LoL), 0xcc); /* &(LoL->firstsftt) */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = (sfttbl FAR *)
      KernelAlloc(sizeof(sftheader)
@@ -409,7 +409,7 @@ void PreConfig2(void)
 
   sp = LoL->_sfthead;
   sp = sp->sftt_next = (sfttbl FAR *)KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
-  sp->sftt_next = (sfttbl FAR *) - 1;
+  sp->sftt_next = (sfttbl FAR *)MK_FP(-1, -1);
   sp->sftt_count = 3;
 
   if (ebda_size)  /* move the Extended BIOS Data Area from top of RAM here */
@@ -460,7 +460,7 @@ void PostConfig(void)
   sp = sp->sftt_next = (sfttbl FAR *)
     KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 8) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
-  sp->sftt_next = (sfttbl FAR *) - 1;
+  sp->sftt_next = (sfttbl FAR *)MK_FP(-1, -1);
   sp->sftt_count = Config.cfgFiles - 8;
 
   LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
@@ -2137,18 +2137,18 @@ STATIC void config_init_buffers(int wantedbuffers)
   DebugPrintf((" (%p)", LoL->_firstbuf));
 
   buffers--;
-  pbuffer->b_prev = FP_OFF(pbuffer + buffers);
+  pbuffer->b_prev = FP_OFF((struct buffer FAR *)(pbuffer + buffers));
   {
     int i = buffers;
     do
     {
-      pbuffer->b_next = FP_OFF(pbuffer + 1);
+      pbuffer->b_next = FP_OFF((struct buffer FAR *)(pbuffer + 1));
       pbuffer++;
-      pbuffer->b_prev = FP_OFF(pbuffer - 1);
+      pbuffer->b_prev = FP_OFF((struct buffer FAR *)(pbuffer - 1));
     }
     while (--i);
   }
-  pbuffer->b_next = FP_OFF(pbuffer - buffers);
+  pbuffer->b_next = FP_OFF((struct buffer FAR *)(pbuffer - buffers));
 
     /* now, we can have quite some buffers in HMA
        -- up to 50 for KE38616.
@@ -2652,8 +2652,8 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   args[*args+2] = 0;
 
   exb.exec.env_seg  = 0;
-  exb.exec.cmd_line = (CommandTail FAR *) args;
-  exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *) 0xfffffffful;
+  exb.exec.cmd_line = _DOS_FP((CommandTail FAR *) args);
+  exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, -1, -1);
 
 
   InstallPrintf(("cmd[%s] args [%u,%s]\n",filename,*args,args+1));

@@ -100,8 +100,8 @@ VOID PreConfig2(VOID);
 VOID DoConfig(int pass);
 VOID PostConfig(VOID);
 VOID configDone(VOID);
-VOID FAR * KernelAlloc(size_t nBytes, char type, int mode);
-void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode);
+__FAR(VOID) KernelAlloc(size_t nBytes, char type, int mode);
+__FAR(void) KernelAllocPara(size_t nPara, char type, char *name, int mode);
 char *strcat(char * d, const char * s);
 BYTE * GetStringArg(BYTE * pLine, BYTE * pszString);
 void DoInstall(void);
@@ -112,7 +112,7 @@ COUNT dsk_init(VOID);
 
 /* inithma.c */
 int MoveKernelToHMA(void);
-VOID FAR * HMAalloc(COUNT bytesToAllocate);
+__FAR(VOID) HMAalloc(COUNT bytesToAllocate);
 
 /* initoem.c */
 unsigned init_oem(void);
@@ -120,8 +120,8 @@ void movebda(size_t bytes, unsigned new_seg);
 unsigned ebdasize(void);
 
 /* main.c */
-BOOL init_device(struct dhdr FAR * dhp, char * cmdLine,
-                      COUNT mode, char FAR **top);
+BOOL init_device(__FAR(struct dhdr) dhp, char * cmdLine,
+                      COUNT mode, __FAR(char*)top);
 VOID init_fatal(BYTE * err_msg);
 
 /* prf.c */
@@ -135,13 +135,13 @@ extern UWORD HMAFree;            /* first byte in HMA not yet used      */
 
 extern unsigned CurrentKernelSegment;
 extern WORD days[2][13];
-extern BYTE FAR *lpTop;
+extern __FAR(BYTE)lpTop;
 extern UWORD ram_top;               /* How much ram in Kbytes               */
 extern char singleStep;
 extern char SkipAllConfig;
 extern char master_env[128];
 
-extern struct lol FAR **_LoL;
+extern __FAR(struct lol*)_LoL;
 #define LoL (*_LoL)
 
 struct _nlsCountryInfoHardcoded {

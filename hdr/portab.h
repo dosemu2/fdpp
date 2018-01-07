@@ -185,6 +185,7 @@ struct far_s {
 #define _FP_SEG(f) ((f).seg)
 #define _FP_OFF(f) ((f).off)
 #define _DOS_FP(p) (struct far_s){ FP_OFF(p), FP_SEG(p) }
+#define _MK_DOS_FP(t, seg, off) (struct far_s){ (UWORD)(off), (UWORD)(seg) }
 
 #define VA_CDECL
 UWORD getCS(void);
@@ -200,10 +201,12 @@ void pokew(UWORD seg, UWORD ofs, UWORD w);
 void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
-UWORD mk_offs(UBYTE *data, UWORD len);
-#define MK_OFFS(data) mk_offs(data, sizeof(data))
+struct far_s mk_dosobj(void *data, UWORD len);
+#define MK_OFFS(data) (mk_dosobj(data, sizeof(data)).off)
+#define MK_FAR(data) (mk_dosobj(data, sizeof(data)))
 void disable(void);
 void enable(void);
+
 #define __FAR(t) t FAR *
 #define __ASMFAR(t) t FAR **
 #define __ASMFARREF(f) &f

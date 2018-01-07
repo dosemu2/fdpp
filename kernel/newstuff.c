@@ -58,11 +58,11 @@ int SetJFTSize(UWORD nHandles)
 
   i = ppsp->ps_maxfiles;
   /* copy existing part and fill up new part by "no open file" */
-  fmemcpy(newtab, ppsp->ps_filetab, i);
+  fmemcpy(newtab, _MK_FP(const void, ppsp->ps_filetab), i);
   fmemset(newtab + i, 0xff, nHandles - i);
 
   ppsp->ps_maxfiles = nHandles;
-  ppsp->ps_filetab = newtab;
+  ppsp->ps_filetab = _DOS_FP(newtab);
 
   return SUCCESS;
 }
