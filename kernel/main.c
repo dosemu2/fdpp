@@ -241,21 +241,21 @@ STATIC void setup_int_vectors(void)
   } vectors[] =
     {
       /* all of these are in the DOS DS */
-      { 0x0, FP_OFF((intvec)int0_handler) },   /* zero divide */
-      { 0x1, FP_OFF((intvec)empty_handler) },  /* single step */
-      { 0x3, FP_OFF((intvec)empty_handler) },  /* debug breakpoint */
-      { 0x6, FP_OFF((intvec)int6_handler) },   /* invalid opcode */
-      { 0x19, FP_OFF((intvec)int19_handler) },
-      { 0x20, FP_OFF((intvec)int20_handler) },
-      { 0x21, FP_OFF((intvec)int21_handler) },
-      { 0x22, FP_OFF((intvec)int22_handler) },
-      { 0x24, FP_OFF((intvec)int24_handler) },
-      { 0x25, FP_OFF((intvec)low_int25_handler) },
-      { 0x26, FP_OFF((intvec)low_int26_handler) },
-      { 0x27, FP_OFF((intvec)int27_handler) },
-      { 0x28, FP_OFF((intvec)int28_handler) },
-      { 0x2a, FP_OFF((intvec)int2a_handler) },
-      { 0x2f, FP_OFF((intvec)int2f_handler) }
+      { 0x0, FP_OFF(int0_handler) },   /* zero divide */
+      { 0x1, FP_OFF(empty_handler) },  /* single step */
+      { 0x3, FP_OFF(empty_handler) },  /* debug breakpoint */
+      { 0x6, FP_OFF(int6_handler) },   /* invalid opcode */
+      { 0x19, FP_OFF(int19_handler) },
+      { 0x20, FP_OFF(int20_handler) },
+      { 0x21, FP_OFF(int21_handler) },
+      { 0x22, FP_OFF(int22_handler) },
+      { 0x24, FP_OFF(int24_handler) },
+      { 0x25, FP_OFF(low_int25_handler) },
+      { 0x26, FP_OFF(low_int26_handler) },
+      { 0x27, FP_OFF(int27_handler) },
+      { 0x28, FP_OFF(int28_handler) },
+      { 0x2a, FP_OFF(int2a_handler) },
+      { 0x2f, FP_OFF(int2f_handler) }
     };
   struct vec *pvec;
   struct lowvec FAR *plvec;
