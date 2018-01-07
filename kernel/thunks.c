@@ -202,7 +202,7 @@ void f(void) \
 }
 
 #define _THUNK_P_0_vp(n, f) \
-void FAR *f(void) \
+__FAR(void) f(void) \
 { \
     _ASSERT(n < asm_tab_len); \
     return (void FAR *)do_asm_call(n, NULL, 0); \

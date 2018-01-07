@@ -79,7 +79,7 @@ __FAR(sft)get_sft(UCOUNT);
 /* dosfns.c */
 __FAR(const char)get_root(__FAR(const char));
 BOOL check_break(void);
-UCOUNT GenericReadSft(sft FAR * sftp, UCOUNT n,__FAR(void) bp,
+UCOUNT GenericReadSft(__FAR(sft) sftp, UCOUNT n,__FAR(void) bp,
                       COUNT * err, BOOL force_binary);
 COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode);
 /*COUNT DosRead(COUNT hndl, UCOUNT n,__FAR(BYTE) bp,__FAR(COUNT) err); */
@@ -370,8 +370,8 @@ COUNT truename(__FAR(const char) src, char * dest, COUNT t);
 
 /* network.c */
 int network_redirector(unsigned cmd);
-int network_redirector_fp(unsigned cmd, void FAR *s);
-long ASMPASCAL network_redirector_mx(unsigned cmd, void FAR *s, void *arg);
+int network_redirector_fp(unsigned cmd, __FAR(void)s);
+long ASMPASCAL network_redirector_mx(unsigned cmd, __FAR(void)s, void *arg);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, (void *)arg)
 #define remote_getfree(s,d) (int)network_redirector_mx(REM_GETSPACE, s, d)
 #define remote_lseek(s,new_pos) network_redirector_mx(REM_LSEEK, s, &new_pos)
@@ -482,11 +482,11 @@ int ASMPASCAL dup2(int oldfd, int newfd);
 ULONG ASMPASCAL lseek(int fd, long position);
 seg ASMPASCAL allocmem(UWORD size);
 void ASMPASCAL keycheck(void);
-void ASMPASCAL set_DTA(void FAR *_dta);
+void ASMPASCAL set_DTA(__FAR(void)_dta);
 WORD ASMPASCAL execrh(__FAR(request),__FAR(struct dhdr));
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
-void FAR * ASMPASCAL DetectXMSDriver(VOID);
+__FAR(void) ASMPASCAL DetectXMSDriver(VOID);
 int ASMPASCAL init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
 
 void ASMPASCAL init_PSPSet(seg psp_seg);
