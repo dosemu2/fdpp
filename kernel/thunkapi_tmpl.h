@@ -9,7 +9,7 @@ _THUNK_API_3v(pokel, uint16_t, seg, uint16_t, ofs, uint32_t, l);
 _THUNK_API_0(uint16_t, getCS);
 _THUNK_API_0(uint16_t, getSS);
 _THUNK_API_1(void *, short_ptr, uint16_t, offs);
-_THUNK_API_2(struct far_s, mk_dosobj, void *, data, uint16_t, len);
+_THUNK_API_2(far_t, mk_dosobj, void *, data, uint16_t, len);
 _THUNK_API_1(uint32_t, getlong, void *, addr);
 _THUNK_API_1(uint16_t, getword, void *, addr);
 _THUNK_API_1(uint8_t, getbyte, void *, addr);

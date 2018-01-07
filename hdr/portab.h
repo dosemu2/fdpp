@@ -175,14 +175,15 @@ unsigned short getSS(void);
 #elif defined(__GNUC__)
 #include <stdint.h>
 #include <stddef.h>
-#include "farptr.hpp"
 
-#define __DOSFAR(t) struct far_s
-#define _MK_FP(t, f) ((__FAR(t)) MK_FP(f.seg, f.off))
-#define _FP_SEG(f) ((f).seg)
-#define _FP_OFF(f) ((f).off)
-#define _DOS_FP(p) (struct far_s){ FP_OFF(p), FP_SEG(p) }
-#define _MK_DOS_FP(t, seg, off) (struct far_s){ (UWORD)(off), (UWORD)(seg) }
+struct far_s {
+    UWORD off;
+    UWORD seg;
+};
+
+#ifdef __cplusplus
+#include "farptr.hpp"
+#endif
 
 #define VA_CDECL
 UWORD getCS(void);
@@ -198,11 +199,30 @@ void pokew(UWORD seg, UWORD ofs, UWORD w);
 void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
-struct far_s mk_dosobj(void *data, UWORD len);
-#define MK_OFFS(data) (mk_dosobj(data, sizeof(data)).off)
+#define MK_OFFS(data) _FP_OFF(mk_dosobj(data, sizeof(data)))
 #define MK_FAR(data) (mk_dosobj(data, sizeof(data)))
 void disable(void);
 void enable(void);
+
+#ifndef __cplusplus
+typedef void *far_t;
+#define __FAR(t) t FAR *
+#define __ASMFAR(t) t FAR **
+#define __ASMFARREF(f) &f
+#define FP_SEG(fp)            ((unsigned short)((ULONG)(VOID FAR *)(fp)>>16))
+#define FP_OFF(fp)            ((unsigned short)(uintptr_t)(fp))
+#define MK_FP(seg,ofs)        ((__FAR(void))(((ULONG)(seg)<<16)|(UWORD)(ofs)))
+
+#define __DOSFAR(t) t FAR *
+#define _MK_FP(t, f) ((__FAR(t))(f))
+#define _FP_SEG(f) FP_SEG(f)
+#define _FP_OFF(f) FP_OFF(f)
+#define _DOS_FP(p) (p)
+#define _MK_DOS_FP(t, seg, off) (t *)MK_FP(seg, off)
+#else
+typedef struct far_s far_t;
+#endif
+far_t mk_dosobj(void *data, UWORD len);
 
 #define FAR                     /* linear architecture  */
 #define REG

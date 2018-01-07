@@ -1,10 +1,5 @@
 #include <type_traits>
 
-struct far_s {
-    UWORD off;
-    UWORD seg;
-};
-
 template<typename T>
 class FarPtr {
 public:
@@ -52,6 +47,13 @@ public:
 #define FP_SEG(fp)            ((fp).seg())
 #define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
+
+#define __DOSFAR(t) struct far_s
+#define _MK_FP(t, f) ((__FAR(t)) MK_FP(f.seg, f.off))
+#define _FP_SEG(f) ((f).seg)
+#define _FP_OFF(f) ((f).off)
+#define _DOS_FP(p) (struct far_s){ FP_OFF(p), FP_SEG(p) }
+#define _MK_DOS_FP(t, seg, off) (struct far_s){ (UWORD)(off), (UWORD)(seg) }
 
 #undef NULL
 #define NULL           nullptr
