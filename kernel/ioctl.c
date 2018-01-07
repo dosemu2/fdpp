@@ -179,7 +179,7 @@ int DosDevIOctl(lregs * r)
       if (dpbp)
       {
         CharReqHdr.r_unit = dpbp->dpb_subunit;
-        dev = dpbp->dpb_device;
+        dev = _MK_FP(struct dhdr, dpbp->dpb_device);
         attr = dev->dh_attr;
       }
       else

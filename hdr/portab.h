@@ -175,6 +175,17 @@ unsigned short getSS(void);
 #elif defined(__GNUC__)
 #include <stdint.h>
 #include <stddef.h>
+
+struct far_s {
+    UWORD off;
+    UWORD seg;
+};
+#define __DOSFAR(t) struct far_s
+#define _MK_FP(t, f) ((__FAR(t)) MK_FP(f.seg, f.off))
+#define _FP_SEG(f) ((f).seg)
+#define _FP_OFF(f) ((f).off)
+#define _DOS_FP(p) (struct far_s){ FP_OFF(p), FP_SEG(p) }
+
 #define VA_CDECL
 UWORD getCS(void);
 #define _CS getCS()
@@ -196,8 +207,8 @@ void enable(void);
 #define __FAR(t) t FAR *
 #define __ASMFAR(t) t FAR **
 #define __ASMFARREF(f) &f
-#define FP_SEG(fp)            ((unsigned)((ULONG)(VOID FAR *)(fp)>>16))
-#define FP_OFF(fp)            ((uintptr_t)(fp))
+#define FP_SEG(fp)            ((unsigned short)((ULONG)(VOID FAR *)(fp)>>16))
+#define FP_OFF(fp)            ((unsigned short)(uintptr_t)(fp))
 #define MK_FP(seg,ofs)        ((__FAR(void))(((ULONG)(seg)<<16)|(UWORD)(ofs)))
 
 #define FAR                     /* linear architecture  */

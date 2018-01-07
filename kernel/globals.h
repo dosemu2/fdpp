@@ -60,13 +60,13 @@ static BYTE *Globals_hRcsId =
 
 /* fatfs.c */
 #ifdef WITHFAT32
-VOID bpb_to_dpb(bpb FAR * bpbp, REG struct dpb FAR * dpbp, BOOL extended);
+VOID bpb_to_dpb(__FAR(bpb) bpbp, __FAR(REG struct dpb) dpbp, BOOL extended);
 #else
-VOID bpb_to_dpb(bpb FAR * bpbp, REG struct dpb FAR * dpbp);
+VOID bpb_to_dpb(__FAR(bpb) bpbp, __FAR(REG struct dpb) dpbp);
 #endif
 
 #ifdef WITHFAT32
-struct dpb FAR *GetDriveDPB(UBYTE drive, COUNT * rc);
+__FAR(struct dpb) GetDriveDPB(UBYTE drive, COUNT * rc);
 #endif
 
 
@@ -211,7 +211,7 @@ struct lowvec {
 #include "glob_asmdefs.h"
 
 enum {LOC_CONV=0, LOC_HMA=1};
-GLOBAL char FAR *firstAvailableBuf;
+extern __FAR(char) firstAvailableBuf;
 
 struct _FcbSearchBuffer {
   COUNT nDrive;
@@ -279,16 +279,16 @@ intvec getvec(unsigned char);
 UDWORD getlong(VOID *);
 UWORD getword(VOID *);
 UBYTE getbyte(VOID *);
-UDWORD fgetlong(VOID FAR *);
-UWORD fgetword(VOID FAR *);
-UBYTE fgetbyte(VOID FAR *);
-VOID fputlong(VOID FAR *, UDWORD);
-VOID fputword(VOID FAR *, UWORD);
-VOID fputbyte(VOID FAR *, UBYTE);
+UDWORD fgetlong(__FAR(VOID));
+UWORD fgetword(__FAR(VOID));
+UBYTE fgetbyte(__FAR(VOID));
+VOID fputlong(__FAR(VOID), UDWORD);
+VOID fputword(__FAR(VOID), UWORD);
+VOID fputbyte(__FAR(VOID), UBYTE);
 #endif
 
 #ifndef __WATCOMC__
-#define setvec setvec_resident
+//#define setvec setvec_resident
 #endif
 void setvec(unsigned char intno, intvec vector);
 /*#define is_leap_year(y) ((y) & 3 ? 0 : (y) % 100 ? 1 : (y) % 400 ? 0 : 1) */

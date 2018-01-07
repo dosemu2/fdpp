@@ -404,7 +404,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     cp[MAX_CDSPATH - 1] = '\0';
     if ((TempCDS.cdsFlags & CDSNETWDRV) == 0)
     {
-      if (media_check(TempCDS.cdsDpb) < 0)
+      if (media_check(_MK_FP(struct dpb, TempCDS.cdsDpb)) < 0)
         return DE_PATHNOTFND;
 
       /* dos_cd ensures that the path exists; if not, we

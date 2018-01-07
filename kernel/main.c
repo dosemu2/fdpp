@@ -366,9 +366,9 @@ STATIC VOID FsConfig(VOID)
 
     if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
     {
-      pcds_table->cdsDpb = dpb;
+      pcds_table->cdsDpb = _DOS_FP(dpb);
       pcds_table->cdsFlags = CDSPHYSDRV;
-      dpb = dpb->dpb_next;
+      dpb = _MK_FP(struct dpb, dpb->dpb_next);
     }
     else
     {
@@ -505,29 +505,30 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; (ULONG) _dpb->dpb_next != 0xffffffffl;
-         _dpb = _dpb->dpb_next)
+    for (_dpb = LoL->_DPBp; (ULONG) _MK_FP(struct dpb, _dpb->dpb_next) != 0xffffffffl;
+         _dpb = _MK_FP(struct dpb, _dpb->dpb_next))
       ;
-    _dpb = _dpb->dpb_next = (struct dpb FAR *)
+    _dpb = (struct dpb FAR *)
       KernelAlloc(nunits * sizeof(struct dpb), 'E', Config.cfgDosDataUmb);
+    _dpb->dpb_next = _DOS_FP(_dpb);
   }
 
   for (Index = 0; Index < nunits; Index++)
   {
-    _dpb->dpb_next = _dpb + 1;
+    _dpb->dpb_next = _DOS_FP(_dpb + 1);
     _dpb->dpb_unit = LoL->_nblkdev;
     _dpb->dpb_subunit = Index;
-    _dpb->dpb_device = dhp;
+    _dpb->dpb_device = _DOS_FP(dhp);
     _dpb->dpb_flags = M_CHANGED;
     if ((LoL->_CDSp != 0) && (LoL->_nblkdev < LoL->_lastdrive))
     {
-      LoL->_CDSp[LoL->_nblkdev].cdsDpb = _dpb;
+      LoL->_CDSp[LoL->_nblkdev].cdsDpb = _DOS_FP(_dpb);
       LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
     }
     ++_dpb;
     ++LoL->_nblkdev;
   }
-  (_dpb - 1)->dpb_next = (struct dpb FAR *)0xFFFFFFFFl;
+  (_dpb - 1)->dpb_next = _DOS_FP((struct dpb FAR *)0xFFFFFFFFl);
 }
 
 /* If cmdLine is NULL, this is an internal driver */
@@ -597,7 +598,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
     /*   the used.  It is recommended that all the device drivers in   */
     /*   the file return the same address                              */
 
-    if (FP_OFF(dhp->dh_next) == 0xffff)
+    if (_FP_OFF(dhp->dh_next) == 0xffff)
     {
       KernelAllocPara(FP_SEG(rq.r_endaddr) + (FP_OFF(rq.r_endaddr) + 15)/16
                       - FP_SEG(dhp), 'D', name, mode);
@@ -634,7 +635,7 @@ STATIC void InitIO(void)
   /* Initialize driver chain                                      */
   do {
     init_device(device, NULL, 0, &lpTop);
-    device = device->dh_next;
+    device = _MK_FP(struct dhdr, device->dh_next);
   }
   while (FP_OFF(device) != 0xffff);
 }

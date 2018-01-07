@@ -49,12 +49,11 @@ struct dpb {
   UWORD dpb_size;               /* # of clusters+1 on media     */
   UWORD dpb_fatsize;            /* # of sectors / FAT           */
   UWORD dpb_dirstrt;            /* start sec. of root dir       */
-  struct dhdr FAR *             /* pointer to device header     */
-    dpb_device;
+  __DOSFAR(struct dhdr)dpb_device;  /* pointer to device header     */
   UBYTE dpb_mdb;                /* media descr. byte            */
   BYTE dpb_flags;               /* -1 = force MEDIA CHK         */
-  struct dpb FAR *              /* next dpb in chain            */
-    dpb_next;                   /* -1 = end                     */
+  __DOSFAR(struct dpb)dpb_next; /* next dpb in chain            */
+                                /* -1 = end                     */
   UWORD dpb_cluster;            /* cluster # of first free      */
   /* -1 if not known              */
 #ifndef WITHFAT32

@@ -114,8 +114,7 @@
 /* Device header */
 
 struct dhdr {
-  struct dhdr
-  FAR *dh_next;
+  __DOSFAR(struct dhdr)dh_next;
   UWORD dh_attr;
     VOID(*dh_strategy) (void);
     VOID(*dh_interrupt) (void);
@@ -491,10 +490,10 @@ WORD ASMCFUNC FAR clk_driver(rqptr rp);
 
 /* execrh.asm */
 #if defined(__WATCOMC__) && _M_IX86 >= 300
-WORD execrh(request FAR *, struct dhdr FAR *);
+WORD execrh(__FAR(request), __FAR(struct dhdr));
 #pragma aux execrh "^" parm reverse routine [] modify [ax bx cx dx es fs gs]
 #else
-WORD ASMPASCAL execrh(request FAR *, struct dhdr FAR *);
+WORD ASMPASCAL execrh(__FAR(request), __FAR(struct dhdr));
 #endif
 
 /*

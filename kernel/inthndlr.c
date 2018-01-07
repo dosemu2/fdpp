@@ -43,6 +43,7 @@ STATIC bTraceNext = FALSE;
 #endif
 
 BYTE ReturnAnyDosVersionExpected;
+char FAR *firstAvailableBuf;
 
 #if 0                           /* Very suspicious, passing structure by value??
                                    Deactivated -- 2000/06/16 ska */
@@ -142,8 +143,8 @@ VOID ASMCFUNC int21_syscall(iregs FAR * irp)
 
           /* Get DOS-C release string pointer                     */
         case 0xff:
-          irp->DX = FP_SEG(os_release);
-          irp->AX = FP_OFF(os_release);
+          irp->DX = FP_SEG((CONST BYTE FAR *)os_release);
+          irp->AX = FP_OFF((CONST BYTE FAR *)os_release);
       }
       break;
 
@@ -816,8 +817,8 @@ dispatch:
 */
       /* Get InDOS flag                                               */
     case 0x34:
-      lr.BX = FP_OFF(&InDOS);
-      lr.ES = FP_SEG(&InDOS);
+      lr.BX = FP_OFF((BYTE FAR *)&InDOS);
+      lr.ES = FP_SEG((BYTE FAR *)&InDOS);
       break;
 
       /* Get Interrupt Vector                                         */
@@ -1116,8 +1117,8 @@ dispatch:
       /* ************UNDOCUMENTED************************************* */
       /* Get List of Lists                                            */
     case 0x52:
-      lr.BX = FP_OFF(&DPBp);
-      lr.ES = FP_SEG(&DPBp);
+      lr.BX = FP_OFF((struct dpb FAR *)&DPBp);
+      lr.ES = FP_SEG((struct dpb FAR *)&DPBp);
       break;
 
     case 0x53:
@@ -1249,8 +1250,8 @@ dispatch:
           goto dispatch;
 
         case 0x06:
-          lr.DS = FP_SEG(internal_data);
-          lr.SI = FP_OFF(internal_data);
+          lr.DS = FP_SEG((BYTE FAR *)internal_data);
+          lr.SI = FP_OFF((BYTE FAR *)internal_data);
           lr.CX = swap_indos - internal_data;
           lr.DX = swap_always - internal_data;
           CLEAR_CARRY_FLAG();
@@ -1307,7 +1308,7 @@ dispatch:
         if (lr.DL < lastdrive)
         {
           struct cds FAR *cdsp = CDSp + lr.DL;
-          if (FP_OFF(cdsp->cdsDpb))     /* letter of physical drive?    */
+          if (_FP_OFF(cdsp->cdsDpb))     /* letter of physical drive?    */
           {
             cdsp->cdsFlags &= ~CDSPHYSDRV;
             if (lr.AL == 7)
@@ -1748,7 +1749,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
       break;
 
     case 0x03:                 /* get DOS data segment */
-      r.DS = FP_SEG(&nul_dev);
+      r.DS = FP_SEG((struct dhdr FAR *)&nul_dev);
       break;
 
     case 0x06:                 /* invoke critical error */
@@ -1776,7 +1777,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
       r.AL = CriticalError(0x38, /* ignore/retry/fail - based on RBIL possible return values */
                            default_drive,
                            r.callerARG1, /* error, from RBIL passed on stack */
-                           CDSp[(WORD)default_drive].cdsDpb->dpb_device);
+                           _MK_FP(struct dhdr,
+                           _MK_FP(struct dpb, CDSp[(WORD)default_drive].cdsDpb)->dpb_device));
       r.FLAGS |= FLG_CARRY;
       if (r.AL == 1) r.FLAGS &= ~FLG_CARRY;  /* carry clear if should retry */
       break;
@@ -1793,7 +1795,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
           r.AL = CriticalError(0x38, /* ignore/retry/fail - ??? */
                                default_drive,
                                r.callerARG1, /* error, from RBIL passed on stack */
-                               CDSp[(WORD)default_drive].cdsDpb->dpb_device);
+                               _MK_FP(struct dhdr,
+                               _MK_FP(struct dpb, CDSp[(WORD)default_drive].cdsDpb)->dpb_device));
           /* clear carry if should retry */
           if (r.AL == 1) r.FLAGS &= ~FLG_CARRY;
         }
@@ -2032,8 +2035,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
                                    Return Null Device Pointer          */
       /* by UDOS+RBIL: get header of SECOND device driver in device chain,
          omitting the NUL device TE */
-      r.BX = FP_SEG(nul_dev.dh_next);
-      r.AX = FP_OFF(nul_dev.dh_next);
+      r.BX = _FP_SEG(nul_dev.dh_next);
+      r.AX = _FP_OFF(nul_dev.dh_next);
       break;
 
     case 0x2d:                 /* Get Extended Error Code */

@@ -420,7 +420,7 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
     IoReqHdr.r_status = 0;
     IoReqHdr.r_meddesc = dpbp->dpb_mdb;
     IoReqHdr.r_count = numblocks;
-    if ((dpbp->dpb_device->dh_attr & ATTR_HUGE) || blkno >= MAXSHORT)
+    if ((_MK_FP(struct dhdr, dpbp->dpb_device)->dh_attr & ATTR_HUGE) || blkno >= MAXSHORT)
     {
       IoReqHdr.r_start = HUGECOUNT;
       IoReqHdr.r_huge = blkno;
@@ -437,14 +437,14 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
       IoReqHdr.r_trans = (BYTE FAR *)deblock_buf;
       if (mode == DSKWRITE)
         fmemcpy(deblock_buf, buf, dpbp->dpb_secsize);
-      execrh((request FAR *) & IoReqHdr, dpbp->dpb_device);
+      execrh((request FAR *) & IoReqHdr, _MK_FP(struct dhdr, dpbp->dpb_device));
       if (mode == DSKREAD)
         fmemcpy(buf, deblock_buf, dpbp->dpb_secsize);
     }
     else
     {
       IoReqHdr.r_trans = (BYTE FAR *) buf;
-      execrh((request FAR *) & IoReqHdr, dpbp->dpb_device);
+      execrh((request FAR *) & IoReqHdr, _MK_FP(struct dhdr, dpbp->dpb_device));
     }
     if ((IoReqHdr.r_status & (S_ERROR | S_DONE)) == S_DONE)
       break;
@@ -460,7 +460,7 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
       return (IoReqHdr.r_status);
 
   loop:
-    switch (block_error(&IoReqHdr, dpbp->dpb_unit, dpbp->dpb_device, mode))
+    switch (block_error(&IoReqHdr, dpbp->dpb_unit, _MK_FP(struct dhdr, dpbp->dpb_device), mode))
     {
       case ABORT:
       case FAIL:

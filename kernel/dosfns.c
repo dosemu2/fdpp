@@ -61,7 +61,7 @@ struct cds FAR *get_cds(unsigned drive)
   /* Entry is disabled or JOINed drives are accessable by the path only */
   if (!(flags & CDSVALID) || (flags & CDSJOINED) != 0)
     return NULL;
-  if (!(flags & CDSNETWDRV) && cdsp->cdsDpb == NULL)
+  if (!(flags & CDSNETWDRV) && _MK_FP(struct dpb, cdsp->cdsDpb) == NULL)
     return NULL;
   return cdsp;
 }
@@ -734,7 +734,7 @@ UWORD DosGetFree(UBYTE drive, UWORD * navc, UWORD * bps, UWORD * nc)
     return spc;
   }
 
-  dpbp = cdsp->cdsDpb;
+  dpbp = _MK_FP(struct dpb, cdsp->cdsDpb);
   if (dpbp == NULL)
     return spc;
 
@@ -1277,7 +1277,7 @@ struct dhdr FAR *IsDevice(const char FAR * fname)
 
   /* cycle through all device headers checking for match */
   for (dhp = (struct dhdr FAR *)&nul_dev; dhp != (struct dhdr FAR *)MK_FP(-1, -1);
-       dhp = dhp->dh_next)
+       dhp = _MK_FP(struct dhdr, dhp->dh_next))
   {
     if (!(dhp->dh_attr & ATTR_CHAR))  /* if this is block device, skip */
       continue;

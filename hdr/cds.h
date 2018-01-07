@@ -32,10 +32,10 @@
 struct cds {
   BYTE cdsCurrentPath[MAX_CDSPATH];
   UWORD cdsFlags;           /* see below */
-  struct dpb FAR *cdsDpb;   /* if != 0, associated DPB */
+  __DOSFAR(struct dpb)cdsDpb;   /* if != 0, associated DPB */
 
   union {
-    BYTE FAR *_cdsRedirRec; /* IFS record */
+    __DOSFAR(BYTE)_cdsRedirRec; /* IFS record */
     struct {
       UWORD _cdsStrtClst;   /* if local path (Flags & CDSPHYSDRV):
                                start cluster of CWD; root == 0,
@@ -56,7 +56,7 @@ struct cds {
                            */
 
   BYTE cdsNetFlag1;        /* According to PCDOS 7 Tech Ref: IFS drive, 2=IFS, 4=NetUse */
-  BYTE FAR *cdsIfs;        /* Pointer to Installable File System Header */
+  __DOSFAR(BYTE)cdsIfs;        /* Pointer to Installable File System Header */
   UWORD cdsNetFlags2;      /* File System specific data */
 
 };

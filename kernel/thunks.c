@@ -13,10 +13,6 @@ struct asm_dsc_s {
 };
 static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
-struct far_s {
-    UWORD off;
-    UWORD seg;
-};
 static void fdprintf(const char *format, ...);
 
 void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
