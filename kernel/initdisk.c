@@ -539,7 +539,7 @@ STATIC void push_ddt(ddt *pddt)
   ddt FAR *fddt = (ddt FAR *)DynAlloc("ddt", 1, sizeof(ddt));
   fmemcpy(fddt, pddt, sizeof(ddt));
   if (pddt->ddt_logdriveno != 0) {
-    (fddt - 1)->ddt_next = fddt;
+    (fddt - 1)->ddt_next = _DOS_FP(fddt);
     if (pddt->ddt_driveno == 0 && pddt->ddt_logdriveno == 1)
       (fddt - 1)->ddt_descflags |= DF_CURLOG | DF_MULTLOG;
   }
@@ -559,7 +559,7 @@ void DosDefinePartition(struct DriveParamS *driveParam,
     return;                     /* we are done */
   }
 
-  pddt->ddt_next = (struct ddtstruct FAR *)MK_FP(0, 0xffff);
+  pddt->ddt_next = _MK_DOS_FP(struct ddtstruct, 0, 0xffff);
   pddt->ddt_driveno = driveParam->driveno;
   pddt->ddt_logdriveno = nUnits;
   pddt->ddt_descflags = driveParam->descflags;
@@ -676,8 +676,8 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
   memset(&lba_bios_parameters, 0, sizeof(lba_bios_parameters));
   lba_bios_parameters.size = sizeof(lba_bios_parameters);
 
-  regs.si = FP_OFF(&lba_bios_parameters);
-  regs.ds = FP_SEG(&lba_bios_parameters);
+  regs.si = FP_OFF((struct _bios_LBA_disk_parameterS FAR *)&lba_bios_parameters);
+  regs.ds = FP_SEG((struct _bios_LBA_disk_parameterS FAR *)&lba_bios_parameters);
   regs.a.b.h = 0x48;
   regs.d.b.l = drive;
   init_call_intr(0x13, &regs);
@@ -986,14 +986,14 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         (InitKernelConfig.ForceLBA || ExtLBAForce || chs.Cylinder > 1023))
     {
       dap.number_of_blocks = 1;
-      dap.buffer_address = (UBYTE FAR *)buffer;
+      dap.buffer_address = _DOS_FP((UBYTE FAR *)buffer);
       dap.block_address_high = 0;       /* clear high part */
       dap.block_address = LBA_address;  /* clear high part */
 
       /* Load the registers and call the interrupt. */
       regs.a.x = LBA_READ;
-      regs.si = FP_OFF(&dap);
-      regs.ds = FP_SEG(&dap);
+      regs.si = FP_OFF((struct _bios_LBA_disk_parameterS FAR *)&dap);
+      regs.ds = FP_SEG((struct _bios_LBA_disk_parameterS FAR *)&dap);
     }
     else
     {                           /* transfer data, using old bios functions */
@@ -1006,12 +1006,12 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
       }
 
       regs.a.x = 0x0201;
-      regs.b.x = FP_OFF(buffer);
+      regs.b.x = FP_OFF((void FAR *)buffer);
       regs.c.x =
           ((chs.Cylinder & 0xff) << 8) + ((chs.Cylinder & 0x300) >> 2) +
           chs.Sector;
       regs.d.b.h = chs.Head;
-      regs.es = FP_SEG(buffer);
+      regs.es = FP_SEG((void FAR *)buffer);
     }                           /* end of retries */
     init_call_intr(0x13, &regs);
     if ((regs.flags & FLG_CARRY) == 0)
@@ -1244,7 +1244,7 @@ I don't know, if I did it right, but I tried to do it that way. TE
 
 STATIC void make_ddt (ddt *pddt, int Unit, int driveno, int flags)
 {
-  pddt->ddt_next = (struct ddtstruct FAR *)MK_FP(0, 0xffff);
+  pddt->ddt_next = _MK_DOS_FP(struct ddtstruct, 0, 0xffff);
   pddt->ddt_logdriveno = Unit;
   pddt->ddt_driveno = driveno;
   pddt->ddt_type = init_getdriveparm(driveno, &pddt->ddt_defbpb);

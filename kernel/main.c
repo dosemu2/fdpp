@@ -241,21 +241,21 @@ STATIC void setup_int_vectors(void)
   } vectors[] =
     {
       /* all of these are in the DOS DS */
-      { 0x0, FP_OFF(int0_handler) },   /* zero divide */
-      { 0x1, FP_OFF(empty_handler) },  /* single step */
-      { 0x3, FP_OFF(empty_handler) },  /* debug breakpoint */
-      { 0x6, FP_OFF(int6_handler) },   /* invalid opcode */
-      { 0x19, FP_OFF(int19_handler) },
-      { 0x20, FP_OFF(int20_handler) },
-      { 0x21, FP_OFF(int21_handler) },
-      { 0x22, FP_OFF(int22_handler) },
-      { 0x24, FP_OFF(int24_handler) },
-      { 0x25, FP_OFF(low_int25_handler) },
-      { 0x26, FP_OFF(low_int26_handler) },
-      { 0x27, FP_OFF(int27_handler) },
-      { 0x28, FP_OFF(int28_handler) },
-      { 0x2a, FP_OFF(int2a_handler) },
-      { 0x2f, FP_OFF(int2f_handler) }
+      { 0x0, FP_OFF((intvec)int0_handler) },   /* zero divide */
+      { 0x1, FP_OFF((intvec)empty_handler) },  /* single step */
+      { 0x3, FP_OFF((intvec)empty_handler) },  /* debug breakpoint */
+      { 0x6, FP_OFF((intvec)int6_handler) },   /* invalid opcode */
+      { 0x19, FP_OFF((intvec)int19_handler) },
+      { 0x20, FP_OFF((intvec)int20_handler) },
+      { 0x21, FP_OFF((intvec)int21_handler) },
+      { 0x22, FP_OFF((intvec)int22_handler) },
+      { 0x24, FP_OFF((intvec)int24_handler) },
+      { 0x25, FP_OFF((intvec)low_int25_handler) },
+      { 0x26, FP_OFF((intvec)low_int26_handler) },
+      { 0x27, FP_OFF((intvec)int27_handler) },
+      { 0x28, FP_OFF((intvec)int28_handler) },
+      { 0x2a, FP_OFF((intvec)int2a_handler) },
+      { 0x2f, FP_OFF((intvec)int2f_handler) }
     };
   struct vec *pvec;
   struct lowvec FAR *plvec;
@@ -267,7 +267,7 @@ STATIC void setup_int_vectors(void)
     setvec(i, empty_handler);
   HaltCpuWhileIdle = 0;
   for (pvec = vectors; pvec < vectors + (sizeof vectors/sizeof *pvec); pvec++)
-    setvec(pvec->intno, (intvec)MK_FP(FP_SEG(empty_handler), pvec->handleroff));
+    setvec(pvec->intno, (intvec)MK_FP(FP_SEG((intvec)empty_handler), pvec->handleroff));
   pokeb(0, 0x30 * 4, 0xea);
   pokel(0, 0x30 * 4 + 1, (ULONG)cpm_entry);
 
@@ -290,7 +290,7 @@ STATIC void init_kernel(void)
 #ifdef __WATCOMC__
   lpTop = MK_FP(_CS, 0);
 #else
-  lpTop = (BYTE FAR *)MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
+  lpTop = (BYTE FAR *)MK_FP(_CS - (FP_OFF((BYTE FAR *)_HMATextEnd) + 15) / 16, 0);
 #endif
 
   MoveKernel(FP_SEG(lpTop));
@@ -364,7 +364,7 @@ STATIC VOID FsConfig(VOID)
 
     pcds_table->cdsCurrentPath[0] += i;
 
-    if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
+    if (i < LoL->_nblkdev && dpb != MK_FP(-1, -1))
     {
       pcds_table->cdsDpb = _DOS_FP(dpb);
       pcds_table->cdsFlags = CDSPHYSDRV;
@@ -437,7 +437,7 @@ STATIC VOID signon()
   " - FAT32 support"
 #endif
   "\n\n%s",
-         MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release)),
+         MK_FP(FP_SEG((struct lol FAR *)LoL), FP_OFF((char FAR *)LoL->_os_release)),
          MAJOR_RELEASE, MINOR_RELEASE, copyright);
 }
 
@@ -505,7 +505,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; (ULONG) _MK_FP(struct dpb, _dpb->dpb_next) != 0xffffffffl;
+    for (_dpb = LoL->_DPBp; _MK_FP(struct dpb, _dpb->dpb_next) != MK_FP(-1, -1);
          _dpb = _MK_FP(struct dpb, _dpb->dpb_next))
       ;
     _dpb = (struct dpb FAR *)
@@ -528,7 +528,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     ++_dpb;
     ++LoL->_nblkdev;
   }
-  (_dpb - 1)->dpb_next = _DOS_FP((struct dpb FAR *)0xFFFFFFFFl);
+  (_dpb - 1)->dpb_next = _MK_DOS_FP(struct dpb, -1, -1);
 }
 
 /* If cmdLine is NULL, this is an internal driver */
@@ -566,8 +566,8 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_status = 0;
   rq.r_command = C_INIT;
   rq.r_length = sizeof(request);
-  rq.r_endaddr = *r_top;
-  rq.r_bpbptr = (bpb FAR **)(cmdLine ? cmdLine : "\n");  // XXX is typecase correct?
+  rq.r_endaddr = _DOS_FP((char FAR *)*r_top);
+  rq.r_bpbptr = _DOS_FP((bpb FAR **)(void *)(cmdLine ? cmdLine : "\n"));  // XXX is typecase correct?
   rq.r_firstunit = LoL->_nblkdev;
 
   execrh((request FAR *) & rq, dhp);
@@ -581,13 +581,13 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   if (cmdLine)
   {
     /* Don't link in device drivers which do not take up memory */
-    if (rq.r_endaddr == (BYTE FAR *) dhp)
+    if (_MK_FP(BYTE, rq.r_endaddr) == (BYTE FAR *) dhp)
       return TRUE;
 
     /* Don't link in block device drivers which indicate no units */
     if (!(dhp->dh_attr & ATTR_CHAR) && !rq.r_nunits)
     {
-      rq.r_endaddr = (BYTE FAR *) dhp;
+      rq.r_endaddr = _DOS_FP((BYTE FAR *) dhp);
       return TRUE;
     }
 
@@ -600,7 +600,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
 
     if (_FP_OFF(dhp->dh_next) == 0xffff)
     {
-      KernelAllocPara(FP_SEG(rq.r_endaddr) + (FP_OFF(rq.r_endaddr) + 15)/16
+      KernelAllocPara(_FP_SEG(rq.r_endaddr) + (_FP_OFF(rq.r_endaddr) + 15)/16
                       - FP_SEG(dhp), 'D', name, mode);
     }
 

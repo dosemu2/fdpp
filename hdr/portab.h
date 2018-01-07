@@ -175,11 +175,8 @@ unsigned short getSS(void);
 #elif defined(__GNUC__)
 #include <stdint.h>
 #include <stddef.h>
+#include "farptr.hpp"
 
-struct far_s {
-    UWORD off;
-    UWORD seg;
-};
 #define __DOSFAR(t) struct far_s
 #define _MK_FP(t, f) ((__FAR(t)) MK_FP(f.seg, f.off))
 #define _FP_SEG(f) ((f).seg)
@@ -206,13 +203,6 @@ struct far_s mk_dosobj(void *data, UWORD len);
 #define MK_FAR(data) (mk_dosobj(data, sizeof(data)))
 void disable(void);
 void enable(void);
-
-#define __FAR(t) t FAR *
-#define __ASMFAR(t) t FAR **
-#define __ASMFARREF(f) &f
-#define FP_SEG(fp)            ((unsigned short)((ULONG)(VOID FAR *)(fp)>>16))
-#define FP_OFF(fp)            ((unsigned short)(uintptr_t)(fp))
-#define MK_FP(seg,ofs)        ((__FAR(void))(((ULONG)(seg)<<16)|(UWORD)(ofs)))
 
 #define FAR                     /* linear architecture  */
 #define REG
@@ -362,7 +352,7 @@ typedef signed long LONG;
 #define FP_OFF(fp)             ((size_t)(fp))
 #endif
 
-typedef __FAR(VOID ASMCFUNC) intvec;
+typedef __FAR_FUNC(VOID, VOID) intvec;
 
 #define MK_PTR(type,seg,ofs) ((type FAR*) MK_FP (seg, ofs))
 #if __TURBOC__ > 0x202

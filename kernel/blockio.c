@@ -434,7 +434,7 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
      */
     if (FP_SEG(buf) >= 0xa000 && numblocks == 1 && bufloc != LOC_CONV)
     {
-      IoReqHdr.r_trans = (BYTE FAR *)deblock_buf;
+      IoReqHdr.r_trans = _DOS_FP((BYTE FAR *)deblock_buf);
       if (mode == DSKWRITE)
         fmemcpy(deblock_buf, buf, dpbp->dpb_secsize);
       execrh((request FAR *) & IoReqHdr, _MK_FP(struct dhdr, dpbp->dpb_device));
@@ -443,7 +443,7 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
     }
     else
     {
-      IoReqHdr.r_trans = (BYTE FAR *) buf;
+      IoReqHdr.r_trans = _DOS_FP((BYTE FAR *) buf);
       execrh((request FAR *) & IoReqHdr, _MK_FP(struct dhdr, dpbp->dpb_device));
     }
     if ((IoReqHdr.r_status & (S_ERROR | S_DONE)) == S_DONE)

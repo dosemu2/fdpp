@@ -190,7 +190,7 @@ struct _bios_LBA_address_packet
   unsigned char reserved_1;     /* set to 0...unused                */
   unsigned char number_of_blocks;       /* 0 < number_of_blocks < 128       */
   unsigned char reserved_2;     /* set to 0...unused                */
-  UBYTE FAR *buffer_address;    /* addr of transfer buffer          */
+  __DOSFAR(UBYTE)buffer_address;    /* addr of transfer buffer          */
   unsigned long block_address;  /* LBA address                      */
   unsigned long block_address_high;     /* high bytes of LBA addr...unused  */
 };
@@ -203,7 +203,7 @@ struct CHS {
 
 /* DOS 4.0-7.0 drive data table (see RBIL at INT2F,AX=0803) */
 typedef struct ddtstruct {
-  struct ddtstruct FAR *ddt_next;
+  __DOSFAR(struct ddtstruct)ddt_next;
   /* pointer to next table (offset FFFFh if last table) */
   UBYTE ddt_driveno;            /* physical unit number (for INT 13)     */
   UBYTE ddt_logdriveno;         /* logical drive number (0=A:)        */
@@ -280,7 +280,7 @@ struct gblkrw                   /* for read / write track */
   UWORD gbrw_cyl;
   UWORD gbrw_sector;
   UWORD gbrw_nsecs;
-  UBYTE FAR *gbrw_buffer;
+  __DOSFAR(UBYTE)gbrw_buffer;
 };
 
 struct Gioc_media {
@@ -340,26 +340,26 @@ typedef struct {
   union {
     struct {
       UBYTE _r_nunits;          /*  number of units     */
-      BYTE FAR *_r_endaddr;     /*  Ending Address      */
-      bpb *FAR * _r_bpbptr;     /*  ptr to BPB array    */
+      __DOSFAR(BYTE)_r_endaddr;     /*  Ending Address      */
+      __DOSFAR(bpb *)_r_bpbptr;     /*  ptr to BPB array    */
       UBYTE _r_firstunit;
     } _r_init;
     struct {
       BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       BYTE _r_retcode;          /*  Return Code         */
-      BYTE FAR * _r_vid;        /* volume id */
+      __DOSFAR(BYTE) _r_vid;        /* volume id */
     } _r_media;
     struct {
       BYTE _r_meddesc;          /*  MEDIA Descriptor    */
-      boot FAR * _r_fat;        /*  boot sector pointer */
-      bpb FAR * _r_bpbpt;       /*  ptr to BPB table    */
+      __DOSFAR(boot) _r_fat;        /*  boot sector pointer */
+      __DOSFAR(bpb) _r_bpbpt;       /*  ptr to BPB table    */
     } _r_bpb;
     struct {
       BYTE _r_meddesc;          /*  MEDIA Descriptor    */
-      BYTE FAR * _r_trans;      /*  Transfer Address    */
+      __DOSFAR(BYTE) _r_trans;      /*  Transfer Address    */
       UWORD _r_count;           /*  Byte/Sector Count   */
       UWORD _r_start;           /*  Starting Sector No. */
-      BYTE FAR * _r_vid;        /* Pointer to volume id */
+      __DOSFAR(BYTE) _r_vid;        /* Pointer to volume id */
       LONG _r_huge;             /* for > 32Mb drives    */
     } _r_rw;
     struct {
@@ -372,11 +372,11 @@ typedef struct {
       UWORD _r_di;              /* (PC DOS 7 Technical Update, pp 104,105) */
       union
       {
-        struct gblkio FAR *_r_io;
-        struct gblkrw FAR *_r_rw;
-        struct gblkfv FAR *_r_fv;
-        struct Gioc_media FAR *_r_gioc;
-        struct Access_info FAR *_r_ai;
+        __DOSFAR(struct gblkio)_r_io;
+        __DOSFAR(struct gblkrw)_r_rw;
+        __DOSFAR(struct gblkfv)_r_fv;
+        __DOSFAR(struct Gioc_media)_r_gioc;
+        __DOSFAR(struct Access_info)_r_ai;
       } _r_par;                 /* Pointer to param. block from 440C/440D */
     } _r_gen;
   } _r_x;
@@ -473,18 +473,18 @@ typedef struct {
 
 /*
  */
-typedef request FAR *rqptr;
-typedef bpb FAR *bpbptr;
-typedef BYTE FAR *byteptr;
-typedef struct dhdr FAR *dhdrptr;
+typedef __FAR(request)rqptr;
+typedef __FAR(bpb)bpbptr;
+typedef __FAR(BYTE)byteptr;
+typedef __FAR(struct dhdr)dhdrptr;
 
 /* dsk.c */
 COUNT ASMCFUNC FAR blk_driver(rqptr rp);
 ddt * getddt(int dev);
 
 /* error.c */
-COUNT char_error(request * rq, struct dhdr FAR * lpDevice);
-COUNT block_error(request * rq, COUNT nDrive, struct dhdr FAR * lpDevice, int mode);
+COUNT char_error(request * rq, __FAR(struct dhdr) lpDevice);
+COUNT block_error(request * rq, COUNT nDrive, __FAR(struct dhdr) lpDevice, int mode);
 /* sysclk.c */
 WORD ASMCFUNC FAR clk_driver(rqptr rp);
 

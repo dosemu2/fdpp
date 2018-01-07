@@ -157,7 +157,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
   /* Get the SFT block that contains the SFT      */
   sft FAR *s = idx_to_sft(sft_idx);
 
-  if (FP_OFF(s) == (size_t) - 1)
+  if (FP_OFF(s) == (UWORD) - 1)
   {
     return DE_INVLDHNDL;
   }
@@ -255,7 +255,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
 COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
 {
   sft FAR *s = idx_to_sft(sft_idx);
-  if (FP_OFF(s) == (size_t) -1)
+  if (FP_OFF(s) == (UWORD) -1)
     return DE_INVLDHNDL;
 
   /* Test for invalid mode                        */
@@ -631,7 +631,7 @@ COUNT DosCloseSft(int sft_idx, BOOL commitonly)
   sft FAR *sftp = idx_to_sft(sft_idx);
   int result;
 
-  if (FP_OFF(sftp) == (size_t) - 1)
+  if (FP_OFF(sftp) == (UWORD) - 1)
     return DE_INVLDHNDL;
 
   lpCurSft = sftp;
@@ -683,7 +683,7 @@ COUNT DosClose(COUNT hndl)
   psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
   int sft_idx = get_sft_idx(hndl);
 
-  if (FP_OFF(idx_to_sft(sft_idx)) == (size_t) - 1)
+  if (FP_OFF(idx_to_sft(sft_idx)) == (UWORD) - 1)
     return DE_INVLDHNDL;
 
   /* We must close the (valid) file handle before any critical error */
@@ -1033,7 +1033,7 @@ COUNT DosGetFtime(COUNT hndl, date * dp, time * tp)
   sft FAR *s;
 
   /* Get the SFT block that contains the SFT      */
-  if (FP_OFF(s = get_sft(hndl)) == (size_t) - 1)
+  if (FP_OFF(s = get_sft(hndl)) == (UWORD) - 1)
     return DE_INVLDHNDL;
 
   *dp = s->sft_date;
@@ -1046,7 +1046,7 @@ COUNT DosSetFtimeSft(int sft_idx, date dp, time tp)
   /* Get the SFT block that contains the SFT      */
   sft FAR *s = idx_to_sft(sft_idx);
 
-  if (FP_OFF(s) == (size_t) - 1)
+  if (FP_OFF(s) == (UWORD) - 1)
     return DE_INVLDHNDL;
 
   /* If SFT entry refers to a device, do nothing */
@@ -1213,7 +1213,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
   sft FAR *s;
 
   /* Get the SFT block that contains the SFT      */
-  if (FP_OFF(s = get_sft(hndl)) == (size_t) - 1)
+  if (FP_OFF(s = get_sft(hndl)) == (UWORD) - 1)
     return DE_INVLDHNDL;
 
   if (s->sft_flags & SFT_FSHARED)

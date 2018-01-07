@@ -465,7 +465,7 @@ STATIC WORD bldbpb(rqptr rp, ddt * pddt)
   if ((result = getbpb(pddt)) != 0)
     return result;
 
-  rp->r_bpptr = &pddt->ddt_bpb;
+  rp->r_bpptr = _DOS_FP((bpb FAR *)&pddt->ddt_bpb);
   return S_DONE;
 }
 
@@ -952,7 +952,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
                  UWORD * transferred)
 {
   static struct _bios_LBA_address_packet dap = {
-    16, 0, 0, 0, NULL, 0, 0
+    16, 0, 0, 0, _DOS_FP((UBYTE FAR *)NULL), 0, 0
   };
 
   unsigned count;
@@ -1020,7 +1020,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
       {
         dap.number_of_blocks = count;
 
-        dap.buffer_address = (UBYTE FAR *)transfer_address;
+        dap.buffer_address = _DOS_FP((UBYTE FAR *)transfer_address);
 
         dap.block_address_high = 0;     /* clear high part */
         dap.block_address = LBA_address;        /* clear high part */

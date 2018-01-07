@@ -88,7 +88,7 @@ ULONG SftGetFsize(int sft_idx)
   sft FAR *s = idx_to_sft(sft_idx);
 
   /* Get the SFT block that contains the SFT      */
-  if (FP_OFF(s) == (size_t) -1)
+  if (FP_OFF(s) == (UWORD) -1)
     return DE_INVLDHNDL;
 
   return s->sft_size;

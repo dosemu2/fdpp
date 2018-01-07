@@ -486,7 +486,7 @@ void ASMPASCAL set_DTA(void FAR *_dta);
 WORD ASMPASCAL execrh(__FAR(request),__FAR(struct dhdr));
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
-__FAR(void) ASMPASCAL DetectXMSDriver(VOID);
+void FAR * ASMPASCAL DetectXMSDriver(VOID);
 int ASMPASCAL init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
 
 void ASMPASCAL init_PSPSet(seg psp_seg);

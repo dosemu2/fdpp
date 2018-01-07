@@ -242,12 +242,12 @@ int DosDevIOctl(lregs * r)
     CharReqHdr.r_fun = r->CL;            /* function (minor) code */
     CharReqHdr.r_si = r->SI;             /* contents of SI and DI */
     CharReqHdr.r_di = r->DI;
-    CharReqHdr.r_io = (struct gblkio FAR *)MK_FP(r->DS, r->DX);    /* parameter block */
+    CharReqHdr.r_io = _MK_DOS_FP(struct gblkio, r->DS, r->DX);    /* parameter block */
   }
   else
   {
     CharReqHdr.r_count = r->CX;
-    CharReqHdr.r_trans = (BYTE FAR *)MK_FP(r->DS, r->DX);
+    CharReqHdr.r_trans = _MK_DOS_FP(BYTE, r->DS, r->DX);
   }
   CharReqHdr.r_length = sizeof(request);
   CharReqHdr.r_status = 0;
