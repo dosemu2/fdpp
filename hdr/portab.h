@@ -222,6 +222,7 @@ typedef void *far_t;
 #else
 typedef struct far_s far_t;
 #endif
+#define FP_FROM_D(l) MK_FP((l) >> 16, (l) & 0xffff)
 far_t mk_dosobj(void *data, UWORD len);
 
 #define FAR                     /* linear architecture  */

@@ -123,7 +123,7 @@ CFILES = blockio.c \
 
 OBJECTS = $(CFILES:.c=.o)
 
-$(filter-out thunks.o,$(OBJECTS)): %.o: %.cc $(HEADERS)
+$(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 .c.cc:

@@ -85,7 +85,10 @@ int FdppSetAsmThunks(struct far_s *ptrs, int size)
 
 #define _ARG(n, t, ap) (*(t *)(ap + n))
 #define _ARG_PTR(n, t, ap) // unimplemented, will create syntax error
-#define _ARG_PTR_FAR(n, t, ap)  ((t FAR *)(uintptr_t)*(UDWORD *)(ap + n))
+#define _ARG_PTR_FAR(n, t, ap)  ({ \
+    UDWORD __d = *(UDWORD *)(ap + n); \
+    FP_FROM_D(__d); \
+})
 
 UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
@@ -120,7 +123,7 @@ static void fdprintf(const char *format, ...)
     va_end(vl);
 }
 
-static uintptr_t do_asm_call(int num, uint8_t *sp, uint8_t len)
+static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 {
     int i;
 
@@ -134,7 +137,7 @@ static uintptr_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 
 #define __ARG(t) t
 #define __ARG_PTR(t) t *
-#define __ARG_PTR_FAR(t) __FAR(t)
+#define __ARG_PTR_FAR(t) t FAR *
 #define __ARG_A(t) t
 #define __ARG_PTR_A(t) t *
 #define __ARG_PTR_FAR_A(t) __DOSFAR(t)
@@ -202,10 +205,12 @@ void f(void) \
 }
 
 #define _THUNK_P_0_vp(n, f) \
-__FAR(void) f(void) \
+void FAR *f(void) \
 { \
+    uint32_t __ret; \
     _ASSERT(n < asm_tab_len); \
-    return (void FAR *)do_asm_call(n, NULL, 0); \
+    __ret = do_asm_call(n, NULL, 0); \
+    return FP_FROM_D((UDWORD)__ret); \
 }
 
 #define _THUNK_P_0(n, r, f) \
