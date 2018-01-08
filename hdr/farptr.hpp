@@ -11,15 +11,17 @@ public:
     FarPtr(far_s);
     FarPtr(std::nullptr_t);
     FarPtr(T*);
-    FarPtr(const FarPtr<const void>&);
+    FarPtr(const FarPtr<void>&);
     template<typename T0, typename T1 = T, typename =
         typename std::enable_if<std::is_const<T1>::value>::type,
         typename T2 = typename std::remove_const<T1>::type, typename =
         typename std::enable_if<std::is_same<T0, T2>::value>::type>
         FarPtr(const FarPtr<T0>&);
     template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<std::is_void<T1>::value &&
-        !std::is_void<T0>::value>::type>
+        typename std::enable_if<(std::is_void<T1>::value &&
+        !std::is_void<T0>::value) ||
+        (!std::is_void<T1>::value && std::is_const<T1>::value &&
+        std::is_void<T0>::value && std::is_const<T0>::value)>::type>
         FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();

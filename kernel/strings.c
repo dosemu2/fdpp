@@ -152,8 +152,8 @@ void *memchr(const void * s, int c)
 
 void FAR * fmemchr(const void FAR * s, int c, size_t n)
 {
-  unsigned char FAR *p;
-  p = (unsigned char FAR *)s - 1;
+  const unsigned char FAR *p;
+  p = (const unsigned char FAR *)s - 1;
   do
   {
     if (*++p == (unsigned char)c)
