@@ -3,26 +3,28 @@
 #define far_typed FarPtr
 
 template<typename T>
-class FarPtr : public far_s {
+class FarPtr : protected far_s {
 public:
     FarPtr() = default;
     FarPtr(uint16_t, uint16_t);
-    explicit FarPtr(const far_s &);
     FarPtr(std::nullptr_t);
     FarPtr(T*);
+#define ALLOW_CNV (std::is_convertible<T0*, T1*>::value || \
+        std::is_void<T0>::value || std::is_same<T0, char>::value || \
+        std::is_same<T1, char>::value || \
+        std::is_same<T0, unsigned char>::value || \
+        std::is_same<T1, unsigned char>::value)
     template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<std::is_convertible<T0*, T1*>::value>::type>
+        typename std::enable_if<ALLOW_CNV>::type>
         FarPtr(const FarPtr<T0>&);
     template<typename T0, typename T1 = T, typename =
         typename std::enable_if<!std::is_same<T0, T1>::value &&
-        (std::is_convertible<T0*, T1*>::value ||
-        std::is_void<T0>::value || std::is_same<T0, char>::value ||
-        std::is_same<T1, char>::value || std::is_same<T0, unsigned char>::value ||
-        std::is_same<T1, unsigned char>::value)>::type>
+        ALLOW_CNV>::type>
         FarPtr(T0*);
     template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<!std::is_convertible<T0*, T1*>::value>::type,
-        typename>
+        typename std::enable_if<!ALLOW_CNV>::type,
+        /* Hell! This "typename = void" fix got me hours and hours! */
+        typename = void>
         explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
@@ -37,12 +39,20 @@ public:
 };
 
 template<typename T>
+class FarPtrAsm : public FarPtr<T> {
+public:
+    FarPtrAsm(const FarPtrAsm&) = delete;
+    FarPtr<T*> operator &();
+    void operator =(const FarPtr<T>&);
+};
+
+template<typename T>
 class AsmFarPtr {
 public:
     AsmFarPtr();
     AsmFarPtr(T**);
     AsmFarPtr(const FarPtr<void>&);
-    FarPtr<T> operator *();
+    FarPtrAsm<T>& operator *();
     uint32_t operator()();
     T*** get_ref();
 };
