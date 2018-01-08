@@ -31,9 +31,6 @@ public:
         explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
-    template<typename T1 = T, typename =
-        typename std::enable_if<std::is_pointer<T1>::value>::type>
-        operator FarPtr<typename std::remove_pointer<T>::type>*();
     FarPtr<T> operator ++(int);
     FarPtr<T> operator ++();
     FarPtr<T> operator --();
@@ -43,11 +40,12 @@ public:
     uint16_t off();
 };
 
+template<typename T> class AsmFarPtr;
 template<typename T>
 class FarPtrAsm : public FarPtr<T> {
 public:
     FarPtrAsm(const FarPtrAsm&) = delete;
-    FarPtr<T*> operator &();
+    AsmFarPtr<T> operator &();
     void operator =(const FarPtr<T>&);
 };
 
@@ -59,6 +57,11 @@ public:
     AsmFarPtr(const FarPtr<void>&);
     FarPtrAsm<T>& operator *();
     uint32_t operator()();
+    operator FarPtr<T> *();
+    template<typename T0>
+        explicit operator T0*();
+    uint16_t seg();
+    uint16_t off();
     T*** get_ref();
 };
 

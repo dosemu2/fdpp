@@ -107,7 +107,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
       bp->b_flag &= ~BFR_UNCACHE;  /* reset uncache attribute */
       if (FP_OFF(bp) != firstbp)
       {
-        *(UWORD FAR *)&firstbuf = FP_OFF(bp);
+        *(UWORD *)&firstbuf = FP_OFF(bp);
         move_buffer(bp, firstbp);
       }
       return bp;
@@ -150,7 +150,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
   if (FP_OFF(bp) != firstbp)          /* move to front */
   {
     move_buffer(bp, firstbp);
-    *(UWORD FAR *)&firstbuf = FP_OFF(bp);
+    *(UWORD *)&firstbuf = FP_OFF(bp);
   }
   return bp;
 }
