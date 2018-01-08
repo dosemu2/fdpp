@@ -9,26 +9,31 @@ public:
     FarPtr(uint16_t, uint16_t);
     FarPtr(std::nullptr_t);
     FarPtr(T*);
-#define ALLOW_CNV (std::is_convertible<T0*, T1*>::value || \
+#define ALLOW_CNV(T0, T1) (std::is_convertible<T0*, T1*>::value || \
         std::is_void<T0>::value || std::is_same<T0, char>::value || \
         std::is_same<T1, char>::value || \
         std::is_same<T0, unsigned char>::value || \
         std::is_same<T1, unsigned char>::value)
     template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<ALLOW_CNV>::type>
+        typename std::enable_if<ALLOW_CNV(T0, T1)>::type>
         FarPtr(const FarPtr<T0>&);
     template<typename T0, typename T1 = T, typename =
         typename std::enable_if<!std::is_same<T0, T1>::value &&
-        ALLOW_CNV>::type>
+        (ALLOW_CNV(T0, T1) || (std::is_pointer<T0>::value &&
+            std::is_pointer<T1>::value &&
+            ALLOW_CNV(typename std::remove_pointer<T0>::type,
+            typename std::remove_pointer<T1>::type)))>::type>
         FarPtr(T0*);
     template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<!ALLOW_CNV>::type,
+        typename std::enable_if<!ALLOW_CNV(T0, T1)>::type,
         /* Hell! This "typename = void" fix got me hours and hours! */
         typename = void>
         explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
-    FarPtr<T*> operator &();
+    template<typename T1 = T, typename =
+        typename std::enable_if<std::is_pointer<T1>::value>::type>
+        operator FarPtr<typename std::remove_pointer<T>::type>*();
     FarPtr<T> operator ++(int);
     FarPtr<T> operator ++();
     FarPtr<T> operator --();

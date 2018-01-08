@@ -121,7 +121,7 @@ unsigned ebdasize(void);
 
 /* main.c */
 BOOL init_device(__FAR(struct dhdr) dhp, char * cmdLine,
-                      COUNT mode, __FAR(char*)top);
+                      COUNT mode, __FAR(char)*top);
 VOID init_fatal(BYTE * err_msg);
 
 /* prf.c */
@@ -141,7 +141,7 @@ extern char singleStep;
 extern char SkipAllConfig;
 extern char master_env[128];
 
-extern __FAR(struct lol*)_LoL;
+extern __ASMFAR(struct lol) _LoL;
 #define LoL (*_LoL)
 
 struct _nlsCountryInfoHardcoded {

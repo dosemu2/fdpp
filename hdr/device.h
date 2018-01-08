@@ -341,7 +341,7 @@ typedef struct {
     struct {
       UBYTE _r_nunits;          /*  number of units     */
       __DOSFAR(BYTE)_r_endaddr;     /*  Ending Address      */
-      __DOSFAR(bpb *)_r_bpbptr;     /*  ptr to BPB array    */
+      __DOSFAR(bpb) *_r_bpbptr;     /*  ptr to BPB array    */
       UBYTE _r_firstunit;
     } _r_init;
     struct {
