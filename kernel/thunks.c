@@ -153,7 +153,7 @@ void f(t1 a1) \
 { \
     struct { \
 	at1 a1; \
-    } PACKED _args = { (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -164,7 +164,7 @@ void f(t1 a1, t2 a2) \
     struct { \
 	at1 a1; \
 	at2 a2; \
-    } PACKED _args = { (at1)a1, (at2)a2 }; \
+    } PACKED _args = { _CNV_T(at1, a1), _CNV_T(at2, a2) }; \
     _ASSERT(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -176,7 +176,7 @@ void f(t1 a1, t2 a2, t3 a3) \
 	at1 a1; \
 	at2 a2; \
 	at2 a3; \
-    } PACKED _args = { (at1)a1, (at2)a2, (at3)a3 }; \
+    } PACKED _args = { _CNV_T(at1, a1), _CNV_T(at2, a2), _CNV_T(at3, a3) }; \
     _ASSERT(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -189,7 +189,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at2 a2; \
 	at3 a3; \
 	at4 a4; \
-    } PACKED _args = { (at1)a1, (at2)a2, (at3)a3, (at4)a4 }; \
+    } PACKED _args = { _CNV_T(at1, a1), _CNV_T(at2, a2), _CNV_T(at3, a3), _CNV_T(at4, a4) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -220,7 +220,7 @@ void f(t1 a1) \
 { \
     struct { \
 	at1 a1; \
-    } PACKED _args = { (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -230,7 +230,7 @@ r f(t1 a1) \
 { \
     struct { \
 	at1 a1; \
-    } PACKED _args = { (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -241,7 +241,7 @@ r f(t1 a1, t2 a2) \
     struct { \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { (at2)a2, (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at2, a2), _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -253,7 +253,7 @@ r f(t1 a1, t2 a2, t3 a3) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { (at3)a3, (at2)a2, (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at3, a3), _CNV_T(at2, a2), _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -266,7 +266,7 @@ void f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at4, a4), _CNV_T(at3, a3), _CNV_T(at2, a2), _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -279,7 +279,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at4, a4), _CNV_T(at3, a3), _CNV_T(at2, a2), _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -293,7 +293,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { (at5)a5, (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at5, a5), _CNV_T(at4, a4), _CNV_T(at3, a3), _CNV_T(at2, a2), _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
@@ -308,7 +308,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 	at3 a3; \
 	at2 a2; \
 	at1 a1; \
-    } PACKED _args = { (at6)a6, (at5)a5, (at4)a4, (at3)a3, (at2)a2, (at1)a1 }; \
+    } PACKED _args = { _CNV_T(at6, a6), _CNV_T(at5, a5), _CNV_T(at4, a4), _CNV_T(at3, a3), _CNV_T(at2, a2), _CNV_T(at1, a1) }; \
     _ASSERT(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }

@@ -1,6 +1,9 @@
 #include <type_traits>
 
 template<typename T>
+struct far_typed : public far_s{};
+
+template<typename T>
 class FarPtr {
 public:
     FarPtr();
@@ -29,7 +32,7 @@ public:
     FarPtr<T> operator --();
     void operator +=(int);
     FarPtr<T> operator +(int);
-    explicit operator struct far_s &();
+    far_typed<T> dosfar() const;
     uint16_t seg();
     uint16_t off();
 };
@@ -42,6 +45,19 @@ public:
     FarPtr<T*> operator ->();
     T*** get_ref();
 };
+
+
+template <typename T>
+static far_typed<T> to_fp(const FarPtr<T>& p)
+{
+    return p.dosfar();
+}
+template <typename T>
+static far_typed<T> to_fp(const FarPtr<void>& p)
+{
+    return p;
+}
+
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMFARREF(f) f.get_ref()
@@ -49,12 +65,31 @@ public:
 #define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
 
-#define __DOSFAR(t) struct far_s
+#define __DOSFAR(t) far_typed<t>
 #define _MK_FP(t, f) ((__FAR(t)) MK_FP(f.seg, f.off))
 #define _FP_SEG(f) ((f).seg)
 #define _FP_OFF(f) ((f).off)
-#define _DOS_FP(p) (struct far_s){ FP_OFF(p), FP_SEG(p) }
-#define _MK_DOS_FP(t, seg, off) (struct far_s){ (UWORD)(off), (UWORD)(seg) }
+#define _DOS_FP(p) to_fp(p)
+#define _MK_DOS_FP(t, s, o) ({ \
+    far_typed<t> __p; \
+    __p.off = (UWORD)(o); \
+    __p.seg = (UWORD)(s); \
+    __p; \
+})
+
+template <typename T1, typename T2, typename =
+    typename std::enable_if<std::is_pod<T2>::value>::type>
+T1 _cnv(T2 &v)
+{
+    return (T1)v;
+}
+template <typename T, typename T1>
+T _cnv(const FarPtr<T1> &v)
+{
+    return v.dosfar();
+}
+
+#define _CNV_T(t, v) _cnv<t>(v)
 
 #undef NULL
 #define NULL           nullptr
