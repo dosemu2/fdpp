@@ -166,7 +166,7 @@ STATIC void PSPInit(void)
 
   /* CP/M-like entry point - call FAR to special entry    */
   p->ps_farcall = 0x9a;
-  p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0, 0x30 * 4);
+  p->ps_reentry = _MK_DOS_FP(VOID, 0, 0x30 * 4);
   /* unix style call - 0xcd 0x21 0xcb (int 21, retf)      */
   p->ps_unix[0] = 0xcd;
   p->ps_unix[1] = 0x21;
@@ -777,8 +777,8 @@ STATIC void CheckContinueBootFromHarddisk(void)
   init_call_intr(0x13, &r);
 
   {
-    void (FAR *reboot)(void) = (void (FAR *)(void)) MK_FP(0x0,0x7c00);
-
-    (*reboot)();
+//    void (FAR *reboot)(void) = (void (FAR *)(void)) MK_FP(0x0,0x7c00);
+#warning XXX commented out by stsp, need to restore later
+//    (*reboot)();
   }
 }

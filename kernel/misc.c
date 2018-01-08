@@ -66,7 +66,7 @@ VOID * memcpy(REG VOID * d, REG CONST VOID * s, REG size_t n)
 VOID fmemcpy(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n)
 {
   while (n--)
-    ((BYTE FAR *) d)[n] = ((BYTE FAR *) s)[n];
+    ((BYTE FAR *) d)[n] = ((CONST BYTE FAR *) s)[n];
 }
 
 VOID *memset(VOID * s, int ch, size_t n)

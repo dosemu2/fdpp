@@ -219,10 +219,10 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
         return 0;
 
       if (s->sft_flags & SFT_FCONIN)
-        rc = read_line_handle(sft_idx, n, (char *)bp);
+        rc = read_line_handle(sft_idx, n, (char FAR *)bp);
       else
-        rc = cooked_read(&dev, n, (char *)bp);
-      if (*(char *)bp == CTL_Z)
+        rc = cooked_read(&dev, n, (char FAR *)bp);
+      if (*(char FAR *)bp == CTL_Z)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
     }
@@ -235,7 +235,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
       if (s->sft_flags & SFT_FNUL)
         return n;
       else
-        return cooked_write(&dev, n, (char *)bp);
+        return cooked_write(&dev, n, (char FAR *)bp);
     }
   }
 

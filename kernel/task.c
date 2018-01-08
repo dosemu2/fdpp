@@ -498,7 +498,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
        while preserving the FAR call to 0:00c0 +
        copy in HMA at ffff:00d0 */
     p = (psp FAR *)MK_FP(mem, 0);
-    p->ps_reentry = (VOID(FAR ASMCFUNC *)(void))MK_FP(0xc - asize, asize << 4);
+    p->ps_reentry = _MK_DOS_FP(VOID, 0xc - asize, asize << 4);
     asize <<= 4;
     asize += 0x10e;
     exp->exec.stack = _MK_DOS_FP(BYTE, mem, asize);

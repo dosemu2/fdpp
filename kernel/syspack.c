@@ -61,10 +61,10 @@ UWORD fgetword(REG VOID FAR * vp)
 
 UDWORD fgetlong(REG VOID FAR * vp)
 {
-  return (((UBYTE *) vp)[0] & 0xff) +
-      ((((UBYTE *) vp)[1] & 0xff) << 8) +
-      ((((UBYTE *) vp)[2] & 0xff) << 16) +
-      ((((UBYTE *) vp)[3] & 0xff) << 24);
+  return (((UBYTE FAR *) vp)[0] & 0xff) +
+      ((((UBYTE FAR *) vp)[1] & 0xff) << 8) +
+      ((((UBYTE FAR *) vp)[2] & 0xff) << 16) +
+      ((((UBYTE FAR *) vp)[3] & 0xff) << 24);
 }
 
 UBYTE fgetbyte(VOID FAR * vp)

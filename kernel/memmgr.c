@@ -81,7 +81,7 @@ STATIC COUNT joinMCBs(seg para)
 /*
  * Return a normalized far pointer
  */
-void FAR * adjust_far(const void FAR * fp)
+void FAR * adjust_far(void FAR * fp)
 {
   /* and return an adddress adjusted to the nearest paragraph     */
   /* boundary.                                                    */

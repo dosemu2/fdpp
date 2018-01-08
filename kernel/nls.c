@@ -574,7 +574,7 @@ COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
     /* matching NLS package found */
     if (nls->flags & NLS_FLAG_DIRECT_GETDATA)
       /* Direct access to the data */
-      return nlsGetData(nls, subfct, (UBYTE *)buf, bufsize);
+      return nlsGetData(nls, subfct, (UBYTE FAR *)buf, bufsize);
     cp = nls->cp;
     cntry = nls->cntry;
   }
