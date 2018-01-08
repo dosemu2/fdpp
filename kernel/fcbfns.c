@@ -54,7 +54,7 @@ static dmatch Dmatch;
 
 UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 {
-  static BYTE mdb;
+  static UBYTE mdb;
   UWORD spc;
 
   /* get the data available from dpb                       */

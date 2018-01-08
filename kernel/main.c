@@ -777,7 +777,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
   init_call_intr(0x13, &r);
 
   {
-    __ASMFAR(void) reboot = MK_FP(0x0,0x7c00);
+    __ASMCALL(void, reboot) = MK_FP(0x0,0x7c00);
     reboot();
   }
 }

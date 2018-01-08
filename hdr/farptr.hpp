@@ -68,6 +68,7 @@ public:
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMFARREF(f) f.get_ref()
+#define __ASMCALL(t, f) __ASMFAR(t) f
 #define FP_SEG(fp)            ((fp).seg())
 #define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
@@ -78,8 +79,6 @@ public:
 #define _FP_OFF(f) ((f).off())
 #define _DOS_FP(p) (p)
 #define _MK_DOS_FP(t, s, o) far_typed<t>(s, o)
-
-#define _CNV_T(t, v) (t)(v)
 
 #undef NULL
 #define NULL           nullptr

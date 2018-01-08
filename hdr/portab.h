@@ -208,7 +208,6 @@ void disable(void);
 void enable(void);
 
 #ifndef __cplusplus
-typedef void *far_t;
 #define __FAR(t) t FAR *
 #define __ASMFAR(t) t FAR **
 #define __ASMFARREF(f) &f
@@ -222,10 +221,10 @@ typedef void *far_t;
 #define _FP_OFF(f) FP_OFF(f)
 #define _DOS_FP(p) (p)
 #define _MK_DOS_FP(t, seg, off) (t *)MK_FP(seg, off)
-#else
-typedef struct far_s far_t;
+#define __ASMCALL(t, f) t (* f)(void)
 #endif
 #define FP_FROM_D(t, l) (__FAR(t))MK_FP((l) >> 16, (l) & 0xffff)
+typedef struct far_s far_t;
 far_t mk_dosobj(void *data, UWORD len);
 
 #define FAR                     /* linear architecture  */

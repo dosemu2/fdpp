@@ -143,6 +143,7 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 #define __ARG_PTR_FAR_A(t) __DOSFAR(t)
 
 #define PACKED __attribute__((packed))
+#define _CNV_T(t, v) (t)(v)
 
 #define _THUNK0_v(n, f) \
 void f(void) \
