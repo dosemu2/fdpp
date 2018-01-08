@@ -199,8 +199,8 @@ void pokew(UWORD seg, UWORD ofs, UWORD w);
 void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
-#define MK_OFFS(data) _FP_OFF((__FAR(void))mk_dosobj(data, sizeof(data)))
-#define MK_FAR(data) ((__FAR(void))mk_dosobj(data, sizeof(data)))
+#define MK_OFFS(data) _FP_OFF((__FAR(void))mk_dosobj(&data, sizeof(data)))
+#define MK_FAR(data) ((__FAR(void))mk_dosobj(&data, sizeof(data)))
 void disable(void);
 void enable(void);
 

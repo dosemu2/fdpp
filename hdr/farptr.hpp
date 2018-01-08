@@ -7,13 +7,18 @@ class FarPtr : public far_s {
 public:
     FarPtr() = default;
     FarPtr(uint16_t, uint16_t);
-    explicit FarPtr(const far_s &);
+    FarPtr(const far_s &);
     FarPtr(std::nullptr_t);
     FarPtr(T*);
-    FarPtr(const FarPtr<void>&);
     template<typename T0, typename T1 = T, typename =
         typename std::enable_if<std::is_convertible<T0*, T1*>::value>::type>
         FarPtr(const FarPtr<T0>&);
+    template<typename T0, typename T1 = T, typename =
+        typename std::enable_if<!std::is_same<T0, T1>::value &&
+        (std::is_convertible<T0*, T1*>::value ||
+        std::is_void<T0>::value || std::is_same<T0, char>::value ||
+        std::is_same<T1, char>::value)>::type>
+        FarPtr(T0*);
     template<typename T0, typename T1 = T, typename =
         typename std::enable_if<!std::is_convertible<T0*, T1*>::value>::type,
         typename>

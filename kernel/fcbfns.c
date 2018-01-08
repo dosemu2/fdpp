@@ -72,7 +72,7 @@ BYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
     }
     else
     {
-      return (BYTE FAR *) & (dpbp->dpb_mdb);
+      return (UBYTE FAR *) & (dpbp->dpb_mdb);
     }
   }
   return NULL;

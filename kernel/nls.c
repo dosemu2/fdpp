@@ -457,7 +457,7 @@ STATIC int nlsYesNo(struct nlsPackage FAR * nls, UWORD ch)
   if (!nlsIsDBCS(ch & 0xFF)) {
     ch &= 0xFF;
     log(("NLS: nlsYesNo(): in ch=%u (%c)\n", ch, ch > 32 ? (char)ch : ' '));
-    xUpMem(nls, _MK_FP(void, MK_FAR(&ch)), 1);          /* Upcase character */
+    xUpMem(nls, _MK_FP(void, MK_FAR(ch)), 1);          /* Upcase character */
     /* Cannot use DosUpChar(), because
        maybe: nls != current NLS pkg
        However: Upcase character within lowlevel
@@ -506,7 +506,7 @@ unsigned char ASMCFUNC DosUpChar(unsigned char ch)
  /* upcase a single character */
 {
   log(("NLS: DosUpChar(): in ch=%u (%c)\n", ch, ch > 32 ? ch : ' '));
-  DosUpMem(_MK_FP(void, MK_FAR(&ch)), 1);
+  DosUpMem(_MK_FP(void, MK_FAR(ch)), 1);
   log(("NLS: DosUpChar(): upcased ch=%u (%c)\n", ch, ch > 32 ? ch : ' '));
   return ch;
 }
@@ -537,7 +537,7 @@ VOID DosUpFMem(VOID FAR * str, unsigned len)
 unsigned char DosUpFChar(unsigned char ch)
  /* upcase a single character for file names */
 {
-  DosUpFMem(_MK_FP(void, MK_FAR(&ch)), 1);
+  DosUpFMem(_MK_FP(void, MK_FAR(ch)), 1);
   return ch;
 }
 

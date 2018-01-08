@@ -992,8 +992,8 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 
       /* Load the registers and call the interrupt. */
       regs.a.x = LBA_READ;
-      regs.si = FP_OFF((struct _bios_LBA_disk_parameterS FAR *)&dap);
-      regs.ds = FP_SEG((struct _bios_LBA_disk_parameterS FAR *)&dap);
+      regs.si = FP_OFF((struct _bios_LBA_address_packet FAR *)&dap);
+      regs.ds = FP_SEG((struct _bios_LBA_address_packet FAR *)&dap);
     }
     else
     {                           /* transfer data, using old bios functions */
