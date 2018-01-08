@@ -55,7 +55,7 @@ typedef struct {
 #define exec    ldata._exec
 #define load    ldata._load
 
-typedef struct {
+typedef struct _psp {
   UWORD ps_exit;                /* 00 CP/M-like exit point: int 20 */
   UWORD ps_size;                /* 02 segment of first byte beyond */
                                 /*    memory allocated to program  */
@@ -78,7 +78,7 @@ typedef struct {
   __DOSFAR(BYTE)ps_stack;           /* 2e user stack pointer - int 21  */
   UWORD ps_maxfiles;            /* 32 maximum open files           */
   __DOSFAR(UBYTE)ps_filetab;        /* 34 open file table pointer      */
-  __DOSFAR(VOID)ps_prevpsp;         /* 38 previous psp pointer         */
+  __DOSFAR(struct _psp)ps_prevpsp;         /* 38 previous psp pointer         */
   UBYTE ps_fill2;               /* 3c unused                       */
   UBYTE ps_truename;            /* 3d [unused] append truename flag int2f/B711h */
   UBYTE ps_netx_taskid[2];      /* 3e [Novell only field] task id  */

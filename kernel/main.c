@@ -176,7 +176,7 @@ STATIC void PSPInit(void)
   /* parent psp segment                                   */
   p->ps_parent = FP_SEG(p);
   /* previous psp pointer                                 */
-  p->ps_prevpsp = _MK_DOS_FP(void, 0xffff,0xffff);
+  p->ps_prevpsp = _MK_DOS_FP(psp, 0xffff,0xffff);
 
   /* Environment and memory useage parameters             */
   /* memory size in paragraphs                            */
