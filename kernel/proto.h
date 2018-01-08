@@ -231,7 +231,7 @@ COUNT DosDevIOctl(lregs * r);
 seg far2para(__FAR(VOID) p);
 seg long2para(ULONG size);
 __FAR(void)add_far(__FAR(void) fp, unsigned off);
-__FAR(VOID)adjust_far(__FAR(void) fp);
+__FAR(VOID)adjust_far(__FAR(const void) fp);
 COUNT DosMemAlloc(UWORD size, COUNT mode, seg * para, UWORD * asize);
 COUNT DosMemLargest(UWORD * size);
 COUNT DosMemFree(UWORD para);

@@ -7,13 +7,17 @@ class FarPtr : public far_s {
 public:
     FarPtr() = default;
     FarPtr(uint16_t, uint16_t);
-    FarPtr(const far_s &);
+    explicit FarPtr(const far_s &);
     FarPtr(std::nullptr_t);
     FarPtr(T*);
     FarPtr(const FarPtr<void>&);
     template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<std::is_convertible<T0, T1>::value>::type>
+        typename std::enable_if<std::is_convertible<T0*, T1*>::value>::type>
         FarPtr(const FarPtr<T0>&);
+    template<typename T0, typename T1 = T, typename =
+        typename std::enable_if<!std::is_convertible<T0*, T1*>::value>::type,
+        typename>
+        explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
     FarPtr<T*> operator &();
@@ -46,7 +50,7 @@ public:
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
 
 #define __DOSFAR(t) far_typed<t>
-#define _MK_FP(t, f) f
+#define _MK_FP(t, f) ((__FAR(t))(f))
 #define _FP_SEG(f) ((f).seg())
 #define _FP_OFF(f) ((f).off())
 #define _DOS_FP(p) (p)
