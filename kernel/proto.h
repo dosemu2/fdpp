@@ -196,7 +196,7 @@ int DosCharInput(VOID);
 VOID DosDirectConsoleIO(__FAR(iregs) r);
 VOID DosCharOutput(COUNT c);
 VOID DosDisplayOutput(COUNT c);
-__FAR(BYTE)FatGetDrvData(UBYTE drive, UBYTE * spc, UWORD * bps,
+__FAR(UBYTE)FatGetDrvData(UBYTE drive, UBYTE * spc, UWORD * bps,
                    UWORD * nc);
 UWORD FcbParseFname(UBYTE *wTestMode,__FAR(const BYTE)lpFileName,__FAR(fcb) lpFcb);
 __FAR(const BYTE)ParseSkipWh(__FAR(const BYTE) lpFileName);

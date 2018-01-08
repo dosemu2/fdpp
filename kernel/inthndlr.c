@@ -637,7 +637,7 @@ dispatch:
       /* Get Drive Data                                               */
     case 0x1c:
       {
-        BYTE FAR *p;
+        UBYTE FAR *p;
 
         if ((p = FatGetDrvData(lr.DL, &lr.AL, &lr.CX, &lr.DX)) != NULL)
         {

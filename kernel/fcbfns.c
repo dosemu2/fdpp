@@ -52,7 +52,7 @@ STATIC void FcbCalcRec(xfcb FAR * lpXfcb);
 
 static dmatch Dmatch;
 
-BYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
+UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 {
   static BYTE mdb;
   UWORD spc;
