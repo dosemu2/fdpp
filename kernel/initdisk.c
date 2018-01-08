@@ -953,7 +953,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
                    ULONG LBA_address, void * buffer)
 {
   static struct _bios_LBA_address_packet dap = {
-    16, 0, 0, 0, 0, 0, 0
+    16, 0, 0, 0, _MK_DOS_FP(unsigned char, 0, 0), 0, 0
   };
 
   struct CHS chs;
