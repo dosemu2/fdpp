@@ -25,7 +25,7 @@ public:
         FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
-    T** operator &();
+    FarPtr<T*> operator &();
     FarPtr<T> operator ++(int);
     FarPtr<T> operator ++();
     FarPtr<T> operator --();
