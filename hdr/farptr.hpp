@@ -40,8 +40,10 @@ class AsmFarPtr {
 public:
     AsmFarPtr();
     AsmFarPtr(T**);
+    AsmFarPtr(const FarPtr<void>&);
     FarPtr<T> operator *();
     FarPtr<T*> operator ->();
+    uint32_t operator()();
     T*** get_ref();
 };
 

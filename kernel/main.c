@@ -777,8 +777,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
   init_call_intr(0x13, &r);
 
   {
-//    void (FAR *reboot)(void) = (void (FAR *)(void)) MK_FP(0x0,0x7c00);
-#warning XXX commented out by stsp, need to restore later
-//    (*reboot)();
+    __ASMFAR(void) reboot = MK_FP(0x0,0x7c00);
+    reboot();
   }
 }
