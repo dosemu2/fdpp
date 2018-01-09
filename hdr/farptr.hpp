@@ -14,20 +14,18 @@ public:
         std::is_same<T1, char>::value || \
         std::is_same<T0, unsigned char>::value || \
         std::is_same<T1, unsigned char>::value)
-    template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<ALLOW_CNV(T0, T1)>::type>
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
         FarPtr(const FarPtr<T0>&);
-    template<typename T0, typename T1 = T, typename =
+    template<typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value &&
         (ALLOW_CNV(T0, T1) || (std::is_pointer<T0>::value &&
             std::is_pointer<T1>::value &&
             ALLOW_CNV(typename std::remove_pointer<T0>::type,
-            typename std::remove_pointer<T1>::type)))>::type>
+            typename std::remove_pointer<T1>::type)))>::type* = nullptr>
         FarPtr(T0*);
-    template<typename T0, typename T1 = T, typename =
-        typename std::enable_if<!ALLOW_CNV(T0, T1)>::type,
-        /* Hell! This "typename = void" fix got me hours and hours! */
-        typename = void>
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
         explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
