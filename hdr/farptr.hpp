@@ -34,8 +34,8 @@ public:
     FarPtr<T> operator --();
     void operator +=(int);
     FarPtr<T> operator +(int);
-    uint16_t seg();
-    uint16_t off();
+    uint16_t __seg();
+    uint16_t __off();
 };
 
 template<typename T> class AsmFarPtr;
@@ -58,8 +58,8 @@ public:
     operator FarPtr<T> *();
     template<typename T0>
         explicit operator T0*();
-    uint16_t seg();
-    uint16_t off();
+    uint16_t __seg();
+    uint16_t __off();
     T*** get_ref();
 };
 
@@ -67,14 +67,14 @@ public:
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMFARREF(f) f.get_ref()
 #define __ASMCALL(t, f) __ASMFAR(t) f
-#define FP_SEG(fp)            ((fp).seg())
-#define FP_OFF(fp)            ((fp).off())
+#define FP_SEG(fp)            ((fp).__seg())
+#define FP_OFF(fp)            ((fp).__off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
 
 #define __DOSFAR(t) far_typed<t>
 #define _MK_FP(t, f) ((__FAR(t))(f))
-#define _FP_SEG(f) ((f).seg())
-#define _FP_OFF(f) ((f).off())
+#define _FP_SEG(f) ((f).__seg())
+#define _FP_OFF(f) ((f).__off())
 #define _DOS_FP(p) (p)
 #define _MK_DOS_FP(t, s, o) far_typed<t>(s, o)
 
