@@ -127,7 +127,7 @@ searchAgain:
 */
   if ((uppermem_link & 1) && uppermem_root != 0xffff)
   {
-    COUNT tmpmode = (mode == LARGEST ? mem_access_mode : mode);
+    COUNT tmpmode = (mode == LARGEST ? (COUNT)mem_access_mode : mode);
     if ((mode != LARGEST || size == 0xffff) &&
         (tmpmode & (FIRST_FIT_UO | FIRST_FIT_U)))
       p = para2far(uppermem_root);

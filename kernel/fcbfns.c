@@ -61,7 +61,7 @@ UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
   spc = DosGetFree(drive, NULL, bps, nc);
   if (spc != 0xffff)
   {
-    struct dpb FAR *dpbp = get_dpb(drive == 0 ? default_drive : drive - 1);
+    struct dpb FAR *dpbp = get_dpb(drive == 0 ? (int)default_drive : drive - 1);
     /* Point to the media desctriptor for this drive               */
     *pspc = (UBYTE)spc;
     if (dpbp == NULL)

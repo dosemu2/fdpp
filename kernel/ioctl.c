@@ -175,7 +175,7 @@ int DosDevIOctl(lregs * r)
 /* JT Fixed it */
 
       /* NDN feeds the actual ASCII drive letter to this function */
-      dpbp = get_dpb((r->BL & 0x1f) == 0 ? default_drive : (r->BL & 0x1f) - 1);
+      dpbp = get_dpb((r->BL & 0x1f) == 0 ? (int)default_drive : (r->BL & 0x1f) - 1);
       if (dpbp)
       {
         CharReqHdr.r_unit = dpbp->dpb_subunit;

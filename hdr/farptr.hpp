@@ -2,6 +2,9 @@
 
 #define far_typed FarPtr
 
+#define _P(T1) std::is_pointer<T1>::value
+#define _C(T1) std::is_const<T1>::value
+#define _RP(T1) typename std::remove_pointer<T1>::type
 template<typename T>
 class FarPtr : protected far_s {
 public:
@@ -19,10 +22,8 @@ public:
         FarPtr(const FarPtr<T0>&);
     template<typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value &&
-        (ALLOW_CNV(T0, T1) || (std::is_pointer<T0>::value &&
-            std::is_pointer<T1>::value &&
-            ALLOW_CNV(typename std::remove_pointer<T0>::type,
-            typename std::remove_pointer<T1>::type)))>::type* = nullptr>
+        (ALLOW_CNV(T0, T1) || (_P(T0) && _P(T1) &&
+            ALLOW_CNV(_RP(T0), _RP(T1))))>::type* = nullptr>
         FarPtr(T0*);
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
@@ -38,6 +39,43 @@ public:
     uint16_t __off();
 };
 
+template<typename T>
+class SymWrp : public T {
+public:
+    SymWrp(const T&);
+    SymWrp(const SymWrp&) = delete;
+    FarPtr<T> operator &();
+    template <typename T1 = T,
+        typename std::enable_if<_P(T1) &&
+        !std::is_void<_RP(T1)>::value>::type* = nullptr>
+        operator FarPtr<const void> &();
+};
+
+template<typename T>
+class SymWrp2 {
+public:
+    SymWrp2(const T&);
+    SymWrp2(const SymWrp2&) = delete;
+    FarPtr<T> operator &();
+    operator T &();
+    template <typename T1 = T,
+        typename std::enable_if<_P(T1) &&
+        !std::is_void<_RP(T1)>::value>::type* = nullptr>
+        operator FarPtr<const void> &();
+};
+
+template<typename T>
+class AsmSym {
+public:
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+        SymWrp<T1>& get_sym();
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+        SymWrp2<T1>& get_sym();
+    T** get_ref();
+};
+
 template<typename T> class AsmFarPtr;
 template<typename T>
 class FarPtrAsm : public FarPtr<T> {
@@ -45,14 +83,6 @@ public:
     FarPtrAsm(const FarPtrAsm&) = delete;
     AsmFarPtr<T> operator &();
     void operator =(const FarPtr<T>&);
-};
-
-template<typename T>
-class AsmSym {
-public:
-    FarPtr<T> get_addr();
-    T& get_sym();
-    T** get_ref();
 };
 
 template<typename T>
@@ -77,7 +107,6 @@ public:
 #define __ASMREF(f) f.get_ref()
 #define __ASMCALL(t, f) __ASMFAR(t) f
 #define __ASYM(x) x.get_sym()
-#define __ASMADDR(x) __##x.get_addr()
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
