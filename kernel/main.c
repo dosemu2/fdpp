@@ -778,6 +778,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
 
   {
     __ASMCALL(void, reboot) = MK_FP(0x0,0x7c00);
-    reboot();
+
+     (*reboot)();
   }
 }

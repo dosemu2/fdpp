@@ -83,6 +83,7 @@ public:
     FarPtrAsm(const FarPtrAsm&) = delete;
     AsmFarPtr<T> operator &();
     void operator =(const FarPtr<T>&);
+    uint32_t operator()();
 };
 
 template<typename T>
@@ -92,7 +93,6 @@ public:
     AsmFarPtr(T**);
     AsmFarPtr(const FarPtr<void>&);
     FarPtrAsm<T>& operator *();
-    uint32_t operator()();
     operator FarPtr<T> *();
     template<typename T0>
         explicit operator T0*();
