@@ -195,7 +195,7 @@ struct lowvec {
   intvec isv;
 };
 
-#define __ASM(t, v) extern t * __##v
+#define __ASM(t, v) extern __ASMSYM(t) __##v
 #define __ASM_FAR(t, v) extern __ASMFAR(t) __##v
 #define __ASM_ARR(t, v, l) extern t (* __##v)[l]
 #define __ASM_ARRI(t, v) extern UBYTE (* __##v)[0]

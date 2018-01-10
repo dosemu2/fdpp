@@ -48,6 +48,14 @@ public:
 };
 
 template<typename T>
+class AsmSym {
+public:
+    FarPtr<T> get_addr();
+    T& get_sym();
+    T** get_ref();
+};
+
+template<typename T>
 class AsmFarPtr {
 public:
     AsmFarPtr();
@@ -63,10 +71,13 @@ public:
     T*** get_ref();
 };
 
+#define __ASMSYM(t) AsmSym<t>
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
-#define __ASMFARREF(f) f.get_ref()
+#define __ASMREF(f) f.get_ref()
 #define __ASMCALL(t, f) __ASMFAR(t) f
+#define __ASYM(x) x.get_sym()
+#define __ASMADDR(x) __##x.get_addr()
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))

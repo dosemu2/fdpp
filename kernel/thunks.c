@@ -23,7 +23,7 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 }
 
 #define SEMIC ;
-#define __ASM(t, v) t * __##v
+#define __ASM(t, v) __ASMSYM(t) __##v
 #define __ASM_FAR(t, v) __ASMFAR(t) __##v
 #define __ASM_ARR(t, v, l) t (* __##v)[l]
 #define __ASM_ARRI(t, v) UBYTE (* __##v)[0]
@@ -53,8 +53,8 @@ static union asm_thunks_u {
 } asm_thunks = {{
 #undef SEMIC
 #define SEMIC ,
-#define __ASM(t, v) &__##v
-#define __ASM_FAR(t, v) __ASMFARREF(__##v)
+#define __ASM(t, v) __ASMREF(__##v)
+#define __ASM_FAR(t, v) __ASMREF(__##v)
 #define __ASM_ARR(t, v, l) &__##v
 #define __ASM_ARRI(t, v) &__##v
 #define __ASM_FUNC(v) &__##v

@@ -33,21 +33,21 @@
 
 struct lol {
   char filler[0x22];
-  char *inputptr;              /* -4 Pointer to unread CON input          */
+  char *_inputptr;              /* -4 Pointer to unread CON input          */
   unsigned short _first_mcb;   /* -2 Start of user memory                 */
   struct dpb FAR *_DPBp;       /*  0 First drive Parameter Block          */
   struct sfttbl FAR *_sfthead; /*  4 System File Table head               */
   struct dhdr FAR *_clock;     /*  8 CLOCK$ device                        */
   struct dhdr FAR *_syscon;    /*  c console device                       */
-  unsigned short maxsecsize;   /* 10 max bytes per sector for any blkdev  */
+  unsigned short _maxsecsize;   /* 10 max bytes per sector for any blkdev  */
   void FAR *inforecptr;        /* 12 pointer to disk buffer info record   */
   struct cds FAR *_CDSp;       /* 16 Current Directory Structure          */
   struct sfttbl FAR *FCBp;     /* 1a FCB table pointer                    */
-  unsigned short nprotfcb;     /* 1e number of protected fcbs             */
+  unsigned short _nprotfcb;     /* 1e number of protected fcbs             */
   unsigned char _nblkdev;      /* 20 number of block devices              */
   unsigned char _lastdrive;    /* 21 value of last drive                  */
   struct dhdr _nul_dev;        /* 22 NUL device driver header(no pointer!)*/
-  unsigned char njoined;       /* 34 number of joined devices             */
+  unsigned char _njoined;       /* 34 number of joined devices             */
   unsigned short specialptr;   /* 35 pointer to list of spec. prog(unused)*/
   void FAR *setverPtr;         /* 37 pointer to SETVER list               */
   void (*a20ptr)(void);        /* 3b pointer to fix A20 ctrl              */
@@ -67,7 +67,7 @@ struct lol {
   unsigned char int24fail;     /* 5d int24 fail while making i/o stat call*/
   unsigned char memstrat;      /* 5e memory allocation strat during exec  */
   unsigned char a20count;      /* 5f nr. of int21 calls for which a20 off */
-  unsigned char VgaSet;        /* 60 bitflags switches=/w, int21/4b05     */
+  unsigned char _VgaSet;        /* 60 bitflags switches=/w, int21/4b05     */
   unsigned short unpack;       /* 61 offset of unpack code start          */
   unsigned char _uppermem_link;/* 63 UMB Link flag                        */
   unsigned short min_pars;     /* 64 minimum para req by program execed   */
