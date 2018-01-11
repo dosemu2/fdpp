@@ -69,7 +69,7 @@ __segment DosTextSeg = 0;
 
 #endif
 
-__ASMSYM(struct lol) *_LoL = __ASMADDR(DATASTART);
+ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
 
 VOID ASMCFUNC FreeDOSmain(void)
 {

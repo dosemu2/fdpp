@@ -211,7 +211,8 @@ void enable(void);
 #define __FAR(t) t FAR *
 #define __ASMFAR(t) t FAR **
 #define __ASMFARREF(f) &f
-#define __ASMADDR(v) &__##v
+#define ASMREF(t) t FAR *
+#define __ASMADDR(v) NULL    /* unsupported */
 #define __ASMREF(f) &f
 #define __ASMSYM(t) t *
 #define __ASMFSYM(t) t *
