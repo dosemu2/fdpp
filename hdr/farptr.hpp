@@ -55,6 +55,7 @@ public:
     SymWrp2(const SymWrp2&) = delete;
     FarPtr<T> operator &();
     operator T &();
+    uint32_t operator()();
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
@@ -77,13 +78,20 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
         SymWrp2<T1>& get_sym();
+
+    /* everyone with get_ref() method should have a default ctor */
+    AsmSym() = default;
     T** get_ref();
 };
 
 template<typename T>
 class AsmFSym {
 public:
+    AsmFSym(const FarPtr<T> &);
+    SymWrp2<T*>& operator *();
     FarPtr<T>& get_sym();
+
+    AsmFSym() = default;
     T** get_ref();
 };
 
@@ -94,13 +102,11 @@ public:
     FarPtrAsm(const FarPtrAsm&) = delete;
     AsmFarPtr<T> operator &();
     void operator =(const FarPtr<T>&);
-    uint32_t operator()();
 };
 
 template<typename T>
 class AsmFarPtr {
 public:
-    AsmFarPtr();
     AsmFarPtr(T**);
     AsmFarPtr(const FarPtr<void>&);
     FarPtrAsm<T>& operator *();
@@ -109,6 +115,8 @@ public:
         explicit operator T0*();
     uint16_t __seg();
     uint16_t __off();
+
+    AsmFarPtr() = default;
     T*** get_ref();
 };
 
@@ -118,7 +126,7 @@ public:
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMREF(f) f.get_ref()
 #define __ASMADDR(v) &__##v
-#define __ASMCALL(t, f) __ASMFAR(t) f
+#define __ASMCALL(t, f) __ASMFSYM(t) f
 #define __ASYM(x) x.get_sym()
 #define __FSYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
