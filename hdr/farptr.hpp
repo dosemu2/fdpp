@@ -79,20 +79,27 @@ public:
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
         SymWrp2<T1>& get_sym();
 
-    /* everyone with get_ref() method should have a default ctor */
+    /* everyone with get_ref() method should have no copy ctor */
     AsmSym() = default;
+    AsmSym(const AsmSym<T> &) = delete;
     T** get_ref();
 };
 
 template<typename T>
 class AsmFSym {
 public:
-    AsmFSym(const FarPtr<T> &);
-    SymWrp2<T*>& operator *();
     FarPtr<T>& get_sym();
 
     AsmFSym() = default;
+    AsmFSym(const AsmFSym<T> &) = delete;
     T** get_ref();
+};
+
+template<typename T>
+class AsmCSym {
+public:
+    AsmCSym(const FarPtr<T> &);
+    SymWrp2<T*>& operator *();
 };
 
 template<typename T> class AsmFarPtr;
@@ -117,6 +124,7 @@ public:
     uint16_t __off();
 
     AsmFarPtr() = default;
+    AsmFarPtr(const AsmFarPtr<T> &) = delete;
     T*** get_ref();
 };
 
@@ -126,7 +134,7 @@ public:
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMREF(f) f.get_ref()
 #define __ASMADDR(v) &__##v
-#define __ASMCALL(t, f) __ASMFSYM(t) f
+#define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define __FSYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
