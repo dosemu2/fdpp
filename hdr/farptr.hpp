@@ -39,12 +39,14 @@ public:
     uint16_t __off();
 };
 
+template<typename T> class AsmSym;
 template<typename T>
 class SymWrp : public T {
 public:
     SymWrp(const T&);
     SymWrp(const SymWrp&) = delete;
     FarPtr<T> operator &();
+    AsmSym<T>& back_ref();
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
@@ -73,6 +75,15 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
         SymWrp2<T1>& get_sym();
+    SymWrp<T>* operator ->();
+    operator FarPtr<T> ();
+    T** get_ref();
+};
+
+template<typename T>
+class AsmFSym {
+public:
+    FarPtr<T>& get_sym();
     T** get_ref();
 };
 
@@ -102,11 +113,14 @@ public:
 };
 
 #define __ASMSYM(t) AsmSym<t>
+#define __ASMFSYM(t) AsmFSym<t>
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMREF(f) f.get_ref()
+#define __ASMADDR(v) &v.back_ref()
 #define __ASMCALL(t, f) __ASMFAR(t) f
 #define __ASYM(x) x.get_sym()
+#define __FSYM(x) x.get_sym()
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))

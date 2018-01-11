@@ -199,7 +199,7 @@ struct lowvec {
 #define __ASM_FAR(t, v) extern __ASMFAR(t) __##v
 #define __ASM_ARR(t, v, l) extern t (* __##v)[l]
 #define __ASM_ARRI(t, v) extern UBYTE (* __##v)[0]
-#define __ASM_FUNC(v) extern void * __##v
+#define __ASM_FUNC(v) extern __ASMFSYM(void) __##v
 #define SEMIC ;
 #include "glob_asm.h"
 #undef __ASM

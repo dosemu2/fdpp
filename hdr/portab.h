@@ -211,6 +211,12 @@ void enable(void);
 #define __FAR(t) t FAR *
 #define __ASMFAR(t) t FAR **
 #define __ASMFARREF(f) &f
+#define __ASMADDR(v) &__##v
+#define __ASMREF(f) &f
+#define __ASMSYM(t) t *
+#define __ASMFSYM(t) t *
+#define __ASYM(v) * v
+#define __FSYM(v) (__FAR(void)) v
 #define FP_SEG(fp)            ((unsigned short)((ULONG)(VOID FAR *)(fp)>>16))
 #define FP_OFF(fp)            ((unsigned short)(uintptr_t)(fp))
 #define MK_FP(seg,ofs)        ((__FAR(void))(((ULONG)(seg)<<16)|(UWORD)(ofs)))

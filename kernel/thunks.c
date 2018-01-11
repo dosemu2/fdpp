@@ -27,7 +27,7 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 #define __ASM_FAR(t, v) __ASMFAR(t) __##v
 #define __ASM_ARR(t, v, l) t (* __##v)[l]
 #define __ASM_ARRI(t, v) UBYTE (* __##v)[0]
-#define __ASM_FUNC(v) void * __##v
+#define __ASM_FUNC(v) __ASMFSYM(void) __##v
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR
@@ -57,7 +57,7 @@ static union asm_thunks_u {
 #define __ASM_FAR(t, v) __ASMREF(__##v)
 #define __ASM_ARR(t, v, l) &__##v
 #define __ASM_ARRI(t, v) &__##v
-#define __ASM_FUNC(v) &__##v
+#define __ASM_FUNC(v) __ASMREF(__##v)
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR

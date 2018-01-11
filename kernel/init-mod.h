@@ -141,7 +141,8 @@ extern char singleStep;
 extern char SkipAllConfig;
 extern char master_env[128];
 
-extern __FAR(struct lol) LoL;
+extern __ASMSYM(struct lol) *_LoL;
+#define LoL (*_LoL)
 
 struct _nlsCountryInfoHardcoded {
   char  ThisIsAConstantOne;
