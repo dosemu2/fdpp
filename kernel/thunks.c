@@ -25,7 +25,7 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 #define SEMIC ;
 #define __ASM(t, v) __ASMSYM(t) __##v
 #define __ASM_FAR(t, v) __ASMFAR(t) __##v
-#define __ASM_ARR(t, v, l) t (* __##v)[l]
+#define __ASM_ARR(t, v, l) __ASMARSYM(t, __##v, l)
 #define __ASM_ARRI(t, v) __ASMARISYM(t, __##v)
 #define __ASM_ARRI_F(t, v) __ASMARIFSYM(t, __##v)
 #define __ASM_FUNC(v) __ASMFSYM(void) __##v
@@ -41,7 +41,7 @@ static union asm_thunks_u {
   struct _thunks {
 #define __ASM(t, v) t ** __##v
 #define __ASM_FAR(t, v) t *** __##v
-#define __ASM_ARR(t, v, l) t (** __##v)[l]
+#define __ASM_ARR(t, v, l) t *** __##v
 #define __ASM_ARRI(t, v) t *** __##v
 #define __ASM_ARRI_F(t, v) t *** __##v
 #define __ASM_FUNC(v) void ** __##v
@@ -59,7 +59,7 @@ static union asm_thunks_u {
 #define SEMIC ,
 #define __ASM(t, v) __ASMREF(__##v)
 #define __ASM_FAR(t, v) __ASMREF(__##v)
-#define __ASM_ARR(t, v, l) &__##v
+#define __ASM_ARR(t, v, l) __ASMREF(__##v)
 #define __ASM_ARRI(t, v) __ASMREF(__##v)
 #define __ASM_ARRI_F(t, v) __ASMREF(__##v)
 #define __ASM_FUNC(v) __ASMREF(__##v)

@@ -169,17 +169,17 @@ thunkapi.h: thunkapi_gen.h thunkapi_tmpl.h makefile
 
 glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\)).*/#define \1 (__ASYM(__\1))/' >$@
+		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >$@
 	grep "__ASM_ARR(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\),.\+).*/#define \1 (*__\1)/' >>$@
+		sed 's/.\+(.\+, \(.\+\), .\+).*/#define \1 __ARSYM(__\1)/' >>$@
 	grep "__ASM_ARRI(" $< | grep -v '^/' | \
-		sed 's/.\+(\(.\+\), \(.\+\)).*/#define \2 (__ARISYM(\1, __\2))/' >>$@
+		sed 's/.\+(.\+, \(.\+\)).*/#define \1 __ARISYM(__\1)/' >>$@
 	grep "__ASM_ARRI_F(" $< | grep -v '^/' | \
-		sed 's/.\+(\(.\+\), \(.\+\)).*/#define \2 (__ARIFSYM(\1, __\2))/' >>$@
+		sed 's/.\+(.\+, \(.\+\)).*/#define \1 __ARIFSYM(__\1)/' >>$@
 	grep "__ASM_FAR(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\)).*/#define \1 (__FARSYM(__\1))/' >>$@
+		sed 's/.\+, \(.\+\)).*/#define \1 __FARSYM(__\1)/' >>$@
 	grep "__ASM_FUNC(" $< | grep -v '^/' | \
-		sed 's/.\+(\(.\+\)).*/#define \1 (__FSYM(__\1))/' >>$@
+		sed 's/.\+(\(.\+\)).*/#define \1 __FSYM(__\1)/' >>$@
 
 install: $(FDPPLIB) thunkapi.h
 	install -t /usr/local/lib $(FDPPLIB)
