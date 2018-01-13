@@ -88,7 +88,7 @@ public:
 template<typename T>
 class AsmFSym {
 public:
-    FarPtr<T>& get_sym();
+    FarPtr<T> get_sym();
 
     AsmFSym() = default;
     AsmFSym(const AsmFSym<T> &) = delete;
@@ -118,8 +118,8 @@ public:
     AsmFarPtr(const FarPtr<void>&);
     FarPtrAsm<T>& operator *();
     operator FarPtr<T> *();
-    template<typename T0>
-        explicit operator T0*();
+    /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
+    explicit operator uint16_t *();
     uint16_t __seg();
     uint16_t __off();
 
