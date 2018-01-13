@@ -6,6 +6,7 @@ COMPILER ?= gcc
 XNASM ?= nasm
 XCPU ?= 386
 XLINK = ../contrib/jwlink
+XFAT ?= 32
 include ../mkfiles/generic.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib

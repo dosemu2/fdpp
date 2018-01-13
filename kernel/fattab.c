@@ -127,8 +127,8 @@ void write_fsinfo(struct dpb FAR * dpbp)
 
   fip = (struct fsinfo FAR *)&bp->b_buffer[0x1e4];
 
-  if (fip->fi_nfreeclst != dpbp->dpb_xnfreeclst ||
-    fip->fi_cluster != dpbp->dpb_xcluster)
+  if (fip->fi_nfreeclst != (signed)dpbp->dpb_xnfreeclst ||
+    fip->fi_cluster != (signed)dpbp->dpb_xcluster)
     bp->b_flag |= BFR_DIRTY; /* only flag for update if we had real news */
 
   fip->fi_nfreeclst = dpbp->dpb_xnfreeclst;

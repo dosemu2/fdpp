@@ -80,4 +80,4 @@ struct xdpbforformat {
   } xdff_f;
 };
 
-COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp);
+COUNT DosGetExtFree(__FAR(BYTE) DriveString, __FAR(struct xfreespace) xfsp);

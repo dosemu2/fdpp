@@ -85,13 +85,13 @@ struct dpb FAR * GetDriveDPB(UBYTE drive, COUNT * rc)
   if (cdsp == NULL)
   {
     *rc = DE_INVLDDRV;
-    return 0;
+    return NULL;
   }
   dpb = cdsp->cdsDpb;
   if (dpb == 0 || cdsp->cdsFlags & CDSNETWDRV)
   {
     *rc = DE_INVLDDRV;
-    return 0;
+    return NULL;
   }
 
   *rc = SUCCESS;
@@ -756,7 +756,7 @@ UWORD DosGetFree(UBYTE drive, UWORD * navc, UWORD * bps, UWORD * nc)
 #ifdef WITHFAT32
   if (ISFAT32(dpbp))
   {
-    ULONG cluster_size, ntotal, nfree;
+    ULONG cluster_size, ntotal, nfree = 0;
 
     /* we shift ntotal until it is equal to or below 0xfff6 */
     cluster_size = (ULONG) dpbp->dpb_secsize << dpbp->dpb_shftcnt;

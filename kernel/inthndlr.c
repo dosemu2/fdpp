@@ -302,7 +302,7 @@ int int21_fat32(lregs *r)
           if (!ISFAT32(dpb))
             return DE_INVLDPARM;
 
-          value = xdffp->xdff_f.setget.new;
+          value = xdffp->xdff_f.setget._new;
           if ((UWORD) xdffp->xdff_function == 0x03)
           {
             /* FAT mirroring */
