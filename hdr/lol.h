@@ -42,7 +42,7 @@ struct lol {
   unsigned short _maxsecsize;   /* 10 max bytes per sector for any blkdev  */
   void FAR *inforecptr;        /* 12 pointer to disk buffer info record   */
   struct cds FAR *_CDSp;       /* 16 Current Directory Structure          */
-  struct sfttbl FAR *FCBp;     /* 1a FCB table pointer                    */
+  struct sfttbl FAR *_FCBp;     /* 1a FCB table pointer                    */
   unsigned short _nprotfcb;     /* 1e number of protected fcbs             */
   unsigned char _nblkdev;      /* 20 number of block devices              */
   unsigned char _lastdrive;    /* 21 value of last drive                  */

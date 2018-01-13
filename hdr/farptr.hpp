@@ -66,7 +66,7 @@ public:
 template<typename T>
 class AsmRef : public FarPtr<T> {
 public:
-    AsmRef(const AsmSym<T> *);
+    AsmRef(const AsmSym<T> *); // XXX fix
 };
 
 template<typename T>
@@ -145,24 +145,31 @@ public:
     AsmArFSym(const AsmArFSym<T> &) = delete;
 };
 
-template<typename T> class AsmFarPtr;
 template<typename T>
-class FarPtrAsm : public FarPtr<T> {
+class FarPtrAsm {
 public:
-    FarPtrAsm(const FarPtrAsm&) = delete;
-    AsmFarPtr<T> operator &();
-    void operator =(const FarPtr<T>&);
+    /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
+    explicit operator uint16_t *();
+    operator FarPtr<T> *();
+    /* via mk_dosobj() I guess */
+    uint16_t __seg();
+    uint16_t __off();
 };
 
 template<typename T>
 class AsmFarPtr {
 public:
-    AsmFarPtr(T**);
-    AsmFarPtr(const FarPtr<void>&);
-    FarPtrAsm<T>& operator *();
-    operator FarPtr<T> *();
-    /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
-    explicit operator uint16_t *();
+    AsmFarPtr(const FarPtr<T>&);
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+        AsmFarPtr(const FarPtr<void>&);
+    template <typename T0, typename T1 = T,
+        typename std::enable_if<!std::is_same<T1, T0>::value &&
+            std::is_void<T1>::value>::type* = nullptr>
+        AsmFarPtr(const FarPtr<T0>&);
+    operator FarPtr<T> &();
+    FarPtr<T>& get_sym();
+    FarPtrAsm<T> operator &();
     uint16_t __seg();
     uint16_t __off();
 
@@ -182,6 +189,7 @@ public:
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define __FSYM(x) x.get_sym()
+#define __FARSYM(x) x.get_sym()
 #define __ARISYM(t, x) x.get_sym()
 #define __ARIFSYM(t, x) x.get_sym()
 #define ASMREF(t) AsmRef<t>

@@ -177,7 +177,7 @@ glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM_ARRI_F(" $< | grep -v '^/' | \
 		sed 's/.\+(\(.\+\), \(.\+\)).*/#define \2 (__ARIFSYM(\1, __\2))/' >>$@
 	grep "__ASM_FAR(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\)).*/#define \1 (*__\1)/' >>$@
+		sed 's/.\+, \(.\+\)).*/#define \1 (__FARSYM(__\1))/' >>$@
 	grep "__ASM_FUNC(" $< | grep -v '^/' | \
 		sed 's/.\+(\(.\+\)).*/#define \1 (__FSYM(__\1))/' >>$@
 
