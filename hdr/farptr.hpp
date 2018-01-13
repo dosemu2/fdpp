@@ -64,9 +64,13 @@ public:
 };
 
 template<typename T>
-class AsmRef : public FarPtr<T> {
+class AsmRef : public T {
 public:
-    AsmRef(const AsmSym<T> *); // XXX fix
+    T* operator ->();
+    operator FarPtr<T> ();
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+        operator FarPtr<void> ();
 };
 
 template<typename T>
@@ -78,6 +82,7 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
         SymWrp2<T1>& get_sym();
+    AsmRef<T> operator &();
 
     /* everyone with get_ref() method should have no copy ctor */
     AsmSym() = default;
