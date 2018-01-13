@@ -101,8 +101,8 @@ __ASM_ARR(struct lowvec, intvec_table, 5) SEMIC
 /* floppy parameter table, at 70:xxxx */
 __ASM_ARR(unsigned char, int1e_table, 0xe) SEMIC
 __ASM(struct DynS FAR, Dyn) SEMIC
-__ASM_ARRI(struct RelocationTable, _HMARelocationTableStart) SEMIC
-__ASM_ARRI(struct RelocationTable, _HMARelocationTableEnd) SEMIC
+__ASM_ARRI_F(struct RelocationTable, _HMARelocationTableStart) SEMIC
+__ASM_ARRI_F(struct RelocationTable, _HMARelocationTableEnd) SEMIC
 __ASM_FAR(void, XMSDriverAddress) SEMIC
 __ASM(request, ClkReqHdr) SEMIC
 __ASM(WORD, current_sft_idx) SEMIC
@@ -139,5 +139,5 @@ __ASM_FUNC(int29_handler) SEMIC
 __ASM_FUNC(int2a_handler) SEMIC
 __ASM_FUNC(int2f_handler) SEMIC
 __ASM_FUNC(got_cbreak) SEMIC
-__ASM_ARRI(const BYTE, os_release) SEMIC
+__ASM_ARRI_F(const BYTE, os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC

@@ -1250,8 +1250,8 @@ dispatch:
           goto dispatch;
 
         case 0x06:
-          lr.DS = FP_SEG((BYTE FAR *)internal_data);
-          lr.SI = FP_OFF((BYTE FAR *)internal_data);
+          lr.DS = FP_SEG(&internal_data);
+          lr.SI = FP_OFF(&internal_data);
           lr.CX = swap_indos - internal_data;
           lr.DX = swap_always - internal_data;
           CLEAR_CARRY_FLAG();

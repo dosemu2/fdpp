@@ -102,6 +102,49 @@ public:
     SymWrp2<T*>& operator *();
 };
 
+template<typename T>
+class NearPtr {
+public:
+    operator uint16_t ();
+    FarPtr<T> operator &();
+    operator T *();
+    NearPtr<T> operator -(const NearPtr<T> &);
+};
+
+template<typename T>
+class AsmArSym {
+public:
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+        SymWrp<T1>& operator [](unsigned);
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+        SymWrp2<T1>& operator [](unsigned);
+    void set_ar_size(unsigned);
+
+    AsmArSym() = default;
+    AsmArSym(const AsmArSym<T> &) = delete;
+    T*** get_ref();
+};
+
+template<typename T>
+class AsmArNSym : public AsmArSym<T> {
+public:
+    NearPtr<T> get_sym();
+
+    AsmArNSym() = default;
+    AsmArNSym(const AsmArNSym<T> &) = delete;
+};
+
+template<typename T>
+class AsmArFSym : public AsmArSym<T> {
+public:
+    FarPtr<T> get_sym();
+
+    AsmArFSym() = default;
+    AsmArFSym(const AsmArFSym<T> &) = delete;
+};
+
 template<typename T> class AsmFarPtr;
 template<typename T>
 class FarPtrAsm : public FarPtr<T> {
@@ -130,6 +173,8 @@ public:
 
 #define __ASMSYM(t) AsmSym<t>
 #define __ASMFSYM(t) AsmFSym<t>
+#define __ASMARISYM(t, v) AsmArNSym<t> v
+#define __ASMARIFSYM(t, v) AsmArFSym<t> v
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMREF(f) f.get_ref()
@@ -137,6 +182,8 @@ public:
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define __FSYM(x) x.get_sym()
+#define __ARISYM(t, x) x.get_sym()
+#define __ARIFSYM(t, x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())
