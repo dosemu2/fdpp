@@ -313,13 +313,13 @@ void MoveKernel(unsigned NewKernelSegment)
   unsigned jmpseg = CurrentKernelSegment;
 
   if (CurrentKernelSegment == 0)
-    CurrentKernelSegment = FP_SEG((BYTE FAR *)_HMATextEnd);
+    CurrentKernelSegment = FP_SEG(_HMATextEnd);
 
   if (CurrentKernelSegment == 0xffff)
     return;
 
   HMASource = (UBYTE FAR *)
-      MK_FP(CurrentKernelSegment, (FP_OFF((BYTE FAR *)_HMATextStart) & 0xfff0));
+      MK_FP(CurrentKernelSegment, (FP_OFF(_HMATextStart) & 0xfff0));
   HMADest = (UBYTE FAR *)MK_FP(NewKernelSegment, 0x0000);
 
   len = (FP_OFF((BYTE FAR *)_HMATextEnd) | 0x000f) - (FP_OFF((BYTE FAR *)_HMATextStart) & 0xfff0);

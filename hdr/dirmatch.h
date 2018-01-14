@@ -37,7 +37,7 @@ static BYTE *dirmatch_hRcsId =
 
 typedef struct {
   UBYTE dm_drive;
-  BYTE dm_name_pat[FNAME_SIZE + FEXT_SIZE];
+  AR_MEMB(BYTE, dm_name_pat, FNAME_SIZE + FEXT_SIZE);
   UBYTE dm_attr_srch;
   UWORD dm_entry;
   CLUSTER dm_dircluster;
@@ -50,5 +50,5 @@ typedef struct {
   time dm_time;                 /* file time                    */
   date dm_date;                 /* file date                    */
   ULONG dm_size;                /* file size                    */
-  BYTE dm_name[FNAME_SIZE + FEXT_SIZE + 2];     /* file name    */
+  AR_MEMB(BYTE, dm_name, FNAME_SIZE + FEXT_SIZE + 2);     /* file name    */
 } dmatch;

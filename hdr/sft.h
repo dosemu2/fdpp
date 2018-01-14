@@ -99,7 +99,7 @@ typedef struct sfttbl {
     sftt_next;
   WORD sftt_count;              /* # of handle definition       */
   /* entries, this table          */
-  sft sftt_table[SFTMAX];       /* The array of sft for block   */
+  AR_MEMB(sft, sftt_table, SFTMAX);       /* The array of sft for block   */
 } sfttbl;
 
 /* defines for sft use                                                  */

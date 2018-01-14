@@ -390,7 +390,7 @@ void hexd(const char *title, VOID FAR * v_p, COUNT numBytes)
       put_console(' ');
     }
     for (loop = start; loop < numBytes && loop < start+16;loop++)
-      put_console(p[loop] < 0x20 ? '.' : p[loop]);
+      put_console(p[loop] < 0x20 ? '.' : (char)p[loop]);
     put_console('\n');
   }
 }

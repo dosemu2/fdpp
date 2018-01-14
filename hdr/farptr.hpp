@@ -5,13 +5,26 @@
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
+
+template<typename T> class SymWrp;
+template<typename T> class SymWrp2;
+template<typename T, int max_len = 0>
+class ArSymBase {
+public:
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+        SymWrp<T1>& operator [](unsigned);
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+        SymWrp2<T1>& operator [](unsigned);
+};
+
 template<typename T>
-class FarPtr : protected far_s {
+class FarPtr : protected far_s, public ArSymBase<T> {
 public:
     FarPtr() = default;
     FarPtr(uint16_t, uint16_t);
     FarPtr(std::nullptr_t);
-    FarPtr(T*);
 #define ALLOW_CNV(T0, T1) (std::is_convertible<T0*, T1*>::value || \
         std::is_void<T0>::value || std::is_same<T0, char>::value || \
         std::is_same<T1, char>::value || \
@@ -30,19 +43,23 @@ public:
         explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
     operator T*();
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T1, T0)>::type* = nullptr>
+        operator T0*();
     FarPtr<T> operator ++(int);
     FarPtr<T> operator ++();
     FarPtr<T> operator --();
     void operator +=(int);
     FarPtr<T> operator +(int);
+    FarPtr<T> operator -(int);
     uint16_t __seg();
     uint16_t __off();
 };
 
-template<typename T> class AsmSym;
 template<typename T>
 class SymWrp : public T {
 public:
+    SymWrp() = default;
     SymWrp(const T&);
     SymWrp(const SymWrp&) = delete;
     FarPtr<T> operator &();
@@ -51,6 +68,7 @@ public:
 template<typename T>
 class SymWrp2 {
 public:
+    SymWrp2() = default;
     SymWrp2(const T&);
     SymWrp2(const SymWrp2&) = delete;
     FarPtr<T> operator &();
@@ -66,11 +84,14 @@ public:
 template<typename T>
 class AsmRef : public T {
 public:
+    AsmRef(const AsmRef<T> &);
     T* operator ->();
     operator FarPtr<T> ();
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
         operator FarPtr<void> ();
+    uint16_t __seg();
+    uint16_t __off();
 };
 
 template<typename T>
@@ -110,22 +131,41 @@ public:
 template<typename T>
 class NearPtr {
 public:
+    NearPtr(uint16_t);
     operator uint16_t ();
     FarPtr<T> operator &();
     operator T *();
     NearPtr<T> operator -(const NearPtr<T> &);
+    uint16_t __off();
+
+    NearPtr() = default;
 };
 
 template<typename T, int max_len = 0>
-class AsmArSym {
+class ArSym : public ArSymBase<T> {
 public:
+    operator FarPtr<void> ();
     template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-        SymWrp<T1>& operator [](unsigned);
+        typename std::enable_if<!_C(T1)>::type* = nullptr>
+        operator FarPtr<const void> ();
     template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-        SymWrp2<T1>& operator [](unsigned);
+        typename std::enable_if<!_C(T1)>::type* = nullptr>
+        operator FarPtr<const T1> ();
+    operator FarPtr<T> ();
+    operator NearPtr<T> ();
+    operator SymWrp2<T*>& ();
+    operator T *();
+    FarPtr<T> operator +(int);
+    FarPtr<T> operator +(size_t);
+    FarPtr<T> operator -(int);
 
+    ArSym() = default;
+    ArSym(const ArSym<T> &) = delete;
+};
+
+template<typename T, int max_len = 0>
+class AsmArSym : public ArSymBase<T> {
+public:
     AsmArSym() = default;
     AsmArSym(const AsmArSym<T> &) = delete;
     T*** get_ref();
@@ -199,6 +239,10 @@ public:
 #define __ARISYM(x) x.get_sym()
 #define __ARIFSYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
+#define AR_MEMB(t, n, l) ArSym<t, l> n
+#define SYM_MEMB(t) SymWrp<t>
+#define SYM_MEMB_T(t) SymWrp2<t>
+#define PTR_MEMB(t) NearPtr<t>
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))

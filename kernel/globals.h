@@ -230,7 +230,7 @@ struct __PriPathBuffer                  /* Path name parsing buffer             
 
 struct __SecPathBuffer                  /* Alternate path name parsing buffer   */
 {
-  BYTE _SecPathName[128];
+  AR_MEMB(BYTE, _SecPathName, 128);
 };
 
 #define SecPathName _SecPathBuffer._SecPathName
@@ -238,7 +238,7 @@ struct __SecPathBuffer                  /* Alternate path name parsing buffer   
 /*extern WORD
   NumFloppies; !!*//* How many floppies we have            */
 
-extern UBYTE DiskTransferBuffer[/*SEC_SIZE*/];
+extern UBYTE DiskTransferBuffer[MAX_SEC_SIZE];
 
 /* start of uncontrolled variables                                      */
 
@@ -271,12 +271,12 @@ intvec getvec(unsigned char);
 #define getlong(vp) (*(UDWORD *)(vp))
 #define getword(vp) (*(UWORD *)(vp))
 #define getbyte(vp) (*(UBYTE *)(vp))
-#define fgetlong(vp) (*(UDWORD FAR *)(vp))
-#define fgetword(vp) (*(UWORD FAR *)(vp))
-#define fgetbyte(vp) (*(UBYTE FAR *)(vp))
-#define fputlong(vp, l) (*(UDWORD FAR *)(vp)=l)
-#define fputword(vp, w) (*(UWORD FAR *)(vp)=w)
-#define fputbyte(vp, b) (*(UBYTE FAR *)(vp)=b)
+#define fgetlong(vp) (*(__FAR(UDWORD))(vp))
+#define fgetword(vp) (*(__FAR(UWORD))(vp))
+#define fgetbyte(vp) (*(__FAR(UBYTE))(vp))
+#define fputlong(vp, l) (*(__FAR(UDWORD))(vp)=l)
+#define fputword(vp, w) (*(__FAR(UWORD))(vp)=w)
+#define fputbyte(vp, b) (*(__FAR(UBYTE))(vp)=b)
 #else
 UDWORD getlong(VOID *);
 UWORD getword(VOID *);

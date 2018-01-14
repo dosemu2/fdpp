@@ -411,7 +411,7 @@ struct nlsExtCntryInfo {
 struct nlsPointer {             /* Information of DOS-65-0X is addressed
                                    by a pointer */
   UBYTE subfct;                 /* number of the subfunction */
-  VOID FAR *pointer;            /* the pointer to be returned when the subfunction
+  __FAR(VOID)pointer;            /* the pointer to be returned when the subfunction
                                    of DOS-65 is called (Note: won't work for
                                    subfunctions 0, 1, 0x20, 0x21, 0x22, 0x23,
                                    0xA0, 0xA1,& 0xA2 */
@@ -419,7 +419,7 @@ struct nlsPointer {             /* Information of DOS-65-0X is addressed
 
 struct nlsPackage {             /* the contents of one chain item of the
                                    list of NLS packages */
-  struct nlsPackage FAR *nxt;   /* next item in chain */
+  __FAR(struct nlsPackage)nxt;   /* next item in chain */
   UWORD cntry, cp;              /* country ID / codepage of this NLS pkg */
   int flags;                    /* direct access and other flags */
   /* Note: Depending on the flags above all remaining
@@ -430,12 +430,12 @@ struct nlsPackage {             /* the contents of one chain item of the
   UWORD yeschar;                /* yes / no character DOS-65-23 */
   UWORD nochar;
   unsigned numSubfct;           /* number of supported sub-functions */
-  struct nlsPointer nlsPointers[1];     /* grows dynamically */
+  AR_MEMB(struct nlsPointer, nlsPointers, 1);     /* grows dynamically */
 };
 
 struct nlsDBCS {                /* The internal structure is unknown to me */
   UWORD numEntries;
-  UWORD dbcsTbl[4];             /* I don't know max size but it should need
+  AR_MEMB(UWORD, dbcsTbl, 4);             /* I don't know max size but it should need
                                    at least 3 words (6 bytes)
                                    ({0x81,0x9f,0xe0,0xfc,0,0} for CP932-Japan)
                                    -- lpproj 2014/10/27 */
@@ -446,7 +446,7 @@ struct nlsCharTbl {
   UWORD numEntries;             /* number of entries of this table.
                                    If <= 0x80, the first element of
                                    the table corresponse to character 0x80 */
-  unsigned char tbl[1];         /* grows dynamically */
+  AR_MEMB(unsigned char, tbl, 1);         /* grows dynamically */
 };
 #define nlsChBuf(len)		struct nlsCharTbl##len {		\
 			UWORD numEntries;							\
@@ -469,12 +469,12 @@ struct nlsFnamTerm {
 
 struct nlsInfoBlock {           /* This block contains all information
                                    shared by the kernel and the external NLSFUNC program */
-  char FAR *fname;              /* filename from COUNTRY=;
+  __FAR(char)fname;              /* filename from COUNTRY=;
                                    maybe tweaked by NLSFUNC */
   UWORD sysCodePage;            /* system code page */
   unsigned flags;               /* implementation flags */
-  struct nlsPackage FAR *actPkg;        /* current NLS package */
-  struct nlsPackage FAR *chain; /* first item of info chain --
+  __FAR(struct nlsPackage)actPkg;        /* current NLS package */
+  __FAR(struct nlsPackage) chain; /* first item of info chain --
                                    hardcoded U.S.A./CP437 */
 };
 
@@ -560,7 +560,7 @@ struct csys_ccDefinition {   /* country/codepage reference */
 
 /* initially the object rpos is pointing to conforms to a
 	struct nlsPackage, where:
-	  struct nlsPackage FAR *nxt;   is missing
+	  __FAR(struct nlsPackage)nxt;   is missing
 	  UWORD cntry, cp;              is missing
 	  int flags;                    is NLS_FLAG_HARDCODED, if the
 	  									kernel is to handle the data of its own

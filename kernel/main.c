@@ -290,7 +290,7 @@ STATIC void init_kernel(void)
 #ifdef __WATCOMC__
   lpTop = MK_FP(_CS, 0);
 #else
-  lpTop = (BYTE FAR *)MK_FP(_CS - (FP_OFF((BYTE FAR *)_HMATextEnd) + 15) / 16, 0);
+  lpTop = MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
 #endif
 
   MoveKernel(FP_SEG(lpTop));
@@ -364,7 +364,7 @@ STATIC VOID FsConfig(VOID)
 
     pcds_table->cdsCurrentPath[0] += i;
 
-    if (i < LoL->_nblkdev && dpb != MK_FP(-1, -1))
+    if (i < LoL->_nblkdev && dpb != _MK_DOS_FP(struct dpb, -1, -1))
     {
       pcds_table->cdsDpb = _DOS_FP(dpb);
       pcds_table->cdsFlags = CDSPHYSDRV;
@@ -437,7 +437,7 @@ STATIC VOID signon()
   " - FAT32 support"
 #endif
   "\n\n%s",
-         MK_FP(FP_SEG((struct lol FAR *)LoL), FP_OFF((char FAR *)LoL->_os_release)),
+         MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release)),
          MAJOR_RELEASE, MINOR_RELEASE, copyright);
 }
 
@@ -491,7 +491,7 @@ STATIC void kernel()
       Config.cfgInitTail = Cmd.ctBuffer;
     }
   }
-  init_call_p_0(&Config); /* go execute process 0 (the shell) */
+  init_call_p_0(MK_FAR(Config)); /* go execute process 0 (the shell) */
 }
 
 /* check for a block device and update  device control block    */
@@ -505,7 +505,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; _MK_FP(struct dpb, _dpb->dpb_next) != MK_FP(-1, -1);
+    for (_dpb = LoL->_DPBp; _MK_FP(struct dpb, _dpb->dpb_next) != _MK_DOS_FP(struct dpb, -1, -1);
          _dpb = _MK_FP(struct dpb, _dpb->dpb_next))
       ;
     _dpb = (struct dpb FAR *)
@@ -570,7 +570,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_bpbptr = _DOS_FP((bpb FAR **)(void *)(cmdLine ? cmdLine : "\n"));  // XXX is typecase correct?
   rq.r_firstunit = LoL->_nblkdev;
 
-  execrh((request FAR *) & rq, dhp);
+  execrh(MK_FAR(rq), dhp);
 
 /*
  *  Added needed Error handle

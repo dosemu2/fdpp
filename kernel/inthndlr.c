@@ -1814,7 +1814,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
         rq.r_status = 0;
         rq.r_command = C_OPEN;
         rq.r_length = sizeof(request);
-        execrh((request FAR *) & rq, lpCurSft->sft_dev);
+        execrh(MK_FAR(rq), lpCurSft->sft_dev);
       }
 
       /* just do it always, not just for FCBs */

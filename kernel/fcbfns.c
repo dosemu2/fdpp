@@ -68,7 +68,7 @@ UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
     {
       mdb = spc >> 8;
       spc &= 0xff;
-      return &mdb;
+      return MK_FAR(mdb);
     }
     else
     {
@@ -465,7 +465,7 @@ STATIC void FcbNameInit(fcb FAR * lpFcb, BYTE * szBuffer, COUNT * pCurDrive)
     pszBuffer[1] = ':';
     pszBuffer += 2;
   }
-  ConvertName83ToNameSZ(pszBuffer, lpFcb->fcb_fname);
+  ConvertName83ToNameSZ(MK_FAR_STR(pszBuffer), lpFcb->fcb_fname);
 }
 
 UBYTE FcbDelete(xfcb FAR * lpXfcb)
@@ -544,7 +544,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       int i;
       UBYTE mode = 0;
 
-      FcbParseFname(&mode, pFromPattern, &LocalFcb);
+      FcbParseFname(&mode, pFromPattern, MK_FAR(LocalFcb));
       /* Overlay the pattern, skipping '?'            */
       /* I'm cheating because this assumes that the   */
       /* struct alignments are on byte boundaries     */
@@ -570,7 +570,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       }
       /* now to build a dos name again                */
       LocalFcb.fcb_drive = FcbDrive;
-      FcbNameInit(&LocalFcb, loc_szBuffer, &FcbDrive);
+      FcbNameInit(MK_FAR(LocalFcb), loc_szBuffer, &FcbDrive);
       result = truename(loc_szBuffer, SecPathName, 0);
       if (result < SUCCESS || (result & (IS_NETWORK|IS_DEVICE)) == IS_DEVICE
         || DosRenameTrue(PriPathName, SecPathName, wAttr) != SUCCESS)

@@ -265,7 +265,7 @@ STATIC WORD RWzero(ddt * pddt, UWORD mode)
   UWORD done;
 
   return LBA_Transfer(pddt, mode,
-                      (UBYTE FAR *) DiskTransferBuffer,
+                      (UBYTE FAR *) MK_FAR(DiskTransferBuffer),
                       pddt->ddt_offset, 1, &done);
 }
 
@@ -604,7 +604,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
             if ((fv->gbfv_spcfunbit & 1) &&
                 (ret =
                  fl_read(pddt->ddt_driveno, 0, 0, 1, 1,
-                         DiskTransferBuffer)) != 0)
+                         MK_FAR(DiskTransferBuffer))) != 0)
             {
               fv->gbfv_spcfunbit = 3;   /* no disk in drive */
               return dskerr(ret);
@@ -1029,18 +1029,18 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
 
         if ((pddt->ddt_descflags & DF_WRTVERIFY) || mode != LBA_WRITE_VERIFY)
         {
-          error_code = fl_lba_ReadWrite(driveno, mode, &dap);
+          error_code = fl_lba_ReadWrite(driveno, mode, MK_FAR(dap));
         }
         else
         {
           /* verify requested, but not supported */
           error_code =
-              fl_lba_ReadWrite(driveno, LBA_WRITE, &dap);
+              fl_lba_ReadWrite(driveno, LBA_WRITE, MK_FAR(dap));
 
           if (error_code == 0)
           {
             error_code =
-                fl_lba_ReadWrite(driveno, LBA_VERIFY, &dap);
+                fl_lba_ReadWrite(driveno, LBA_VERIFY, MK_FAR(dap));
           }
         }
       }

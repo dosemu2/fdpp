@@ -44,7 +44,7 @@ struct f_node {
   ULONG f_dirsector;            /* the sector containing dir entry*/
   UBYTE f_diridx;               /* offset/32 of dir entry in sec*/
   /* when dir is not root         */
-  struct dpb FAR *f_dpb;        /* the block device for file    */
+  __FAR(struct dpb) f_dpb;        /* the block device for file    */
 
   ULONG f_offset;               /* byte offset for next op      */
   CLUSTER f_cluster_offset;     /* relative cluster number within file */

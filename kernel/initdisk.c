@@ -634,6 +634,7 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
 {
   iregs regs;
   struct _bios_LBA_disk_parameterS lba_bios_parameters;
+  struct _bios_LBA_disk_parameterS FAR *bp;
 
   ExtLBAForce = FALSE;
 
@@ -676,8 +677,9 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
   memset(&lba_bios_parameters, 0, sizeof(lba_bios_parameters));
   lba_bios_parameters.size = sizeof(lba_bios_parameters);
 
-  regs.si = FP_OFF((struct _bios_LBA_disk_parameterS FAR *)&lba_bios_parameters);
-  regs.ds = FP_SEG((struct _bios_LBA_disk_parameterS FAR *)&lba_bios_parameters);
+  bp = MK_FAR(lba_bios_parameters);
+  regs.si = FP_OFF(bp);
+  regs.ds = FP_SEG(bp);
   regs.a.b.h = 0x48;
   regs.d.b.l = drive;
   init_call_intr(0x13, &regs);
@@ -956,6 +958,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
     16, 0, 0, 0, _MK_DOS_FP(unsigned char, 0, 0), 0, 0
   };
 
+  static struct _bios_LBA_address_packet FAR *f_dap;
   struct CHS chs;
   iregs regs;
   int num_retries;
@@ -986,17 +989,19 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         (InitKernelConfig.ForceLBA || ExtLBAForce || chs.Cylinder > 1023))
     {
       dap.number_of_blocks = 1;
-      dap.buffer_address = _DOS_FP((UBYTE FAR *)buffer);
+      dap.buffer_address = MK_FAR_SZ(buffer, MAX_SEC_SIZE);
       dap.block_address_high = 0;       /* clear high part */
       dap.block_address = LBA_address;  /* clear high part */
 
       /* Load the registers and call the interrupt. */
       regs.a.x = LBA_READ;
-      regs.si = FP_OFF((struct _bios_LBA_address_packet FAR *)&dap);
-      regs.ds = FP_SEG((struct _bios_LBA_address_packet FAR *)&dap);
+      f_dap = MK_FAR(dap);
+      regs.si = FP_OFF(f_dap);
+      regs.ds = FP_SEG(f_dap);
     }
     else
     {                           /* transfer data, using old bios functions */
+      UBYTE FAR *f_buf;
       /* avoid overflow at end of track */
 
       if (chs.Cylinder > 1023)
@@ -1005,13 +1010,14 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         return 1;
       }
 
+      f_buf = MK_FAR_SZ(buffer, MAX_SEC_SIZE);
       regs.a.x = 0x0201;
-      regs.b.x = FP_OFF((void FAR *)buffer);
+      regs.b.x = FP_OFF(f_buf);
       regs.c.x =
           ((chs.Cylinder & 0xff) << 8) + ((chs.Cylinder & 0x300) >> 2) +
           chs.Sector;
       regs.d.b.h = chs.Head;
-      regs.es = FP_SEG((void FAR *)buffer);
+      regs.es = FP_SEG(f_buf);
     }                           /* end of retries */
     init_call_intr(0x13, &regs);
     if ((regs.flags & FLG_CARRY) == 0)

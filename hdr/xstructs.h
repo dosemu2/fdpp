@@ -15,7 +15,7 @@ static BYTE *XStructs_hRcsId =
 
 struct xdpbdata {
   UWORD xdd_dpbsize;
-  struct dpb xdd_dpb;
+  SYM_MEMB(struct dpb) xdd_dpb;
 };
 
 struct xfreespace {

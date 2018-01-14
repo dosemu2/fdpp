@@ -56,7 +56,7 @@ struct cds FAR *get_cds(unsigned drive)
 
   if (drive >= lastdrive)
     return NULL;
-  cdsp = &CDSp[drive];
+  cdsp = __ASMADDR(CDSp[drive]);
   flags = cdsp->cdsFlags;
   /* Entry is disabled or JOINed drives are accessable by the path only */
   if (!(flags & CDSVALID) || (flags & CDSJOINED) != 0)
@@ -368,7 +368,7 @@ const char FAR *get_root(const char FAR * fname)
 
 STATIC void ConvertPathNameToFCBName(char *FCBName, const char *PathName)
 {
-  ConvertNameSZToName83(FCBName, (char *)MK_SP(FP_OFF(get_root(PathName))));
+  ConvertNameSZToName83(FCBName, (char *)MK_SP(FP_OFF(get_root(MK_FAR_STR(PathName)))));
   FCBName[FNAME_SIZE + FEXT_SIZE] = '\0';
 }
 

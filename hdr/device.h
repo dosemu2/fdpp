@@ -207,7 +207,7 @@ typedef struct ddtstruct {
   /* pointer to next table (offset FFFFh if last table) */
   UBYTE ddt_driveno;            /* physical unit number (for INT 13)     */
   UBYTE ddt_logdriveno;         /* logical drive number (0=A:)        */
-  bpb ddt_bpb;                  /* BIOS Parameter Block */
+  SYM_MEMB(bpb) ddt_bpb;                  /* BIOS Parameter Block */
   UBYTE ddt_flags;
   /* bit 6: 16-bit FAT instead of 12-bit
      bit 7: unsupportable disk (all accesses will return Not Ready) */

@@ -8,7 +8,7 @@ __ASM_FAR(sfttbl, sfthead) SEMIC    /* System File Table head               */
 __ASM(WORD, maxsecsize) SEMIC
 __ASM(unsigned char, bufloc) SEMIC    /* 0=conv, 1=HMA                        */
 __ASM_FAR(void, deblock_buf) SEMIC  /* pointer to workspace buffer      */
-__ASM_FAR(struct cds, CDSp) SEMIC   /* Current Directory Structure          */
+__ASM_ARRI_F(struct cds, CDSp) SEMIC   /* Current Directory Structure          */
 __ASM(LONG, current_filepos) SEMIC    /* current file position                */
 __ASM_FAR(sfttbl, FCBp) SEMIC       /* FCB table pointer                    */
 __ASM(WORD, nprotfcb) SEMIC           /* number of protected fcbs             */
@@ -89,8 +89,8 @@ __ASM_ARRI(BYTE, _ib_end) SEMIC
 __ASM_ARRI(BYTE, _init_end) SEMIC
 __ASM(struct lol FAR, DATASTART) SEMIC
 __ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
-__ASM_ARRI(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
-__ASM_ARRI(BYTE, _HMATextEnd) SEMIC
+__ASM_ARRI_F(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
+__ASM_ARRI_F(BYTE, _HMATextEnd) SEMIC
 __ASM_ARRI(BYTE, _InitTextStart) SEMIC     /* first available byte of ram          */
 __ASM_ARRI(BYTE, _InitTextEnd) SEMIC
 //__ASM(BYTE FAR, ReturnAnyDosVersionExpected) SEMIC

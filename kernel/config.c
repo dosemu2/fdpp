@@ -139,8 +139,8 @@ struct config Config = {
   0,
   NFCBS,
   0,
-  _cfgInit,
-  _cfgInitTail,
+  MK_OFFS_STR(_cfgInit),
+  MK_OFFS_STR(_cfgInitTail),
   NLAST,
   0,
   NSTACKS,
@@ -1697,8 +1697,8 @@ STATIC VOID InitPgm(BYTE * pLine)
   static char init[NAMEMAX];
   static char inittail[NAMEMAX];
 
-  Config.cfgInit = init;
-  Config.cfgInitTail = inittail;
+  Config.cfgInit = MK_OFFS(init);
+  Config.cfgInitTail = MK_OFFS(inittail);
 
   /* Get the string argument that represents the new init pgm     */
   pLine = GetStringArg(pLine, Config.cfgInit);
@@ -2130,7 +2130,7 @@ STATIC void config_init_buffers(int wantedbuffers)
       firstAvailableBuf = (char FAR *)(pbuffer + wantedbuffers);
     }
   }
-  LoL->_deblock_buf = DiskTransferBuffer;
+  LoL->_deblock_buf = MK_FAR(DiskTransferBuffer);
   LoL->_firstbuf = pbuffer;
 
   DebugPrintf(("init_buffers (size %u) at", sizeof(struct buffer)));

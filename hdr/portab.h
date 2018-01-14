@@ -200,8 +200,17 @@ void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
 #define MK_OFFS(data) (mk_dosobj(&data, sizeof(data)).off)
+#define MK_OFFS_STR(data) (mk_dosobj(data, strlen(data)).off)
 #define MK_FAR(data) ({ \
     struct far_s __f = mk_dosobj(&data, sizeof(data)); \
+    MK_FP(__f.seg, __f.off); \
+})
+#define MK_FAR_STR(data) ({ \
+    struct far_s __f = mk_dosobj(data, strlen(data)); \
+    MK_FP(__f.seg, __f.off); \
+})
+#define MK_FAR_SZ(data, sz) ({ \
+    struct far_s __f = mk_dosobj(data, sz); \
     MK_FP(__f.seg, __f.off); \
 })
 void disable(void);
@@ -232,7 +241,7 @@ void enable(void);
 #endif
 #define FP_FROM_D(t, l) (__FAR(t))MK_FP((l) >> 16, (l) & 0xffff)
 typedef struct far_s far_t;
-far_t mk_dosobj(void *data, UWORD len);
+far_t mk_dosobj(const void *data, UWORD len);
 
 #define FAR                     /* linear architecture  */
 #define REG

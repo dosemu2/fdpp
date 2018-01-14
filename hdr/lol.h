@@ -35,21 +35,21 @@ struct lol {
   char filler[0x22];
   char *_inputptr;              /* -4 Pointer to unread CON input          */
   unsigned short _first_mcb;   /* -2 Start of user memory                 */
-  struct dpb FAR *_DPBp;       /*  0 First drive Parameter Block          */
-  struct sfttbl FAR *_sfthead; /*  4 System File Table head               */
-  struct dhdr FAR *_clock;     /*  8 CLOCK$ device                        */
-  struct dhdr FAR *_syscon;    /*  c console device                       */
+  __FAR(struct dpb)_DPBp;       /*  0 First drive Parameter Block          */
+  __FAR(struct sfttbl)_sfthead; /*  4 System File Table head               */
+  __FAR(struct dhdr)_clock;     /*  8 CLOCK$ device                        */
+  __FAR(struct dhdr)_syscon;    /*  c console device                       */
   unsigned short _maxsecsize;   /* 10 max bytes per sector for any blkdev  */
-  void FAR *inforecptr;        /* 12 pointer to disk buffer info record   */
-  struct cds FAR *_CDSp;       /* 16 Current Directory Structure          */
-  struct sfttbl FAR *_FCBp;     /* 1a FCB table pointer                    */
+  __FAR(void)inforecptr;        /* 12 pointer to disk buffer info record   */
+  __FAR(struct cds)_CDSp;       /* 16 Current Directory Structure          */
+  __FAR(struct sfttbl)_FCBp;     /* 1a FCB table pointer                    */
   unsigned short _nprotfcb;     /* 1e number of protected fcbs             */
   unsigned char _nblkdev;      /* 20 number of block devices              */
   unsigned char _lastdrive;    /* 21 value of last drive                  */
-  struct dhdr _nul_dev;        /* 22 NUL device driver header(no pointer!)*/
+  SYM_MEMB(struct dhdr) _nul_dev;        /* 22 NUL device driver header(no pointer!)*/
   unsigned char _njoined;       /* 34 number of joined devices             */
   unsigned short specialptr;   /* 35 pointer to list of spec. prog(unused)*/
-  void FAR *setverPtr;         /* 37 pointer to SETVER list               */
+  __FAR(void)setverPtr;         /* 37 pointer to SETVER list               */
   void (*a20ptr)(void);        /* 3b pointer to fix A20 ctrl              */
   unsigned short recentpsp;    /* 3d PSP of most recently exec'ed prog    */
   unsigned short nbuffers;     /* 3f Number of buffers                    */
@@ -57,12 +57,12 @@ struct lol {
   unsigned char _BootDrive;    /* 43 bootdrive (1=A:)                     */
   unsigned char cpu;           /* 44 CPU family [was unused dword moves]  */
   unsigned short xmssize;      /* 45 extended memory size in KB           */
-  struct buffer FAR *_firstbuf;/* 47 head of buffers linked list          */
+  __FAR(struct buffer)_firstbuf;/* 47 head of buffers linked list          */
   unsigned short dirtybuf;     /* 4b number of dirty buffers              */
-  struct buffer FAR *lookahead;/* 4d pointer to lookahead buffer          */
+  __FAR(struct buffer)lookahead;/* 4d pointer to lookahead buffer          */
   unsigned short slookahead;   /* 51 number of lookahead sectors          */
   unsigned char _bufloc;       /* 53 BUFFERS loc (1=HMA)                  */
-  unsigned char FAR *_deblock_buf;      /* 54 pointer to workspace buffer          */
+  __FAR(unsigned char)_deblock_buf;      /* 54 pointer to workspace buffer          */
   char filler2[5];             /* 58 ???/unused                           */
   unsigned char int24fail;     /* 5d int24 fail while making i/o stat call*/
   unsigned char memstrat;      /* 5e memory allocation strat during exec  */
@@ -81,7 +81,7 @@ struct lol {
   unsigned char _os_major;     /* 6d major DOS version                    */
   unsigned char rev_number;    /* 6e DOS revision#, only 3 bits           */
   unsigned char _version_flags;/* 6f DOS version flags                    */
-  char *_os_release;           /* 70 near pointer to os_release string    */
+  PTR_MEMB(char) _os_release;           /* 70 near pointer to os_release string    */
 #ifdef WIN31SUPPORT
   unsigned short winInstanced; /* WinInit called                          */
   unsigned long  winStartupInfo[4];

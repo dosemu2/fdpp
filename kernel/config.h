@@ -34,8 +34,8 @@ struct config {     /* Configuration variables */
   UBYTE cfgFilesHigh;
   UBYTE cfgFcbs;             /* number of available FCBs */
   UBYTE cfgProtFcbs;         /* number of protected FCBs */
-  BYTE *cfgInit;             /* init of command.com */
-  BYTE *cfgInitTail;         /* command.com's tail */
+  PTR_MEMB(BYTE) cfgInit;             /* init of command.com */
+  PTR_MEMB(BYTE) cfgInitTail;         /* command.com's tail */
   UBYTE cfgLastdrive;        /* last drive */
   UBYTE cfgLastdriveHigh;
   BYTE cfgStacks;            /* number of stacks */

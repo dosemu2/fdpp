@@ -43,6 +43,6 @@ static BYTE *kbd_hRcsId =
 typedef struct {
   UBYTE kb_size;                /* size of buffer in bytes              */
   UBYTE kb_count;               /* number of bytes returned             */
-  BYTE _kb_buf[KBD_MAXLENGTH];   /* the buffer itself            */
+  AR_MEMB(BYTE, _kb_buf, KBD_MAXLENGTH);   /* the buffer itself            */
 } keyboard;
 

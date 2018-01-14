@@ -34,7 +34,7 @@ static BYTE *RcsId =
     "$Id: task.c 1563 2011-04-08 16:04:24Z bartoldeman $";
 #endif
 
-#define toupper(c)	((c) >= 'a' && (c) <= 'z' ? (c) + ('A' - 'a') : (c))
+#define toupper(c)	((c) >= 'a' && (c) <= 'z' ? (char)((c) + ('A' - 'a')) : (char)(c))
 
 #define LOADNGO 0
 #define LOAD    1
@@ -487,7 +487,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     setvec(0x22, (intvec)MK_FP(user_r->CS, user_r->IP));
     child_psp(mem, cu_psp, mem + asize);
 
-    fcbcode = patchPSP(mem - 1, env, exp, namep);
+    fcbcode = patchPSP(mem - 1, env, MK_FAR(*exp), namep);
     /* set asize to end of segment */
     if (asize > 0x1000)
       asize = 0x1000;
@@ -745,7 +745,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     setvec(0x22, (intvec)MK_FP(user_r->CS, user_r->IP));
     child_psp(mem, cu_psp, mem + asize);
 
-    fcbcode = patchPSP(mem - 1, env, exp, namep);
+    fcbcode = patchPSP(mem - 1, env, MK_FAR(*exp), namep);
     exp->exec.stack = _MK_DOS_FP(BYTE,
       ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
     exp->exec.start_addr = _MK_DOS_FP(BYTE,
@@ -812,9 +812,9 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   /* build exec block and save all parameters here as init part will vanish! */
   exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, -1, -1);
   exb.exec.env_seg = DOS_PSP + 8;
-  fstrcpy(Shell, (char FAR *)MK_FP(FP_SEG(Config), FP_OFF((BYTE FAR *)Config->cfgInit)));
+  fstrcpy(Shell, MK_FP(FP_SEG(Config), Config->cfgInit));
   /* join name and tail */
-  fstrcpy(Shell + strlen(Shell), (char FAR *)MK_FP(FP_SEG(Config), FP_OFF((BYTE FAR *)Config->cfgInitTail)));
+  fstrcpy(Shell + strlen(Shell), MK_FP(FP_SEG(Config), Config->cfgInitTail));
   endp =  Shell + strlen(Shell);
 
   for ( ; ; )   /* endless shell load loop - reboot or shut down to exit it! */
