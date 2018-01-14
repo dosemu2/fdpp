@@ -16,9 +16,9 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size);
 struct far_s;
 int FdppSetAsmThunks(struct far_s *ptrs, int size);
 struct fdpp_api {
+    uint8_t *mem_base;
     void (*abort_handler)(const char *, int);
     void (*print_handler)(const char *format, va_list ap);
-    void *(*resolve_segoff)(uint16_t seg, uint16_t off);
 };
 void FdppInit(struct fdpp_api *api);
 
