@@ -231,11 +231,6 @@ public:
 #define __ASMADDR(v) &__##v
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
-#define __FSYM(x) x.get_sym()
-#define __FARSYM(x) x.get_sym()
-#define __ARSYM(x) x.get_sym()
-#define __ARISYM(x) x.get_sym()
-#define __ARIFSYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
 #define AR_MEMB(t, n, l) ArSym<t, l> n
 #define SYM_MEMB(t) SymWrp<t>
