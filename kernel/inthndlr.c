@@ -1583,7 +1583,7 @@ error_exit:
 error_carry:
   SET_CARRY_FLAG();
 exit_dispatch:
-  fmemcpy(r, MK_FAR(lr), sizeof(lregs) - 4); /* copy lr -> r but exclude flags */
+  fmemcpy(r, MK_FAR_SCP(lr), sizeof(lregs) - 4); /* copy lr -> r but exclude flags */
   r->DS = lr.DS;
   r->ES = lr.ES;
 real_exit:;

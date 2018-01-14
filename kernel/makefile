@@ -128,7 +128,12 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 .c.cc:
-	../utils/mkfar.sh FAR __FAR $< >$@
+	../utils/mkfar.sh FAR __FAR $< | \
+		../utils/scopify.sh 1 MK_FAR_ST _MK_FAR_ST __MK_FAR_ST | \
+		../utils/scopify.sh 2 MK_FAR_SCP _MK_FAR __MK_FAR | \
+		../utils/scopify.sh 2 MK_FAR_PTR_SCP _MK_FAR_PTR __MK_FAR | \
+		../utils/scopify.sh 1 MK_FAR_PTR _MK_FAR_PTR __MK_FAR | \
+		../utils/scopify.sh 1 MK_FAR _MK_FAR __MK_FAR >$@
 
 $(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^

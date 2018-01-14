@@ -1598,10 +1598,10 @@ err:printf("%s has invalid format\n", filename);
         }
         else
         {
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR(subf_data.buffer), subf_data.length);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR_SCP(subf_data.buffer), subf_data.length);
           /* write length */
           *(UWORD *)(subf_data.buffer) = subf_data.length;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR(subf_data.buffer), 2);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR_SCP(subf_data.buffer), 2);
         }
         continue;
       }
@@ -2047,7 +2047,7 @@ STATIC VOID strupr(char *s)
 STATIC VOID mcb_init_copy(UCOUNT seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
-  fmemcpy(MK_FP(seg, 0), MK_FAR(*near_mcb), sizeof(mcb));
+  fmemcpy(MK_FP(seg, 0), MK_FAR_PTR(near_mcb), sizeof(mcb));
 }
 
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)

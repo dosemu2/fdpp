@@ -176,7 +176,7 @@ int MoveKernelToHMA()
     return TRUE;
   }
 
-  if ((xms_addr = DetectXMSDriver()) == NULL)
+  if ((xms_addr = DetectXMSDriver()) == (void *)NULL)
     return FALSE;
 
   XMSDriverAddress = xms_addr;
@@ -246,9 +246,7 @@ int MoveKernelToHMA()
 
     so: we install this after all drivers have been loaded
 */
-STATIC void InstallVDISK(void)
-{
-  static struct {               /* Boot-Sektor of a RAM-Disk */
+  static struct _S {               /* Boot-Sektor of a RAM-Disk */
     UBYTE dummy1[3];            /* HIMEM.SYS uses 3, but FDXMS uses 2 */
     char Name[5];
     BYTE dummy2[3];
@@ -267,6 +265,8 @@ STATIC void InstallVDISK(void)
     'F', 'D', 'O', 'S', ' ', ' '}, 128, /* 128*512 = 64K */
   ' '};
 
+STATIC void InstallVDISK(void)
+{
   if (!DosLoadedInHMA)
     return;
 

@@ -537,7 +537,7 @@ VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
 STATIC void push_ddt(ddt *pddt)
 {
   ddt FAR *fddt = (ddt FAR *)DynAlloc("ddt", 1, sizeof(ddt));
-  fmemcpy(fddt, MK_FAR(*pddt), sizeof(ddt));
+  fmemcpy(fddt, MK_FAR_PTR(pddt), sizeof(ddt));
   if (pddt->ddt_logdriveno != 0) {
     (fddt - 1)->ddt_next = fddt;
     if (pddt->ddt_driveno == 0 && pddt->ddt_logdriveno == 1)
@@ -677,12 +677,14 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
   memset(&lba_bios_parameters, 0, sizeof(lba_bios_parameters));
   lba_bios_parameters.size = sizeof(lba_bios_parameters);
 
+  {
   bp = MK_FAR(lba_bios_parameters);
   regs.si = FP_OFF(bp);
   regs.ds = FP_SEG(bp);
   regs.a.b.h = 0x48;
   regs.d.b.l = drive;
   init_call_intr(0x13, &regs);
+  }
 
   /* error or DMA boundary errors not handled transparently */
   if (regs.flags & 0x01)

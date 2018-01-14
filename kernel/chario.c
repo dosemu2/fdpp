@@ -206,7 +206,7 @@ long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp)
       fast_counter++;
       fast_counter &= 0x9f;
       if (PrinterEcho)
-        DosWrite(STDPRN, 1, MK_FAR(c));
+        DosWrite(STDPRN, 1, MK_FAR_SCP(c));
       if (fast_counter & 0x80)
         fast_put_char(c);
       else
@@ -320,7 +320,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
     }
   }
   else
-    DosRWSft(sft_in, 1, MK_FAR(c), XFR_READ);
+    DosRWSft(sft_in, 1, MK_FAR_SCP(c), XFR_READ);
 
   /* check for break or stop on sft_in, echo to sft_out */
   if (check_break && (c == CTL_C || c == CTL_S))

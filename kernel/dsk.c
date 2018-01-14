@@ -264,9 +264,7 @@ STATIC WORD RWzero(ddt * pddt, UWORD mode)
 {
   UWORD done;
 
-  return LBA_Transfer(pddt, mode,
-                      (UBYTE FAR *) MK_FAR(DiskTransferBuffer),
-                      pddt->ddt_offset, 1, &done);
+  return LBA_Transfer(pddt, mode, (UBYTE FAR *) MK_FAR(DiskTransferBuffer), pddt->ddt_offset, 1, &done);
 }
 
 /*
@@ -601,10 +599,11 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
           {
             unsigned char type;
             unsigned tracks, secs;
+            _MK_FAR(DiskTransferBuffer);
             if ((fv->gbfv_spcfunbit & 1) &&
                 (ret =
                  fl_read(pddt->ddt_driveno, 0, 0, 1, 1,
-                         MK_FAR(DiskTransferBuffer))) != 0)
+                         __MK_FAR(DiskTransferBuffer))) != 0)
             {
               fv->gbfv_spcfunbit = 3;   /* no disk in drive */
               return dskerr(ret);
@@ -651,9 +650,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
                afentry.sector <= pddt->ddt_bpb.bpb_nsecs; afentry.sector++)
             memcpy(addrfield++, &afentry, sizeof(afentry));
 
-          ret =
-              Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0,
-                         pddt->ddt_bpb.bpb_nsecs, MK_FAR(DiskTransferBuffer));
+          ret = Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0, pddt->ddt_bpb.bpb_nsecs, MK_FAR(DiskTransferBuffer));
           if (ret != 0)
             return dskerr(ret);
         }
@@ -671,10 +668,11 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
       {
         struct gblkfv FAR *fv = rp->r_fv;
 
+        _MK_FAR(DiskTransferBuffer);
         ret = Genblockio(pddt, LBA_VERIFY, fv->gbfv_head, fv->gbfv_cyl, 0,
                          (fv->gbfv_spcfunbit ?
                           fv->gbfv_ntracks * pddt->ddt_defbpb.bpb_nsecs :
-                          pddt->ddt_defbpb.bpb_nsecs), MK_FAR(DiskTransferBuffer));
+                          pddt->ddt_defbpb.bpb_nsecs), __MK_FAR(DiskTransferBuffer));
         if (ret != 0)
           return dskerr(ret);
         fv->gbfv_spcfunbit = 0; /* success */
@@ -1034,13 +1032,11 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
         else
         {
           /* verify requested, but not supported */
-          error_code =
-              fl_lba_ReadWrite(driveno, LBA_WRITE, MK_FAR(dap));
+          error_code = fl_lba_ReadWrite(driveno, LBA_WRITE, MK_FAR(dap));
 
           if (error_code == 0)
           {
-            error_code =
-                fl_lba_ReadWrite(driveno, LBA_VERIFY, MK_FAR(dap));
+            error_code = fl_lba_ReadWrite(driveno, LBA_VERIFY, MK_FAR(dap));
           }
         }
       }

@@ -1,3 +1,6 @@
+#ifndef FARPTR_HPP
+#define FARPTR_HPP
+
 #include <type_traits>
 
 #define _P(T1) std::is_pointer<T1>::value
@@ -23,11 +26,13 @@ public:
     FarPtr() = default;
     FarPtr(uint16_t, uint16_t);
     FarPtr(std::nullptr_t);
-#define ALLOW_CNV(T0, T1) (std::is_convertible<T0*, T1*>::value || \
+#define ALLOW_CNV0(T0, T1) std::is_convertible<T0*, T1*>::value
+#define ALLOW_CNV1(T0, T1) \
         std::is_void<T0>::value || std::is_same<T0, char>::value || \
         std::is_same<T1, char>::value || \
         std::is_same<T0, unsigned char>::value || \
-        std::is_same<T1, unsigned char>::value)
+        std::is_same<T1, unsigned char>::value
+#define ALLOW_CNV(T0, T1) (ALLOW_CNV0(T0, T1) || ALLOW_CNV1(T0, T1))
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
         FarPtr(const FarPtr<T0>&);
@@ -37,7 +42,7 @@ public:
     T* operator ->();
     operator T*();
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV1(T1, T0)>::type* = nullptr>
         operator T0*();
     FarPtr<T> operator ++(int);
     FarPtr<T> operator ++();
@@ -244,3 +249,5 @@ public:
 
 #undef NULL
 #define NULL           nullptr
+
+#endif

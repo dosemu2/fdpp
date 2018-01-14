@@ -491,7 +491,7 @@ STATIC void kernel()
       Config.cfgInitTail = Cmd.ctBuffer;
     }
   }
-  init_call_p_0(MK_FAR(Config)); /* go execute process 0 (the shell) */
+  init_call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
 }
 
 /* check for a block device and update  device control block    */

@@ -183,6 +183,7 @@ struct far_s {
 
 #ifdef __cplusplus
 #include "farptr.hpp"
+#include "farobj.hpp"
 #endif
 
 #define VA_CDECL
@@ -201,10 +202,10 @@ void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
 #define MK_OFFS(data) (mk_dosobj(&data, sizeof(data)).off)
 #define MK_OFFS_STR(data) (mk_dosobj(data, strlen(data)).off)
-#define MK_FAR(data) ({ \
+/*#define MK_FAR(data) ({ \
     struct far_s __f = mk_dosobj(&data, sizeof(data)); \
     MK_FP(__f.seg, __f.off); \
-})
+})*/
 #define MK_FAR_STR(data) ({ \
     struct far_s __f = mk_dosobj(data, strlen(data)); \
     MK_FP(__f.seg, __f.off); \

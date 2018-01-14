@@ -68,7 +68,7 @@ UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
     {
       mdb = spc >> 8;
       spc &= 0xff;
-      return MK_FAR(mdb);
+      return MK_FAR_ST(mdb);
     }
     else
     {
@@ -570,8 +570,8 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       }
       /* now to build a dos name again                */
       LocalFcb.fcb_drive = FcbDrive;
-      FcbNameInit(MK_FAR(LocalFcb), loc_szBuffer, &FcbDrive);
-      result = truename(MK_FAR(loc_szBuffer), SecPathName, 0);
+      FcbNameInit(MK_FAR_SCP(LocalFcb), loc_szBuffer, &FcbDrive);
+      result = truename(MK_FAR_SCP(loc_szBuffer), SecPathName, 0);
       if (result < SUCCESS || (result & (IS_NETWORK|IS_DEVICE)) == IS_DEVICE
         || DosRenameTrue(PriPathName, SecPathName, wAttr) != SUCCESS)
       {
