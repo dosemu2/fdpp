@@ -1,7 +1,5 @@
 #include <type_traits>
 
-#define far_typed FarPtr
-
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
@@ -246,13 +244,8 @@ public:
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
-
-#define __DOSFAR(t) far_typed<t>
-#define _MK_FP(t, f) ((__FAR(t))(f))
-#define _FP_SEG(f) ((f).__seg())
-#define _FP_OFF(f) ((f).__off())
-#define _DOS_FP(p) (p)
-#define _MK_DOS_FP(t, s, o) far_typed<t>(s, o)
+#define __DOSFAR(t) FarPtr<t>
+#define _MK_DOS_FP(t, s, o) __FAR(t)MK_FP(s, o)
 
 #undef NULL
 #define NULL           nullptr

@@ -199,7 +199,7 @@ STATIC void PSPInit(void)
   fmemset(p->ps_files, 0xff, 20);
 
   /* open file table pointer                              */
-  p->ps_filetab = _DOS_FP((UBYTE FAR *)p->ps_files);
+  p->ps_filetab = (UBYTE FAR *)p->ps_files;
 
   /* first command line argument                          */
   /* p->ps_fcb1.fcb_drive = 0; already set                */
@@ -366,9 +366,9 @@ STATIC VOID FsConfig(VOID)
 
     if (i < LoL->_nblkdev && dpb != _MK_DOS_FP(struct dpb, -1, -1))
     {
-      pcds_table->cdsDpb = _DOS_FP(dpb);
+      pcds_table->cdsDpb = dpb;
       pcds_table->cdsFlags = CDSPHYSDRV;
-      dpb = _MK_FP(struct dpb, dpb->dpb_next);
+      dpb = dpb->dpb_next;
     }
     else
     {
@@ -505,24 +505,24 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; _MK_FP(struct dpb, _dpb->dpb_next) != _MK_DOS_FP(struct dpb, -1, -1);
-         _dpb = _MK_FP(struct dpb, _dpb->dpb_next))
+    for (_dpb = LoL->_DPBp; _dpb->dpb_next != _MK_DOS_FP(struct dpb, -1, -1);
+         _dpb = _dpb->dpb_next)
       ;
     _dpb = (struct dpb FAR *)
       KernelAlloc(nunits * sizeof(struct dpb), 'E', Config.cfgDosDataUmb);
-    _dpb->dpb_next = _DOS_FP(_dpb);
+    _dpb->dpb_next = _dpb;
   }
 
   for (Index = 0; Index < nunits; Index++)
   {
-    _dpb->dpb_next = _DOS_FP(_dpb + 1);
+    _dpb->dpb_next = _dpb + 1;
     _dpb->dpb_unit = LoL->_nblkdev;
     _dpb->dpb_subunit = Index;
-    _dpb->dpb_device = _DOS_FP(dhp);
+    _dpb->dpb_device = dhp;
     _dpb->dpb_flags = M_CHANGED;
     if ((LoL->_CDSp != 0) && (LoL->_nblkdev < LoL->_lastdrive))
     {
-      LoL->_CDSp[LoL->_nblkdev].cdsDpb = _DOS_FP(_dpb);
+      LoL->_CDSp[LoL->_nblkdev].cdsDpb = _dpb;
       LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
     }
     ++_dpb;
@@ -566,8 +566,8 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_status = 0;
   rq.r_command = C_INIT;
   rq.r_length = sizeof(request);
-  rq.r_endaddr = _DOS_FP((char FAR *)*r_top);
-  rq.r_bpbptr = _DOS_FP((bpb FAR **)(void *)(cmdLine ? cmdLine : "\n"));  // XXX is typecase correct?
+  rq.r_endaddr = (char FAR *)*r_top;
+  rq.r_bpbptr = (bpb FAR **)MK_FAR_STR(cmdLine ? cmdLine : "\n");  // XXX is typecase correct?
   rq.r_firstunit = LoL->_nblkdev;
 
   execrh(MK_FAR(rq), dhp);
@@ -581,13 +581,13 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   if (cmdLine)
   {
     /* Don't link in device drivers which do not take up memory */
-    if (_MK_FP(BYTE, rq.r_endaddr) == (BYTE FAR *) dhp)
+    if (rq.r_endaddr == (BYTE FAR *) dhp)
       return TRUE;
 
     /* Don't link in block device drivers which indicate no units */
     if (!(dhp->dh_attr & ATTR_CHAR) && !rq.r_nunits)
     {
-      rq.r_endaddr = _DOS_FP((BYTE FAR *) dhp);
+      rq.r_endaddr = (BYTE FAR *) dhp;
       return TRUE;
     }
 
@@ -598,9 +598,9 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
     /*   the used.  It is recommended that all the device drivers in   */
     /*   the file return the same address                              */
 
-    if (_FP_OFF(dhp->dh_next) == 0xffff)
+    if (FP_OFF(dhp->dh_next) == 0xffff)
     {
-      KernelAllocPara(_FP_SEG(rq.r_endaddr) + (_FP_OFF(rq.r_endaddr) + 15)/16
+      KernelAllocPara(FP_SEG(rq.r_endaddr) + (FP_OFF(rq.r_endaddr) + 15)/16
                       - FP_SEG(dhp), 'D', name, mode);
     }
 
@@ -635,7 +635,7 @@ STATIC void InitIO(void)
   /* Initialize driver chain                                      */
   do {
     init_device(device, NULL, 0, &lpTop);
-    device = _MK_FP(struct dhdr, device->dh_next);
+    device = device->dh_next;
   }
   while (FP_OFF(device) != 0xffff);
 }

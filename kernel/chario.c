@@ -71,7 +71,7 @@ long BinaryCharIO(struct dhdr FAR **pdev, size_t n, void FAR * bp,
   do
   {
     CharReqHdr.r_count = n;
-    CharReqHdr.r_trans = _DOS_FP((BYTE FAR *)bp);
+    CharReqHdr.r_trans = (BYTE FAR *)bp;
     err = CharRequest(pdev, command);
   } while (err == 1);
   return err == SUCCESS ? (long)CharReqHdr.r_count : err;

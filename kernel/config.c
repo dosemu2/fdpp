@@ -1818,10 +1818,10 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
        (result = init_device(dhp, szBuf, mode, &top)) == SUCCESS;
        dhp = next_dhp)
   {
-    next_dhp = (struct dhdr FAR *)MK_FP(FP_SEG(dhp), _FP_OFF(dhp->dh_next));
+    next_dhp = (struct dhdr FAR *)MK_FP(FP_SEG(dhp), FP_OFF(dhp->dh_next));
     /* Link in device driver and save LoL->_nul_dev pointer to next */
     dhp->dh_next = LoL->_nul_dev.dh_next;
-    LoL->_nul_dev.dh_next = _DOS_FP(dhp);
+    LoL->_nul_dev.dh_next = dhp;
   }
 
   /* might have been the UMB driver or DOS=UMB */

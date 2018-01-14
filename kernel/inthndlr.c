@@ -391,7 +391,7 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
 
-  ((psp FAR *) MK_FP(cu_psp, 0))->ps_stack = _DOS_FP((BYTE FAR *)r);
+  ((psp FAR *) MK_FP(cu_psp, 0))->ps_stack = (BYTE FAR *)r;
 
   fmemcpy_n(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
@@ -1308,7 +1308,7 @@ dispatch:
         if (lr.DL < lastdrive)
         {
           struct cds FAR *cdsp = CDSp + lr.DL;
-          if (_FP_OFF(cdsp->cdsDpb))     /* letter of physical drive?    */
+          if (FP_OFF(cdsp->cdsDpb))     /* letter of physical drive?    */
           {
             cdsp->cdsFlags &= ~CDSPHYSDRV;
             if (lr.AL == 7)
@@ -1777,8 +1777,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
       r.AL = CriticalError(0x38, /* ignore/retry/fail - based on RBIL possible return values */
                            default_drive,
                            r.callerARG1, /* error, from RBIL passed on stack */
-                           _MK_FP(struct dhdr,
-                           _MK_FP(struct dpb, CDSp[(WORD)default_drive].cdsDpb)->dpb_device));
+                           CDSp[(WORD)default_drive].cdsDpb->dpb_device);
       r.FLAGS |= FLG_CARRY;
       if (r.AL == 1) r.FLAGS &= ~FLG_CARRY;  /* carry clear if should retry */
       break;
@@ -1795,8 +1794,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
           r.AL = CriticalError(0x38, /* ignore/retry/fail - ??? */
                                default_drive,
                                r.callerARG1, /* error, from RBIL passed on stack */
-                               _MK_FP(struct dhdr,
-                               _MK_FP(struct dpb, CDSp[(WORD)default_drive].cdsDpb)->dpb_device));
+                               CDSp[(WORD)default_drive].cdsDpb->dpb_device);
           /* clear carry if should retry */
           if (r.AL == 1) r.FLAGS &= ~FLG_CARRY;
         }
@@ -1932,7 +1930,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
           r.FLAGS |= FLG_CARRY;
           break;
         }
-        idx = &_MK_FP(UBYTE, p->ps_filetab)[r.BX];
+        idx = &p->ps_filetab[r.BX];
         r.FLAGS &= ~FLG_CARRY;
         r.ES = FP_SEG(idx);
         r.DI = FP_OFF(idx);
@@ -2035,8 +2033,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
                                    Return Null Device Pointer          */
       /* by UDOS+RBIL: get header of SECOND device driver in device chain,
          omitting the NUL device TE */
-      r.BX = _FP_SEG(nul_dev.dh_next);
-      r.AX = _FP_OFF(nul_dev.dh_next);
+      r.BX = FP_SEG(nul_dev.dh_next);
+      r.AX = FP_OFF(nul_dev.dh_next);
       break;
 
     case 0x2d:                 /* Get Extended Error Code */

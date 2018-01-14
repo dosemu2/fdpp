@@ -89,7 +89,7 @@ struct dpb FAR *get_dpb(COUNT dsk)
 
   if (cdsp == NULL || cdsp->cdsFlags & CDSNETWDRV)
     return NULL;
-  return _MK_FP(struct dpb, cdsp->cdsDpb);
+  return cdsp->cdsDpb;
 }
 
 /* initialize directory entry (creation/access stamps 0 as per MS-DOS 7.10) */
@@ -1663,12 +1663,12 @@ STATIC int rqblockio(unsigned char command, struct dpb FAR * dpbp)
 
   if (command == C_BLDBPB) /* help USBASPI.SYS & DI1000DD.SYS (TE) */
     MediaReqHdr.r_bpfat = MK_FAR(DiskTransferBuffer);
-  execrh((request FAR *) & MediaReqHdr, _MK_FP(struct dhdr, dpbp->dpb_device));
+  execrh((request FAR *) & MediaReqHdr, dpbp->dpb_device);
   if ((MediaReqHdr.r_status & S_ERROR) || !(MediaReqHdr.r_status & S_DONE))
   {
     FOREVER
     {
-      switch (block_error(&MediaReqHdr, dpbp->dpb_unit, _MK_FP(struct dhdr, dpbp->dpb_device), 0))
+      switch (block_error(&MediaReqHdr, dpbp->dpb_unit, dpbp->dpb_device, 0))
       {
       case ABORT:
       case FAIL:
