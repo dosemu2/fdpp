@@ -113,7 +113,7 @@ typedef struct {
   BYTE renOldName[8];           /* Old Filename                 */
   BYTE renOldExtent[3];         /* Old File Extension           */
   BYTE renReserved1[5];
-  BYTE renNewName[8];           /* New Filename                 */
+  AR_MEMB(BYTE, renNewName, 8);           /* New Filename                 */
   BYTE renNewExtent[3];         /* New FileExtension            */
   BYTE renReserved2[9];
 } rfcb;

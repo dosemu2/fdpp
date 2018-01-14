@@ -62,8 +62,8 @@ UBYTE DiskTransferBuffer[MAX_SEC_SIZE];
 
 struct FS_info {
   ULONG serialno;
-  BYTE volume[11];
-  BYTE fstype[8];
+  AR_MEMB(BYTE, volume, 11);
+  AR_MEMB(BYTE, fstype, 8);
 };
 
 /*TE - array access functions */
@@ -416,8 +416,8 @@ STATIC WORD getbpb(ddt * pddt)
       fmemcpy(pddt->ddt_fstype, fs->fstype, sizeof fs->fstype);
     } else {
       /* earlier extended BPB or short BPB, fields not available */
-      fmemcpy(pddt->ddt_volume, "NO NAME    ", 11);
-      fmemcpy(pddt->ddt_fstype, "FAT??   ", 8);
+      fmemcpy(pddt->ddt_volume, MK_FAR_STR("NO NAME    "), 11);
+      fmemcpy(pddt->ddt_fstype, MK_FAR_STR("FAT??   "), 8);
     }
   }
 
@@ -537,7 +537,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
     case 0x40:                 /* set device parameters */
       {
         struct gblkio FAR *gblp = rp->r_io;
-        bpb *pbpb;
+        bpb FAR *pbpb;
 
         pddt->ddt_type = gblp->gbio_devtype;
         pddt->ddt_descflags = (descflags & ~3) | (gblp->gbio_devattrib & 3)
@@ -653,7 +653,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
 
           ret =
               Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0,
-                         pddt->ddt_bpb.bpb_nsecs, DiskTransferBuffer);
+                         pddt->ddt_bpb.bpb_nsecs, MK_FAR(DiskTransferBuffer));
           if (ret != 0)
             return dskerr(ret);
         }
@@ -674,7 +674,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
         ret = Genblockio(pddt, LBA_VERIFY, fv->gbfv_head, fv->gbfv_cyl, 0,
                          (fv->gbfv_spcfunbit ?
                           fv->gbfv_ntracks * pddt->ddt_defbpb.bpb_nsecs :
-                          pddt->ddt_defbpb.bpb_nsecs), DiskTransferBuffer);
+                          pddt->ddt_defbpb.bpb_nsecs), MK_FAR(DiskTransferBuffer));
         if (ret != 0)
           return dskerr(ret);
         fv->gbfv_spcfunbit = 0; /* success */
@@ -718,7 +718,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
     case 0x60:                 /* get device parameters */
       {
         struct gblkio FAR *gblp = rp->r_io;
-        bpb *pbpb;
+        bpb FAR *pbpb;
 
         gblp->gbio_devtype = pddt->ddt_type;
         gblp->gbio_devattrib = descflags & 3;
@@ -1001,12 +1001,12 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
 
     if (FP_SEG(buffer) >= 0xa000 || count == 0)
     {
-      transfer_address = DiskTransferBuffer;
+      transfer_address = MK_FAR(DiskTransferBuffer);
       count = 1;
 
       if ((mode & 0xff00) == (LBA_WRITE & 0xff00))
       {
-        fmemcpy(DiskTransferBuffer, buffer, bytes_sector);
+        fmemcpy_n(DiskTransferBuffer, buffer, bytes_sector);
       }
     }
     else
@@ -1089,7 +1089,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
     if (transfer_address == DiskTransferBuffer &&
         (mode & 0xff00) == (LBA_READ & 0xff00))
     {
-      fmemcpy(buffer, DiskTransferBuffer, bytes_sector);
+      fmemcpy(buffer, MK_FAR(DiskTransferBuffer), bytes_sector);
     }
 
     *transferred += count;

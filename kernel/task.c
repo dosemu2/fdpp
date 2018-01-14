@@ -708,7 +708,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     for (i = 0; i < ExeHeader.exRelocItems; i++)
     {
       if (DosRWSft
-          (fd, sizeof(reloc), (VOID FAR *) & reloc[0], XFR_READ) != sizeof(reloc))
+          (fd, sizeof(reloc), MK_FAR(reloc), XFR_READ) != sizeof(reloc))
       {
         if (mode != OVERLAY)
         {
@@ -771,7 +771,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
   if ((mode & 0x7f) > 3 || (mode & 0x7f) == 2)
     return DE_INVLDFMT;
 
-  fmemcpy(&TempExeBlock, ep, sizeof(exec_blk));
+  fmemcpy_n(&TempExeBlock, ep, sizeof(exec_blk));
   /* If file not found - free ram and return error        */
 
   if (IsDevice(lp) ||        /* we don't want to execute C:>NUL */
@@ -780,7 +780,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
     return DE_FILENOTFND;
   }
 
-  rc = (int)DosRWSft(fd, sizeof(exe_header), (BYTE FAR *)&ExeHeader, XFR_READ);
+  rc = (int)DosRWSft(fd, sizeof(exe_header), MK_FAR(ExeHeader), XFR_READ);
 
   if (rc == sizeof(exe_header) &&
       (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))
@@ -795,7 +795,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
   DosCloseSft(fd, FALSE);
 
   if (mode == LOAD && rc == SUCCESS)
-    fmemcpy(ep, &TempExeBlock, sizeof(exec_blk));
+    fmemcpy(ep, MK_FAR(TempExeBlock), sizeof(exec_blk));
 
   return rc;
 }
@@ -830,7 +830,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     /* terminate name and tail */
     *tailp =  *(endp + 2) = '\0';
     /* ctCount: just past '\0' do not count the "\r\n" */
-    exb.exec.cmd_line = _DOS_FP((CommandTail FAR *)(tailp + 1));
+    exb.exec.cmd_line = MK_FAR_SZ(tailp + 1, sizeof(CommandTail));
     _MK_FP(CommandTail, exb.exec.cmd_line)->ctCount = endp - tailp - 2;
 #ifdef DEBUG
     printf("Process 0 starting: %s%s\n\n", Shell, tailp + 2);

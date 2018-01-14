@@ -82,9 +82,9 @@ void handle_break(struct dhdr FAR **pdev, int sft_out)
   CB_FLG &= ~CB_MSK;            /* reset the ^Break flag */
   con_flush(pdev);
   if (sft_out == -1)
-    cooked_write(pdev, 4, buf);
+    cooked_write(pdev, 4, MK_FAR(buf));
   else
-    DosRWSft(sft_out, 4, buf, XFR_FORCE_WRITE);
+    DosRWSft(sft_out, 4, MK_FAR(buf), XFR_FORCE_WRITE);
   if (!ErrorMode)               /* within int21_handler, InDOS is not incremented */
     if (InDOS)
       --InDOS;                  /* fail-safe */

@@ -118,7 +118,7 @@ struct dhdr {
   UWORD dh_attr;
     VOID(*dh_strategy) (void);
     VOID(*dh_interrupt) (void);
-  UBYTE dh_name[8];
+  AR_MEMB(UBYTE, dh_name, 8);
 };
 
 #define ATTR_SUBST      0x8000
@@ -216,7 +216,7 @@ typedef struct ddtstruct {
   UWORD ddt_descflags;          /* bit flags describing drive */
   UWORD ddt_ncyl;               /* number of cylinders
                                    (for partition only, if hard disk) */
-  bpb ddt_defbpb;               /* BPB for default (highest) capacity supported */
+  SYM_MEMB(bpb) ddt_defbpb;               /* BPB for default (highest) capacity supported */
   UBYTE ddt_reserved[6];        /* (part of BPB above) */
   UBYTE ddt_ltrack;             /* last track accessed */
   union {
@@ -230,11 +230,11 @@ typedef struct ddtstruct {
                                    (FFFFh if primary partition in DOS 4.x) */
     } ddt_hd;
   } ddt_fh;
-  UBYTE ddt_volume[12];         /* ASCIIZ volume label or "NO NAME    " if none
+  AR_MEMB(UBYTE, ddt_volume, 12);         /* ASCIIZ volume label or "NO NAME    " if none
                                    (apparently taken from extended boot record
                                    rather than root directory) */
   ULONG ddt_serialno;           /* serial number */
-  UBYTE ddt_fstype[9];          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
+  AR_MEMB(UBYTE, ddt_fstype, 9);          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
   ULONG ddt_offset;             /* relative partition offset */
 } ddt;
 
@@ -261,7 +261,7 @@ struct gblkio {
   UWORD gbio_devattrib;
   UWORD gbio_ncyl;
   UBYTE gbio_media;
-  bpb gbio_bpb;
+  SYM_MEMB(bpb) gbio_bpb;
   UWORD gbio_nsecs;
 };
 
@@ -286,8 +286,8 @@ struct gblkrw                   /* for read / write track */
 struct Gioc_media {
   WORD ioc_level;
   ULONG ioc_serialno;
-  BYTE ioc_volume[11];
-  BYTE ioc_fstype[8];
+  AR_MEMB(BYTE, ioc_volume, 11);
+  AR_MEMB(BYTE, ioc_fstype, 8);
 };
 
 struct Access_info {

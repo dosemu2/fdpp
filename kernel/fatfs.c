@@ -449,7 +449,7 @@ COUNT dos_rmdir(BYTE * path)
 
   /* prevent removal of the current directory of that drive */
   REG struct cds FAR *cdsp = get_cds(path[0] - 'A');
-  if (!fstrcmp(path, cdsp->cdsCurrentPath))
+  if (!fstrcmp(MK_FAR_STR(path), cdsp->cdsCurrentPath))
     return DE_RMVCUDIR;
 
   /* Check that we're not trying to remove the root!      */
@@ -507,7 +507,7 @@ COUNT dos_rename(BYTE * path1, BYTE * path2, int attrib)
 
   /* prevent renaming of the current directory of that drive */
   REG struct cds FAR *cdsp = get_cds(path1[0] - 'A');
-  if (!fstrcmp(path1, cdsp->cdsCurrentPath))
+  if (!fstrcmp(MK_FAR_STR(path1), cdsp->cdsCurrentPath))
     return DE_RMVCUDIR;
 
   /* first check if the source file exists                        */
@@ -1582,7 +1582,7 @@ VOID bpb_to_dpb(bpb FAR * bpbp, REG struct dpb FAR * dpbp)
   REG UWORD shftcnt;
   bpb sbpb;
 
-  fmemcpy(&sbpb, bpbp, sizeof(sbpb));
+  fmemcpy_n(&sbpb, bpbp, sizeof(sbpb));
   for (shftcnt = 0; (sbpb.bpb_nsector >> shftcnt) > 1; shftcnt++)
     ;
   dpbp->dpb_shftcnt = shftcnt;
@@ -1662,7 +1662,7 @@ STATIC int rqblockio(unsigned char command, struct dpb FAR * dpbp)
   MediaReqHdr.r_status = 0;
 
   if (command == C_BLDBPB) /* help USBASPI.SYS & DI1000DD.SYS (TE) */
-    MediaReqHdr.r_bpfat = _DOS_FP((boot FAR *)DiskTransferBuffer);
+    MediaReqHdr.r_bpfat = MK_FAR(DiskTransferBuffer);
   execrh((request FAR *) & MediaReqHdr, _MK_FP(struct dhdr, dpbp->dpb_device));
   if ((MediaReqHdr.r_status & S_ERROR) || !(MediaReqHdr.r_status & S_DONE))
   {

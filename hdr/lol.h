@@ -57,7 +57,7 @@ struct lol {
   unsigned char _BootDrive;    /* 43 bootdrive (1=A:)                     */
   unsigned char cpu;           /* 44 CPU family [was unused dword moves]  */
   unsigned short xmssize;      /* 45 extended memory size in KB           */
-  __FAR(struct buffer)_firstbuf;/* 47 head of buffers linked list          */
+  SYM_MEMB(__FAR(struct buffer))_firstbuf;/* 47 head of buffers linked list          */
   unsigned short dirtybuf;     /* 4b number of dirty buffers              */
   __FAR(struct buffer)lookahead;/* 4d pointer to lookahead buffer          */
   unsigned short slookahead;   /* 51 number of lookahead sectors          */

@@ -91,15 +91,15 @@ typedef struct _psp {
   BYTE ps_fill3[9];             /* 53 */
   union {
     struct {
-      fcb _ps_fcb1;             /* 5c first command line argument */
+      SYM_MEMB(fcb) _ps_fcb1;             /* 5c first command line argument */
     } _u1;
     struct {
       BYTE fill4[16];
-      fcb _ps_fcb2;             /* second command line argument */
+      SYM_MEMB(fcb) _ps_fcb2;             /* second command line argument */
     } _u2;
     struct {
       BYTE fill5[36];
-      CommandTail _ps_cmd;
+      SYM_MEMB(CommandTail) _ps_cmd;
     } _u3;
   } _u;
 } psp;

@@ -382,7 +382,7 @@ void MoveKernel(unsigned NewKernelSegment)
       {
         struct RelocatedEntry FAR *rel = (struct RelocatedEntry FAR *)rp;
 
-        fmemcpy(&rtemp, rp, sizeof(rtemp));
+        fmemcpy_n(&rtemp, rp, sizeof(rtemp));
 
         rel->jmpFar = rtemp.jmpFar;
         rel->jmpSegment = NewKernelSegment;

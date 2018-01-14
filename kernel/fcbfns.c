@@ -486,7 +486,7 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
     int attr = (lpXfcb->xfcb_flag == 0xff ? lpXfcb->xfcb_attrib : D_ALL);
     dmatch Dmatch;
 
-    dta = &Dmatch;
+    dta = MK_FAR(Dmatch);
     if ((CritErrCode = -DosFindFirst(attr, SecPathName)) != SUCCESS)
     {
       result = FCB_ERROR;
@@ -529,7 +529,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
     COUNT result;
 
     wAttr = (lpXfcb->xfcb_flag == 0xff ? lpXfcb->xfcb_attrib : D_ALL);
-    dta = &Dmatch;
+    dta = MK_FAR(Dmatch);
     if ((CritErrCode = -DosFindFirst(wAttr, SecPathName)) != SUCCESS)
     {
       result = FCB_ERROR;
@@ -571,7 +571,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       /* now to build a dos name again                */
       LocalFcb.fcb_drive = FcbDrive;
       FcbNameInit(MK_FAR(LocalFcb), loc_szBuffer, &FcbDrive);
-      result = truename(loc_szBuffer, SecPathName, 0);
+      result = truename(MK_FAR(loc_szBuffer), SecPathName, 0);
       if (result < SUCCESS || (result & (IS_NETWORK|IS_DEVICE)) == IS_DEVICE
         || DosRenameTrue(PriPathName, SecPathName, wAttr) != SUCCESS)
       {
@@ -639,7 +639,7 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
   /* First, move the dta to a local and change it around to match */
   /* our functions.                                               */
   lpDir = (BYTE FAR *)dta;
-  dta = &Dmatch;
+  dta = MK_FAR(Dmatch);
 
   /* Next initialze local variables by moving them from the fcb   */
   lpFcb = CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);

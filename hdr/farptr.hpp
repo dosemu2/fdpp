@@ -34,11 +34,6 @@ public:
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
         FarPtr(const FarPtr<T0>&);
     template<typename T0, typename T1 = T,
-        typename std::enable_if<!std::is_same<T0, T1>::value &&
-        (ALLOW_CNV(T0, T1) || (_P(T0) && _P(T1) &&
-            ALLOW_CNV(_RP(T0), _RP(T1))))>::type* = nullptr>
-        FarPtr(T0*);
-    template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
         explicit FarPtr(const FarPtr<T0>&);
     T* operator ->();
@@ -144,6 +139,7 @@ public:
 template<typename T, int max_len = 0>
 class ArSym : public ArSymBase<T> {
 public:
+    ArSym(const FarPtr<void> &);
     operator FarPtr<void> ();
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
@@ -155,7 +151,11 @@ public:
     operator NearPtr<T> ();
     operator SymWrp2<T*>& ();
     operator T *();
+    template <typename T0, typename T1 = T,
+        typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
+        explicit operator T0 *();
     FarPtr<T> operator +(int);
+    FarPtr<T> operator +(unsigned);
     FarPtr<T> operator +(size_t);
     FarPtr<T> operator -(int);
 

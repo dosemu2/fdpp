@@ -334,7 +334,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
                                    included by original truename() */
   /* MUX succeeded and really something */
   if (!(mode & CDS_MODE_SKIP_PHYSICAL) &&
-      QRemote_Fn(dest, src) == SUCCESS && dest[0] != '\0')
+      QRemote_Fn(MK_FAR_STR(dest), src) == SUCCESS && dest[0] != '\0')
   {
     tn_printf(("QRemoteFn() returned: \"%s\"\n", dest));
 #ifdef DEBUG_TRUENAME
@@ -368,8 +368,8 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     {
       if (froot == src + 5)
       {
-        fmemcpy(dest + 3, src, 5);
-        DosUpMem(dest + 3, 5);
+        fmemcpy_n(dest + 3, src, 5);
+        DosUpMem(MK_FAR_STR(dest) + 3, 5);
         if (dest[3] == '/') dest[3] = '\\';
         if (dest[7] == '/') dest[7] = '\\';
       }
@@ -586,7 +586,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
       if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0')
-         && fmemcmp(dest, cdsp->cdsCurrentPath, j) == 0)
+         && fmemcmp(MK_FAR_STR(dest), cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';

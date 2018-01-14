@@ -304,6 +304,7 @@ __FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);
 char * strcpy(char * d, const char * s);
 //void ASMPASCAL fmemcpyBack(__FAR(void) d,__FAR(const void) s, size_t n);
 void fmemcpy(__FAR(void) d,__FAR(const void) s, size_t n);
+void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
 void fstrcpy(__FAR(char) d,__FAR(const char) s);
 void * memcpy(void *d, const void * s, size_t n);
 void fmemset(__FAR(void) s, int ch, size_t n);

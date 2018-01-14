@@ -68,7 +68,7 @@ typedef struct {
   UWORD sft_relclust;           /* 19 - File relative cluster (low part)     */
   ULONG sft_dirsector;          /* 1b - Sector containing cluster            */
   UBYTE sft_diridx;             /* 1f - directory index                      */
-  BYTE sft_name[11];            /* 20 - dir style file name                  */
+  AR_MEMB(BYTE, sft_name, 11);            /* 20 - dir style file name                  */
 #ifdef WITHFAT32
   CLUSTER sft_stclust;          /* 2b - Starting cluster                     */
 #else

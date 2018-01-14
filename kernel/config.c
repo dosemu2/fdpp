@@ -1594,19 +1594,19 @@ err:printf("%s has invalid format\n", filename);
         {
           /* if DBCS table (in country.sys) is empty, clear internal table */
           *(DWORD *)(subf_data.buffer) = 0L;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 4);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR(subf_data.buffer), 4);
         }
         else
         {
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer, subf_data.length);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR(subf_data.buffer), subf_data.length);
           /* write length */
           *(UWORD *)(subf_data.buffer) = subf_data.length;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 2);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR(subf_data.buffer), 2);
         }
         continue;
       }
 
-      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer,
+      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR(subf_data.buffer),
                                 /* skip length ^*/  subf_data.length);
     }
     rc = TRUE;
@@ -1901,7 +1901,7 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
   p->start = FP_SEG(p)+1;
   p->size = nPara-1;
   if (name)
-    fmemcpy(p->name, name, 8);
+    memcpy(p->name, name, 8);
   base += nPara;
   if (mode)
     umb_base_seg = base;
@@ -2047,7 +2047,7 @@ STATIC VOID strupr(char *s)
 STATIC VOID mcb_init_copy(UCOUNT seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
-  fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
+  fmemcpy(MK_FP(seg, 0), MK_FAR(*near_mcb), sizeof(mcb));
 }
 
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)
@@ -2063,7 +2063,7 @@ STATIC VOID mumcb_init(UCOUNT seg, UWORD size)
     MCB_NORMAL,
     8, 0,
     {0,0,0},
-    {"SC"}
+    MK_FAR_STR("SC")
   };
   mcb_init_copy(seg, size, &near_mcb);
 }
@@ -2652,7 +2652,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   args[*args+2] = 0;
 
   exb.exec.env_seg  = 0;
-  exb.exec.cmd_line = _DOS_FP((CommandTail FAR *) args);
+  exb.exec.cmd_line = MK_FAR_SZ(args, sizeof(CommandTail));
   exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, -1, -1);
 
 

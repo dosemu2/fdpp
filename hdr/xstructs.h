@@ -59,7 +59,7 @@ struct xdpbforformat {
 
     struct {
       UDWORD unknown;
-      bpb FAR *bpbp;
+      __FAR(bpb) bpbp;
       UDWORD reserved[2];
     } rebuilddpb;
 

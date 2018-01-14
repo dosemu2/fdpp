@@ -79,7 +79,7 @@ long BinaryCharIO(struct dhdr FAR **pdev, size_t n, void FAR * bp,
 
 STATIC int CharIO(struct dhdr FAR **pdev, unsigned char ch, unsigned command)
 {
-  int err = (int)BinaryCharIO(pdev, 1, &ch, command);
+  int err = (int)BinaryCharIO(pdev, 1, MK_FAR(ch), command);
   if (err == 0)
     return 256;
   if (err < 0)
@@ -206,7 +206,7 @@ long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp)
       fast_counter++;
       fast_counter &= 0x9f;
       if (PrinterEcho)
-        DosWrite(STDPRN, 1, &c);
+        DosWrite(STDPRN, 1, MK_FAR(c));
       if (fast_counter & 0x80)
         fast_put_char(c);
       else
@@ -224,7 +224,7 @@ long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp)
 void write_char(int c, int sft_idx)
 {
   unsigned char ch = (unsigned char)c;
-  DosRWSft(sft_idx, 1, &ch, XFR_FORCE_WRITE);
+  DosRWSft(sft_idx, 1, MK_FAR(ch), XFR_FORCE_WRITE);
 }
 
 void write_char_stdout(int c)
@@ -320,7 +320,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
     }
   }
   else
-    DosRWSft(sft_in, 1, &c, XFR_READ);
+    DosRWSft(sft_in, 1, MK_FAR(c), XFR_READ);
 
   /* check for break or stop on sft_in, echo to sft_out */
   if (check_break && (c == CTL_C || c == CTL_S))

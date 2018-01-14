@@ -64,6 +64,6 @@ typedef struct {
   UWORD m_psp;                  /* owner id via psp segment             */
   UWORD m_size;                 /* size of segment in paragraphs        */
   BYTE m_fill[3];
-  BYTE m_name[8];               /* owner name limited to 8 bytes        */
+  AR_MEMB(BYTE, m_name, 8);               /* owner name limited to 8 bytes        */
 } mcb;
 

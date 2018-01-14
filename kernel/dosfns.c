@@ -866,7 +866,7 @@ COUNT DosGetCuDir(UBYTE drive, BYTE FAR * s)
   path[1] = ':';
   path[2] = '\0';
 
-  if (truename(path, PriPathName, CDS_MODE_SKIP_PHYSICAL) < SUCCESS)
+  if (truename(MK_FAR(path), PriPathName, CDS_MODE_SKIP_PHYSICAL) < SUCCESS)
     return DE_INVLDDRV;
 
   /* skip d:\ */

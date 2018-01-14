@@ -393,7 +393,7 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
 
   ((psp FAR *) MK_FP(cu_psp, 0))->ps_stack = _DOS_FP((BYTE FAR *)r);
 
-  fmemcpy(&lr, r, sizeof(lregs) - 4);
+  fmemcpy_n(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
   lr.ES = r->ES;
 
@@ -1246,7 +1246,7 @@ dispatch:
       {
           /* Remote Server Call */
         case 0x00:
-          fmemcpy(&lr, FP_DS_DX, sizeof(lr));
+          fmemcpy_n(&lr, FP_DS_DX, sizeof(lr));
           goto dispatch;
 
         case 0x06:
@@ -1297,7 +1297,7 @@ dispatch:
           break;
 
         default:
-          rc = (int)network_redirector_mx(REM_PRINTSET, &lr, MK_SP(Int21AX));
+          rc = (int)network_redirector_mx(REM_PRINTSET, MK_FAR(lr), MK_SP(Int21AX));
           goto short_check;
       }
       break;
@@ -1321,7 +1321,7 @@ dispatch:
       }
       else
       {
-        rc = (int)network_redirector_mx(REM_DOREDIRECT, &lr, MK_SP(Int21AX));
+        rc = (int)network_redirector_mx(REM_DOREDIRECT, MK_FAR(lr), MK_SP(Int21AX));
         /* the remote function manipulates *r directly !,
            so we should not copy lr to r here            */
         if (rc != SUCCESS)
@@ -1583,7 +1583,7 @@ error_exit:
 error_carry:
   SET_CARRY_FLAG();
 exit_dispatch:
-  fmemcpy(r, &lr, sizeof(lregs) - 4); /* copy lr -> r but exclude flags */
+  fmemcpy(r, MK_FAR(lr), sizeof(lregs) - 4); /* copy lr -> r but exclude flags */
   r->DS = lr.DS;
   r->ES = lr.ES;
 real_exit:;

@@ -93,9 +93,9 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   drv = LoL->_BootDrive + 1;
   p = (unsigned char FAR *)MK_FP(0, 0x5e0);
-  if (fmemcmp(p+2,"CONFIG",6) == 0)      /* UPX */
+  if (fmemcmp(p+2,MK_FAR_STR("CONFIG"),6) == 0)      /* UPX */
   {
-    fmemcpy(&InitKernelConfig, p+2, sizeof(InitKernelConfig));
+    fmemcpy_n(&InitKernelConfig, p+2, sizeof(InitKernelConfig));
 
     drv = *p + 1;
     *(DWORD FAR *)(p+2) = 0;
@@ -103,7 +103,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   else
   {
     *p = drv - 1;
-    fmemcpy(&InitKernelConfig, &LowKernelConfig, sizeof(InitKernelConfig));
+    fmemcpy_n(&InitKernelConfig, &LowKernelConfig, sizeof(InitKernelConfig));
   }
 
   if (drv >= 0x80)
@@ -360,7 +360,7 @@ STATIC VOID FsConfig(VOID)
   {
     struct cds FAR *pcds_table = &LoL->_CDSp[i];
 
-    fmemcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
+    fmemcpy(pcds_table->cdsCurrentPath, MK_FAR_STR("A:\\\0"), 4);
 
     pcds_table->cdsCurrentPath[0] += i;
 
@@ -447,7 +447,7 @@ STATIC void kernel()
 
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
-  fmemcpy(MK_FP(DOS_PSP + 8, 0), master_env, sizeof(master_env));
+  fmemcpy(MK_FP(DOS_PSP + 8, 0), MK_FAR(master_env), sizeof(master_env));
 
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */

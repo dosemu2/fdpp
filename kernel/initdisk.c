@@ -537,7 +537,7 @@ VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
 STATIC void push_ddt(ddt *pddt)
 {
   ddt FAR *fddt = (ddt FAR *)DynAlloc("ddt", 1, sizeof(ddt));
-  fmemcpy(fddt, pddt, sizeof(ddt));
+  fmemcpy(fddt, MK_FAR(*pddt), sizeof(ddt));
   if (pddt->ddt_logdriveno != 0) {
     (fddt - 1)->ddt_next = _DOS_FP(fddt);
     if (pddt->ddt_driveno == 0 && pddt->ddt_logdriveno == 1)
