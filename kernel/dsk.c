@@ -599,11 +599,11 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
           {
             unsigned char type;
             unsigned tracks, secs;
-            _MK_FAR(DiskTransferBuffer);
+            _MK_FAR(d, DiskTransferBuffer);
             if ((fv->gbfv_spcfunbit & 1) &&
                 (ret =
                  fl_read(pddt->ddt_driveno, 0, 0, 1, 1,
-                         __MK_FAR(DiskTransferBuffer))) != 0)
+                         __MK_FAR(d))) != 0)
             {
               fv->gbfv_spcfunbit = 3;   /* no disk in drive */
               return dskerr(ret);
@@ -668,11 +668,11 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
       {
         struct gblkfv FAR *fv = rp->r_fv;
 
-        _MK_FAR(DiskTransferBuffer);
+        _MK_FAR(d, DiskTransferBuffer);
         ret = Genblockio(pddt, LBA_VERIFY, fv->gbfv_head, fv->gbfv_cyl, 0,
                          (fv->gbfv_spcfunbit ?
                           fv->gbfv_ntracks * pddt->ddt_defbpb.bpb_nsecs :
-                          pddt->ddt_defbpb.bpb_nsecs), __MK_FAR(DiskTransferBuffer));
+                          pddt->ddt_defbpb.bpb_nsecs), __MK_FAR(d));
         if (ret != 0)
           return dskerr(ret);
         fv->gbfv_spcfunbit = 0; /* success */

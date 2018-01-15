@@ -22,10 +22,7 @@ public:
     FarPtr<T> get_obj();
 };
 
-#define _MK_FAR_ST(o) static FarObjSt<decltype(o)> __obj_o(o)
-#define __MK_FAR_ST(o) __obj_o.get_obj()
-
-#define _MK_FAR(o) FarObj<decltype(o)> __obj_o(o)
-#define __MK_FAR(o) __obj_o.get_obj()
-#define _MK_FAR_PTR(o) FarObj<typename std::remove_pointer<decltype(o)>::type> __obj_o(*o)
-#define __MK_FAR_SCP(o) __obj_o.get_obj()
+#define _MK_FAR_ST(n, o) static FarObjSt<decltype(o)> __obj_##n(o)
+#define _MK_FAR(n, o) FarObj<decltype(o)> __obj_##n(o)
+#define _MK_FAR_PTR(n, o) FarObj<typename std::remove_pointer<decltype(o)>::type> __obj_##n(*o)
+#define __MK_FAR(n) __obj_##n.get_obj()
