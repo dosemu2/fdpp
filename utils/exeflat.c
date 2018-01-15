@@ -150,7 +150,7 @@ static int exeflat(const char *srcfile, const char *dstfile,
     }
     if (fread(*curbuf, sizeof(char), bufsize, src) != bufsize)
     {
-      printf("Source file read error %ld %d\n", to_xfer, bufsize);
+      printf("Source file read error %ld %zd\n", to_xfer, bufsize);
       exit(1);
     }
   }
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
       case 'S':
         if (silentcount >= LENGTH(silentSegments))
         {
-          printf("can't handle more then %d silent's\n",
+          printf("can't handle more then %zd silent's\n",
                  LENGTH(silentSegments));
           exit(1);
         }

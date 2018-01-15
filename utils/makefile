@@ -25,5 +25,6 @@ clobber: clean
 
 clean:
 	$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.las *.cod *.err status.me
-	$(RM) exeflat.exe patchobj.com
+	$(RM) *.tab.*
+	$(RM) exeflat.exe patchobj.com thunk_gen
 
