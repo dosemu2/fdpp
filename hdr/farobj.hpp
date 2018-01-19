@@ -3,7 +3,9 @@
 template <typename T>
 class FarObj {
 public:
-    FarObj(const T& obj);
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+        FarObj(const T1& obj);
     FarObj(const T* obj, unsigned size);
     FarObj(const char *str);
     template <typename T1 = T,
@@ -26,3 +28,5 @@ public:
 #define _MK_FAR(n, o) FarObj<decltype(o)> __obj_##n(o)
 #define _MK_FAR_PTR(n, o) FarObj<typename std::remove_pointer<decltype(o)>::type> __obj_##n(*o)
 #define __MK_FAR(n) __obj_##n.get_obj()
+#define _MK_FAR_STR(n, o) FarObj<char> __obj_##n(o)
+#define _MK_FAR_SZ(n, o, sz) FarObj<typename std::remove_pointer<decltype(o)>::type> __obj_##n(o, sz)

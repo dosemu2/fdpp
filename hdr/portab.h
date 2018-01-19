@@ -202,8 +202,6 @@ void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
 #define MK_OFFS(data) FP_OFF(mk_dosobj(&data, sizeof(data)))
 #define MK_OFFS_STR(data) FP_OFF(mk_dosobj(data, strlen(data)))
-#define MK_FAR_STR(data) mk_dosobj(data, strlen(data))
-#define MK_FAR_SZ(data, sz) mk_dosobj(data, sz)
 void disable(void);
 void enable(void);
 

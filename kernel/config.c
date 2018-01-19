@@ -2063,8 +2063,9 @@ STATIC VOID mumcb_init(UCOUNT seg, UWORD size)
     MCB_NORMAL,
     8, 0,
     {0,0,0},
-    MK_FAR_STR("SC")
+    NULL
   };
+  fstrcpy(near_mcb.m_name, MK_FAR_STR("SC"));
   mcb_init_copy(seg, size, &near_mcb);
 }
 #endif
@@ -2652,7 +2653,8 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   args[*args+2] = 0;
 
   exb.exec.env_seg  = 0;
-  exb.exec.cmd_line = MK_FAR_SZ(args, sizeof(CommandTail));
+  size_t sz = sizeof(CommandTail);
+  exb.exec.cmd_line = MK_FAR_SZ(args, sz);
   exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, -1, -1);
 
 

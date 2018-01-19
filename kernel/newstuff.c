@@ -333,8 +333,8 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   dest[0] = '\0';		/* better probable for sanity check below --
                                    included by original truename() */
   /* MUX succeeded and really something */
-  if (!(mode & CDS_MODE_SKIP_PHYSICAL) &&
-      QRemote_Fn(MK_FAR_STR(dest), src) == SUCCESS && dest[0] != '\0')
+  {
+  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(MK_FAR_STR(dest), src) == SUCCESS && dest[0] != '\0')
   {
     tn_printf(("QRemoteFn() returned: \"%s\"\n", dest));
 #ifdef DEBUG_TRUENAME
@@ -344,6 +344,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     if (dest[2] == '/' && (result & IS_DEVICE))
       result &= ~IS_NETWORK;
     return result;
+  }
   }
 
   /* Redirector interface failed --> proceed with local mapper */
@@ -585,8 +586,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
       size_t j = fstrlen(cdsp->cdsCurrentPath);
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
-      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0')
-         && fmemcmp(MK_FAR_STR(dest), cdsp->cdsCurrentPath, j) == 0)
+      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0') && fmemcmp(MK_FAR_STR(dest), cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';

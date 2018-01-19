@@ -414,8 +414,8 @@ STATIC WORD getbpb(ddt * pddt)
       fmemcpy(pddt->ddt_fstype, fs->fstype, sizeof fs->fstype);
     } else {
       /* earlier extended BPB or short BPB, fields not available */
-      fmemcpy(pddt->ddt_volume, MK_FAR_STR("NO NAME    "), 11);
-      fmemcpy(pddt->ddt_fstype, MK_FAR_STR("FAT??   "), 8);
+      fmemcpy(pddt->ddt_volume, MK_FAR_STR_SCP("NO NAME    "), 11);
+      fmemcpy(pddt->ddt_fstype, MK_FAR_STR_SCP("FAT??   "), 8);
     }
   }
 

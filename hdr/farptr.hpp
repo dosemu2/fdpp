@@ -143,6 +143,7 @@ public:
 template<typename T, int max_len = 0>
 class ArSym : public ArSymBase<T> {
 public:
+    ArSym(std::nullptr_t);
     ArSym(const FarPtr<void> &);
     operator FarPtr<void> ();
     template <typename T1 = T,
