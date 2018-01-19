@@ -1,6 +1,8 @@
+#include <assert.h>
 #include "../hdr/portab.h"
 #include "globals.h"
 #include "proto.h"
+#include "thunks_priv.h"
 #include "thunks.h"
 
 static struct fdpp_api *fdpp;
@@ -73,9 +75,9 @@ static union asm_thunks_u {
 #undef SEMIC
 }};
 
-static void *resolve_segoff(uint16_t seg, uint16_t off)
+void *resolve_segoff(void FAR *fa)
 {
-    return fdpp->mem_base + (seg << 4) + off;
+    return fdpp->mem_base + (FP_SEG(fa) << 4) + FP_OFF(fa);
 }
 
 int FdppSetAsmThunks(struct far_s *ptrs, int size)
@@ -90,7 +92,7 @@ int FdppSetAsmThunks(struct far_s *ptrs, int size)
         return -1;
     }
     for (i = 0; i < len; i++)
-        *asm_thunks.arr[i] = resolve_segoff(ptrs[i].seg, ptrs[i].off);
+        *asm_thunks.arr[i] = resolve_segoff(ptrs[i]);
     return 0;
 }
 
@@ -118,7 +120,7 @@ UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     return ret;
 }
 
-#define _ASSERT(c) if (!(c)) fdpp->abort_handler(__FILE__, __LINE__)
+#define _ASSERT(c) assert(c)
 
 void FdppInit(struct fdpp_api *api)
 {

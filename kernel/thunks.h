@@ -17,7 +17,6 @@ struct far_s;
 int FdppSetAsmThunks(struct far_s *ptrs, int size);
 struct fdpp_api {
     uint8_t *mem_base;
-    void (*abort_handler)(const char *, int);
     void (*print_handler)(const char *format, va_list ap);
 };
 void FdppInit(struct fdpp_api *api);

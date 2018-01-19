@@ -120,7 +120,9 @@ CFILES = blockio.c \
     initclk.c \
     iprf.c \
     prf.c \
-    thunks.c
+    thunks.c \
+    smalloc.c \
+    dosobj.c
 
 OBJECTS = $(CFILES:.c=.o)
 

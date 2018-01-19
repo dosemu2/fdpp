@@ -200,20 +200,10 @@ void pokew(UWORD seg, UWORD ofs, UWORD w);
 void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void *short_ptr(UWORD offs);
 #define MK_SP(offs) short_ptr(offs)
-#define MK_OFFS(data) (mk_dosobj(&data, sizeof(data)).off)
-#define MK_OFFS_STR(data) (mk_dosobj(data, strlen(data)).off)
-/*#define MK_FAR(data) ({ \
-    struct far_s __f = mk_dosobj(&data, sizeof(data)); \
-    MK_FP(__f.seg, __f.off); \
-})*/
-#define MK_FAR_STR(data) ({ \
-    struct far_s __f = mk_dosobj(data, strlen(data)); \
-    MK_FP(__f.seg, __f.off); \
-})
-#define MK_FAR_SZ(data, sz) ({ \
-    struct far_s __f = mk_dosobj(data, sz); \
-    MK_FP(__f.seg, __f.off); \
-})
+#define MK_OFFS(data) FP_OFF(mk_dosobj(&data, sizeof(data)))
+#define MK_OFFS_STR(data) FP_OFF(mk_dosobj(data, strlen(data)))
+#define MK_FAR_STR(data) mk_dosobj(data, strlen(data))
+#define MK_FAR_SZ(data, sz) mk_dosobj(data, sz)
 void disable(void);
 void enable(void);
 
@@ -242,7 +232,7 @@ void enable(void);
 #endif
 #define FP_FROM_D(t, l) (__FAR(t))MK_FP((l) >> 16, (l) & 0xffff)
 typedef struct far_s far_t;
-far_t mk_dosobj(const void *data, UWORD len);
+#include "dosobj.h"
 
 #define FAR                     /* linear architecture  */
 #define REG

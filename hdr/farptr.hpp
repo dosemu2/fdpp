@@ -24,6 +24,7 @@ template<typename T>
 class FarPtr : protected far_s, public ArSymBase<T> {
 public:
     FarPtr() = default;
+    FarPtr(far_s&);
     FarPtr(uint16_t, uint16_t);
     FarPtr(std::nullptr_t);
 #define ALLOW_CNV0(T0, T1) std::is_convertible<T0*, T1*>::value
