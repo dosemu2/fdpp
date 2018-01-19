@@ -4,11 +4,7 @@
 # On Windows, use config.mak, and
 # "mingw32-make all", "mingw32-make clean", or "mingw32-make clobber"
 
-default:
-	@echo On DOS, please type build, clean, or clobber.
-	@echo On Linux, please type make all, make clean, or make clobber.
-	@echo On Windows, please type mingw32-make all, mingw32-make clean, or
-	@echo mingw32-make clobber.
+default: all
 
 build:
 	build

@@ -230,7 +230,6 @@ void enable(void);
 #endif
 #define FP_FROM_D(t, l) (__FAR(t))MK_FP((l) >> 16, (l) & 0xffff)
 typedef struct far_s far_t;
-#include "dosobj.h"
 
 #define FAR                     /* linear architecture  */
 #define REG
@@ -238,6 +237,8 @@ typedef struct far_s far_t;
 #define CONST          const
 #define PROTO
 #define NATIVE
+
+#include "dosobj.h"
 
 #else
 #error Unknown compiler
