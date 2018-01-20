@@ -568,8 +568,8 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_status = 0;
   rq.r_command = C_INIT;
   rq.r_length = sizeof(request);
-  rq.r_endaddr = (char FAR *)*r_top;
-  rq.r_bpbptr = (bpb FAR **)MK_FAR_STR(cmdLine ? cmdLine : "\n");  // XXX is typecase correct?
+  rq.r_endaddr = *r_top;
+  rq.r_cmdline = MK_FAR_STR(cmdLine ? cmdLine : "\n");
   rq.r_firstunit = LoL->_nblkdev;
 
   execrh(MK_FAR(rq), dhp);

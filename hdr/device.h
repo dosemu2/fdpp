@@ -341,7 +341,10 @@ typedef struct {
     struct {
       UBYTE _r_nunits;          /*  number of units     */
       __DOSFAR(BYTE)_r_endaddr;     /*  Ending Address      */
-      __DOSFAR(bpb) *_r_bpbptr;     /*  ptr to BPB array    */
+      union {
+        __DOSFAR(bpb) _r_bpbptr;     /*  ptr to BPB array    */
+        __DOSFAR(char) _r_cmdline;
+      } _r_cmd;
       UBYTE _r_firstunit;
     } _r_init;
     struct {
@@ -392,7 +395,8 @@ typedef struct {
 /* Init packet macros                                                   */
 #define r_nunits        _r_x._r_init._r_nunits
 #define r_endaddr       _r_x._r_init._r_endaddr
-#define r_bpbptr        _r_x._r_init._r_bpbptr
+#define r_bpbptr        _r_x._r_init._r_cmd._r_bpbptr
+#define r_cmdline       _r_x._r_init._r_cmd._r_cmdline
 #define r_firstunit     _r_x._r_init._r_firstunit
 
 /* MEDIA Check packet macros                                            */
