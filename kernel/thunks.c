@@ -354,28 +354,40 @@ r n(void) \
     return api_calls->n(); \
 }
 
-#define _THUNK_API_1(r, n, t1, a1) \
-r n(t1 a1) \
-{ \
-    return api_calls->n(a1); \
-}
-
-#define _THUNK_API_2v(n, t1, a1, t2, a2) \
-void n(t1 a1, t2 a2) \
-{ \
-    api_calls->n(a1, a2); \
-}
-
-#define _THUNK_API_2(r, n, t1, a1, t2, a2) \
-r n(t1 a1, t2 a2) \
-{ \
-    return api_calls->n(a1, a2); \
-}
-
-#define _THUNK_API_3v(n, t1, a1, t2, a2, t3, a3) \
-void n(t1 a1, t2 a2, t3 a3) \
-{ \
-    api_calls->n(a1, a2, a3); \
-}
-
 #include "thunkapi_tmpl.h"
+
+
+static void *so2lin(uint16_t seg, uint16_t off)
+{
+    return fdpp->mem_base + (seg << 4) + off;
+}
+
+UBYTE peekb(UWORD seg, UWORD ofs)
+{
+    return *(UBYTE *)so2lin(seg, ofs);
+}
+
+UWORD peekw(UWORD seg, UWORD ofs)
+{
+    return *(UWORD *)so2lin(seg, ofs);
+}
+
+UDWORD peekl(UWORD seg, UWORD ofs)
+{
+    return *(UDWORD *)so2lin(seg, ofs);
+}
+
+void pokeb(UWORD seg, UWORD ofs, UBYTE b)
+{
+    *(UBYTE *)so2lin(seg, ofs) = b;
+}
+
+void pokew(UWORD seg, UWORD ofs, UWORD w)
+{
+    *(UWORD *)so2lin(seg, ofs) = w;
+}
+
+void pokel(UWORD seg, UWORD ofs, UDWORD l)
+{
+    *(UDWORD *)so2lin(seg, ofs) = l;
+}

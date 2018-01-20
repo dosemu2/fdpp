@@ -1,10 +1,4 @@
 _THUNK_API_v(enable);
 _THUNK_API_v(disable);
-_THUNK_API_2(uint8_t, peekb, uint16_t, seg, uint16_t, ofs);
-_THUNK_API_2(uint16_t, peekw, uint16_t, seg, uint16_t, ofs);
-_THUNK_API_2(uint32_t, peekl, uint16_t, seg, uint16_t, ofs);
-_THUNK_API_3v(pokeb, uint16_t, seg, uint16_t, ofs, uint8_t, b);
-_THUNK_API_3v(pokew, uint16_t, seg, uint16_t, ofs, uint16_t, w);
-_THUNK_API_3v(pokel, uint16_t, seg, uint16_t, ofs, uint32_t, l);
 _THUNK_API_0(uint16_t, getCS);
 _THUNK_API_0(uint16_t, getSS);

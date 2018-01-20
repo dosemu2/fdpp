@@ -191,9 +191,9 @@ UWORD getCS(void);
 #define _CS getCS()
 UWORD getSS(void);
 #define _SS getSS()
+typedef uint32_t UDWORD;
 UBYTE peekb(UWORD seg, UWORD ofs);
 UWORD peekw(UWORD seg, UWORD ofs);
-typedef uint32_t UDWORD;
 UDWORD peekl(UWORD seg, UWORD ofs);
 void pokeb(UWORD seg, UWORD ofs, UBYTE b);
 void pokew(UWORD seg, UWORD ofs, UWORD w);
