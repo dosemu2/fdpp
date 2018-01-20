@@ -1297,7 +1297,7 @@ dispatch:
           break;
 
         default:
-          rc = (int)network_redirector_mx(REM_PRINTSET, MK_FAR(lr), MK_SP(Int21AX));
+          rc = (int)network_redirector_mx(REM_PRINTSET, MK_FAR(lr), Int21AX);
           goto short_check;
       }
       break;
@@ -1321,7 +1321,7 @@ dispatch:
       }
       else
       {
-        rc = (int)network_redirector_mx(REM_DOREDIRECT, MK_FAR(lr), MK_SP(Int21AX));
+        rc = (int)network_redirector_mx(REM_DOREDIRECT, MK_FAR(lr), Int21AX);
         /* the remote function manipulates *r directly !,
            so we should not copy lr to r here            */
         if (rc != SUCCESS)

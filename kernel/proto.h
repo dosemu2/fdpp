@@ -372,13 +372,13 @@ COUNT truename(__FAR(const char) src, char * dest, COUNT t);
 /* network.c */
 int network_redirector(unsigned cmd);
 int network_redirector_fp(unsigned cmd, __FAR(void)s);
-long ASMPASCAL network_redirector_mx(unsigned cmd, __FAR(void)s, void *arg);
-#define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, (void *)arg)
-#define remote_getfree(s,d) (int)network_redirector_mx(REM_GETSPACE, s, d)
-#define remote_lseek(s,new_pos) network_redirector_mx(REM_LSEEK, s, &new_pos)
-#define remote_setfattr(attr) (int)network_redirector_mx(REM_SETATTR, NULL, MK_SP(attr))
-#define remote_printredir(dx,ax) (int)network_redirector_mx(REM_PRINTREDIR, MK_FP(0,dx),MK_SP(ax))
-#define QRemote_Fn(d,s) (int)network_redirector_mx(REM_FILENAME, d, (void *)&s)
+long ASMPASCAL network_redirector_mx(unsigned cmd, __FAR(void)s, UDWORD arg);
+#define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
+#define remote_getfree(s,d) (int)network_redirector_mx(REM_GETSPACE, s, GET_FP32(d))
+#define remote_lseek(s,new_pos) network_redirector_mx(REM_LSEEK, s, GET_FP32(new_pos))
+#define remote_setfattr(attr) (int)network_redirector_mx(REM_SETATTR, NULL, attr)
+#define remote_printredir(dx,ax) (int)network_redirector_mx(REM_PRINTREDIR, MK_FP(0,dx), ax)
+#define QRemote_Fn(d,s) (int)network_redirector_mx(REM_FILENAME, d, GET_FP32(s))
 
 UWORD get_machine_name(__FAR(BYTE) netname);
 VOID set_machine_name(__FAR(BYTE) netname, UWORD name_num);

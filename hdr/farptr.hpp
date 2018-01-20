@@ -53,6 +53,7 @@ public:
     FarPtr<T> operator -(int);
     uint16_t __seg();
     uint16_t __off();
+    uint32_t get_fp32();
 };
 
 template<typename T>
@@ -248,6 +249,7 @@ public:
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
 #define __DOSFAR(t) FarPtr<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)MK_FP(s, o)
+#define GET_FP32(f) f.get_fp32()
 
 #undef NULL
 #define NULL           nullptr

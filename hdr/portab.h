@@ -198,8 +198,6 @@ UDWORD peekl(UWORD seg, UWORD ofs);
 void pokeb(UWORD seg, UWORD ofs, UBYTE b);
 void pokew(UWORD seg, UWORD ofs, UWORD w);
 void pokel(UWORD seg, UWORD ofs, UDWORD l);
-void *short_ptr(UWORD offs);
-#define MK_SP(offs) short_ptr(offs)
 void disable(void);
 void enable(void);
 

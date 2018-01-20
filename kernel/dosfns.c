@@ -287,7 +287,7 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
  */
     if ((s->sft_flags & SFT_FSHARED) &&
         (s->sft_mode & (O_DENYREAD | O_DENYNONE)))
-      new_pos = remote_lseek(s, new_pos);
+      new_pos = remote_lseek(s, MK_FAR_SCP(new_pos));
     else
       new_pos += s->sft_size;
   }
@@ -501,7 +501,7 @@ long DosOpenSft(char FAR * fname, unsigned flags, unsigned attrib)
       cmd = REM_OPEN;
       attrib = (BYTE)flags;
     }
-    status = (int)network_redirector_mx(cmd, sftp, MK_SP(attrib));
+    status = (int)network_redirector_mx(cmd, sftp, attrib);
     if (status >= SUCCESS)
     {
       if (sftp->sft_count == 0)
@@ -712,7 +712,7 @@ UWORD DosGetFree(UBYTE drive, UWORD * navc, UWORD * bps, UWORD * nc)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, rg) != SUCCESS)
+    if (remote_getfree(cdsp, MK_FAR(rg)) != SUCCESS)
       return spc;
 
     /* for int21/ah=1c:
@@ -827,7 +827,7 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, rg) != SUCCESS)
+    if (remote_getfree(cdsp, MK_FAR(rg)) != SUCCESS)
       return DE_INVLDDRV;
 
     xfsp->xfs_clussize = rg[0];
@@ -1338,19 +1338,20 @@ COUNT DosTruename(const char FAR *src, char FAR *dest)
   return rc;
 }
 
+struct _SSS
+{
+    unsigned long ofs, len;
+    int unlock;
+};
 STATIC int remote_lock_unlock(sft FAR *sftp,     /* SFT for file */
                               unsigned long ofs, /* offset into file */
                               unsigned long len, /* length (in bytes) of region to lock or unlock */
                               int unlock)
                                  /* one to unlock; zero to lock */
 {
-  struct
-  {
-    unsigned long ofs, len;
-    int unlock;
-  } param_block;
+  struct _SSS param_block;
   param_block.ofs = ofs;
   param_block.len = len;
   param_block.unlock = unlock;
-  return (int)network_redirector_mx(REM_LOCK, sftp, &param_block);
+  return (int)network_redirector_mx(REM_LOCK, sftp, GET_FP32(MK_FAR(param_block)));
 }
