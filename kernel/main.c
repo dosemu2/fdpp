@@ -706,12 +706,15 @@ STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 {
   iregs r;
   UBYTE buffer[0x13];
+  UBYTE FAR *buf;
   buffer[0] = 0x13;
 
   r.a.b.h = 0x4b;               /* bootable CDROM - get status */
   r.a.b.l = statusOnly;
   r.d.b.l = (char)drive;
-  r.si = MK_OFFS(buffer);
+  buf = MK_FAR(buffer);
+  r.ds = FP_SEG(buf);
+  r.si = FP_OFF(buf);
   init_call_intr(0x13, &r);
 
   if (r.flags & 1)

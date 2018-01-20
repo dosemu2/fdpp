@@ -368,7 +368,7 @@ const char FAR *get_root(const char FAR * fname)
 
 STATIC void ConvertPathNameToFCBName(char *FCBName, const char *PathName)
 {
-  ConvertNameSZToName83(FCBName, (char *)MK_SP(FP_OFF(get_root(MK_FAR_STR(PathName)))));
+  ConvertNameSZToName83(FCBName, (char *)get_root(MK_FAR_STR(PathName)));
   FCBName[FNAME_SIZE + FEXT_SIZE] = '\0';
 }
 
@@ -975,7 +975,7 @@ COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
     SearchDir.dir_attrib = D_DEVICE;
     SearchDir.dir_time = dos_gettime();
     SearchDir.dir_date = dos_getdate();
-    p = (char *)MK_SP(FP_OFF(get_root(PriPathName)));
+    p = (char *)get_root(PriPathName);
     memset(SearchDir.dir_name, ' ', FNAME_SIZE + FEXT_SIZE);
     for (i = 0; i < FNAME_SIZE && *p && *p != '.'; i++)
       SearchDir.dir_name[i] = *p++;
