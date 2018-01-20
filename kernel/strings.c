@@ -109,6 +109,7 @@ COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
   return *d - *s;
 }
 
+#if 0
 char *strchr(const char * s, int c)
 {
   REG CONST BYTE *p;
@@ -121,6 +122,7 @@ char *strchr(const char * s, int c)
   while (*p);
   return 0;
 }
+#endif
 
 char FAR * fstrchr(const char FAR * s, int c)
 {

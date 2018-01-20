@@ -822,8 +822,8 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   {
     BYTE *p;
     /* if there are no parameters, point to end without "\r\n" */
-    if((tailp = strchr(Shell,'\t')) == NULL &&
-       (tailp = strchr(Shell, ' ')) == NULL)
+    if((tailp = strchr((char *)Shell,'\t')) == NULL &&
+       (tailp = strchr((char *)Shell, ' ')) == NULL)
         tailp = endp - 2;
     /* shift tail to right by 2 to make room for '\0', ctCount */
     for (p = endp - 1; p >= tailp; p--)

@@ -228,6 +228,10 @@ public:
     T*** get_ref();
 };
 
+#undef _P
+#undef _C
+#undef _RP
+
 #define __ASMSYM(t) AsmSym<t>
 #define __ASMFSYM(t) AsmFSym<t>
 #define __ASMARSYM(t, v, l) AsmArFSym<t, l> v

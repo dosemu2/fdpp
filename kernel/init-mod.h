@@ -102,7 +102,7 @@ VOID PostConfig(VOID);
 VOID configDone(VOID);
 __FAR(VOID) KernelAlloc(size_t nBytes, char type, int mode);
 __FAR(void) KernelAllocPara(size_t nPara, char type, char *name, int mode);
-char *strcat(char * d, const char * s);
+//char *strcat(char * d, const char * s);
 BYTE * GetStringArg(BYTE * pLine, BYTE * pszString);
 void DoInstall(void);
 UWORD GetBiosKey(int timeout);

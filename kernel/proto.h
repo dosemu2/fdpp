@@ -289,28 +289,28 @@ void put_string(const char *s);
 void put_console(int);
 
 /* strings.c */
-size_t strlen(const char * s);
+//size_t strlen(const char * s);
 size_t fstrlen(__FAR(const char) s);
 __FAR(char) _fstrcpy(__FAR(char) d,__FAR(const char) s);
-int strcmp(const char * d, const char * s);
+//int strcmp(const char * d, const char * s);
 int fstrcmp(__FAR(const char) d,__FAR(const char) s);
 int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
-int strncmp(const char * d, const char * s, size_t l);
-char * strchr(const char * s, int c);
+//int strncmp(const char * d, const char * s, size_t l);
+//char * strchr(const char * s, int c);
 __FAR(char) fstrchr(__FAR(const char) s, int c);
 __FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);
 
 /* misc.c */
-char * strcpy(char * d, const char * s);
+//char * strcpy(char * d, const char * s);
 //void ASMPASCAL fmemcpyBack(__FAR(void) d,__FAR(const void) s, size_t n);
 void fmemcpy(__FAR(void) d,__FAR(const void) s, size_t n);
 void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
 void fstrcpy(__FAR(char) d,__FAR(const char) s);
-void * memcpy(void *d, const void * s, size_t n);
+//void * memcpy(void *d, const void * s, size_t n);
 void fmemset(__FAR(void) s, int ch, size_t n);
-void * memset(void * s, int ch, size_t n);
+//void * memset(void * s, int ch, size_t n);
 
-int memcmp(const void *m1, const void *m2, size_t n);
+//int memcmp(const void *m1, const void *m2, size_t n);
 int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 
 #ifdef __WATCOMC__
