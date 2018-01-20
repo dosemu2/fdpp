@@ -36,6 +36,7 @@ static BYTE *miscRcsId =
 #include "globals.h"
 #ifndef I86
 
+#ifndef USE_STDLIB
 char *strcpy(REG BYTE * d, REG CONST BYTE * s)
 {
   char *tmp = d;
@@ -45,6 +46,7 @@ char *strcpy(REG BYTE * d, REG CONST BYTE * s)
 
   return tmp;
 }
+#endif
 
 VOID fstrcpy(REG BYTE FAR * d, REG CONST BYTE FAR * s)
 {
@@ -53,6 +55,7 @@ VOID fstrcpy(REG BYTE FAR * d, REG CONST BYTE FAR * s)
   *d = '\0';
 }
 
+#ifndef USE_STDLIB
 VOID * memcpy(REG VOID * d, REG CONST VOID * s, REG size_t n)
 {
   char *cd = (char *)d;
@@ -62,6 +65,7 @@ VOID * memcpy(REG VOID * d, REG CONST VOID * s, REG size_t n)
     *cd++ = *cs++;
   return d;
 }
+#endif
 
 VOID fmemcpy(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n)
 {
@@ -75,12 +79,14 @@ VOID fmemcpy_n(REG VOID * d, REG CONST VOID FAR * s, REG size_t n)
     ((BYTE *) d)[n] = ((BYTE FAR *) s)[n];
 }
 
+#ifndef USE_STDLIB
 VOID *memset(VOID * s, int ch, size_t n)
 {
   while (n--)
     ((BYTE *) s)[n] = ch;
   return s;
 }
+#endif
 
 VOID fmemset(REG VOID FAR * s, REG int ch, REG size_t n)
 {

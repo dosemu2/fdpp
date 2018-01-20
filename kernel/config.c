@@ -2070,11 +2070,13 @@ STATIC VOID mumcb_init(UCOUNT seg, UWORD size)
 }
 #endif
 
+#ifndef USE_STDLIB
 char *strcat(REG char * d, REG const char * s)
 {
   strcpy(d + strlen(d), s);
   return d;
 }
+#endif
 
 /* compare two ASCII strings ignoring case */
 STATIC char strcaseequal(const char * d, const char * s)

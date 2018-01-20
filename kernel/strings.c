@@ -34,6 +34,7 @@ static BYTE *stringsRcsId =
 #endif
 
 #ifndef I86
+#ifndef USE_STDLIB
 size_t strlen(REG CONST BYTE * s)
 {
   REG size_t cnt = 0;
@@ -42,6 +43,7 @@ size_t strlen(REG CONST BYTE * s)
     ++cnt;
   return cnt;
 }
+#endif
 
 size_t fstrlen(REG CONST BYTE FAR * s)
 {
@@ -59,6 +61,7 @@ VOID _fstrcpy(REG BYTE FAR * d, REG BYTE FAR * s)
   *d = 0;
 }
 
+#ifndef USE_STDLIB
 int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
 {
   while (*s != '\0' && *d != '\0')
@@ -70,6 +73,7 @@ int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
   }
   return *d - *s;
 }
+#endif
 
 COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
 {
@@ -83,6 +87,7 @@ COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
   return *d - *s;
 }
 
+#ifndef USE_STDLIB
 int strncmp(REG const char *d, REG const char *s, size_t l)
 {
   size_t index = 1;
@@ -95,6 +100,7 @@ int strncmp(REG const char *d, REG const char *s, size_t l)
   }
   return *d - *s;
 }
+#endif
 
 COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
 {
@@ -109,7 +115,7 @@ COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
   return *d - *s;
 }
 
-#if 0
+#ifndef USE_STDLIB
 char *strchr(const char * s, int c)
 {
   REG CONST BYTE *p;
@@ -137,7 +143,7 @@ char FAR * fstrchr(const char FAR * s, int c)
   return NULL;
 }
 
-#if 0
+#ifndef USE_STDLIB
 void *memchr(const void * s, int c)
 {
   REG unsigned char *p;
@@ -165,6 +171,7 @@ void FAR * fmemchr(const void FAR * s, int c, size_t n)
   return NULL;
 }
 
+#ifndef USE_STDLIB
 int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)
 {
   CONST BYTE * d = (CONST BYTE *)c_d;
@@ -179,6 +186,7 @@ int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)
   }
   return *d - *s;
 }
+#endif
 
 int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
 {

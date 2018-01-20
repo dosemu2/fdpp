@@ -233,6 +233,7 @@ typedef struct far_s far_t;
 #define CONST          const
 #define PROTO
 #define NATIVE
+#define USE_STDLIB
 
 #include "dosobj.h"
 
