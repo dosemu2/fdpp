@@ -1,32 +1,72 @@
 #include <string.h>
+#include <assert.h>
 #include "farptr.hpp"
+#include "dosobj.h"
 
 template <typename T>
 class FarObj {
+protected:
     T *ptr;
     int size;
+    FarPtr<void> fobj;
+    bool have_obj = false;
+
+    template <typename T1>
+    FarPtr<T1> GetObj() {
+        assert(!have_obj);
+        pr_dosobj(fobj, ptr, size);
+        have_obj = true;
+        return fobj;
+    }
+
+    template <typename T1 = T,
+        typename std::enable_if<std::is_const<T1>::value>::type* = nullptr>
+    void RmObj() {
+        if (!have_obj)
+            return;
+        rm_dosobj(fobj);
+    }
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_const<T1>::value>::type* = nullptr>
+    void RmObj() {
+        if (!have_obj)
+            return;
+        cp_dosobj(ptr, fobj, size);
+        rm_dosobj(fobj);
+    }
 
 public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
-        FarObj(T1& obj) : ptr(&obj), size(sizeof(T1)) {}
-    FarObj(T* obj, unsigned sz) : ptr(obj), size(sz) {}
+    FarObj(T1& obj) : ptr(&obj), size(sizeof(T1)) {
+        fobj = mk_dosobj(ptr, size);
+    }
+    FarObj(T* obj, unsigned sz) : ptr(obj), size(sz) {
+        fobj = mk_dosobj(ptr, size);
+    }
     template <typename T1 = T,
         typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
-        FarPtr<typename std::remove_extent<T1>::type> get_obj();
+    FarPtr<typename std::remove_extent<T1>::type> get_obj() {
+        return GetObj<typename std::remove_extent<T1>::type>();
+    }
     template <typename T1 = T,
         typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
-        FarPtr<T1> get_obj();
-    ~FarObj();
+    FarPtr<T1> get_obj() {
+        return GetObj<T1>();
+    }
+    ~FarObj() { RmObj(); }
 };
 
 template <typename T>
-class FarObjSt {
+class FarObjSt : public FarObj<T> {
 public:
-    FarObjSt(T& obj);
-    FarObjSt(T* obj, unsigned sz);
-    FarPtr<T> get_obj();
+    FarObjSt(T& obj) : FarObj<T>(obj) {}
+    FarObjSt(T* obj, unsigned sz) : FarObj<T>(obj, sz) {}
+    FarPtr<T> get_obj() {
+        pr_dosobj(this->fobj, this->ptr, this->size);
+        return this->fobj;
+    }
 };
 
 #define _RP(t) typename std::remove_pointer<t>::type

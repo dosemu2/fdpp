@@ -22,17 +22,30 @@ void dosobj_init(void)
 void FAR *mk_dosobj(const void *data, UWORD len)
 {
     void *ptr = smalloc(&pool, len);
-    uint16_t offs = (uintptr_t)ptr - (uintptr_t)smget_base_addr(&pool);
+    uint16_t offs;
 
     assert(ptr);
-    memcpy(ptr, data, len);
+    offs = (uintptr_t)ptr - (uintptr_t)smget_base_addr(&pool);
     return base + offs;
 }
 
-void rm_dosobj(void *data, const void FAR *fa, UWORD len)
+void pr_dosobj(void FAR *fa, const void *data, UWORD len)
+{
+    void *ptr = resolve_segoff(fa);
+
+    memcpy(ptr, data, len);
+}
+
+void cp_dosobj(void *data, const void FAR *fa, UWORD len)
 {
     void *ptr = resolve_segoff(fa);
 
     memcpy(data, ptr, len);
+}
+
+void rm_dosobj(void FAR *fa)
+{
+    void *ptr = resolve_segoff(fa);
+
     smfree(&pool, ptr);
 }
