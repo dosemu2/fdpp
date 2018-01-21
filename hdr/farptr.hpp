@@ -2,31 +2,20 @@
 #define FARPTR_HPP
 
 #include <type_traits>
+#include <cassert>
+#include "thunks_priv.h"
 
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
-
 template<typename T> class SymWrp;
 template<typename T> class SymWrp2;
-template<typename T, int max_len = 0>
-class ArSymBase {
-public:
-    template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-        SymWrp<T1>& operator [](unsigned);
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-        SymWrp2<T1>& operator [](unsigned);
-};
-
 template<typename T>
-class FarPtr : protected far_s, public ArSymBase<T> {
+class FarPtr : protected far_s {
 public:
     FarPtr() = default;
-    FarPtr(far_s&);
-    FarPtr(uint16_t, uint16_t);
-    FarPtr(std::nullptr_t);
+    FarPtr(uint16_t s, uint16_t o) : far_s((far_s){s, o}) {}
+    FarPtr(std::nullptr_t) : far_s((far_s){0, 0}) {}
 #define ALLOW_CNV0(T0, T1) std::is_convertible<T0*, T1*>::value
 #define ALLOW_CNV1(T0, T1) \
         std::is_void<T0>::value || std::is_same<T0, char>::value || \
@@ -36,12 +25,22 @@ public:
 #define ALLOW_CNV(T0, T1) (ALLOW_CNV0(T0, T1) || ALLOW_CNV1(T0, T1))
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-        FarPtr(const FarPtr<T0>&);
+    FarPtr(const FarPtr<T0>& f) : far_s((far_s){f.__seg(), f.__off()}) {}
+
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-        explicit FarPtr(const FarPtr<T0>&);
-    T* operator ->();
-    operator T*();
+    explicit FarPtr(const FarPtr<T0>& f) : far_s((far_s){f.__seg(), f.__off()}) {}
+
+    T* operator ->() { return (T*)resolve_segoff(*this); }
+    operator T*() { return (T*)resolve_segoff(*this); }
+
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+    SymWrp<T1>& operator [](unsigned idx);
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+    SymWrp2<T1>& operator [](unsigned idx);
+
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV1(T1, T0)>::type* = nullptr>
         operator T0*();
@@ -51,9 +50,10 @@ public:
     void operator +=(int);
     FarPtr<T> operator +(int);
     FarPtr<T> operator -(int);
-    uint16_t __seg();
-    uint16_t __off();
-    uint32_t get_fp32();
+    uint16_t __seg() const;
+    uint16_t __off() const;
+    uint32_t get_fp32() const;
+    far_s get_far() const;
 };
 
 template<typename T>
@@ -90,8 +90,8 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
         operator FarPtr<void> ();
-    uint16_t __seg();
-    uint16_t __off();
+    uint16_t __seg() const;
+    uint16_t __off() const;
 };
 
 template<typename T>
@@ -136,9 +136,29 @@ public:
     FarPtr<T> operator &();
     operator T *();
     NearPtr<T> operator -(const NearPtr<T> &);
-    uint16_t __off();
+    uint16_t __off() const;
 
     NearPtr() = default;
+};
+
+template<typename T, int max_len = 0>
+class ArSymBase {
+public:
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+    SymWrp<T1>& operator [](unsigned idx) {
+        SymWrp<T1> *s = (SymWrp<T1> *)this;
+        assert(!max_len || idx < max_len);
+        return s[idx];
+    }
+
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+    SymWrp2<T1>& operator [](unsigned idx) {
+        SymWrp2<T1> *s = (SymWrp2<T1> *)this;
+        assert(!max_len || idx < max_len);
+        return s[idx];
+    }
 };
 
 template<typename T, int max_len = 0>
@@ -202,8 +222,8 @@ public:
     explicit operator uint16_t *();
     operator FarPtr<T> *();
     /* via mk_dosobj() I guess */
-    uint16_t __seg();
-    uint16_t __off();
+    uint16_t __seg() const;
+    uint16_t __off() const;
 };
 
 template<typename T>
@@ -220,8 +240,8 @@ public:
     operator FarPtr<T> &();
     FarPtr<T>& get_sym();
     FarPtrAsm<T> operator &();
-    uint16_t __seg();
-    uint16_t __off();
+    uint16_t __seg() const;
+    uint16_t __off() const;
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
@@ -254,6 +274,7 @@ public:
 #define __DOSFAR(t) FarPtr<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)MK_FP(s, o)
 #define GET_FP32(f) f.get_fp32()
+#define GET_FAR(f) f.get_far()
 
 #undef NULL
 #define NULL           nullptr

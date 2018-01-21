@@ -75,9 +75,9 @@ static union asm_thunks_u {
 #undef SEMIC
 }};
 
-void *resolve_segoff(void FAR *fa)
+void *resolve_segoff(struct far_s fa)
 {
-    return fdpp->mem_base + (FP_SEG(fa) << 4) + FP_OFF(fa);
+    return fdpp->mem_base + (fa.seg << 4) + fa.off;
 }
 
 int FdppSetAsmThunks(struct far_s *ptrs, int size)

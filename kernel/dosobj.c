@@ -3,7 +3,6 @@
 #include "portab.h"
 #include "dyndata.h"
 #include "smalloc.h"
-#include "thunks_priv.h"
 #include "dosobj.h"
 
 static smpool pool;
@@ -13,7 +12,7 @@ void dosobj_init(void)
 {
     const int size = 512;
     void FAR *fa = DynAlloc("dosobj", 1, size);
-    void *ptr = resolve_segoff(fa);
+    void *ptr = resolve_segoff(GET_FAR(fa));
 
     sminit(&pool, ptr, size);
     base = fa;
@@ -31,21 +30,21 @@ void FAR *mk_dosobj(const void *data, UWORD len)
 
 void pr_dosobj(void FAR *fa, const void *data, UWORD len)
 {
-    void *ptr = resolve_segoff(fa);
+    void *ptr = resolve_segoff(GET_FAR(fa));
 
     memcpy(ptr, data, len);
 }
 
 void cp_dosobj(void *data, const void FAR *fa, UWORD len)
 {
-    void *ptr = resolve_segoff(fa);
+    void *ptr = resolve_segoff(GET_FAR(fa));
 
     memcpy(data, ptr, len);
 }
 
 void rm_dosobj(void FAR *fa)
 {
-    void *ptr = resolve_segoff(fa);
+    void *ptr = resolve_segoff(GET_FAR(fa));
 
     smfree(&pool, ptr);
 }

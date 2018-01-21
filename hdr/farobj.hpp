@@ -1,5 +1,5 @@
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 #include "farptr.hpp"
 #include "dosobj.h"
 
