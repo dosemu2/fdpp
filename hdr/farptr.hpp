@@ -36,24 +36,41 @@ public:
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](unsigned idx);
+    SymWrp<T1>& operator [](unsigned idx) {
+        SymWrp<T1> *s = (SymWrp<T1> *)resolve_segoff(*this);
+        return s[idx];
+    }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](unsigned idx);
+    SymWrp2<T1>& operator [](unsigned idx) {
+        SymWrp2<T1> *s = (SymWrp2<T1> *)resolve_segoff(*this);
+        return s[idx];
+    }
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV1(T1, T0)>::type* = nullptr>
-        operator T0*();
-    FarPtr<T> operator ++(int);
-    FarPtr<T> operator ++();
-    FarPtr<T> operator --();
-    void operator +=(int);
-    FarPtr<T> operator +(int);
-    FarPtr<T> operator -(int);
-    uint16_t __seg() const;
-    uint16_t __off() const;
-    uint32_t get_fp32() const;
-    far_s get_far() const;
+    operator T0*() { return (T0*)resolve_segoff(*this); }
+
+    FarPtr<T> operator ++(int) {
+        FarPtr<T> f = *this;
+        off++;
+        return f;
+    }
+    FarPtr<T> operator ++() {
+        off++;
+        return *this;
+    }
+    FarPtr<T> operator --() {
+        off--;
+        return *this;
+    }
+    void operator +=(int inc) { off += inc; }
+    FarPtr<T> operator +(int inc) { return FarPtr<T>(seg, off + inc); }
+    FarPtr<T> operator -(int dec) { return FarPtr<T>(seg, off - dec); }
+    uint16_t __seg() const { return seg; }
+    uint16_t __off() const { return off; }
+    uint32_t get_fp32() const { return ((seg << 16) | off); }
+    far_s get_far() const { return *this; }
 };
 
 template<typename T>
