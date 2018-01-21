@@ -321,6 +321,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
   COUNT sys_idx = 0;
   sfttbl FAR *sp;
 
+  *sft_idx = 0;
   /* Get the SFT block that contains the SFT      */
   for (sp = sfthead; sp != (sfttbl FAR *)MK_FP(-1, -1); sp = sp->sftt_next)
   {

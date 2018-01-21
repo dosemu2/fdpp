@@ -231,6 +231,7 @@ typedef struct far_s far_t;
 #define REG
 #define VOID           void
 #define CONST          const
+#define STATICS
 #define PROTO
 #define NATIVE
 #define USE_STDLIB
