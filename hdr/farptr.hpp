@@ -73,29 +73,35 @@ public:
     far_s get_far() const { return *this; }
 };
 
+#define _MK_F(f, s) ({ far_s __s = s; f(__s.seg, __s.off); })
+
 template<typename T>
 class SymWrp : public T {
 public:
     SymWrp() = default;
-    SymWrp(const T&);
     SymWrp(const SymWrp&) = delete;
-    FarPtr<T> operator &();
+    SymWrp<T>& operator =(T& f) { *this = f; return *this; }
+    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, mk_far(this)); }
 };
 
 template<typename T>
 class SymWrp2 {
+    T sym;
+
 public:
     SymWrp2() = default;
-    SymWrp2(const T&);
     SymWrp2(const SymWrp2&) = delete;
-    FarPtr<T> operator &();
-    operator T &();
-    uint32_t operator()();
+    SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
+    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, mk_far(this)); }
+    operator T &() { return sym; }
+    uint32_t operator()() { return thunk_call(this); }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
-        operator FarPtr<const void> &();
+    operator FarPtr<const void> () {
+        return _MK_F(FarPtr<const void>, mk_far(this));
+    }
 };
 
 template<typename T>
@@ -192,7 +198,6 @@ public:
         operator FarPtr<const T1> ();
     operator FarPtr<T> ();
     operator NearPtr<T> ();
-    operator SymWrp2<T*>& ();
     operator T *();
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
