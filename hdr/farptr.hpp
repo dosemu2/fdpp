@@ -81,7 +81,7 @@ public:
     SymWrp() = default;
     SymWrp(const SymWrp&) = delete;
     SymWrp<T>& operator =(T& f) { *this = f; return *this; }
-    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, mk_far(this)); }
+    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, lookup_far(this)); }
 };
 
 template<typename T>
@@ -92,15 +92,14 @@ public:
     SymWrp2() = default;
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
-    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, mk_far(this)); }
+    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, lookup_far(this)); }
     operator T &() { return sym; }
-    uint32_t operator()() { return thunk_call(this); }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () {
-        return _MK_F(FarPtr<const void>, mk_far(this));
+        return _MK_F(FarPtr<const void>, lookup_far(this));
     }
 };
 
@@ -145,10 +144,26 @@ public:
 };
 
 template<typename T>
-class AsmCSym {
+class CallSym {
+    FarPtr<T> ptr;
+
 public:
-    AsmCSym(const FarPtr<T> &);
-    SymWrp2<T*>& operator *();
+    CallSym(const FarPtr<T>& f) { ptr = f; }
+    template <typename T1 = T,
+        typename std::enable_if<std::is_void<T1>::value>::type* = nullptr>
+    T1 operator()() { thunk_call_void(ptr.get_far()); }
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+    T1 operator()() { return thunk_call_void(ptr.get_far()); }
+};
+
+template<typename T>
+class AsmCSym {
+    CallSym<T> sym;
+
+public:
+    AsmCSym(const FarPtr<T>& f) : sym(f) {}
+    CallSym<T>& operator *() { return sym; }
 };
 
 template<typename T>
