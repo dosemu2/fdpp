@@ -103,44 +103,51 @@ public:
     }
 };
 
+template<typename T> class AsmSym;
 template<typename T>
-class AsmRef : public T {
+class AsmRef {
+    T **sym;
+
 public:
-    AsmRef(const AsmRef<T> &);
-    T* operator ->();
-    operator FarPtr<T> ();
+    AsmRef(T **s) : sym(s) {}
+    T* operator ->() { return *sym; }
+    operator FarPtr<T> () { return _MK_F(FarPtr<T>, lookup_far(*sym)); }
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
-        operator FarPtr<void> ();
-    uint16_t __seg() const;
-    uint16_t __off() const;
+    operator FarPtr<void> () { return _MK_F(FarPtr<T>, lookup_far(*sym)); }
+    uint16_t __seg() const { return _MK_F(FarPtr<T>, lookup_far(*sym)).__seg(); }
+    uint16_t __off() const { return _MK_F(FarPtr<T>, lookup_far(*sym)).__off(); }
 };
 
 template<typename T>
 class AsmSym {
+    T *sym;
+
 public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-        SymWrp<T1>& get_sym();
+    SymWrp<T1>& get_sym() { return *(SymWrp<T1> *)sym; }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-        SymWrp2<T1>& get_sym();
-    AsmRef<T> operator &();
+    SymWrp2<T1>& get_sym() { return *(SymWrp2<T1> *)sym; }
+    AsmRef<T> operator &() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
     AsmSym() = default;
     AsmSym(const AsmSym<T> &) = delete;
-    T** get_ref();
+    T** get_ref() { return &sym; }
 };
 
 template<typename T>
 class AsmFSym {
+    T *sym;
+
 public:
-    FarPtr<T> get_sym();
+    FarPtr<T> get_sym() { return _MK_F(FarPtr<T>, lookup_far(sym)); }
 
     AsmFSym() = default;
     AsmFSym(const AsmFSym<T> &) = delete;
-    T** get_ref();
+    T **get_ref() { return &sym; }
 };
 
 template<typename T>
@@ -169,9 +176,8 @@ public:
 template<typename T>
 class NearPtr {
 public:
-    NearPtr(uint16_t);
+    NearPtr(uint16_t o);
     operator uint16_t ();
-    FarPtr<T> operator &();
     operator T *();
     NearPtr<T> operator -(const NearPtr<T> &);
     uint16_t __off() const;

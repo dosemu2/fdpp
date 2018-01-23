@@ -57,9 +57,9 @@ __ASM(struct dirent, SearchDir) SEMIC
 //__ASM(struct _FcbSearchBuffer, FcbSearchBuffer) SEMIC
 __ASM(struct __PriPathBuffer, _PriPathBuffer) SEMIC
 __ASM(struct __SecPathBuffer, _SecPathBuffer) SEMIC
-__ASM_ARRI(BYTE, internal_data) SEMIC              /* sda areas                            */
-__ASM_ARRI(BYTE, swap_always) SEMIC                /*  "    "                              */
-__ASM_ARRI(BYTE, swap_indos) SEMIC                 /*  "    "                              */
+__ASM_ARRI_F(BYTE, internal_data) SEMIC              /* sda areas                            */
+__ASM_ARRI_F(BYTE, swap_always) SEMIC                /*  "    "                              */
+__ASM_ARRI_F(BYTE, swap_indos) SEMIC                 /*  "    "                              */
 __ASM(BYTE, tsr) SEMIC                          /* true if program is TSR               */
 __ASM(BYTE, break_flg) SEMIC                    /* true if break was detected           */
 __ASM(BYTE, break_ena) SEMIC                    /* break enabled flag                   */
