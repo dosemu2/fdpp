@@ -71,6 +71,8 @@ public:
     uint16_t __off() const { return off; }
     uint32_t get_fp32() const { return ((seg << 16) | off); }
     far_s get_far() const { return *this; }
+    far_s& get_ref() { return *this; }
+    T* get_ptr() { return (T*)resolve_segoff(*this); }
 };
 
 #define _MK_F(f, s) ({ far_s __s = s; f(__s.seg, __s.off); })
@@ -106,48 +108,48 @@ public:
 template<typename T> class AsmSym;
 template<typename T>
 class AsmRef {
-    T **sym;
+    FarPtr<T> *sym;
 
 public:
-    AsmRef(T **s) : sym(s) {}
+    AsmRef(FarPtr<T> *s) : sym(s) {}
     T* operator ->() { return *sym; }
-    operator FarPtr<T> () { return _MK_F(FarPtr<T>, lookup_far(*sym)); }
+    operator FarPtr<T> () { return *sym; }
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
-    operator FarPtr<void> () { return _MK_F(FarPtr<T>, lookup_far(*sym)); }
-    uint16_t __seg() const { return _MK_F(FarPtr<T>, lookup_far(*sym)).__seg(); }
-    uint16_t __off() const { return _MK_F(FarPtr<T>, lookup_far(*sym)).__off(); }
+    operator FarPtr<void> () { return FarPtr<void>(*sym); }
+    uint16_t __seg() const { return sym->__seg(); }
+    uint16_t __off() const { return sym->__off(); }
 };
 
 template<typename T>
 class AsmSym {
-    T *sym;
+    FarPtr<T> sym;
 
 public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& get_sym() { return *(SymWrp<T1> *)sym; }
+    SymWrp<T1>& get_sym() { return *(SymWrp<T1> *)sym.get_ptr(); }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& get_sym() { return *(SymWrp2<T1> *)sym; }
+    SymWrp2<T1>& get_sym() { return *(SymWrp2<T1> *)sym.get_ptr(); }
     AsmRef<T> operator &() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
     AsmSym() = default;
     AsmSym(const AsmSym<T> &) = delete;
-    T** get_ref() { return &sym; }
+    far_s* get_ref() { return &sym.get_ref(); }
 };
 
 template<typename T>
 class AsmFSym {
-    T *sym;
+    FarPtr<T> sym;
 
 public:
-    FarPtr<T> get_sym() { return _MK_F(FarPtr<T>, lookup_far(sym)); }
+    FarPtr<T> get_sym() { return sym; }
 
     AsmFSym() = default;
     AsmFSym(const AsmFSym<T> &) = delete;
-    T **get_ref() { return &sym; }
+    far_s* get_ref() { return &sym.get_ref(); }
 };
 
 template<typename T>
@@ -237,7 +239,7 @@ class AsmArSym : public ArSymBase<T> {
 public:
     AsmArSym() = default;
     AsmArSym(const AsmArSym<T> &) = delete;
-    T*** get_ref();
+    far_s* get_ref();
 };
 
 template<typename T, int max_len = 0>
@@ -288,7 +290,7 @@ public:
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
-    T*** get_ref();
+    far_s* get_ref();
 };
 
 #undef _P

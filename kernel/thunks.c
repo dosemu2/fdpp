@@ -44,12 +44,12 @@ void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
 
 static union asm_thunks_u {
   struct _thunks {
-#define __ASM(t, v) t ** __##v
-#define __ASM_FAR(t, v) t *** __##v
-#define __ASM_ARR(t, v, l) t *** __##v
-#define __ASM_ARRI(t, v) t *** __##v
-#define __ASM_ARRI_F(t, v) t *** __##v
-#define __ASM_FUNC(v) void ** __##v
+#define __ASM(t, v) struct far_s * __##v
+#define __ASM_FAR(t, v) struct far_s * __##v
+#define __ASM_ARR(t, v, l) struct far_s * __##v
+#define __ASM_ARRI(t, v) struct far_s * __##v
+#define __ASM_ARRI_F(t, v) struct far_s * __##v
+#define __ASM_FUNC(v) struct far_s * __##v
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR
@@ -58,7 +58,7 @@ static union asm_thunks_u {
 #undef __ASM_ARRI_F
 #undef __ASM_FUNC
   } thunks;
-  void ** arr[sizeof(struct _thunks) / sizeof(void *)];
+  struct far_s * arr[sizeof(struct _thunks) / sizeof(struct far_s *)];
 } asm_thunks = {{
 #undef SEMIC
 #define SEMIC ,
@@ -95,7 +95,7 @@ int FdppSetAsmThunks(struct far_s *ptrs, int size)
         return -1;
     }
     for (i = 0; i < len; i++)
-        *asm_thunks.arr[i] = resolve_segoff(ptrs[i]);
+        *asm_thunks.arr[i] = ptrs[i];
 
     sym_tab = (struct far_s *)malloc(size);
     memcpy(sym_tab, ptrs, size);
