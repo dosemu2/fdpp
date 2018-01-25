@@ -28,7 +28,7 @@
 /****************************************************************/
 
 /* one byte alignment */
-#include <algnbyte.h>
+#include "algnbyte.h"
 
 /*
  *	Description of the organization of NLS information -- 2000/02/13 ska
@@ -608,7 +608,7 @@ struct nlsCSys_loadPackage {
 };
 
 /* standard alignment */
-#include <algndflt.h>
+#include "algndflt.h"
 
 #ifdef DEBUG
         /* Enable debugging of NLS part */
