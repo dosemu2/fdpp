@@ -7,7 +7,7 @@ RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
 CC=g++ -c -std=c++11
-CL=gcc
+CL=g++
 
 TARGETOPT=
 ifneq ($(XCPU),386)
