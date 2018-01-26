@@ -5,6 +5,9 @@
 #include <cassert>
 #include "thunks_priv.h"
 
+void store_far(void *ptr, far_s fptr);
+far_s lookup_far(void *ptr);
+
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
@@ -36,15 +39,27 @@ public:
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+    SymWrp<T1>& get_wrp() {
+        SymWrp<T1> *s = (SymWrp<T1> *)get_ptr();
+        store_far(s, get_far());
+        return *s;
+    }
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
-        SymWrp<T1> *s = (SymWrp<T1> *)resolve_segoff(*this);
-        return s[idx];
+        return FarPtr<T1>(*this + idx).get_wrp();
+    }
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+    SymWrp2<T1>& get_wrp() {
+        SymWrp2<T1> *s = (SymWrp2<T1> *)get_ptr();
+        store_far(s, get_far());
+        return *s;
     }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
-        SymWrp2<T1> *s = (SymWrp2<T1> *)resolve_segoff(*this);
-        return s[idx];
+        return FarPtr<T1>(*this + idx).get_wrp();
     }
 
     template<typename T0, typename T1 = T,
@@ -53,20 +68,20 @@ public:
 
     FarPtr<T> operator ++(int) {
         FarPtr<T> f = *this;
-        off++;
+        off =+ sizeof(T);
         return f;
     }
     FarPtr<T> operator ++() {
-        off++;
+        off += sizeof(T);
         return *this;
     }
     FarPtr<T> operator --() {
-        off--;
+        off -= sizeof(T);
         return *this;
     }
-    void operator +=(int inc) { off += inc; }
-    FarPtr<T> operator +(int inc) { return FarPtr<T>(seg, off + inc); }
-    FarPtr<T> operator -(int dec) { return FarPtr<T>(seg, off - dec); }
+    void operator +=(int inc) { off += inc * sizeof(T); }
+    FarPtr<T> operator +(int inc) { return FarPtr<T>(seg, off + inc * sizeof(T)); }
+    FarPtr<T> operator -(int dec) { return FarPtr<T>(seg, off - dec * sizeof(T)); }
     uint16_t __seg() const { return seg; }
     uint16_t __off() const { return off; }
     uint32_t get_fp32() const { return ((seg << 16) | off); }
@@ -77,6 +92,33 @@ public:
 
 #define _MK_F(f, s) ({ far_s __s = s; f(__s.seg, __s.off); })
 
+/* These SymWrp are tricky, and are needed only because we
+ * can't provide 'operator.':
+ * https://isocpp.org/blog/2016/02/a-bit-of-background-for-the-operator-dot-proposal-bjarne-stroustrup
+ * Consider the following code (1):
+ * void FAR *f = &fp[idx];
+ * In this case & should create "void FAR *" from ref, not just "void *".
+ * Wrapper helps with this.
+ * And some other code (2) does this:
+ * int a = fp[idx].a_memb;
+ * in which case we should better have no wrapper.
+ * Getting both cases to work together is challenging.
+ * Note that the simplest solution "operator T &()" for case 2
+ * currently doesn't work, but it may work in the future:
+ * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0352r1.pdf
+ * But I don't think waiting for this document to materialize in
+ * gcc/g++ is a good idea, as it is not even a part of the upcoming C++20.
+ * So what I do is a public inheritance of T. This kind of works,
+ * but puts an additional restrictions on the wrapper, namely, that
+ * it should be a POD, it should not add any data members and it should
+ * be non-copyable.
+ * Fortunately the POD requirement is satisfied with 'ctor = default'
+ * trick, and non-copyable is simple, but having no data members means
+ * I can't easily retrieve the far ptr for case 1.
+ * So the only solution I can come up with, is to put the static
+ * map somewhere that will allow to look up the "lost" far pointers.
+ * Thus farhlp.cpp
+ */
 template<typename T>
 class SymWrp : public T {
 public:
@@ -128,10 +170,10 @@ class AsmSym {
 public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& get_sym() { return *(SymWrp<T1> *)sym.get_ptr(); }
+    SymWrp<T1>& get_sym() { return sym.get_wrp(); }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& get_sym() { return *(SymWrp2<T1> *)sym.get_ptr(); }
+    SymWrp2<T1>& get_sym() { return sym.get_wrp(); }
     AsmRef<T> operator &() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
@@ -189,21 +231,21 @@ public:
 
 template<typename T, int max_len = 0>
 class ArSymBase {
+    FarPtr<T> sym;
+
 public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
-        SymWrp<T1> *s = (SymWrp<T1> *)this;
         assert(!max_len || idx < max_len);
-        return s[idx];
+        return sym[idx];
     }
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
-        SymWrp2<T1> *s = (SymWrp2<T1> *)this;
         assert(!max_len || idx < max_len);
-        return s[idx];
+        return sym[idx];
     }
 };
 

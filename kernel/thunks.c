@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <assert.h>
 #include "../hdr/portab.h"
 #include "globals.h"
@@ -16,8 +15,6 @@ struct asm_dsc_s {
 };
 static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
-static struct far_s *sym_tab;
-static int sym_tab_len;
 static void fdprintf(const char *format, ...);
 
 void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
@@ -97,9 +94,6 @@ int FdppSetAsmThunks(struct far_s *ptrs, int size)
     for (i = 0; i < len; i++)
         *asm_thunks.arr[i] = ptrs[i];
 
-    sym_tab = (struct far_s *)malloc(size);
-    memcpy(sym_tab, ptrs, size);
-    sym_tab_len = len;
     return 0;
 }
 
@@ -397,19 +391,6 @@ void pokew(UWORD seg, UWORD ofs, UWORD w)
 void pokel(UWORD seg, UWORD ofs, UDWORD l)
 {
     *(UDWORD *)so2lin(seg, ofs) = l;
-}
-
-/* never create far pointers.
- * only look them up in symtab. */
-struct far_s lookup_far(void *ptr)
-{
-    int i;
-    for (i = 0; i < sym_tab_len; i++) {
-        if (resolve_segoff(sym_tab[i]) == ptr)
-            return sym_tab[i];
-    }
-    assert(0);
-    return (struct far_s){0, 0};
 }
 
 uint32_t thunk_call_void(struct far_s fa)

@@ -6,7 +6,7 @@
 #include "dosobj.h"
 
 static smpool pool;
-static void FAR *base;
+static uint8_t FAR *base;
 
 void dosobj_init(void)
 {

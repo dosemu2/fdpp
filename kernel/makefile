@@ -129,6 +129,9 @@ OBJECTS = $(CFILES:.c=.o)
 $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
+.cpp.o:
+	$(CC) $(CFLAGS) -o $@ $<
+
 .c.cc:
 	../utils/mkfar.sh FAR __FAR $< | \
 		../utils/scopify.sh 1 MK_FAR_ST _MK_FAR_ST __MK_FAR | \
@@ -140,7 +143,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 		../utils/scopify.sh 3 MK_FAR_SZ _MK_FAR_SZ __MK_FAR | \
 		../utils/scopify.sh 1 MK_FAR _MK_FAR __MK_FAR >$@
 
-$(FDPPLIB): $(OBJECTS)
+$(FDPPLIB): $(OBJECTS) farhlp.o
 	$(CL) -shared -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
