@@ -6,8 +6,8 @@ DIRSEP=/
 RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
-CC=g++ -c -std=c++11
-CL=g++
+CC=g++ -c
+CL=gcc
 
 TARGETOPT=
 ifneq ($(XCPU),386)

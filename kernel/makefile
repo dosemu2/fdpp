@@ -122,14 +122,12 @@ CFILES = blockio.c \
     prf.c \
     thunks.c \
     smalloc.c \
-    dosobj.c
+    dosobj.c \
+    farhlp.c
 
 OBJECTS = $(CFILES:.c=.o)
 
 $(OBJECTS): %.o: %.cc $(HEADERS)
-	$(CC) $(CFLAGS) -o $@ $<
-
-.cpp.o:
 	$(CC) $(CFLAGS) -o $@ $<
 
 .c.cc:
@@ -143,7 +141,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 		../utils/scopify.sh 3 MK_FAR_SZ _MK_FAR_SZ __MK_FAR | \
 		../utils/scopify.sh 1 MK_FAR _MK_FAR __MK_FAR >$@
 
-$(FDPPLIB): $(OBJECTS) farhlp.o
+$(FDPPLIB): $(OBJECTS)
 	$(CL) -shared -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
