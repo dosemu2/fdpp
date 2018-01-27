@@ -139,8 +139,8 @@ struct config Config = {
   0,
   NFCBS,
   0,
-  FP_OFF(__MK_FAR(_cfgInit)),
-  FP_OFF(__MK_FAR(_cfgInitTail)),
+  __MK_FAR(_cfgInit),
+  __MK_FAR(_cfgInitTail),
   NLAST,
   0,
   NSTACKS,
@@ -1697,8 +1697,8 @@ STATIC VOID InitPgm(BYTE * pLine)
   static char init[NAMEMAX];
   static char inittail[NAMEMAX];
 
-  Config.cfgInit = FP_OFF(MK_FAR_ST(init));
-  Config.cfgInitTail = FP_OFF(MK_FAR_ST(inittail));
+  Config.cfgInit = MK_FAR_ST(init);
+  Config.cfgInitTail = MK_FAR_ST(inittail);
 
   /* Get the string argument that represents the new init pgm     */
   pLine = GetStringArg(pLine, Config.cfgInit);

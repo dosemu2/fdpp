@@ -52,8 +52,8 @@ public:
     }
     template <typename T1 = T,
         typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
-    FarPtr<T1> get_obj() {
-        return GetObj<T1>();
+    FarPtr<typename std::remove_const<T1>::type> get_obj() {
+        return GetObj<typename std::remove_const<T1>::type>();
     }
     ~FarObj() { RmObj(); }
 };
@@ -63,7 +63,15 @@ class FarObjSt : public FarObj<T> {
 public:
     FarObjSt(T& obj) : FarObj<T>(obj) {}
     FarObjSt(T* obj, unsigned sz) : FarObj<T>(obj, sz) {}
-    FarPtr<T> get_obj() {
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
+    FarPtr<typename std::remove_const<T1>::type> get_obj() {
+        pr_dosobj(this->fobj, this->ptr, this->size);
+        return this->fobj;
+    }
+    template <typename T1 = T,
+        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
+    FarPtr<typename std::remove_extent<T1>::type> get_obj() {
         pr_dosobj(this->fobj, this->ptr, this->size);
         return this->fobj;
     }

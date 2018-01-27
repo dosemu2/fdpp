@@ -220,7 +220,10 @@ public:
 template<typename T>
 class NearPtr {
 public:
-    NearPtr(uint16_t o);
+    NearPtr(const FarPtr<T>&);
+    template <typename T1 = T,
+        typename std::enable_if<std::is_const<T1>::value>::type* = nullptr>
+    NearPtr(const FarPtr<typename std::remove_const<T1>::type>&);
     operator uint16_t ();
     operator T *();
     NearPtr<T> operator -(const NearPtr<T> &);
