@@ -129,8 +129,8 @@ static UBYTE ErrorAlreadyPrinted[128] BSS_INIT({0});
 char master_env[128] BSS_INIT({0});
 static char *envp = master_env;
 
-_MK_FAR_ST_STR(_cfgInit, "command.com");
-_MK_FAR_ST_STR(_cfgInitTail, " /P /E:256\r\n");
+static const char *_cfgInit = "command.com";
+static const char *_cfgInitTail = " /P /E:256\r\n";
 
 struct config Config = {
   0,
@@ -139,8 +139,8 @@ struct config Config = {
   0,
   NFCBS,
   0,
-  __MK_FAR(_cfgInit),
-  __MK_FAR(_cfgInitTail),
+  NULL,
+  NULL,
   NLAST,
   0,
   NSTACKS,
@@ -361,6 +361,8 @@ void PreConfig(void)
      KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
 
+  Config.cfgInit = MK_NEAR_STR_ST(_cfgInit);
+  Config.cfgInitTail = MK_NEAR_STR_ST(_cfgInitTail);
   config_init_buffers(Config.cfgBuffers);
 
   LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
@@ -1697,8 +1699,8 @@ STATIC VOID InitPgm(BYTE * pLine)
   static char init[NAMEMAX];
   static char inittail[NAMEMAX];
 
-  Config.cfgInit = MK_FAR_ST(init);
-  Config.cfgInitTail = MK_FAR_ST(inittail);
+  Config.cfgInit = MK_NEAR_ST(init);
+  Config.cfgInitTail = MK_NEAR_ST(inittail);
 
   /* Get the string argument that represents the new init pgm     */
   pLine = GetStringArg(pLine, Config.cfgInit);

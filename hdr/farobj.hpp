@@ -55,6 +55,20 @@ public:
     FarPtr<typename std::remove_const<T1>::type> get_obj() {
         return GetObj<typename std::remove_const<T1>::type>();
     }
+
+    template <typename T1 = T,
+        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
+    NearPtr<typename std::remove_extent<T1>::type> get_near() {
+        FarPtr<typename std::remove_extent<T1>::type> f = get_obj();
+        return NearPtr<typename std::remove_extent<T1>::type>(f.__off());
+    }
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
+    NearPtr<typename std::remove_const<T1>::type> get_near() {
+        FarPtr<typename std::remove_const<T1>::type> f = get_obj();
+        return NearPtr<typename std::remove_const<T1>::type>(f.__off());
+    }
+
     ~FarObj() { RmObj(); }
 };
 
@@ -75,6 +89,20 @@ public:
         pr_dosobj(this->fobj, this->ptr, this->size);
         return this->fobj;
     }
+
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
+    NearPtr<typename std::remove_const<T1>::type> get_near() {
+        FarPtr<typename std::remove_const<T1>::type> f = get_obj();
+        return NearPtr<typename std::remove_const<T1>::type>(f.__off());
+    }
+    template <typename T1 = T,
+        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
+    NearPtr<typename std::remove_extent<T1>::type> get_near() {
+        FarPtr<typename std::remove_extent<T1>::type> f = get_obj();
+        return NearPtr<typename std::remove_extent<T1>::type>(f.__off());
+    }
+
 };
 
 #define _RP(t) typename std::remove_pointer<t>::type
@@ -83,9 +111,10 @@ public:
 #define _R(o) _RP(_RE(_RR(decltype(o))))
 
 #define _MK_FAR_ST(n, o) static FarObjSt<decltype(o)> __obj_##n(o)
-#define _MK_FAR_ST_STR(n, o) static FarObjSt<_R(o)> __obj_##n(o, strlen(o))
+#define _MK_FAR_STR_ST(n, o) static FarObjSt<_R(o)> __obj_##n(o, strlen(o))
 #define _MK_FAR(n, o) FarObj<decltype(o)> __obj_##n(o)
 #define _MK_FAR_PTR(n, o) FarObj<_R(o)> __obj_##n(*o)
 #define __MK_FAR(n) __obj_##n.get_obj()
+#define __MK_NEAR(n) __obj_##n.get_near()
 #define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o))
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)

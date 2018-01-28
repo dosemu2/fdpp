@@ -7,6 +7,7 @@
 
 static smpool pool;
 static uint8_t FAR *base;
+static int initialized;
 
 void dosobj_init(void)
 {
@@ -16,13 +17,16 @@ void dosobj_init(void)
 
     sminit(&pool, ptr, size);
     base = fa;
+    initialized = 1;
 }
 
 void FAR *mk_dosobj(const void *data, UWORD len)
 {
-    void *ptr = smalloc(&pool, len);
+    void *ptr;
     uint16_t offs;
 
+    assert(initialized);
+    ptr = smalloc(&pool, len);
     assert(ptr);
     offs = (uintptr_t)ptr - (uintptr_t)smget_base_addr(&pool);
     return base + offs;
