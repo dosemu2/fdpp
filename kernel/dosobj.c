@@ -52,3 +52,8 @@ void rm_dosobj(void FAR *fa)
 
     smfree(&pool, ptr);
 }
+
+uint16_t dosobj_seg(void)
+{
+    return FP_SEG(base);
+}

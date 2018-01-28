@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <cassert>
 #include "thunks_priv.h"
+#include "dosobj_priv.h"
 
 void store_far(void *ptr, far_s fptr);
 far_s lookup_far(void *ptr);
@@ -219,13 +220,17 @@ public:
 
 template<typename T>
 class NearPtr {
+    uint16_t off;
+
 public:
-    explicit NearPtr(uint16_t);    // for farobj only
-    NearPtr(std::nullptr_t);
-    operator uint16_t ();
-    operator T *();
-    NearPtr<T> operator -(const NearPtr<T> &);
-    uint16_t __off() const;
+    explicit NearPtr(uint16_t o) : off(o) {}    // for farobj only
+    NearPtr(std::nullptr_t) : off(0) {}
+    operator uint16_t () { return off; }
+    operator T *() { return FarPtr<T>(dosobj_seg(), off); }
+    NearPtr<T> operator - (const NearPtr<T>& n) const {
+        return NearPtr<T>(off - n.__off());
+    }
+    uint16_t __off() const { return off; }
 
     NearPtr() = default;
 };
