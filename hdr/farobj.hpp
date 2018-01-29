@@ -35,6 +35,10 @@ protected:
         rm_dosobj(fobj);
     }
 
+    using obj_type = typename std::conditional<std::is_array<T>::value,
+        typename std::remove_extent<T>::type,
+        typename std::remove_const<T>::type>::type;
+
 public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
@@ -45,28 +49,13 @@ public:
     FarObj(T* obj, unsigned sz) : ptr(obj), size(sz) {
         fobj = mk_dosobj(ptr, size);
     }
-    template <typename T1 = T,
-        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
-    FarPtr<typename std::remove_extent<T1>::type> get_obj() {
-        return GetObj<typename std::remove_extent<T1>::type>();
-    }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
-    FarPtr<typename std::remove_const<T1>::type> get_obj() {
-        return GetObj<typename std::remove_const<T1>::type>();
+    FarPtr<obj_type> get_obj() {
+        return GetObj<obj_type>();
     }
 
-    template <typename T1 = T,
-        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
-    NearPtr<typename std::remove_extent<T1>::type> get_near() {
-        FarPtr<typename std::remove_extent<T1>::type> f = get_obj();
-        return NearPtr<typename std::remove_extent<T1>::type>(f.__off());
-    }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
-    NearPtr<typename std::remove_const<T1>::type> get_near() {
-        FarPtr<typename std::remove_const<T1>::type> f = get_obj();
-        return NearPtr<typename std::remove_const<T1>::type>(f.__off());
+    NearPtr<obj_type> get_near() {
+        FarPtr<obj_type> f = get_obj();
+        return NearPtr<obj_type>(f.__off());
     }
 
     ~FarObj() { RmObj(); }
@@ -74,35 +63,20 @@ public:
 
 template <typename T>
 class FarObjSt : public FarObj<T> {
+    using obj_type = typename FarObj<T>::obj_type; // inherit type from parent
+
 public:
     FarObjSt(T& obj) : FarObj<T>(obj) {}
     FarObjSt(T* obj, unsigned sz) : FarObj<T>(obj, sz) {}
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
-    FarPtr<typename std::remove_const<T1>::type> get_obj() {
+
+    FarPtr<obj_type> get_obj() {
         pr_dosobj(this->fobj, this->ptr, this->size);
         return this->fobj;
     }
-    template <typename T1 = T,
-        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
-    FarPtr<typename std::remove_extent<T1>::type> get_obj() {
-        pr_dosobj(this->fobj, this->ptr, this->size);
-        return this->fobj;
+    NearPtr<obj_type> get_near() {
+        FarPtr<obj_type> f = get_obj();
+        return NearPtr<obj_type>(f.__off());
     }
-
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_array<T1>::value>::type* = nullptr>
-    NearPtr<typename std::remove_const<T1>::type> get_near() {
-        FarPtr<typename std::remove_const<T1>::type> f = get_obj();
-        return NearPtr<typename std::remove_const<T1>::type>(f.__off());
-    }
-    template <typename T1 = T,
-        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
-    NearPtr<typename std::remove_extent<T1>::type> get_near() {
-        FarPtr<typename std::remove_extent<T1>::type> f = get_obj();
-        return NearPtr<typename std::remove_extent<T1>::type>(f.__off());
-    }
-
 };
 
 #define _RP(t) typename std::remove_pointer<t>::type
