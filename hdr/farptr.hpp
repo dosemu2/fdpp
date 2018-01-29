@@ -12,6 +12,7 @@ far_s lookup_far(void *ptr);
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
+#define _RC(T1) typename std::remove_const<T1>::type
 template<typename T> class SymWrp;
 template<typename T> class SymWrp2;
 template<typename T>
@@ -20,13 +21,14 @@ public:
     FarPtr() = default;
     FarPtr(uint16_t s, uint16_t o) : far_s((far_s){s, o}) {}
     FarPtr(std::nullptr_t) : far_s((far_s){0, 0}) {}
-#define ALLOW_CNV0(T0, T1) std::is_convertible<T0*, T1*>::value
-#define ALLOW_CNV1(T0, T1) \
-        std::is_void<T0>::value || std::is_same<T0, char>::value || \
-        std::is_same<T1, char>::value || \
-        std::is_same<T0, unsigned char>::value || \
-        std::is_same<T1, unsigned char>::value
-#define ALLOW_CNV(T0, T1) (ALLOW_CNV0(T0, T1) || ALLOW_CNV1(T0, T1))
+#define ALLOW_CNV(T0, T1) (( \
+        std::is_void<T0>::value || \
+        std::is_void<T1>::value || \
+        std::is_same<_RC(T0), char>::value || \
+        std::is_same<_RC(T1), char>::value || \
+        std::is_same<_RC(T0), unsigned char>::value || \
+        std::is_same<_RC(T1), unsigned char>::value) && \
+        (_C(T1) || !_C(T0)))
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtr<T0>& f) : far_s((far_s){f.__seg(), f.__off()}) {}
@@ -64,8 +66,8 @@ public:
     }
 
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV1(T1, T0)>::type* = nullptr>
-    explicit operator T0*() { return (T0*)resolve_segoff(*this); }
+        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+    operator T0*() { return (T0*)resolve_segoff(*this); }
 
     FarPtr<T> operator ++(int) {
         FarPtr<T> f = *this;
@@ -83,6 +85,8 @@ public:
     void operator +=(int inc) { off += inc * sizeof(T); }
     FarPtr<T> operator +(int inc) { return FarPtr<T>(seg, off + inc * sizeof(T)); }
     FarPtr<T> operator -(int dec) { return FarPtr<T>(seg, off - dec * sizeof(T)); }
+    bool operator == (std::nullptr_t) { return (!seg && !off); }
+    bool operator != (std::nullptr_t) { return (seg || off); }
     uint16_t __seg() const { return seg; }
     uint16_t __off() const { return off; }
     uint32_t get_fp32() const { return ((seg << 16) | off); }
@@ -338,6 +342,7 @@ public:
 #undef _P
 #undef _C
 #undef _RP
+#undef _RC
 
 #define __ASMSYM(t) AsmSym<t>
 #define __ASMFSYM(t) AsmFSym<t>
