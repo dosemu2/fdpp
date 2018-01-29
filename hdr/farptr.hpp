@@ -65,7 +65,7 @@ public:
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV1(T1, T0)>::type* = nullptr>
-    operator T0*() { return (T0*)resolve_segoff(*this); }
+    explicit operator T0*() { return (T0*)resolve_segoff(*this); }
 
     FarPtr<T> operator ++(int) {
         FarPtr<T> f = *this;
