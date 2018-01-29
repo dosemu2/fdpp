@@ -125,7 +125,7 @@ class SymWrp : public T {
 public:
     SymWrp() = default;
     SymWrp(const SymWrp&) = delete;
-    SymWrp<T>& operator =(T& f) { *this = f; return *this; }
+    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() { return _MK_F(FarPtr<T>, lookup_far(this)); }
 };
 

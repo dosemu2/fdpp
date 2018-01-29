@@ -845,7 +845,7 @@ STATIC WORD dskerr(COUNT code)
   {
     case 1:                    /* invalid command - general failure */
       if (code & 0x08)
-        return S_ERROR | E_NOTRDY;      /* failure(E_NOTRDY); at least on yhe INT25 route,
+        return (WORD)(S_ERROR | E_NOTRDY);      /* failure(E_NOTRDY); at least on yhe INT25 route,
                                            0x8002 is returned */
       else
         return failure(E_CMD);

@@ -463,7 +463,7 @@ STATIC void kernel()
   /* if stepping CONFIG.SYS (F5/F8), tell COMMAND.COM about it */
 
   /* 3 for string + 2 for "\r\n" */
-  if (Cmd.ctCount < sizeof(Cmd.ctBuffer) - 5)
+  if (Cmd.ctCount < CTBUFFERSIZE - 5)
   {
     const char *insertString = NULL;
 
