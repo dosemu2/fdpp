@@ -113,6 +113,7 @@ public:
 #define _MK_FAR_ST(n, o) static FarObjSt<decltype(o)> __obj_##n(o)
 #define _MK_FAR_STR_ST(n, o) static FarObjSt<_R(o)> __obj_##n(o, strlen(o))
 #define _MK_FAR(n, o) FarObj<decltype(o)> __obj_##n(o)
+#define _MK_NEAR(n, o) FarObj<decltype(o)::type> __obj_##n(o, decltype(o)::len)
 #define _MK_FAR_PTR(n, o) FarObj<_R(o)> __obj_##n(*o)
 #define __MK_FAR(n) __obj_##n.get_obj()
 #define __MK_NEAR(n) __obj_##n.get_near()

@@ -134,6 +134,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 	../utils/mkfar.sh FAR __FAR $< | \
 		../utils/scopify.sh 1 MK_FAR_ST _MK_FAR_ST __MK_FAR | \
 		../utils/scopify.sh 1 MK_NEAR_ST _MK_FAR_ST __MK_NEAR | \
+		../utils/scopify.sh 1 MK_NEAR _MK_NEAR __MK_NEAR | \
 		../utils/scopify.sh 1 MK_NEAR_STR_ST _MK_FAR_STR_ST __MK_NEAR | \
 		../utils/scopify.sh 2 MK_FAR_SCP _MK_FAR __MK_FAR | \
 		../utils/scopify.sh 2 MK_FAR_PTR_SCP _MK_FAR_PTR __MK_FAR | \

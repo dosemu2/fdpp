@@ -258,17 +258,19 @@ public:
 template<typename T, int max_len = 0>
 class ArSym : public ArSymBase<T> {
 public:
+    using type = T;
+    static constexpr decltype(max_len) len = max_len;
+
     ArSym(std::nullptr_t);
     ArSym(const FarPtr<void> &);
-    operator FarPtr<void> ();
+    operator FarPtr<const void> ();
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-        operator FarPtr<const void> ();
+        operator FarPtr<void> ();
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
         operator FarPtr<const T1> ();
     operator FarPtr<T> ();
-    operator NearPtr<T> ();
     operator T *();
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
@@ -330,7 +332,7 @@ public:
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
-    far_s* get_ref();
+    far_s* get_ref() { return &ptr.get_ref(); }
 };
 
 #undef _P

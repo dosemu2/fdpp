@@ -453,10 +453,10 @@ STATIC void kernel()
 
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */
-  memset(Cmd.ctBuffer, 0, sizeof(Cmd.ctBuffer));
+  memset(Cmd.ctBuffer, 0, CTBUFFERSIZE);
   strcpy(Cmd.ctBuffer, Config.cfgInitTail);
 
-  for (Cmd.ctCount = 0; Cmd.ctCount < sizeof(Cmd.ctBuffer); Cmd.ctCount++)
+  for (Cmd.ctCount = 0; Cmd.ctCount < CTBUFFERSIZE; Cmd.ctCount++)
     if (Cmd.ctBuffer[Cmd.ctCount] == '\r')
       break;
 
@@ -490,7 +490,7 @@ STATIC void kernel()
         }
       }
       /* save buffer -- on the stack it's fine here */
-      Config.cfgInitTail = Cmd.ctBuffer;
+      Config.cfgInitTail = MK_NEAR(Cmd.ctBuffer);
     }
   }
   init_call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
