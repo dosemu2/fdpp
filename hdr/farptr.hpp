@@ -69,7 +69,7 @@ public:
 
     FarPtr<T> operator ++(int) {
         FarPtr<T> f = *this;
-        off =+ sizeof(T);
+        off += sizeof(T);
         return f;
     }
     FarPtr<T> operator ++() {
@@ -310,31 +310,23 @@ public:
 
 template<typename T>
 class FarPtrAsm {
+    FarPtr<FarPtr<T>> ptr;
+
 public:
+    explicit FarPtrAsm(const FarPtr<FarPtr<T>>& f) : ptr(f) {}
     /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
-    explicit operator uint16_t *();
-    operator FarPtr<T> *();
-    /* via mk_dosobj() I guess */
-    uint16_t __seg() const;
-    uint16_t __off() const;
+    explicit operator uint16_t *() { return &ptr->get_ref().off; }
+    uint16_t __seg() const { return ptr.__seg(); }
+    uint16_t __off() const { return ptr.__off(); }
 };
 
 template<typename T>
 class AsmFarPtr {
+    FarPtr<FarPtr<T>> ptr;
+
 public:
-    AsmFarPtr(const FarPtr<T>&);
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
-        AsmFarPtr(const FarPtr<void>&);
-    template <typename T0, typename T1 = T,
-        typename std::enable_if<!std::is_same<T1, T0>::value &&
-            std::is_void<T1>::value>::type* = nullptr>
-        AsmFarPtr(const FarPtr<T0>&);
-    operator FarPtr<T> &();
-    FarPtr<T>& get_sym();
-    FarPtrAsm<T> operator &();
-    uint16_t __seg() const;
-    uint16_t __off() const;
+    FarPtr<T>& get_sym() { return *ptr.get_ptr(); }
+    FarPtrAsm<T> operator &() { return FarPtrAsm<T>(ptr); }
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
