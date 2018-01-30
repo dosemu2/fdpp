@@ -13,8 +13,6 @@
 
 static void yyerror(const char* s);
 int yylex(void);
-extern char *yytext;
-extern FILE *yyin;
 
 static int thunk_type;
 
@@ -105,8 +103,8 @@ static void fin_arg(int last)
 %token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG STRUCT CONST
 
 %define api.value.type union
-%type <int> num lnum
-%type <char *> str fname sname tname
+%type <int> num lnum NUM
+%type <char *> fname sname tname STRING
 
 %%
 
@@ -144,15 +142,13 @@ rb:		RB	{ fin_arg(1); }
 
 lnum:		num	{ is_pas = 0; is_rvoid = 0; is_rptr = 0; beg_arg(); }
 ;
-num:		NUM	{ $$ = atoi(yytext); }
-
-fname:		str
+num:		NUM
 ;
-sname:		str
+fname:		STRING
 ;
-tname:		str
+sname:		STRING
 ;
-str:		STRING	{ $$ = strdup(yytext); }
+tname:		STRING
 ;
 
 decls:		  ASMCFUNC decls
@@ -273,7 +269,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void yyerror(const char* s)
+static void yyerror(const char* s)
 {
     fprintf(stderr, "Parse error: %s\n", s);
     exit(1);

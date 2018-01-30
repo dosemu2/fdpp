@@ -17,7 +17,10 @@
 
 %%
 
-[0-9]+		{ return NUM; }
+[0-9]+		{
+		  yylval.NUM = atoi(yytext);
+		  return NUM;
+		}
 "("		{ return LB; }
 ")"		{ return RB; }
 ";"		{ return SEMIC; }
@@ -51,6 +54,9 @@
 "const"		{ return CONST; }
 "/*".*"*/"	{ /* comments */ }
 [\t ]+		{ /* skip spaces */ }
-[_A-Za-z][_A-Za-z0-9]*	{ return STRING; }
+[_A-Za-z][_A-Za-z0-9]*	{
+			  yylval.STRING = strdup(yytext);
+			  return STRING;
+			}
 
 %%
