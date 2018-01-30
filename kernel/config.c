@@ -2065,9 +2065,8 @@ STATIC VOID mumcb_init(UCOUNT seg, UWORD size)
     MCB_NORMAL,
     8, 0,
     {0,0,0},
-    NULL
+    {"SC"}
   };
-  fstrcpy(near_mcb.m_name, MK_FAR_STR("SC"));
   mcb_init_copy(seg, size, &near_mcb);
 }
 #endif

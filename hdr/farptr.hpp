@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <cassert>
+#include <cstring>
 #include "thunks_priv.h"
 #include "dosobj_priv.h"
 
@@ -259,33 +260,56 @@ public:
     }
 };
 
-template<typename T, int max_len = 0>
-class ArSym : public ArSymBase<T> {
+template<typename T, int max_len>
+class ArSym {
+    T sym[max_len];
+
 public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
 
-    ArSym(std::nullptr_t);
-    ArSym(const FarPtr<void> &);
-    operator FarPtr<const void> ();
+    ArSym(const T s[]) { strncpy(sym, s, max_len); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-        operator FarPtr<void> ();
+    operator FarPtr<void> () { return _MK_F(FarPtr<T>, lookup_far(sym)); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-        operator FarPtr<const T1> ();
-    operator FarPtr<T> ();
-    operator T *();
+    operator FarPtr<const T1> () { return _MK_F(FarPtr<T>, lookup_far(sym)); }
+    operator FarPtr<T> () { return _MK_F(FarPtr<T>, lookup_far(sym)); }
+    operator T *() { return sym; }
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
-        explicit operator T0 *();
-    FarPtr<T> operator +(int);
-    FarPtr<T> operator +(unsigned);
-    FarPtr<T> operator +(size_t);
-    FarPtr<T> operator -(int);
+    explicit operator T0 *() { return (T0 *)sym; }
+    FarPtr<T> operator +(int inc) {
+        return _MK_F(FarPtr<T>, lookup_far(sym)) + inc;
+    }
+    FarPtr<T> operator +(unsigned inc) {
+        return _MK_F(FarPtr<T>, lookup_far(sym)) + inc;
+    }
+    FarPtr<T> operator +(size_t inc) {
+        return _MK_F(FarPtr<T>, lookup_far(sym)) + inc;
+    }
+    FarPtr<T> operator -(int dec) {
+        return _MK_F(FarPtr<T>, lookup_far(sym)) - dec;
+    }
+
+    template <typename T1 = T,
+        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
+    SymWrp<T1>& operator [](unsigned idx) {
+        assert(idx < max_len);
+        FarPtr<T> f = _MK_F(FarPtr<T>, lookup_far(sym));
+        return f[idx];
+    }
+
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
+    SymWrp2<T1>& operator [](unsigned idx) {
+        assert(idx < max_len);
+        FarPtr<T> f = _MK_F(FarPtr<T>, lookup_far(sym));
+        return f[idx];
+    }
 
     ArSym() = default;
-    ArSym(const ArSym<T> &) = delete;
 };
 
 template<typename T, int max_len = 0>
