@@ -77,10 +77,10 @@ static BYTE *fcb_hRcsId =
 #define FCB_WRITE 1
 
 /* File Control Block (FCB)                                             */
-typedef struct {
+typedef struct _fcb {
   UBYTE fcb_drive;              /* Drive number 0=default, 1=A, etc     */
-  AR_MEMB(BYTE, fcb_fname, FNAME_SIZE);   /* File name                    */
-  AR_MEMB(BYTE, fcb_fext, FEXT_SIZE);     /* File name Extension          */
+  AR_MEMB(struct _fcb, BYTE, fcb_fname, FNAME_SIZE);   /* File name                    */
+  AR_MEMB(struct _fcb, BYTE, fcb_fext, FEXT_SIZE);     /* File name Extension          */
   UWORD fcb_cublock;            /* Current block number of              */
   /* 128 records/block, for seq. r/w      */
   UWORD fcb_recsiz;             /* Logical record size in bytes,        */
@@ -108,12 +108,12 @@ typedef struct {
   SYM_MEMB(fcb) xfcb_fcb;
 } xfcb;
 
-typedef struct {
+typedef struct _rfcb {
   UBYTE renDriveID;             /* drive no.                    */
   BYTE renOldName[8];           /* Old Filename                 */
   BYTE renOldExtent[3];         /* Old File Extension           */
   BYTE renReserved1[5];
-  AR_MEMB(BYTE, renNewName, 8);           /* New Filename                 */
+  AR_MEMB(struct _rfcb, BYTE, renNewName, 8);           /* New Filename                 */
   BYTE renNewExtent[3];         /* New FileExtension            */
   BYTE renReserved2[9];
 } rfcb;

@@ -223,14 +223,14 @@ struct _FcbSearchBuffer {
 
 struct __PriPathBuffer                  /* Path name parsing buffer             */
 {
-  AR_MEMB(BYTE, _PriPathName, 128);
+  AR_MEMB(struct __PriPathBuffer, BYTE, _PriPathName, 128);
 };
 
 #define PriPathName _PriPathBuffer._PriPathName
 
 struct __SecPathBuffer                  /* Alternate path name parsing buffer   */
 {
-  AR_MEMB(BYTE, _SecPathName, 128);
+  AR_MEMB(struct __SecPathBuffer, BYTE, _SecPathName, 128);
 };
 
 #define SecPathName _SecPathBuffer._SecPathName

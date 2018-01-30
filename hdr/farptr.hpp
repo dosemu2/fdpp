@@ -267,7 +267,7 @@ class ArSym {
     FarPtr<T> lookup_sym() {
         /* find parent first */
         uint8_t *ptr = (uint8_t *)sym - F();
-        return _MK_F(FarPtr<T>, lookup_far(ptr)) + F();
+        return _MK_F(FarPtr<uint8_t>, lookup_far(ptr)) + F();
     }
 
 public:
@@ -378,7 +378,11 @@ public:
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
-#define AR_MEMB(t, n, l) static int off_##n(); ArSym<t, l, off_##n> n
+#define AR_MEMB(p, t, n, l) \
+    static int off_##n() { \
+        return offsetof(p, n); \
+    } \
+    ArSym<t, l, off_##n> n
 #define SYM_MEMB(t) SymWrp<t>
 #define SYM_MEMB_T(t) SymWrp2<t>
 #define PTR_MEMB(t) NearPtr<t>

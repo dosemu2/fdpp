@@ -40,9 +40,9 @@ static BYTE *kbd_hRcsId =
 #define LINEBUFSIZE0A   256 /* maximum length for int21/ah=0a */
 
 /* Keyboard buffer                                                      */
-typedef struct {
+typedef struct _kbd {
   UBYTE kb_size;                /* size of buffer in bytes              */
   UBYTE kb_count;               /* number of bytes returned             */
-  AR_MEMB(BYTE, _kb_buf, KBD_MAXLENGTH);   /* the buffer itself            */
+  AR_MEMB(struct _kbd, BYTE, _kb_buf, KBD_MAXLENGTH);   /* the buffer itself            */
 } keyboard;
 

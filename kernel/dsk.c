@@ -62,8 +62,8 @@ UBYTE DiskTransferBuffer[MAX_SEC_SIZE];
 
 struct FS_info {
   ULONG serialno;
-  AR_MEMB(BYTE, volume, 11);
-  AR_MEMB(BYTE, fstype, 8);
+  AR_MEMB(struct FS_info, BYTE, volume, 11);
+  AR_MEMB(struct FS_info, BYTE, fstype, 8);
 };
 
 /*TE - array access functions */

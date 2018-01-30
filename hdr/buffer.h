@@ -52,7 +52,7 @@ struct buffer {
   struct dpb FAR *b_dpbp;       /* pointer to DPB               */
   UWORD b_remotesz;             /* size of remote buffer if remote */
   BYTE b_padding;
-  AR_MEMB(UBYTE, b_buffer, BUFFERSIZE);   /* 512 byte sectors for now     */
+  AR_MEMB(struct buffer, UBYTE, b_buffer, BUFFERSIZE);   /* 512 byte sectors for now     */
 };
 
 #define BFR_DIRTY       0x40    /* buffer modified              */

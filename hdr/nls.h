@@ -430,12 +430,12 @@ struct nlsPackage {             /* the contents of one chain item of the
   UWORD yeschar;                /* yes / no character DOS-65-23 */
   UWORD nochar;
   unsigned numSubfct;           /* number of supported sub-functions */
-  AR_MEMB(struct nlsPointer, nlsPointers, 1);     /* grows dynamically */
+  AR_MEMB(struct nlsPackage, struct nlsPointer, nlsPointers, 1);     /* grows dynamically */
 };
 
 struct nlsDBCS {                /* The internal structure is unknown to me */
   UWORD numEntries;
-  AR_MEMB(UWORD, dbcsTbl, 4);             /* I don't know max size but it should need
+  AR_MEMB(struct nlsDBCS, UWORD, dbcsTbl, 4);             /* I don't know max size but it should need
                                    at least 3 words (6 bytes)
                                    ({0x81,0x9f,0xe0,0xfc,0,0} for CP932-Japan)
                                    -- lpproj 2014/10/27 */
@@ -446,7 +446,7 @@ struct nlsCharTbl {
   UWORD numEntries;             /* number of entries of this table.
                                    If <= 0x80, the first element of
                                    the table corresponse to character 0x80 */
-  AR_MEMB(unsigned char, tbl, 1);         /* grows dynamically */
+  AR_MEMB(struct nlsCharTbl, unsigned char, tbl, 1);         /* grows dynamically */
 };
 #define nlsChBuf(len)		struct nlsCharTbl##len {		\
 			UWORD numEntries;							\

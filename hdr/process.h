@@ -73,7 +73,7 @@ typedef struct _psp {
          ps_isv23,              /* 0e ctrl-break address           */
          ps_isv24;              /* 12 critical error address       */
   UWORD ps_parent;              /* 16 parent psp segment           */
-  AR_MEMB(UBYTE, ps_files, 20);           /* 18 file table - 0xff is unused  */
+  AR_MEMB(struct _psp, UBYTE, ps_files, 20);           /* 18 file table - 0xff is unused  */
   UWORD ps_environ;             /* 2c environment paragraph        */
   __DOSFAR(BYTE)ps_stack;           /* 2e user stack pointer - int 21  */
   UWORD ps_maxfiles;            /* 32 maximum open files           */

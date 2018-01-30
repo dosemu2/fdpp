@@ -118,7 +118,7 @@ struct dhdr {
   UWORD dh_attr;
     VOID(*dh_strategy) (void);
     VOID(*dh_interrupt) (void);
-  AR_MEMB(UBYTE, dh_name, 8);
+  AR_MEMB(struct dhdr, UBYTE, dh_name, 8);
 };
 
 #define ATTR_SUBST      0x8000
@@ -230,11 +230,11 @@ typedef struct ddtstruct {
                                    (FFFFh if primary partition in DOS 4.x) */
     } ddt_hd;
   } ddt_fh;
-  AR_MEMB(UBYTE, ddt_volume, 12);         /* ASCIIZ volume label or "NO NAME    " if none
+  AR_MEMB(struct ddtstruct, UBYTE, ddt_volume, 12);         /* ASCIIZ volume label or "NO NAME    " if none
                                    (apparently taken from extended boot record
                                    rather than root directory) */
   ULONG ddt_serialno;           /* serial number */
-  AR_MEMB(UBYTE, ddt_fstype, 9);          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
+  AR_MEMB(struct ddtstruct, UBYTE, ddt_fstype, 9);          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
   ULONG ddt_offset;             /* relative partition offset */
 } ddt;
 
@@ -286,8 +286,8 @@ struct gblkrw                   /* for read / write track */
 struct Gioc_media {
   WORD ioc_level;
   ULONG ioc_serialno;
-  AR_MEMB(BYTE, ioc_volume, 11);
-  AR_MEMB(BYTE, ioc_fstype, 8);
+  AR_MEMB(struct Gioc_media, BYTE, ioc_volume, 11);
+  AR_MEMB(struct Gioc_media, BYTE, ioc_fstype, 8);
 };
 
 struct Access_info {
