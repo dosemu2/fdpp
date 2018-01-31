@@ -242,6 +242,7 @@ public:
 
 template<typename T, int max_len = 0>
 class ArSymBase {
+protected:
     FarPtr<T> sym;
 
 public:
@@ -258,6 +259,8 @@ public:
         assert(!max_len || idx < max_len);
         return sym[idx];
     }
+
+    far_s* get_ref() { return &sym.get_ref(); }
 };
 
 template<typename T, int max_len, int (*F)(void)>
@@ -311,26 +314,18 @@ public:
 };
 
 template<typename T, int max_len = 0>
-class AsmArSym : public ArSymBase<T> {
+class AsmArNSym : public ArSymBase<T, max_len> {
 public:
-    AsmArSym() = default;
-    AsmArSym(const AsmArSym<T> &) = delete;
-    far_s* get_ref();
-};
-
-template<typename T, int max_len = 0>
-class AsmArNSym : public AsmArSym<T> {
-public:
-    NearPtr<T> get_sym();
+    T* get_sym() { return this->sym.get_ptr(); }
 
     AsmArNSym() = default;
     AsmArNSym(const AsmArNSym<T> &) = delete;
 };
 
 template<typename T, int max_len = 0>
-class AsmArFSym : public AsmArSym<T> {
+class AsmArFSym : public ArSymBase<T, max_len> {
 public:
-    FarPtr<T> get_sym();
+    FarPtr<T> get_sym() { return this->sym; }
 
     AsmArFSym() = default;
     AsmArFSym(const AsmArFSym<T> &) = delete;
