@@ -6,7 +6,8 @@ DIRSEP=/
 RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
-CC=g++ -c -std=c++11
+CC=g++ -c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
+    -fno-exceptions -fno-threadsafe-statics
 CL=gcc
 
 TARGETOPT=
