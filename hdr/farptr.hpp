@@ -269,7 +269,7 @@ class ArSym {
     FarPtr<T> lookup_sym() {
         /* find parent first */
         uint8_t *ptr = (uint8_t *)sym - F();
-        return _MK_F(FarPtr<uint8_t>, lookup_far(ptr)) + F();
+        return _MK_F(FarPtr<uint8_t>, lookup_far_st(ptr)) + F();
     }
 
 public:
