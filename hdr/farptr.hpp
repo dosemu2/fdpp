@@ -260,9 +260,15 @@ public:
     }
 };
 
-template<typename T, int max_len>
+template<typename T, int max_len, int (*F)(void)>
 class ArSym {
     T sym[max_len];
+
+    FarPtr<T> lookup_sym() {
+        /* find parent first */
+        uint8_t *ptr = (uint8_t *)sym - F();
+        return _MK_F(FarPtr<T>, lookup_far(ptr)) + F();
+    }
 
 public:
     using type = T;
@@ -271,33 +277,25 @@ public:
     ArSym(const T s[]) { strncpy(sym, s, max_len); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    operator FarPtr<void> () { return _MK_F(FarPtr<T>, lookup_far(sym)); }
+    operator FarPtr<void> () { return lookup_sym(); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    operator FarPtr<const T1> () { return _MK_F(FarPtr<T>, lookup_far(sym)); }
-    operator FarPtr<T> () { return _MK_F(FarPtr<T>, lookup_far(sym)); }
+    operator FarPtr<const T1> () { return lookup_sym(); }
+    operator FarPtr<T> () { return lookup_sym(); }
     operator T *() { return sym; }
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
     explicit operator T0 *() { return (T0 *)sym; }
-    FarPtr<T> operator +(int inc) {
-        return _MK_F(FarPtr<T>, lookup_far(sym)) + inc;
-    }
-    FarPtr<T> operator +(unsigned inc) {
-        return _MK_F(FarPtr<T>, lookup_far(sym)) + inc;
-    }
-    FarPtr<T> operator +(size_t inc) {
-        return _MK_F(FarPtr<T>, lookup_far(sym)) + inc;
-    }
-    FarPtr<T> operator -(int dec) {
-        return _MK_F(FarPtr<T>, lookup_far(sym)) - dec;
-    }
+    FarPtr<T> operator +(int inc) { return lookup_sym() + inc; }
+    FarPtr<T> operator +(unsigned inc) { return lookup_sym() + inc; }
+    FarPtr<T> operator +(size_t inc) { return lookup_sym() + inc; }
+    FarPtr<T> operator -(int dec) { return lookup_sym() - dec; }
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
         assert(idx < max_len);
-        FarPtr<T> f = _MK_F(FarPtr<T>, lookup_far(sym));
+        FarPtr<T> f = lookup_sym();
         return f[idx];
     }
 
@@ -305,7 +303,7 @@ public:
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
         assert(idx < max_len);
-        FarPtr<T> f = _MK_F(FarPtr<T>, lookup_far(sym));
+        FarPtr<T> f = lookup_sym();
         return f[idx];
     }
 
@@ -380,7 +378,7 @@ public:
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
-#define AR_MEMB(t, n, l) ArSym<t, l> n
+#define AR_MEMB(t, n, l) static int off_##n(); ArSym<t, l, off_##n> n
 #define SYM_MEMB(t) SymWrp<t>
 #define SYM_MEMB_T(t) SymWrp2<t>
 #define PTR_MEMB(t) NearPtr<t>
