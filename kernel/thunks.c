@@ -74,9 +74,14 @@ static union asm_thunks_u {
 #undef SEMIC
 }};
 
+static void *so2lin(uint16_t seg, uint16_t off)
+{
+    return fdpp->mem_base() + (seg << 4) + off;
+}
+
 void *resolve_segoff(struct far_s fa)
 {
-    return fdpp->mem_base + (fa.seg << 4) + fa.off;
+    return so2lin(fa.seg, fa.off);
 }
 
 int FdppSetAsmThunks(struct far_s *ptrs, int size)
@@ -359,11 +364,6 @@ r n(void) \
 
 #include "thunkapi_tmpl.h"
 
-
-static void *so2lin(uint16_t seg, uint16_t off)
-{
-    return fdpp->mem_base + (seg << 4) + off;
-}
 
 UBYTE peekb(UWORD seg, UWORD ofs)
 {
