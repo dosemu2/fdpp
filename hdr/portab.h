@@ -181,6 +181,9 @@ struct far_s {
     UWORD seg;
 };
 
+#define _assert(c) if (!(c)) do_abort(__FILE__, __LINE__)
+void do_abort(const char *file, int line);
+
 #ifdef __cplusplus
 #include "farptr.hpp"
 #include "farobj.hpp"

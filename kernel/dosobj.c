@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <string.h>
 #include "portab.h"
 #include "dyndata.h"
@@ -25,9 +24,9 @@ void FAR *mk_dosobj(const void *data, UWORD len)
     void *ptr;
     uint16_t offs;
 
-    assert(initialized);
+    _assert(initialized);
     ptr = smalloc(&pool, len);
-    assert(ptr);
+    _assert(ptr);
     offs = (uintptr_t)ptr - (uintptr_t)smget_base_addr(&pool);
     return base + offs;
 }

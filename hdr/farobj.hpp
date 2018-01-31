@@ -1,5 +1,4 @@
 #include <cstring>
-#include <cassert>
 #include "farptr.hpp"
 #include "dosobj.h"
 
@@ -13,7 +12,7 @@ protected:
 
     template <typename T1>
     FarPtr<T1> GetObj() {
-        assert(!have_obj);
+        _assert(!have_obj);
         pr_dosobj(fobj, ptr, size);
         have_obj = true;
         return fobj;

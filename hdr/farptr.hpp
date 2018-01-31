@@ -2,7 +2,6 @@
 #define FARPTR_HPP
 
 #include <type_traits>
-#include <cassert>
 #include <cstring>
 #include "thunks_priv.h"
 #include "dosobj_priv.h"
@@ -249,14 +248,14 @@ public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
-        assert(!max_len || idx < max_len);
+        _assert(!max_len || idx < max_len);
         return sym[idx];
     }
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
-        assert(!max_len || idx < max_len);
+        _assert(!max_len || idx < max_len);
         return sym[idx];
     }
 
@@ -297,7 +296,7 @@ public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
-        assert(idx < max_len);
+        _assert(idx < max_len);
         FarPtr<T> f = lookup_sym();
         return f[idx];
     }
@@ -305,7 +304,7 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
-        assert(idx < max_len);
+        _assert(idx < max_len);
         FarPtr<T> f = lookup_sym();
         return f[idx];
     }

@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <assert.h>
 #include "portab.h"
 #include "farptr.hpp"
 
@@ -36,18 +35,18 @@ void store_far(void *ptr, far_t fptr)
     if (!f_m_size) {
         f_m_size = INIT_SIZE;
         far_map = (struct f_m *)malloc(f_m_size * sizeof(struct f_m));
-        assert(far_map);
+        _assert(far_map);
     }
-    assert(f_m_len <= f_m_size);
+    _assert(f_m_len <= f_m_size);
     if (f_m_len == f_m_size) {
         f_m_size *= 2;
         far_map = (struct f_m *)realloc(far_map, f_m_size * sizeof(struct f_m));
-        assert(far_map);
+        _assert(far_map);
     }
     idx = do_lookup(ptr);
     if (idx != -1) {
         far_t *f = &far_map[idx].f;
-        assert(f->seg == fptr.seg && f->off == fptr.off);
+        _assert(f->seg == fptr.seg && f->off == fptr.off);
         /* already exists, do nothing */
         return;
     }
@@ -59,6 +58,6 @@ void store_far(void *ptr, far_t fptr)
 far_t lookup_far(void *ptr)
 {
     int idx = do_lookup(ptr);
-    assert(idx != -1);
+    _assert(idx != -1);
     return far_map[idx].f;
 }
