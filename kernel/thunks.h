@@ -7,6 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "thunkapi.h"
 
 uint32_t FdppThunkCall(int fn, uint8_t *sp, uint8_t *r_len);
 
@@ -20,12 +21,9 @@ struct fdpp_api {
     void (*abort_handler)(const char *, int);
     void (*print_handler)(const char *format, va_list ap);
     FdppAsmCall_t asm_call;
+    struct fdthunk_api thunks;
 };
 void FdppInit(struct fdpp_api *api);
-
-#include "thunkapi.h"
-
-void FdSetApiCalls(struct fdthunk_api *calls);
 
 #ifdef __cplusplus
 }

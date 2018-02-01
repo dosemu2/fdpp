@@ -6,6 +6,7 @@
 #include "thunks.h"
 
 static struct fdpp_api *fdpp;
+static struct fdthunk_api *api_calls;
 
 struct asm_dsc_s {
     UWORD num;
@@ -137,6 +138,7 @@ void do_abort(const char *file, int line)
 void FdppInit(struct fdpp_api *api)
 {
     fdpp = api;
+    api_calls = &api->thunks;
 }
 
 static void fdprintf(const char *format, ...)
@@ -346,13 +348,6 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 
 #include "thunk_asms.h"
 
-
-static struct fdthunk_api *api_calls;
-
-void FdSetApiCalls(struct fdthunk_api *calls)
-{
-    api_calls = calls;
-}
 
 #define _THUNK_API_v(n) \
 void n(void) \
