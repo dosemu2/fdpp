@@ -453,17 +453,17 @@ STATIC void kernel()
 
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */
-  memset(Cmd.ctBuffer, 0, CTBUFFERSIZE);
+  memset(Cmd.ctBuffer, 0, sizeof(Cmd.ctBuffer));
   strcpy(Cmd.ctBuffer, Config.cfgInitTail);
 
-  for (Cmd.ctCount = 0; Cmd.ctCount < CTBUFFERSIZE; Cmd.ctCount++)
+  for (Cmd.ctCount = 0; Cmd.ctCount < sizeof(Cmd.ctBuffer); Cmd.ctCount++)
     if (Cmd.ctBuffer[Cmd.ctCount] == '\r')
       break;
 
   /* if stepping CONFIG.SYS (F5/F8), tell COMMAND.COM about it */
 
   /* 3 for string + 2 for "\r\n" */
-  if (Cmd.ctCount < CTBUFFERSIZE - 5)
+  if (Cmd.ctCount < sizeof(Cmd.ctBuffer) - 5)
   {
     const char *insertString = NULL;
 
