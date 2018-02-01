@@ -7,7 +7,6 @@
 
 static struct fdpp_api *fdpp;
 
-static FdppAsmCall_t asm_call;
 struct asm_dsc_s {
     UWORD num;
     UWORD off;
@@ -19,9 +18,8 @@ static struct far_s *sym_tab;
 static int sym_tab_len;
 static void fdprintf(const char *format, ...);
 
-void FdppSetAsmCalls(FdppAsmCall_t call, struct asm_dsc_s *tab, int size)
+void FdppSetAsmCalls(struct asm_dsc_s *tab, int size)
 {
-    asm_call = call;
     asm_tab = tab;
     asm_tab_len = size / sizeof(struct asm_dsc_s);
 }
@@ -156,7 +154,7 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num)
-            return asm_call(asm_tab[i].seg, asm_tab[i].off, sp, len);
+            return fdpp->asm_call(asm_tab[i].seg, asm_tab[i].off, sp, len);
     }
     _assert(0);
     return -1;
@@ -416,5 +414,5 @@ struct far_s lookup_far_st(void *ptr)
 
 uint32_t thunk_call_void(struct far_s fa)
 {
-    return asm_call(fa.seg, fa.off, NULL, 0);
+    return fdpp->asm_call(fa.seg, fa.off, NULL, 0);
 }
