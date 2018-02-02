@@ -27,6 +27,9 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "pcb.h"
+#include "globals.h"
+#include "proto.h"
 
 #ifdef FORSYS
 #include <io.h>
@@ -99,8 +102,7 @@ void put_console(int c)
 
 #ifdef FORSYS
   write(1, &c, 1);              /* write character to stdout */
-#else
-#if defined(__TURBOC__)
+#elif defined(__TURBOC__)
   _AL = c;
   __int__(0x29);
 #elif defined(__WATCOMC__)
@@ -111,8 +113,11 @@ void put_console(int c)
     mov al, byte ptr c;
     int 0x29;
   }
-#endif                          /* __TURBO__ */
-#endif                          /*  FORSYS   */
+#else
+  iregs r;
+  r.a.b.l = c;
+  init_call_intr(0x29, &r);
+#endif
 }
 #endif                          /*  DOSEMU   */
 
@@ -183,8 +188,8 @@ STATIC void ltob(LONG n, BYTE SSFAR * s, COUNT base)
   }
 }
 
-#define LEFT    0
-#define RIGHT   1
+#define _LEFT    0
+#define _RIGHT   1
 #define ZEROSFILL 2
 #define LONGARG 4
 
@@ -240,11 +245,11 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
     }
 
     fmt++;
-    flags = RIGHT;
+    flags = _RIGHT;
 
     if (*fmt == '-')
     {
-      flags = LEFT;
+      flags = _LEFT;
       fmt++;
     }
 
@@ -298,7 +303,11 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
         fmt++;
         /* we assume %Fs here */
       case 'S':
+#ifndef __GNUC__
         p = va_arg(arg, char FAR *);
+#else
+        p = va_arg(arg, char *);
+#endif
         break;
 
       case 'i':
@@ -348,7 +357,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
       size -= i;
     }
 
-    if (flags & RIGHT)
+    if (flags & _RIGHT)
     {
       int ch = ' ';
       if (flags & ZEROSFILL) ch = '0';
