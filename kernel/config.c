@@ -355,7 +355,7 @@ void PreConfig(void)
   LoL->_DPBp = (struct dpb FAR *)
       DynAlloc("DPBp", blk_dev.dh_name[0], sizeof(struct dpb));
 
-  LoL->_sfthead = (sfttbl FAR *)MK_FP(FP_SEG((struct lol FAR *)LoL), 0xcc); /* &(LoL->firstsftt) */
+  LoL->_sfthead = MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = (sfttbl FAR *)
      KernelAlloc(sizeof(sftheader)
@@ -365,7 +365,7 @@ void PreConfig(void)
   Config.cfgInitTail = MK_NEAR_STR_ST(_cfgInitTail);
   config_init_buffers(Config.cfgBuffers);
 
-  LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
+  LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
 #ifdef DEBUG
 /*  printf(" FCB table 0x%p\n",LoL->FCBp);*/

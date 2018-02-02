@@ -58,7 +58,7 @@ void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
 {
   void FAR *now;
   unsigned total = num * size;
-  struct DynS FAR *Dynp = _MK_DOS_FP(struct DynS, FP_SEG((struct lol FAR *)LoL), FP_OFF((struct DynS FAR *)__ASMADDR(Dyn)));
+  struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(__ASMADDR(Dyn)));
 
 #ifndef DEBUG
   UNREFERENCED_PARAMETER(what);
@@ -84,13 +84,13 @@ void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
 
 void DynFree(void *ptr)
 {
-  struct DynS FAR *Dynp = (struct DynS FAR *)MK_FP(FP_SEG((struct lol FAR *)LoL), FP_OFF((struct DynS FAR *)__ASMADDR(Dyn)));
+  struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(__ASMADDR(Dyn)));
   Dynp->Allocated = (char *)ptr - (char *)Dynp->Buffer;
 }
 
 void FAR * DynLast()
 {
-  struct DynS FAR *Dynp = (struct DynS FAR *)MK_FP(FP_SEG((struct lol FAR *)LoL), FP_OFF((struct DynS FAR *)__ASMADDR(Dyn)));
+  struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(__ASMADDR(Dyn)));
   DebugPrintf(("dynamic data end at %p\n",
                (void FAR *)(Dynp->Buffer + Dynp->Allocated)));
 
