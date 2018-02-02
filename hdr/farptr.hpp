@@ -9,6 +9,8 @@
 void store_far(void *ptr, far_s fptr);
 far_s lookup_far(void *ptr);
 
+#define _MK_S(s, o) (far_s){o, s}
+
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
@@ -19,8 +21,8 @@ template<typename T>
 class FarPtr : protected far_s {
 public:
     FarPtr() = default;
-    FarPtr(uint16_t s, uint16_t o) : far_s((far_s){s, o}) {}
-    FarPtr(std::nullptr_t) : far_s((far_s){0, 0}) {}
+    FarPtr(uint16_t s, uint16_t o) : far_s(_MK_S(s, o)) {}
+    FarPtr(std::nullptr_t) : far_s(_MK_S(0, 0)) {}
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
@@ -31,11 +33,11 @@ public:
         (_C(T1) || !_C(T0)))
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : far_s((far_s){f.__seg(), f.__off()}) {}
+    FarPtr(const FarPtr<T0>& f) : far_s(_MK_S(f.__seg(), f.__off())) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : far_s((far_s){f.__seg(), f.__off()}) {}
+    explicit FarPtr(const FarPtr<T0>& f) : far_s(_MK_S(f.__seg(), f.__off())) {}
 
     T* operator ->() { return (T*)resolve_segoff(*this); }
     operator T*() { return (T*)resolve_segoff(*this); }
