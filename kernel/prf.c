@@ -313,7 +313,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 #ifndef __GNUC__
         p = va_arg(arg, char FAR *);
 #else
-        p = va_arg(arg, char *);
+        p = __FAR(char)(va_arg(arg, uint32_t));
 #endif
         break;
 

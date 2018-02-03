@@ -23,6 +23,7 @@ public:
     FarPtr() = default;
     FarPtr(uint16_t s, uint16_t o) : far_s(_MK_S(s, o)) {}
     FarPtr(std::nullptr_t) : far_s(_MK_S(0, 0)) {}
+    explicit FarPtr(uint32_t f) : far_s(_MK_S((uint16_t)(f >> 16), (uint16_t)(f & 0xffff))) {}
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
