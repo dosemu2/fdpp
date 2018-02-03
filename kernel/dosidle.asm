@@ -43,7 +43,6 @@ segment HMA_TEXT
                 extern   _user_r:wrt DGROUP
 		; variables as the following are "part of" module inthndlr.c
 		; because of the define MAIN before include globals.h there!
-                extern   _HaltCpuWhileIdle:wrt DGROUP
                 extern   _DGROUP_:wrt HMA_TEXT
 ;
 _DosIdle_hlt:
@@ -91,6 +90,8 @@ Do_DosI:
                 pop     ax
                 ret
 
-; segment _DATA		; belongs to DGROUP
+segment _DATA		; belongs to DGROUP
 ; whatever	db whatever
 
+                global  _HaltCpuWhileIdle
+_HaltCpuWhileIdle db    0
