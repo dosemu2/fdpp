@@ -132,12 +132,14 @@ void put_console(int c)
 #define SSFAR
 #endif
 
-#ifndef FORSYS
+#if !defined(FORSYS) && !defined(__GNUC__)
 /* copied from bcc (Bruce's C compiler) stdarg.h */
 typedef char SSFAR *va_list;
 #define va_start(arg, last) ((arg) = (va_list) (&(last)+1))
 #define va_arg(arg, type) (((type SSFAR *)(arg+=sizeof(type)))[-1])
 #define va_end(arg)
+#else
+#include <stdarg.h>
 #endif
 
 static BYTE SSFAR *charp = 0;
@@ -202,6 +204,7 @@ int VA_CDECL printf(CONST char *fmt, ...)
   va_start(arg, fmt);
   charp = 0;
   do_printf(fmt, arg);
+  va_end(arg);
   return 0;
 }
 
@@ -213,6 +216,7 @@ STATIC int VA_CDECL fsprintf(char FAR * buff, CONST char * fmt, ...)
   va_start(arg, fmt);
   charp = buff;
   do_printf(fmt, arg);
+  va_end(arg);
   handle_char('\0');
   return 0;
 }
@@ -227,6 +231,7 @@ int VA_CDECL sprintf(char * buff, CONST char * fmt, ...)
   va_start(arg, fmt);
   charp = buff;
   do_printf(fmt, arg);
+  va_end(arg);
   handle_char('\0');
   return 0;
 }
