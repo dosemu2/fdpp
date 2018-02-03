@@ -415,7 +415,7 @@ STATIC VOID FsConfig(VOID)
 
 STATIC VOID signon()
 {
-  printf("\r%S"
+  printf("\r%S\n"
          "Kernel compatibility %d.%d - "
 #if defined(__BORLANDC__)
   "BORLANDC"

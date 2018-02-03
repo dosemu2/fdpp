@@ -45,7 +45,7 @@
 #endif
 
 /* actual version string */
-#define KVS(v,s,o) "FreeDOS kernel " v "(build 20" #s " OEM:" #o ") [compiled " __DATE__ "]\n"
+#define KVS(v,s,o) "FreeDOS kernel " v "(build 20" #s " OEM:" #o ") [compiled " __DATE__ "]"
 #define xKVS(v,s,o) KVS(v,s,o)
 #define KERNEL_VERSION_STRING xKVS(KERNEL_VERSION, REVISION_SEQ, OEM_ID)
 
