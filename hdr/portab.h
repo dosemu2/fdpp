@@ -183,6 +183,7 @@ struct far_s {
 
 #define _assert(c) if (!(c)) do_abort(__FILE__, __LINE__)
 void do_abort(const char *file, int line);
+void fdprintf(const char *format, ...);
 
 #ifdef __cplusplus
 #include "farptr.hpp"

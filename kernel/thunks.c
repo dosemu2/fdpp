@@ -17,7 +17,6 @@ static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
 static struct far_s *sym_tab;
 static int sym_tab_len;
-static void fdprintf(const char *format, ...);
 
 void FdppSetAsmCalls(struct asm_dsc_s *tab, int size)
 {
@@ -141,7 +140,7 @@ void FdppInit(struct fdpp_api *api)
     api_calls = &api->thunks;
 }
 
-static void fdprintf(const char *format, ...)
+void fdprintf(const char *format, ...)
 {
     va_list vl;
 
