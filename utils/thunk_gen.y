@@ -27,7 +27,7 @@ static int is_rvoid;
 static int is_const;
 static int is_pas;
 static char rbuf[256];
-static char abuf[256];
+static char abuf[1024];
 static char atype[256];
 static char atype2[256];
 static char rtbuf[256];
@@ -43,29 +43,50 @@ static void beg_arg(void)
     atype2[0] = 0;
 }
 
-static void do_start_arg(int alias)
+static void do_start_arg(int anum)
 {
     if (thunk_type == 1)
 	strcat(abuf, "_");
     if (is_ptr) {
 	if (is_far) {
-	    if (!alias)
+	    switch (anum) {
+	    case 0:
 		strcat(abuf, "_ARG_PTR_FAR(");
-	    else
+		break;
+	    case 1:
 		strcat(abuf, "_ARG_PTR_FAR_A(");
+		break;
+	    case 2:
+		strcat(abuf, "_CNV_PTR_FAR");
+		break;
+	    }
 	    arg_size = 4;
 	} else {
-	    if (!alias)
+	    switch (anum) {
+	    case 0:
 		strcat(abuf, "_ARG_PTR(");
-	    else
+		break;
+	    case 1:
 		strcat(abuf, "_ARG_PTR_A(");
+		break;
+	    case 2:
+		strcat(abuf, "_CNV_PTR");
+		break;
+	    }
 	    arg_size = 2;
 	}
     } else {
-	if (!alias)
+	switch (anum) {
+	case 0:
 	    strcat(abuf, "_ARG(");
-	else
+	    break;
+	case 1:
 	    strcat(abuf, "_ARG_A(");
+	    break;
+	case 2:
+	    strcat(abuf, "_CNV_SIMPLE");
+	    break;
+	}
     }
 }
 
@@ -86,7 +107,9 @@ static void fin_arg(int last)
 	sprintf(abuf + strlen(abuf), "%s)", atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
-	sprintf(abuf + strlen(abuf), "%s)", atype2[0] ? atype2 : atype);
+	sprintf(abuf + strlen(abuf), "%s)", (atype2[0] && !is_ptr) ? atype2 : atype);
+	strcat(abuf, ", ");
+	do_start_arg(2);
 	break;
     }
     if (!last) {
