@@ -47,7 +47,7 @@ clobber:        clean
 
 clean:
 		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
-			*.lnk *.o *.cc *.so *.tmp $(GEN_HEADERS)
+			*.lnk *.o *.cc *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS)
 
 # XXX: This is a very ugly way of linking the kernel, forced upon us by the
 # inability of Turbo `make' 2.0 to perform command line redirection. -- ror4
@@ -85,6 +85,7 @@ HDRS=\
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h dyndata.h
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h thunkapi.h
+GEN_ASMS=plt.asm cdata.asm
 HEADERS=$(HDRS) globals.h proto.h $(GEN_HEADERS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
