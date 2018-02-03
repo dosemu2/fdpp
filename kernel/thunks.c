@@ -402,6 +402,12 @@ r n(void) \
     return api_calls->n(); \
 }
 
+#define _THUNK_API_1v(n, t1, a1) \
+void n(t1 a1) \
+{ \
+    api_calls->n(a1); \
+}
+
 #include "thunkapi_tmpl.h"
 
 

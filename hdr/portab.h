@@ -191,6 +191,8 @@ void do_abort(const char *file, int line);
 
 #define VA_CDECL
 UWORD getCS(void);
+void setDS(UWORD);
+void setES(UWORD);
 #define _CS getCS()
 typedef uint32_t UDWORD;
 UBYTE peekb(UWORD seg, UWORD ofs);
