@@ -33,7 +33,7 @@
 
 struct lol {
   char filler[0x22];
-  char *_inputptr;              /* -4 Pointer to unread CON input          */
+  PTR_MEMB(char) _inputptr;              /* -4 Pointer to unread CON input          */
   unsigned short _first_mcb;   /* -2 Start of user memory                 */
   __FAR(struct dpb)_DPBp;       /*  0 First drive Parameter Block          */
   __FAR(struct sfttbl)_sfthead; /*  4 System File Table head               */
@@ -50,7 +50,7 @@ struct lol {
   unsigned char _njoined;       /* 34 number of joined devices             */
   unsigned short specialptr;   /* 35 pointer to list of spec. prog(unused)*/
   __FAR(void)setverPtr;         /* 37 pointer to SETVER list               */
-  void (*a20ptr)(void);        /* 3b pointer to fix A20 ctrl              */
+  PTR_MEMB(void) a20ptr;        /* 3b pointer to fix A20 ctrl              */
   unsigned short recentpsp;    /* 3d PSP of most recently exec'ed prog    */
   unsigned short nbuffers;     /* 3f Number of buffers                    */
   unsigned short nlookahead;   /* 41 Number of lookahead buffers          */
@@ -87,5 +87,5 @@ struct lol {
   unsigned long  winStartupInfo[4];
   unsigned short instanceTable[5];
 #endif
-};
+} __attribute__((packed));
 

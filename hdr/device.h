@@ -116,8 +116,8 @@
 struct dhdr {
   __DOSFAR(struct dhdr)dh_next;
   UWORD dh_attr;
-    VOID(*dh_strategy) (void);
-    VOID(*dh_interrupt) (void);
+    PTR_MEMB(VOID) dh_strategy;
+    PTR_MEMB(VOID) dh_interrupt;
   AR_MEMB(struct dhdr, UBYTE, dh_name, 8);
 };
 
