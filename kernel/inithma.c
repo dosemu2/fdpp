@@ -407,6 +407,6 @@ void MoveKernel(unsigned NewKernelSegment)
   return;
 
 errorReturn:
-  for (;;) ;
+  for (;;) cpu_relax();
 }
 

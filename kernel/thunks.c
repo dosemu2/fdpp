@@ -149,6 +149,11 @@ void fdprintf(const char *format, ...)
     va_end(vl);
 }
 
+void cpu_relax(void)
+{
+    fdpp->cpu_relax();
+}
+
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 {
     int i;

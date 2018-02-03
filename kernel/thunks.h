@@ -20,6 +20,7 @@ struct fdpp_api {
     uint8_t *(*mem_base)(void);
     void (*abort_handler)(const char *, int);
     void (*print_handler)(const char *format, va_list ap);
+    void (*cpu_relax)(void);
     FdppAsmCall_t asm_call;
     struct fdthunk_api thunks;
 };
