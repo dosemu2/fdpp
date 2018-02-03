@@ -115,8 +115,10 @@ void put_console(int c)
   }
 #else
   iregs r;
+  r.a.b.h = 0x0e;
   r.a.b.l = c;
-  init_call_intr(0x29, &r);
+  r.b.x = 0;
+  init_call_intr(0x10, &r);
 #endif
 }
 #endif                          /*  DOSEMU   */
