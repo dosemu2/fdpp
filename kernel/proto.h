@@ -475,7 +475,7 @@ VOID ASMFUNC FAR cpm_entry(VOID);
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);
 VOID ASMFUNC FAR CharMapSrvc(VOID);
 
-unsigned ASMPASCAL init_call_intr(int nr, iregs * rp);
+unsigned ASMPASCAL FAR init_call_intr(int nr, iregs * rp);
 unsigned ASMPASCAL read(int fd, void *buf, unsigned count);
 int ASMPASCAL init_DosOpen(const char *pathname, int flags);
 int ASMPASCAL close(int fd);

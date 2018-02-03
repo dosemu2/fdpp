@@ -41,10 +41,10 @@
 %endif
                 push	ds
 
-                mov	ax, [bp+6]		; interrupt number
+                mov	ax, [bp+8]		; interrupt number
                 mov	[cs:%%intr_1-1], al
                 jmp 	short %%intr_2		; flush the instruction cache
-%%intr_2	mov	bx, [bp+4]		; regpack structure
+%%intr_2	mov	bx, [bp+6]		; regpack structure
 		mov	ax, [bx]
 		mov	cx, [bx+4]
 		mov	dx, [bx+6]
@@ -66,7 +66,7 @@
 %ifdef WATCOM
 		mov	bx, [ss:bx+24]		; address of REGPACK
 %else
-		mov	bx, [ss:bx+16]		; address of REGPACK
+		mov	bx, [ss:bx+18]		; address of REGPACK
 %endif
 		mov	[bx], ax
 		pop	word [bx+2]
@@ -89,7 +89,7 @@
 		pop	di
 		pop	si
 		pop	bp
-		ret     4
+		retf    4
 %endmacro
 
 segment	HMA_TEXT
