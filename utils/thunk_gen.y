@@ -57,10 +57,9 @@ static void do_start_arg(int anum)
 		strcat(abuf, "_ARG_PTR_FAR_A(");
 		break;
 	    case 2:
-		strcat(abuf, "_CNV_PTR_FAR");
+		strcat(abuf, "_CNV_PTR_FAR, 0");
 		break;
 	    }
-	    arg_size = 4;
 	} else {
 	    switch (anum) {
 	    case 0:
@@ -70,10 +69,19 @@ static void do_start_arg(int anum)
 		strcat(abuf, "_ARG_PTR_A(");
 		break;
 	    case 2:
-		strcat(abuf, "_CNV_PTR");
+		switch (arg_size) {
+		case 0:
+		    sprintf(abuf + strlen(abuf), "_CNV_PTR_VOID, %i", arg_num + 2);
+		    break;
+		case 1:
+		    strcat(abuf, "_CNV_PTR_CHAR, 0");
+		    break;
+		default:
+		    strcat(abuf, "_CNV_PTR, 0");
+		    break;
+		}
 		break;
 	    }
-	    arg_size = 2;
 	}
     } else {
 	switch (anum) {
@@ -84,7 +92,7 @@ static void do_start_arg(int anum)
 	    strcat(abuf, "_ARG_A(");
 	    break;
 	case 2:
-	    strcat(abuf, "_CNV_SIMPLE");
+	    strcat(abuf, "_CNV_SIMPLE, 0");
 	    break;
 	}
     }
@@ -112,12 +120,22 @@ static void fin_arg(int last)
 	do_start_arg(2);
 	break;
     }
+    if (is_ptr) {
+	if (is_far)
+	    arg_size = 4;
+	else
+	    arg_size = 2;
+    }
     if (!last) {
         assert(arg_size != -1);
         arg_offs += arg_size;
     }
-    if (arg_size)
+    if (arg_size) {
 	arg_num++;
+    } else if (arg_num) {
+	fprintf(stderr, "parse error, void argument?\n");
+	exit(1);
+    }
 }
 
 %}
