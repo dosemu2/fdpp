@@ -87,5 +87,5 @@ struct lol {
   unsigned long  winStartupInfo[4];
   unsigned short instanceTable[5];
 #endif
-} __attribute__((packed));
+} PACKED;
 

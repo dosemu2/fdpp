@@ -162,7 +162,7 @@ struct RelocationTable {
   UWORD jmpSegment;
   UBYTE callNear;
   UWORD callOffset;
-};
+} PACKED;
 
 struct RelocatedEntry {
   UBYTE callNear;
@@ -170,7 +170,7 @@ struct RelocatedEntry {
   UBYTE jmpFar;
   UWORD jmpOffset;
   UWORD jmpSegment;
-};
+} PACKED;
 
 #if defined(WATCOM) && 0
 ULONG ASMCFUNC FAR MULULUS(ULONG mul1, UWORD mul2);     /* MULtiply ULong by UShort */

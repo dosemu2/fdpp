@@ -240,6 +240,7 @@ typedef struct far_s far_t;
 #define PROTO
 #define NATIVE
 #define USE_STDLIB
+#define PACKED         __attribute__((packed))
 
 #include "dosobj.h"
 

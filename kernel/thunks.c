@@ -173,7 +173,6 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 #define __ARG_PTR_A(t) PTR_MEMB(t)
 #define __ARG_PTR_FAR_A(t) __DOSFAR(t)
 
-#define PACKED __attribute__((packed))
 #define __CNV_PTR_FAR(t, d, f, l) t d = (f)
 #define __CNV_PTR(t, d, f, l) \
     _MK_FAR_SZ(__##d, f, sizeof(*f)); \
