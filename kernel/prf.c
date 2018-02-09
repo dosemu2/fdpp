@@ -239,7 +239,7 @@ int VA_CDECL sprintf(char * buff, CONST char * fmt, ...)
 STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 {
   int base;
-  BYTE s[11], FAR * p;
+  BYTE s[11], * p;
   int size;
   unsigned char flags;
 
@@ -294,9 +294,9 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 
       case 'p':
         {
-          UWORD w0 = va_arg(arg, unsigned);
+          UDWORD w0 = va_arg(arg, unsigned);
           char SSFAR *tmp = charp;
-          fsprintf(s, "%04x:%04x", va_arg(arg, unsigned), w0);
+          fsprintf(MK_FAR_SCP(s), "%04x:%04x", w0 >> 16, w0 & 0xffff);
           p = s;
           charp = tmp;
           break;
@@ -313,7 +313,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 #ifndef __GNUC__
         p = va_arg(arg, char FAR *);
 #else
-        p = __FAR(char)(va_arg(arg, uint32_t));
+        p = (char FAR *)(va_arg(arg, uint32_t));
 #endif
         break;
 

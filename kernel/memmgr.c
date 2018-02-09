@@ -452,7 +452,7 @@ VOID mcb_print(mcb FAR * mcbp)
 {
   static BYTE buff[9];
 
-  fmemcpy(buff, mcbp->m_name, 8);
+  fmemcpy_n(buff, mcbp->m_name, 8);
   buff[8] = '\0';
   printf
       ("%04x:%04x -> |%s| m_type = 0x%02x '%c'; m_psp = 0x%04x; m_size = 0x%04x\n",

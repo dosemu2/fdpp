@@ -70,9 +70,12 @@ void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
     for (;;) ;
   }
 
+#if 0
+  /* can't do prints here as the subsystems are not yet inited */
   DebugPrintf(("DYNDATA:allocating %s - %u * %u bytes, total %u, %u..%u\n",
                what, num, size, total, Dynp->Allocated,
                Dynp->Allocated + total));
+#endif
 
   now = (void FAR *)&Dynp->Buffer[Dynp->Allocated];
   fmemset(now, 0, total);
@@ -92,7 +95,7 @@ void FAR * DynLast()
 {
   struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(__ASMADDR(Dyn)));
   DebugPrintf(("dynamic data end at %p\n",
-               (void FAR *)(Dynp->Buffer + Dynp->Allocated)));
+               GET_FP32(Dynp->Buffer + Dynp->Allocated)));
 
   return Dynp->Buffer + Dynp->Allocated;
 }

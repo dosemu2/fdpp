@@ -318,7 +318,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   }
 
   fmemcpy(&TempCDS, cdsEntry, sizeof(TempCDS));
-  tn_printf(("CDS entry: #%u @%p (%u) '%s'\n", result, cdsEntry,
+  tn_printf(("CDS entry: #%u @%p (%u) '%s'\n", result, GET_FP32(cdsEntry),
             TempCDS.cdsBackslashOffset, TempCDS.cdsCurrentPath));
   /* is the current_ldt thing necessary for compatibly??
      -- 2001/09/03 ska*/

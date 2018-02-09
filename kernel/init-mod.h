@@ -42,6 +42,7 @@
 
 extern struct _KernelConfig InitKernelConfig;
 
+#if 0
 /*
  * Functions in `INIT_TEXT' may need to call functions in `_TEXT'. The entry
  * calls for the latter functions therefore need to be wrapped up with far
@@ -49,7 +50,6 @@ extern struct _KernelConfig InitKernelConfig;
  */
 #define printf      init_printf
 #define sprintf     init_sprintf
-#if 0
 #ifndef __WATCOMC__
 #define execrh      init_execrh
 #define  memcpy     init_memcpy
@@ -124,9 +124,11 @@ BOOL init_device(__FAR(struct dhdr) dhp, char * cmdLine,
                       COUNT mode, __FAR(char)*top);
 VOID init_fatal(BYTE * err_msg);
 
+#if 0
 /* prf.c */
 int VA_CDECL init_printf(CONST char * fmt, ...);
 int VA_CDECL init_sprintf(char * buff, CONST char * fmt, ...);
+#endif
 
 /* initclk.c */
 extern void Init_clk_driver(void);

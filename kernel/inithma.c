@@ -81,7 +81,7 @@ STATIC void InstallVDISK(void);
 #ifdef DEBUG
 #ifdef __TURBOC__
 #define int3() __int__(3);
-#else
+#elif defined(__WATCOMC__)
 void int3()
 {
   __asm int 3;
@@ -101,10 +101,10 @@ void int3()
 VOID hdump(BYTE FAR * p)
 {
   int loop;
-  HMAInitPrintf(("%p", p));
+  HMAInitPrintf(("%p", GET_FP32(p)));
 
   for (loop = 0; loop < 16; loop++)
-    HMAInitPrintf(("%02x ", p[loop]));
+    HMAInitPrintf(("%02x ", (const char)p[loop]));
 
   printf("\n");
 }
@@ -332,7 +332,7 @@ void MoveKernel(unsigned NewKernelSegment)
   }
 
   HMAInitPrintf(("HMA moving %p up to %p for %04x bytes\n",
-                 HMASource, HMADest, len));
+                 GET_FP32(HMASource), GET_FP32(HMADest), len));
 
   if (NewKernelSegment < CurrentKernelSegment ||
       NewKernelSegment == 0xffff)

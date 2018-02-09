@@ -102,7 +102,7 @@ STATIC long muxGo(int subfct, UWORD bp, UWORD cp, UWORD cntry, UWORD bufsize,
 {
   long ret;
   log(("NLS: muxGo(): subfct=%x, cntry=%u, cp=%u, ES:DI=%p\n",
-       subfct, cntry, cp, buf));
+       subfct, cntry, cp, GET_FP32(buf)));
   ret = call_nls(bp, buf, subfct, cp, cntry, bufsize);
   log(("NLS: muxGo(): return value = %lx\n", ret));
   return ret;
@@ -144,7 +144,7 @@ STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
                     UWORD bufsize, VOID FAR * buf)
 {
   log(("NLS: muxBufGo(): subfct=%x, BP=%u, cp=%u, cntry=%u, len=%u, buf=%p\n",
-       subfct, bp, cp, cntry, bufsize, buf));
+       subfct, bp, cp, cntry, bufsize, GET_FP32(buf)));
 
   return (int)muxGo(subfct, bp, cp, cntry, bufsize, buf);
 }

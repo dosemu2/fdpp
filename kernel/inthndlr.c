@@ -402,7 +402,7 @@ dispatch:
 #ifdef DEBUG
   if (bDumpRegs)
   {
-    fmemcpy(&error_regs, user_r, sizeof(iregs));
+    fmemcpy_n(&error_regs, user_r, sizeof(iregs));
     printf("System call (21h): %02x\n", user_r->AX);
     dump_regs = TRUE;
     dump();
@@ -1591,7 +1591,7 @@ real_exit:;
 #ifdef DEBUG
   if (bDumpRegs)
   {
-    fmemcpy(&error_regs, user_r, sizeof(iregs));
+    fmemcpy_n(&error_regs, user_r, sizeof(iregs));
     dump_regs = TRUE;
     dump();
   }

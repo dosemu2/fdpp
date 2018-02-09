@@ -205,6 +205,7 @@ void pokew(UWORD seg, UWORD ofs, UWORD w);
 void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void disable(void);
 void enable(void);
+void int3(void);
 
 #ifndef __cplusplus
 #define __FAR(t) t FAR *
@@ -241,6 +242,7 @@ typedef struct far_s far_t;
 #define NATIVE
 #define USE_STDLIB
 #define PACKED         __attribute__((packed))
+#define DEBUG
 
 #include "dosobj.h"
 

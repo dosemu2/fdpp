@@ -641,7 +641,7 @@ COUNT DosCloseSft(int sft_idx, BOOL commitonly)
  */
   if (sftp->sft_flags & SFT_FSHARED)
   {
-    /* printf("closing SFT %d = %p\n",sft_idx,sftp); */
+    /* printf("closing SFT %d = %p\n",sft_idx,GET_FP32(sftp)); */
     return network_redirector_fp(commitonly ? REM_FLUSH: REM_CLOSE, sftp);
   }
 

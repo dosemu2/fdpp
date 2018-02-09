@@ -119,7 +119,6 @@ CFILES = blockio.c \
     dyninit.c \
     initdisk.c \
     initclk.c \
-    iprf.c \
     prf.c \
     thunks.c \
     smalloc.c \
@@ -131,7 +130,6 @@ OBJECTS = $(CFILES:.c=.o)
 $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
-iprf.cc: prf.c
 .c.cc:
 	../utils/mkfar.sh FAR __FAR $< | \
 		../utils/scopify.sh 1 MK_FAR_ST _MK_FAR_ST __MK_FAR | \
