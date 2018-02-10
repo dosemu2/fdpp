@@ -183,7 +183,8 @@ struct far_s {
 
 #define _assert(c) if (!(c)) do_abort(__FILE__, __LINE__)
 void do_abort(const char *file, int line);
-void fdprintf(const char *format, ...);
+#define PRINTF(n) __attribute__((format(printf, n, n + 1)))
+void fdprintf(const char *format, ...) PRINTF(1);
 void cpu_relax(void);
 
 #ifdef __cplusplus

@@ -209,6 +209,7 @@ int VA_CDECL printf(CONST char *fmt, ...)
 }
 
 #if defined(DEBUG_NEED_PRINTF) && !defined(_INIT) && !defined(FORSYS)
+PRINTF(2)
 STATIC int VA_CDECL fsprintf(char FAR * buff, CONST char * fmt, ...)
 {
   va_list arg;
@@ -224,6 +225,7 @@ STATIC int VA_CDECL fsprintf(char FAR * buff, CONST char * fmt, ...)
 #define fsprintf sprintf
 #endif
 
+PRINTF(2)
 int VA_CDECL sprintf(char * buff, CONST char * fmt, ...)
 {
   va_list arg;
