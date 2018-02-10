@@ -92,3 +92,6 @@ public:
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o))
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
+#define MK_FAR_SCP(o) FarObj<decltype(o)>(o).get_obj()
+#define MK_FAR_PTR_SCP(o) FarObj<_R(o)>(*o).get_obj()
+#define MK_FAR_STR_SCP(o) FarObj<_R(o)>(o, strlen(o)).get_obj()
