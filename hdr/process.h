@@ -90,16 +90,16 @@ typedef struct _psp {
   UBYTE ps_unix[3];             /* 50 unix style call - 0xcd 0x21 0xcb */
   BYTE ps_fill3[9];             /* 53 */
   union {
-    struct {
-      SYM_MEMB(fcb) _ps_fcb1;             /* 5c first command line argument */
+    struct __u1 {
+      SYM_MEMB2(struct _psp, _u, struct __u1, fcb, _ps_fcb1);             /* 5c first command line argument */
     } _u1;
-    struct {
+    struct __u2 {
       BYTE fill4[16];
-      SYM_MEMB(fcb) _ps_fcb2;             /* second command line argument */
+      SYM_MEMB2(struct _psp, _u, struct __u2, fcb, _ps_fcb2);             /* second command line argument */
     } _u2;
-    struct {
+    struct __u3 {
       BYTE fill5[36];
-      SYM_MEMB(CommandTail) _ps_cmd;
+      SYM_MEMB2(struct _psp, _u, struct __u3, CommandTail, _ps_cmd);
     } _u3;
   } _u;
 } psp;

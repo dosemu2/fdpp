@@ -6,8 +6,8 @@
 #include "thunks_priv.h"
 #include "dosobj_priv.h"
 
-void store_far(void *ptr, far_s fptr);
-far_s lookup_far(void *ptr);
+void store_far(const void *ptr, far_s fptr);
+far_s lookup_far(const void *ptr);
 
 #define _MK_S(s, o) (far_s){o, s}
 
@@ -130,10 +130,10 @@ public:
 template<typename T>
 class SymWrp : public T {
 public:
-    SymWrp() = default;
+    SymWrp() = delete;
     SymWrp(const SymWrp&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
-    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, lookup_far(this)); }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, lookup_far(this)); }
 };
 
 template<typename T>
@@ -141,16 +141,16 @@ class SymWrp2 {
     T sym;
 
 public:
-    SymWrp2() = default;
+    SymWrp2() = delete;
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
-    FarPtr<T> operator &() { return _MK_F(FarPtr<T>, lookup_far(this)); }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, lookup_far(this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
-    operator FarPtr<const void> () {
+    operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, lookup_far(this));
     }
 };
@@ -265,54 +265,58 @@ public:
     far_s* get_ref() { return &sym.get_ref(); }
 };
 
-template<typename T, int max_len, int (*F)(void)>
-class ArSym {
-    T sym[max_len];
-
-    FarPtr<T> lookup_sym() {
+template<typename T, int (*F)(void)>
+class MembBase {
+protected:
+    FarPtr<T> lookup_sym() const {
         /* find parent first */
-        uint8_t *ptr = (uint8_t *)sym - F();
+        const uint8_t *ptr = (const uint8_t *)this - F();
         return _MK_F(FarPtr<uint8_t>, lookup_far_st(ptr)) + F();
     }
+};
+
+template<typename T, int max_len, int (*F)(void)>
+class ArMemb : public MembBase<T, F> {
+    T sym[max_len];
 
 public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
 
-    ArSym(const T s[]) { strncpy(sym, s, max_len); }
+    ArMemb(const T s[]) { strncpy(sym, s, max_len); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    operator FarPtr<void> () { return lookup_sym(); }
+    operator FarPtr<void> () { return this->lookup_sym(); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    operator FarPtr<const T1> () { return lookup_sym(); }
-    operator FarPtr<T> () { return lookup_sym(); }
+    operator FarPtr<const T1> () { return this->lookup_sym(); }
+    operator FarPtr<T> () { return this->lookup_sym(); }
     operator T *() { return sym; }
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
     explicit operator T0 *() { return (T0 *)sym; }
-    FarPtr<T> operator +(int inc) { return lookup_sym() + inc; }
-    FarPtr<T> operator +(unsigned inc) { return lookup_sym() + inc; }
-    FarPtr<T> operator +(size_t inc) { return lookup_sym() + inc; }
-    FarPtr<T> operator -(int dec) { return lookup_sym() - dec; }
+    FarPtr<T> operator +(int inc) { return this->lookup_sym() + inc; }
+    FarPtr<T> operator +(unsigned inc) { return this->lookup_sym() + inc; }
+    FarPtr<T> operator +(size_t inc) { return this->lookup_sym() + inc; }
+    FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
-        _assert(idx < max_len);
-        FarPtr<T> f = lookup_sym();
+        _assert(!max_len || idx < max_len);
+        FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
-        _assert(idx < max_len);
-        FarPtr<T> f = lookup_sym();
+        _assert(!max_len || idx < max_len);
+        FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }
 
-    ArSym() = default;
+    ArMemb() = default;
 };
 
 template<typename T, int max_len = 0>
@@ -358,6 +362,27 @@ public:
     far_s* get_ref() { return &ptr.get_ref(); }
 };
 
+template<typename T, int (*F)(void)>
+class SymMemb : public T, public MembBase<T, F> {
+public:
+    SymMemb() = default;
+    SymMemb(const SymMemb&) = delete;
+    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *(SymWrp<T> *)this; }
+    FarPtr<T> operator &() const { return this->lookup_sym(); }
+};
+
+template<typename T, int (*F)(void)>
+class SymMemb2 : public MembBase<T, F> {
+    T sym;
+
+public:
+    SymMemb2() = default;
+    SymMemb2(const SymMemb2&) = delete;
+    SymWrp2<T>& operator =(const T& f) { sym = f; return *(SymWrp2<T> *)this; }
+    FarPtr<T> operator &() const { return this->lookup_sym(); }
+    operator T &() { return sym; }
+};
+
 #undef _P
 #undef _C
 #undef _RP
@@ -379,9 +404,22 @@ public:
     static int off_##n() { \
         return offsetof(p, n); \
     } \
-    ArSym<t, l, off_##n> n
-#define SYM_MEMB(t) SymWrp<t>
-#define SYM_MEMB_T(t) SymWrp2<t>
+    ArMemb<t, l, off_##n> n
+#define SYM_MEMB(p, t, n) \
+    static int off_##n() { \
+        return offsetof(p, n); \
+    } \
+    SymMemb<t, off_##n> n
+#define SYM_MEMB2(c, m, p, t, n) \
+    static int off_##n() { \
+        return offsetof(c, m) + offsetof(p, n); \
+    } \
+    SymMemb<t, off_##n> n
+#define SYM_MEMB_T(p, t, n) \
+    static int off_##n() { \
+        return offsetof(p, n); \
+    } \
+    SymMemb2<t, off_##n> n
 #define PTR_MEMB(t) NearPtr<t>
 #define FP_SEG(fp)            ((fp).__seg())
 #define FP_OFF(fp)            ((fp).__off())

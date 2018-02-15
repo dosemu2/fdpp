@@ -39,7 +39,7 @@ struct f_node {
   UWORD f_flags;                /* file flags                   */
 
   dmatch *f_dmp;                /* this file's dir match        */
-  SYM_MEMB(struct dirent) f_dir;          /* this file's dir entry image  */
+  SYM_MEMB(struct f_node, struct dirent, f_dir);          /* this file's dir entry image  */
 
   ULONG f_dirsector;            /* the sector containing dir entry*/
   UBYTE f_diridx;               /* offset/32 of dir entry in sec*/

@@ -101,11 +101,11 @@ typedef struct _fcb {
 } fcb;
 
 /* FAT extended fcb                                                     */
-typedef struct {
+typedef struct _xfcb {
   UBYTE xfcb_flag;              /* 0xff indicates Extended FCB  */
   BYTE xfcb_resvrd[5];          /* Reserved                     */
   UBYTE xfcb_attrib;            /* Attribute                    */
-  SYM_MEMB(fcb) xfcb_fcb;
+  SYM_MEMB(struct _xfcb, fcb, xfcb_fcb);
 } xfcb;
 
 typedef struct _rfcb {

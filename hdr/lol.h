@@ -46,7 +46,7 @@ struct lol {
   unsigned short _nprotfcb;     /* 1e number of protected fcbs             */
   unsigned char _nblkdev;      /* 20 number of block devices              */
   unsigned char _lastdrive;    /* 21 value of last drive                  */
-  SYM_MEMB(struct dhdr) _nul_dev;        /* 22 NUL device driver header(no pointer!)*/
+  SYM_MEMB(struct lol, struct dhdr, _nul_dev);        /* 22 NUL device driver header(no pointer!)*/
   unsigned char _njoined;       /* 34 number of joined devices             */
   unsigned short specialptr;   /* 35 pointer to list of spec. prog(unused)*/
   __FAR(void)setverPtr;         /* 37 pointer to SETVER list               */
@@ -57,7 +57,7 @@ struct lol {
   unsigned char _BootDrive;    /* 43 bootdrive (1=A:)                     */
   unsigned char cpu;           /* 44 CPU family [was unused dword moves]  */
   unsigned short xmssize;      /* 45 extended memory size in KB           */
-  SYM_MEMB(__FAR(struct buffer))_firstbuf;/* 47 head of buffers linked list          */
+  SYM_MEMB(struct lol, __FAR(struct buffer), _firstbuf);/* 47 head of buffers linked list          */
   unsigned short dirtybuf;     /* 4b number of dirty buffers              */
   __FAR(struct buffer)lookahead;/* 4d pointer to lookahead buffer          */
   unsigned short slookahead;   /* 51 number of lookahead sectors          */

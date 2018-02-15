@@ -15,5 +15,5 @@ void DynFree(void *ptr);
 
 struct DynS {
   unsigned Allocated;
-  AR_MEMB(struct DynS, char, Buffer, 1);
+  AR_MEMB(struct DynS, char, Buffer, 0);
 };

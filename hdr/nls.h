@@ -375,7 +375,7 @@ struct nlsExtCntryInfo {
   /* Note: The ASCIZ strings might become
      a totally different understanding with
      DBCS (Double Byte Character Support) */
-  SYM_MEMB_T(WORD) dateFmt;                 /* order of portions of date
+  SYM_MEMB_T(struct nlsExtCntryInfo, WORD, dateFmt);                 /* order of portions of date
                                    0: mm/dd/yyyy (USA)
                                    1: dd/mm/yyyy (Europe)
                                    2: yyyy/mm/dd (Japan)

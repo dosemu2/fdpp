@@ -453,7 +453,7 @@ void pokel(UWORD seg, UWORD ofs, UDWORD l)
 
 /* never create far pointers.
  * only look them up in symtab. */
-struct far_s lookup_far_st(void *ptr)
+struct far_s lookup_far_st(const void *ptr)
 {
     int i;
     for (i = 0; i < sym_tab_len; i++) {

@@ -8,7 +8,7 @@
  * in farptr.hpp */
 
 struct f_m {
-    void *p;
+    const void *p;
     far_t f;
 };
 static struct f_m *far_map;
@@ -16,7 +16,7 @@ static int f_m_size;
 static int f_m_len;
 #define INIT_SIZE 128
 
-static int do_lookup(void *ptr)
+static int do_lookup(const void *ptr)
 {
     int i;
 
@@ -27,7 +27,7 @@ static int do_lookup(void *ptr)
     return -1;
 }
 
-void store_far(void *ptr, far_t fptr)
+void store_far(const void *ptr, far_t fptr)
 {
     int idx;
     struct f_m *fm;
@@ -55,7 +55,7 @@ void store_far(void *ptr, far_t fptr)
     fm->f = fptr;
 }
 
-far_t lookup_far(void *ptr)
+far_t lookup_far(const void *ptr)
 {
     int idx = do_lookup(ptr);
     _assert(idx != -1);
