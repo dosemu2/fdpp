@@ -265,7 +265,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   char *rootPos;
   char src0;
 
-  tn_printf(("truename(%S)\n", src));
+  tn_printf(("truename(%S)\n", GET_FP32(src)));
 
   /* First, adjust the source pointer */
   src = (const char FAR *)adjust_far(src);

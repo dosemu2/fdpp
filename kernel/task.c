@@ -454,7 +454,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
   }
 
 #ifdef DEBUG
-  printf("DosComLoader. Loading '%S' at %04x\n", namep, mem);
+  printf("DosComLoader. Loading '%S' at %04x\n", GET_FP32(namep), mem);
 #endif
   /* Now load the executable                              */
   {
@@ -635,7 +635,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       mode &= 0x7f; /* forget about high loading from now on */
 
 #ifdef DEBUG
-      printf("DosExeLoader. Loading '%S' at %04x\n", namep, mem);
+      printf("DosExeLoader. Loading '%S' at %04x\n", GET_FP32(namep), mem);
 #endif
 
       /* memory found large enough - continue processing      */
@@ -835,7 +835,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     exb.exec.cmd_line = MK_FAR_SZ(tailp + 1, sz);
     exb.exec.cmd_line->ctCount = endp - tailp - 2;
 #ifdef DEBUG
-    printf("Process 0 starting: %s%s\n\n", Shell, tailp + 2);
+    printf("Process 0 starting: %s%s\n\n", GET_FP32(Shell), tailp + 2);
 #endif
     res_DosExec(mode, &exb, Shell);
     put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
