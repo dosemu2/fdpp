@@ -18,12 +18,14 @@ far_s lookup_far(const void *ptr);
 template<typename T> class SymWrp;
 template<typename T> class SymWrp2;
 template<typename T>
-class FarPtr : protected far_s {
+class FarPtr {
+    far_s ptr;
+
 public:
     FarPtr() = default;
-    FarPtr(uint16_t s, uint16_t o) : far_s(_MK_S(s, o)) {}
-    FarPtr(std::nullptr_t) : far_s(_MK_S(0, 0)) {}
-    explicit FarPtr(uint32_t f) : far_s(_MK_S((uint16_t)(f >> 16), (uint16_t)(f & 0xffff))) {}
+    FarPtr(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
+    FarPtr(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
+    explicit FarPtr(uint32_t f) : ptr(_MK_S((uint16_t)(f >> 16), (uint16_t)(f & 0xffff))) {}
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
@@ -34,14 +36,14 @@ public:
         (_C(T1) || !_C(T0)))
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : far_s(_MK_S(f.__seg(), f.__off())) {}
+    FarPtr(const FarPtr<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : far_s(_MK_S(f.__seg(), f.__off())) {}
+    explicit FarPtr(const FarPtr<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
-    T* operator ->() { return (T*)resolve_segoff(*this); }
-    operator T*() { return (T*)resolve_segoff(*this); }
+    T* operator ->() { return (T*)resolve_segoff(ptr); }
+    operator T*() { return (T*)resolve_segoff(ptr); }
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
@@ -70,32 +72,32 @@ public:
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
-    operator T0*() { return (T0*)resolve_segoff(*this); }
+    operator T0*() { return (T0*)resolve_segoff(ptr); }
 
     FarPtr<T> operator ++(int) {
         FarPtr<T> f = *this;
-        off += sizeof(T);
+        ptr.off += sizeof(T);
         return f;
     }
     FarPtr<T> operator ++() {
-        off += sizeof(T);
+        ptr.off += sizeof(T);
         return *this;
     }
     FarPtr<T> operator --() {
-        off -= sizeof(T);
+        ptr.off -= sizeof(T);
         return *this;
     }
-    void operator +=(int inc) { off += inc * sizeof(T); }
-    FarPtr<T> operator +(int inc) { return FarPtr<T>(seg, off + inc * sizeof(T)); }
-    FarPtr<T> operator -(int dec) { return FarPtr<T>(seg, off - dec * sizeof(T)); }
-    bool operator == (std::nullptr_t) { return (!seg && !off); }
-    bool operator != (std::nullptr_t) { return (seg || off); }
-    uint16_t __seg() const { return seg; }
-    uint16_t __off() const { return off; }
-    uint32_t get_fp32() const { return ((seg << 16) | off); }
-    far_s get_far() const { return *this; }
-    far_s& get_ref() { return *this; }
-    T* get_ptr() { return (T*)resolve_segoff(*this); }
+    void operator +=(int inc) { ptr.off += inc * sizeof(T); }
+    FarPtr<T> operator +(int inc) { return FarPtr<T>(ptr.seg, ptr.off + inc * sizeof(T)); }
+    FarPtr<T> operator -(int dec) { return FarPtr<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
+    bool operator == (std::nullptr_t) { return (!ptr.seg && !ptr.off); }
+    bool operator != (std::nullptr_t) { return (ptr.seg || ptr.off); }
+    uint16_t seg() const { return ptr.seg; }
+    uint16_t off() const { return ptr.off; }
+    uint32_t get_fp32() const { return ((ptr.seg << 16) | ptr.off); }
+    far_s get_far() const { return ptr; }
+    far_s& get_ref() { return ptr; }
+    T* get_ptr() { return (T*)resolve_segoff(ptr); }
 };
 
 #define _MK_F(f, s) ({ far_s __s = s; f(__s.seg, __s.off); })
@@ -167,8 +169,8 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     operator FarPtr<void> () { return FarPtr<void>(*sym); }
-    uint16_t __seg() const { return sym->__seg(); }
-    uint16_t __off() const { return sym->__off(); }
+    uint16_t seg() const { return sym->seg(); }
+    uint16_t off() const { return sym->off(); }
 };
 
 template<typename T>
@@ -227,17 +229,17 @@ public:
 
 template<typename T>
 class NearPtr {
-    uint16_t off;
+    uint16_t _off;
 
 public:
-    explicit NearPtr(uint16_t o) : off(o) {}    // for farobj only
-    NearPtr(std::nullptr_t) : off(0) {}
-    operator uint16_t () { return off; }
-    operator T *() { return FarPtr<T>(dosobj_seg(), off); }
+    explicit NearPtr(uint16_t o) : _off(o) {}    // for farobj only
+    NearPtr(std::nullptr_t) : _off(0) {}
+    operator uint16_t () { return _off; }
+    operator T *() { return FarPtr<T>(dosobj_seg(), _off); }
     NearPtr<T> operator - (const NearPtr<T>& n) const {
-        return NearPtr<T>(off - n.__off());
+        return NearPtr<T>(_off - n.off());
     }
-    uint16_t __off() const { return off; }
+    uint16_t off() const { return _off; }
 
     NearPtr() = default;
 };
@@ -345,8 +347,8 @@ public:
     explicit FarPtrAsm(const FarPtr<FarPtr<T>>& f) : ptr(f) {}
     /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
     explicit operator uint16_t *() { return &ptr->get_ref().off; }
-    uint16_t __seg() const { return ptr.__seg(); }
-    uint16_t __off() const { return ptr.__off(); }
+    uint16_t seg() const { return ptr.seg(); }
+    uint16_t off() const { return ptr.off(); }
 };
 
 template<typename T>
@@ -421,8 +423,8 @@ public:
     } \
     SymMemb2<t, off_##n> n
 #define PTR_MEMB(t) NearPtr<t>
-#define FP_SEG(fp)            ((fp).__seg())
-#define FP_OFF(fp)            ((fp).__off())
+#define FP_SEG(fp)            ((fp).seg())
+#define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
 #define __DOSFAR(t) FarPtr<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)MK_FP(s, o)

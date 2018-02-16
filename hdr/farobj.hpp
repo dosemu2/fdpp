@@ -54,7 +54,7 @@ public:
 
     NearPtr<obj_type> get_near() {
         FarPtr<obj_type> f = get_obj();
-        return NearPtr<obj_type>(f.__off());
+        return NearPtr<obj_type>(f.off());
     }
 
     ~FarObj() { RmObj(); }
@@ -74,7 +74,7 @@ public:
     }
     NearPtr<obj_type> get_near() {
         FarPtr<obj_type> f = get_obj();
-        return NearPtr<obj_type>(f.__off());
+        return NearPtr<obj_type>(f.off());
     }
 };
 
