@@ -18,29 +18,14 @@ far_s lookup_far(const void *ptr);
 template<typename T> class SymWrp;
 template<typename T> class SymWrp2;
 template<typename T>
-class FarPtr {
+class FarPtrBase {
+protected:
     far_s ptr;
 
 public:
-    FarPtr() = default;
-    FarPtr(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
-    FarPtr(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
-    explicit FarPtr(uint32_t f) : ptr(_MK_S((uint16_t)(f >> 16), (uint16_t)(f & 0xffff))) {}
-#define ALLOW_CNV(T0, T1) (( \
-        std::is_void<T0>::value || \
-        std::is_void<T1>::value || \
-        std::is_same<_RC(T0), char>::value || \
-        std::is_same<_RC(T1), char>::value || \
-        std::is_same<_RC(T0), unsigned char>::value || \
-        std::is_same<_RC(T1), unsigned char>::value) && \
-        (_C(T1) || !_C(T0)))
-    template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
-
-    template<typename T0, typename T1 = T,
-        typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
+    FarPtrBase() = default;
+    FarPtrBase(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
+    FarPtrBase(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
 
     T* operator ->() { return (T*)resolve_segoff(ptr); }
     operator T*() { return (T*)resolve_segoff(ptr); }
@@ -55,7 +40,7 @@ public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& operator [](unsigned idx) {
-        return FarPtr<T1>(*this + idx).get_wrp();
+        return FarPtrBase<T1>(*this + idx).get_wrp();
     }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
@@ -67,29 +52,25 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& operator [](unsigned idx) {
-        return FarPtr<T1>(*this + idx).get_wrp();
+        return FarPtrBase<T1>(*this + idx).get_wrp();
     }
 
-    template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
-    operator T0*() { return (T0*)resolve_segoff(ptr); }
-
-    FarPtr<T> operator ++(int) {
-        FarPtr<T> f = *this;
+    FarPtrBase<T> operator ++(int) {
+        FarPtrBase<T> f = *this;
         ptr.off += sizeof(T);
         return f;
     }
-    FarPtr<T> operator ++() {
+    FarPtrBase<T> operator ++() {
         ptr.off += sizeof(T);
         return *this;
     }
-    FarPtr<T> operator --() {
+    FarPtrBase<T> operator --() {
         ptr.off -= sizeof(T);
         return *this;
     }
     void operator +=(int inc) { ptr.off += inc * sizeof(T); }
-    FarPtr<T> operator +(int inc) { return FarPtr<T>(ptr.seg, ptr.off + inc * sizeof(T)); }
-    FarPtr<T> operator -(int dec) { return FarPtr<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
+    FarPtrBase<T> operator +(int inc) { return FarPtrBase<T>(ptr.seg, ptr.off + inc * sizeof(T)); }
+    FarPtrBase<T> operator -(int dec) { return FarPtrBase<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
     bool operator == (std::nullptr_t) { return (!ptr.seg && !ptr.off); }
     bool operator != (std::nullptr_t) { return (ptr.seg || ptr.off); }
     uint16_t seg() const { return ptr.seg; }
@@ -98,6 +79,38 @@ public:
     far_s get_far() const { return ptr; }
     far_s& get_ref() { return ptr; }
     T* get_ptr() { return (T*)resolve_segoff(ptr); }
+};
+
+template<typename T>
+class FarPtr : public FarPtrBase<T>
+{
+public:
+    using FarPtrBase<T>::FarPtrBase;
+    FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {}
+    explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
+#define ALLOW_CNV(T0, T1) (( \
+        std::is_void<T0>::value || \
+        std::is_void<T1>::value || \
+        std::is_same<_RC(T0), char>::value || \
+        std::is_same<_RC(T1), char>::value || \
+        std::is_same<_RC(T0), unsigned char>::value || \
+        std::is_same<_RC(T1), unsigned char>::value) && \
+        (_C(T1) || !_C(T0)))
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
+    FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
+
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
+    explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
+
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+    operator FarPtrBase<T0>() { return FarPtrBase<T0>(this->seg(), this->off()); }
+
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+    operator T0*() { return (T0*)resolve_segoff(this->ptr); }
 };
 
 #define _MK_F(f, s) ({ far_s __s = s; f(__s.seg, __s.off); })
@@ -426,7 +439,7 @@ public:
 #define FP_SEG(fp)            ((fp).seg())
 #define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
-#define __DOSFAR(t) FarPtr<t>
+#define __DOSFAR(t) FarPtrBase<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)MK_FP(s, o)
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
