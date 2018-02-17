@@ -13,6 +13,8 @@ extern struct farhlp g_farhlp;
 
 void farhlp_init(struct farhlp *ctx);
 void store_far(struct farhlp *ctx, const void *ptr, far_s fptr);
-far_s lookup_far(struct farhlp *ctx, const void *ptr);
+struct far_s lookup_far(struct farhlp *ctx, const void *ptr);
+struct far_s lookup_far_ref(struct farhlp *ctx, const void *ptr);
+struct far_s lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm);
 
 #endif

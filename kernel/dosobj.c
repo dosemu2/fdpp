@@ -66,10 +66,23 @@ __DOSFAR(uint8_t) mk_dosobj_st(const void *data, UWORD len)
     __DOSFAR(uint8_t) ret;
 
     _assert(initialized);
-    f = lookup_far(&hlp, data);
+    f = lookup_far_ref(&hlp, data);
     if (f.seg || f.off)
         return __DOSFAR(uint8_t)(f);
     ret = mk_dosobj(data, len);
     store_far(&hlp, data, GET_FAR(ret));
     return ret;
+}
+
+void rm_dosobj_st(const void *data)
+{
+    void *ptr;
+    int rm;
+    far_t f = lookup_far_unref(&hlp, data, &rm);
+
+    _assert(f.seg || f.off);
+    if (rm) {
+        ptr = resolve_segoff(f);
+        smfree(&pool, ptr);
+    }
 }

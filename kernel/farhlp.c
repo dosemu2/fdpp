@@ -10,6 +10,7 @@
 struct f_m {
     const void *p;
     far_t f;
+    int refcnt;
 };
 
 struct farhlp g_farhlp;
@@ -34,7 +35,21 @@ static int do_lookup(struct farhlp *ctx, const void *ptr)
     int i;
 
     for (i = 0; i < ctx->f_m_len; i++) {
-        if (ctx->far_map[i].p == ptr)
+        struct f_m *fm = &ctx->far_map[i];
+        if (!fm->refcnt)
+            continue;
+        if (fm->p == ptr)
+            return i;
+    }
+    return -1;
+}
+
+static int find_unused(struct farhlp *ctx)
+{
+    int i;
+
+    for (i = 0; i < ctx->f_m_len; i++) {
+        if (!ctx->far_map[i].refcnt)
             return i;
     }
     return -1;
@@ -59,15 +74,51 @@ void store_far(struct farhlp *ctx, const void *ptr, far_t fptr)
         /* already exists, do nothing */
         return;
     }
-    fm = &ctx->far_map[ctx->f_m_len++];
+    idx = find_unused(ctx);
+    if (idx == -1)
+        idx = ctx->f_m_len++;
+    fm = &ctx->far_map[idx];
     fm->p = ptr;
     fm->f = fptr;
+    fm->refcnt = 1;
 }
 
 far_t lookup_far(struct farhlp *ctx, const void *ptr)
 {
     int idx = do_lookup(ctx, ptr);
+
     if (idx == -1)
         return (far_t){0, 0};
     return ctx->far_map[idx].f;
+}
+
+far_t lookup_far_ref(struct farhlp *ctx, const void *ptr)
+{
+    struct f_m *fm;
+    int idx = do_lookup(ctx, ptr);
+
+    if (idx == -1)
+        return (far_t){0, 0};
+    fm = &ctx->far_map[idx];
+    fm->refcnt++;
+    return fm->f;
+}
+
+far_t lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm)
+{
+    struct f_m *fm;
+    far_t ret;
+    int idx = do_lookup(ctx, ptr);
+
+    _assert(idx != -1);
+    fm = &ctx->far_map[idx];
+    ret = fm->f;
+    fm->refcnt--;
+    *rm = 0;
+    if (!fm->refcnt) {
+        *rm = 1;
+        while (ctx->f_m_len && !ctx->far_map[ctx->f_m_len - 1].refcnt)
+            ctx->f_m_len--;
+    }
+    return ret;
 }
