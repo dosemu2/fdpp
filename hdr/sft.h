@@ -138,6 +138,8 @@ typedef struct sfttbl {
 #define sft_flags_lo  sft_flags_union._split_sft_flags._sft_flags_lo
 
 /* defines for LSEEK */
+#ifndef SEEK_SET
 #define SEEK_SET 0u
 #define SEEK_CUR 1u
 #define SEEK_END 2u
+#endif
