@@ -2,10 +2,12 @@
 #include "portab.h"
 #include "dyndata.h"
 #include "smalloc.h"
+#include "farhlp.h"
 #include "dosobj.h"
 
 static smpool pool;
 static __DOSFAR(uint8_t) base;
+static struct farhlp hlp;
 static int initialized;
 
 void dosobj_init(void)
@@ -16,6 +18,7 @@ void dosobj_init(void)
 
     sminit(&pool, ptr, size);
     base = fa;
+    farhlp_init(&hlp);
     initialized = 1;
 }
 
@@ -55,4 +58,18 @@ void rm_dosobj(__DOSFAR(uint8_t) fa)
 uint16_t dosobj_seg(void)
 {
     return FP_SEG(base);
+}
+
+__DOSFAR(uint8_t) mk_dosobj_st(const void *data, UWORD len)
+{
+    far_t f;
+    __DOSFAR(uint8_t) ret;
+
+    _assert(initialized);
+    f = lookup_far(&hlp, data);
+    if (f.seg || f.off)
+        return __DOSFAR(uint8_t)(f);
+    ret = mk_dosobj(data, len);
+    store_far(&hlp, data, GET_FAR(ret));
+    return ret;
 }

@@ -5,9 +5,19 @@
 #include <cstring>
 #include "thunks_priv.h"
 #include "dosobj_priv.h"
+#include "farhlp.h"
 
-void store_far(const void *ptr, far_s fptr);
-far_s lookup_far(const void *ptr);
+static inline far_s _lookup_far(const void *ptr)
+{
+    far_s f = lookup_far(&g_farhlp, ptr);
+    _assert(f.seg || f.off);
+    return f;
+}
+
+static inline void _store_far(const void *ptr, far_s fptr)
+{
+    store_far(&g_farhlp, ptr, fptr);
+}
 
 #define _MK_S(s, o) (far_s){o, s}
 
@@ -35,7 +45,7 @@ public:
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
     SymWrp<T1>& get_wrp() {
         SymWrp<T1> *s = (SymWrp<T1> *)get_ptr();
-        store_far(s, get_far());
+        _store_far(s, get_far());
         return *s;
     }
     template <typename T1 = T,
@@ -47,7 +57,7 @@ public:
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
     SymWrp2<T1>& get_wrp() {
         SymWrp2<T1> *s = (SymWrp2<T1> *)get_ptr();
-        store_far(s, get_far());
+        _store_far(s, get_far());
         return *s;
     }
     template <typename T1 = T,
@@ -167,7 +177,7 @@ public:
     SymWrp() = delete;
     SymWrp(const SymWrp&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
-    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, lookup_far(this)); }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
 };
 
 template<typename T>
@@ -178,14 +188,14 @@ public:
     SymWrp2() = delete;
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
-    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, lookup_far(this)); }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
-        return _MK_F(FarPtr<const void>, lookup_far(this));
+        return _MK_F(FarPtr<const void>, _lookup_far(this));
     }
 };
 

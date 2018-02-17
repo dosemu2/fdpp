@@ -70,10 +70,10 @@ public:
     using obj_type = typename FarObjBase<T>::obj_type; // inherit type from parent
 
     FarObjSt(T& obj) : FarObjBase<T>(&obj, sizeof(T)) {
-        this->fobj = mk_dosobj(this->ptr, this->size);
+        this->fobj = mk_dosobj_st(this->ptr, this->size);
     }
     FarObjSt(T* obj, unsigned sz) : FarObjBase<T>(obj, sz) {
-        this->fobj = mk_dosobj(this->ptr, this->size);
+        this->fobj = mk_dosobj_st(this->ptr, this->size);
     }
 
     virtual far_s get_obj() {
