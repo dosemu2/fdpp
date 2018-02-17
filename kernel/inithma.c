@@ -270,7 +270,7 @@ STATIC void InstallVDISK(void)
   if (!DosLoadedInHMA)
     return;
 
-  fmemcpy(MK_FP(0xffff, 0x0010), MK_FAR(VDISK_BOOT_SEKTOR),
+  fmemcpy(MK_FP(0xffff, 0x0010), MK_FAR_SCP(VDISK_BOOT_SEKTOR),
           sizeof(VDISK_BOOT_SEKTOR));
 
   *(WORD FAR *) MK_FP(0xffff, 0x002e) = 1024 + 64;

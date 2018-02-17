@@ -452,7 +452,7 @@ STATIC void kernel()
 
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
-  fmemcpy(MK_FP(DOS_PSP + 8, 0), MK_FAR(master_env), sizeof(master_env));
+  fmemcpy(MK_FP(DOS_PSP + 8, 0), MK_FAR_SCP(master_env), sizeof(master_env));
 
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */
@@ -575,7 +575,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_cmdline = MK_FAR_STR(cmdLine ? cmdLine : "\n");
   rq.r_firstunit = LoL->_nblkdev;
 
-  execrh(MK_FAR(rq), dhp);
+  execrh(MK_FAR_SCP(rq), dhp);
 
 /*
  *  Added needed Error handle

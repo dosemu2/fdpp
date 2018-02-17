@@ -713,7 +713,7 @@ UWORD DosGetFree(UBYTE drive, UWORD * navc, UWORD * bps, UWORD * nc)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, MK_FAR(rg)) != SUCCESS)
+    if (remote_getfree(cdsp, MK_FAR_SCP(rg)) != SUCCESS)
       return spc;
 
     /* for int21/ah=1c:
@@ -828,7 +828,7 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, MK_FAR(rg)) != SUCCESS)
+    if (remote_getfree(cdsp, MK_FAR_SCP(rg)) != SUCCESS)
       return DE_INVLDDRV;
 
     xfsp->xfs_clussize = rg[0];
@@ -867,7 +867,7 @@ COUNT DosGetCuDir(UBYTE drive, BYTE FAR * s)
   path[1] = ':';
   path[2] = '\0';
 
-  if (truename(MK_FAR(path), PriPathName, CDS_MODE_SKIP_PHYSICAL) < SUCCESS)
+  if (truename(MK_FAR_SCP(path), PriPathName, CDS_MODE_SKIP_PHYSICAL) < SUCCESS)
     return DE_INVLDDRV;
 
   /* skip d:\ */
@@ -1354,5 +1354,5 @@ STATIC int remote_lock_unlock(sft FAR *sftp,     /* SFT for file */
   param_block.ofs = ofs;
   param_block.len = len;
   param_block.unlock = unlock;
-  return (int)network_redirector_mx(REM_LOCK, sftp, GET_FP32(MK_FAR(param_block)));
+  return (int)network_redirector_mx(REM_LOCK, sftp, GET_FP32(MK_FAR_SCP(param_block)));
 }

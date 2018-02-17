@@ -1597,7 +1597,7 @@ err:
         {
           /* if DBCS table (in country.sys) is empty, clear internal table */
           *(DWORD *)(subf_data.buffer) = 0L;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR(subf_data.buffer), 4);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR_SCP(subf_data.buffer), 4);
         }
         else
         {
@@ -1609,7 +1609,7 @@ err:
         continue;
       }
 
-      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR(subf_data.buffer),
+      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR_SCP(subf_data.buffer),
                                 /* skip length ^*/  subf_data.length);
     }
     rc = TRUE;
@@ -2135,7 +2135,7 @@ STATIC void config_init_buffers(int wantedbuffers)
       firstAvailableBuf = (char FAR *)(pbuffer + wantedbuffers);
     }
   }
-  LoL->_deblock_buf = MK_FAR(DiskTransferBuffer);
+  LoL->_deblock_buf = MK_FAR_ST(DiskTransferBuffer);
   LoL->_firstbuf = pbuffer;
 
   DebugPrintf(("init_buffers (size %zu) at", sizeof(struct buffer)));

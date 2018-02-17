@@ -544,7 +544,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       int i;
       UBYTE mode = 0;
 
-      FcbParseFname(&mode, pFromPattern, MK_FAR(LocalFcb));
+      FcbParseFname(&mode, pFromPattern, MK_FAR_SCP(LocalFcb));
       /* Overlay the pattern, skipping '?'            */
       /* I'm cheating because this assumes that the   */
       /* struct alignments are on byte boundaries     */

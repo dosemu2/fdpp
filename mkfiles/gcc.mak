@@ -8,7 +8,7 @@ CP=cp
 ECHOTO=../utils/echoto
 CC=clang++ -c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
     -fno-exceptions -fno-threadsafe-statics
-CL=gcc
+CL=clang++
 
 TARGETOPT=
 ifneq ($(XCPU),386)

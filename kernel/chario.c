@@ -79,7 +79,7 @@ long BinaryCharIO(struct dhdr FAR **pdev, size_t n, void FAR * bp,
 
 STATIC int CharIO(struct dhdr FAR **pdev, unsigned char ch, unsigned command)
 {
-  int err = (int)BinaryCharIO(pdev, 1, MK_FAR(ch), command);
+  int err = (int)BinaryCharIO(pdev, 1, MK_FAR_SCP(ch), command);
   if (err == 0)
     return 256;
   if (err < 0)
@@ -224,7 +224,7 @@ long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp)
 void write_char(int c, int sft_idx)
 {
   unsigned char ch = (unsigned char)c;
-  DosRWSft(sft_idx, 1, MK_FAR(ch), XFR_FORCE_WRITE);
+  DosRWSft(sft_idx, 1, MK_FAR_SCP(ch), XFR_FORCE_WRITE);
 }
 
 void write_char_stdout(int c)

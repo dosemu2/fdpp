@@ -707,7 +707,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     SftSeek(fd, ExeHeader.exRelocTable, 0);
     for (i = 0; i < ExeHeader.exRelocItems; i++)
     {
-      if (DosRWSft(fd, sizeof(reloc), MK_FAR(reloc), XFR_READ) != sizeof(reloc))
+      if (DosRWSft(fd, sizeof(reloc), MK_FAR_SCP(reloc), XFR_READ) != sizeof(reloc))
       {
         if (mode != OVERLAY)
         {

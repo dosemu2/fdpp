@@ -132,14 +132,13 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 
 .c.cc:
 	../utils/mkfar.sh FAR __FAR $< | \
-		../utils/scopify.sh 1 MK_FAR_ST _MK_FAR_ST __MK_FAR | \
+		../utils/scopify.sh 2 MK_FAR_ST _MK_FAR_ST __MK_FAR | \
 		../utils/scopify.sh 1 MK_NEAR_ST _MK_FAR_ST __MK_NEAR | \
 		../utils/scopify.sh 1 MK_NEAR _MK_NEAR __MK_NEAR | \
 		../utils/scopify.sh 1 MK_NEAR_STR_ST _MK_FAR_STR_ST __MK_NEAR | \
 		../utils/scopify.sh 1 MK_FAR_PTR _MK_FAR_PTR __MK_FAR | \
 		../utils/scopify.sh 3 MK_FAR_STR _MK_FAR_STR __MK_FAR | \
-		../utils/scopify.sh 3 MK_FAR_SZ _MK_FAR_SZ __MK_FAR | \
-		../utils/scopify.sh 1 MK_FAR _MK_FAR __MK_FAR >$@
+		../utils/scopify.sh 3 MK_FAR_SZ _MK_FAR_SZ __MK_FAR >$@
 
 $(FDPPLIB): $(OBJECTS)
 	$(CL) $(LDFLAGS) -o $@ $^

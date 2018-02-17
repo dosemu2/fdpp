@@ -3,7 +3,7 @@
 #include "dosobj.h"
 
 template <typename T>
-class FarObj {
+class FarObj : public ObjIf {
 protected:
     T *ptr;
     int size;
@@ -40,7 +40,7 @@ public:
     FarObj(T* obj, unsigned sz) : ptr(obj), size(sz) {
         fobj = mk_dosobj(ptr, size);
     }
-    far_s get_obj() {
+    virtual far_s get_obj() {
         _assert(!have_obj);
         pr_dosobj(fobj, ptr, size);
         have_obj = true;
@@ -52,7 +52,7 @@ public:
         return NearPtr<obj_type>(f.off);
     }
 
-    ~FarObj() { RmObj(); }
+    virtual ~FarObj() { RmObj(); }
 };
 
 template <typename T>
@@ -63,7 +63,7 @@ public:
     FarObjSt(T& obj) : FarObj<T>(obj) {}
     FarObjSt(T* obj, unsigned sz) : FarObj<T>(obj, sz) {}
 
-    far_s get_obj() {
+    virtual far_s get_obj() {
         pr_dosobj(this->fobj, this->ptr, this->size);
         return this->fobj.get_far();
     }
@@ -80,7 +80,7 @@ public:
 
 #define _MK_FAR_ST(n, o) static FarObjSt<decltype(o)> __obj_##n(o)
 #define _MK_FAR_STR_ST(n, o) static FarObjSt<_R(o)> __obj_##n(o, strlen(o))
-#define _MK_FAR(n, o) FarObj<decltype(o)> __obj_##n(o)
+#define MK_FAR(o) FarPtr<decltype(o)>(new FarObj<decltype(o)>(o))
 #define _MK_NEAR(n, o) FarObj<decltype(o)::type> __obj_##n(o, decltype(o)::len)
 #define _MK_FAR_PTR(n, o) FarObj<_R(o)> __obj_##n(*o)
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
