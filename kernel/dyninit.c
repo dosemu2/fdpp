@@ -41,7 +41,7 @@ additionally:
 #include "dyndata.h"
 
 #if defined(DEBUG)
-#define DebugPrintf(x) printf x
+#define DebugPrintf(x) _printf x
 #else
 #define DebugPrintf(x)
 #endif
@@ -66,7 +66,7 @@ void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
 
   if ((ULONG) total + Dynp->Allocated > 0xffff)
   {
-    printf("PANIC:Dyn %lu\n", (ULONG) total + Dynp->Allocated);
+    _printf("PANIC:Dyn %lu\n", (ULONG) total + Dynp->Allocated);
     for (;;) ;
   }
 

@@ -88,7 +88,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
   size_t firstbp = FP_OFF(firstbuf);
 
 #ifdef DISPLAY_GETBLOCK
-  printf("[searchblock %d, blk %ld, buf ", dsk, blkno);
+  _printf("[searchblock %d, blk %ld, buf ", dsk, blkno);
 #endif
 
   /* Search through buffers to see if the required block  */
@@ -102,7 +102,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
     {
       /* found it -- rearrange LRU links      */
 #ifdef DISPLAY_GETBLOCK
-      printf("HIT %04x:%04x]\n", FP_SEG(bp), FP_OFF(bp));
+      _printf("HIT %04x:%04x]\n", FP_SEG(bp), FP_OFF(bp));
 #endif
       bp->b_flag &= ~BFR_UNCACHE;  /* reset uncache attribute */
       if (FP_OFF(bp) != firstbp)
@@ -144,7 +144,7 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
   bp->b_flag |= BFR_UNCACHE;  /* set uncache attribute */
 
 #ifdef DISPLAY_GETBLOCK
-  printf("MISS, replace %04x:%04x]\n", FP_SEG(bp), FP_OFF(bp));
+  _printf("MISS, replace %04x:%04x]\n", FP_SEG(bp), FP_OFF(bp));
 #endif
 
   if (FP_OFF(bp) != firstbp)          /* move to front */
@@ -191,13 +191,13 @@ void dumpBufferCache(void)
 
   do
   {
-    printf("%8lx %02x ", bp->b_blkno, bp->b_flag);
+    _printf("%8lx %02x ", bp->b_blkno, bp->b_flag);
     if (++printed % 6 == 0)
-      printf("\n");
+      _printf("\n");
     bp = b_next(bp);
   }
   while (FP_OFF(bp) != FP_OFF(firstbuf));
-  printf("\n");
+  _printf("\n");
 }
 #endif
 /*                                                                      */
@@ -384,7 +384,7 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
 
   if (KeyboardShiftState() & 0x01)
   {
-    printf("dskxfer:%s %x - %lx %u\n", mode == DSKWRITE ? "write" : "read",
+    _printf("dskxfer:%s %x - %lx %u\n", mode == DSKWRITE ? "write" : "read",
            dsk, blkno, numblocks);
     if ((KeyboardShiftState() & 0x03) == 3)
       dumpBufferCache();

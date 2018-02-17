@@ -198,7 +198,7 @@ STATIC void ltob(LONG n, BYTE SSFAR * s, COUNT base)
 #define LONGARG 4
 
 /* printf -- short version of printf to conserve space */
-int VA_CDECL printf(CONST char *fmt, ...)
+int VA_CDECL _printf(CONST char *fmt, ...)
 {
   va_list arg;
   va_start(arg, fmt);
@@ -210,7 +210,7 @@ int VA_CDECL printf(CONST char *fmt, ...)
 
 #if defined(DEBUG_NEED_PRINTF) && !defined(_INIT) && !defined(FORSYS)
 PRINTF(2)
-STATIC int VA_CDECL fsprintf(char FAR * buff, CONST char * fmt, ...)
+STATIC int VA_CDECL _fsprintf(char FAR * buff, CONST char * fmt, ...)
 {
   va_list arg;
 
@@ -226,7 +226,7 @@ STATIC int VA_CDECL fsprintf(char FAR * buff, CONST char * fmt, ...)
 #endif
 
 PRINTF(2)
-int VA_CDECL sprintf(char * buff, CONST char * fmt, ...)
+int VA_CDECL _sprintf(char * buff, CONST char * fmt, ...)
 {
   va_list arg;
 
@@ -298,7 +298,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
         {
           UDWORD w0 = va_arg(arg, unsigned);
           char SSFAR *tmp = charp;
-          fsprintf(MK_FAR_SCP(s), "%04x:%04x", w0 >> 16, w0 & 0xffff);
+          _fsprintf(MK_FAR_SCP(s), "%04x:%04x", w0 >> 16, w0 & 0xffff);
           p = s;
           charp = tmp;
           break;
@@ -535,13 +535,13 @@ void test(char *should, char *format, unsigned lowint, unsigned highint)
 {
   char b[100];
 
-  sprintf(b, format, lowint, highint);
+  _sprintf(b, format, lowint, highint);
 
-  printf("'%s' = '%s'\n", should, b);
+  _printf("'%s' = '%s'\n", should, b);
 
   if (strcmp(b, should))
   {
-    printf("\nhit ENTER\n");
+    _printf("\nhit ENTER\n");
     getchar();
   }
 }
@@ -549,7 +549,7 @@ void test(char *should, char *format, unsigned lowint, unsigned highint)
 int main(void)
 {
   int i;
-  printf("hello world\n");
+  _printf("hello world\n");
 
   for (i = 0; testarray[i].should; i++)
   {

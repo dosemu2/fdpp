@@ -357,7 +357,7 @@ void init_LBA_to_CHS(struct CHS *chs, ULONG LBA_address,
 void printCHS(const char *title, struct CHS *chs)
 {
   /* has no fixed size for head/sect: is often 1/1 in our context */
-  printf("%s%4u-%u-%u", title, chs->Cylinder, chs->Head, chs->Sector);
+  _printf("%s%4u-%u-%u", title, chs->Cylinder, chs->Head, chs->Sector);
 }
 
 /*
@@ -421,12 +421,12 @@ VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
       unsigned maxclust = (defbpb->bpb_nfsect * 2 * MAX_SEC_SIZE) / 3;
       if (maxclust > FAT12MAX)
         maxclust = FAT12MAX;
-      printf("FAT12: #clu=%u, fatlength=%u, maxclu=%u, limit=%u\n",
+      _printf("FAT12: #clu=%u, fatlength=%u, maxclu=%u, limit=%u\n",
              clust, defbpb->bpb_nfsect, maxclust, FAT12MAX);
       if (clust > maxclust - 2)
       {
         clust = maxclust - 2;
-        printf("FAT12: too many clusters: setting to maxclu-2\n");
+        _printf("FAT12: too many clusters: setting to maxclu-2\n");
       }
     }
 #endif
@@ -555,7 +555,7 @@ void DosDefinePartition(struct DriveParamS *driveParam,
 
   if (nUnits >= NDEV)
   {
-    printf("more Partitions detected then possible, max = %d\n", NDEV);
+    _printf("more Partitions detected then possible, max = %d\n", NDEV);
     return;                     /* we are done */
   }
 
@@ -617,12 +617,12 @@ void DosDefinePartition(struct DriveParamS *driveParam,
       ExtPri = "Ext";
       num = extendedPartNo;
     }
-    printf("\r%c: HD%d, %s[%2d]", 'A' + nUnits,
+    _printf("\r%c: HD%d, %s[%2d]", 'A' + nUnits,
            (driveParam->driveno & 0x7f) + 1, ExtPri, num);
 
     printCHS(", CHS= ", &chs);
 
-    printf(", start=%6lu MB, size=%6lu MB\n",
+    _printf(", start=%6lu MB, size=%6lu MB\n",
            StartSector / 2048, pEntry->NumSect / 2048);
   }
 
@@ -698,7 +698,7 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
       lba_bios_parameters.sectors > 0xffff ||
       lba_bios_parameters.totalSectHigh != 0)
   {
-    printf("Drive is too large to handle, using only 1st 8 GB\n"
+    _printf("Drive is too large to handle, using only 1st 8 GB\n"
            " drive %02x heads %lu sectors %lu , total=0x%lx-%08lx\n",
            drive,
            (ULONG) lba_bios_parameters.heads,
@@ -735,7 +735,7 @@ StandardBios:                  /* old way to get parameters */
   if (driveParam->chs.Sector == 0) {
     /* happens e.g. with Bochs 1.x if no harddisk defined */
     driveParam->chs.Sector = 63; /* avoid division by zero...! */
-    printf("BIOS reported 0 sectors/track, assuming 63!\n");
+    _printf("BIOS reported 0 sectors/track, assuming 63!\n");
   }
 
   if (!(driveParam->descflags & DF_LBA))
@@ -819,10 +819,10 @@ void print_warning_suspect(char *partitionName, UBYTE fs, struct CHS *chs,
 {
   if (!InitKernelConfig.ForceLBA)
   {
-    printf("WARNING: using suspect partition %s FS %02x:", partitionName, fs);
+    _printf("WARNING: using suspect partition %s FS %02x:", partitionName, fs);
     printCHS(" with calculated values ", chs);
     printCHS(" instead of ", pEntry_chs);
-    printf("\n");
+    _printf("\n");
   }
   memcpy(pEntry_chs, chs, sizeof(struct CHS));
 }
@@ -858,9 +858,9 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
     }
 
     if (extendedPartNo)
-      sprintf(partitionName, "Ext:%d", extendedPartNo);
+      _sprintf(partitionName, "Ext:%d", extendedPartNo);
     else
-      sprintf(partitionName, "Pri:%d", i + 1);
+      _sprintf(partitionName, "Pri:%d", i + 1);
 
     /*
        some sanity checks, that partition
@@ -883,7 +883,7 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
     {
       if (pEntry->NumSect == 0)
       {
-        printf("Not using partition %s with 0 sectors\n", partitionName);
+        _printf("Not using partition %s with 0 sectors\n", partitionName);
         continue;
       }
       print_warning_suspect(partitionName, pEntry->FileSystem, &end,
@@ -895,13 +895,13 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
 
       if (!(driveParam->descflags & DF_LBA))
       {
-        printf
+        _printf
             ("can't use LBA partition without LBA support - part %s FS %02x",
              partitionName, pEntry->FileSystem);
 
         printCHS(" start ", &chs);
         printCHS(", end ", &end);
-        printf("\n");
+        _printf("\n");
 
         continue;
       }
@@ -909,14 +909,14 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
       if (!InitKernelConfig.ForceLBA && !ExtLBAForce
           && !IsLBAPartition(pEntry->FileSystem))
       {
-        printf
+        _printf
             ("WARNING: Partition ID does not suggest LBA - part %s FS %02x.\n"
              "Please run FDISK to correct this - using LBA to access partition.\n",
              partitionName, pEntry->FileSystem);
 
         printCHS(" start ", &chs);
         printCHS(", end ", &end);
-        printf("\n");
+        _printf("\n");
         pEntry->FileSystem = (pEntry->FileSystem == FAT12 ? FAT12_LBA :
                               pEntry->FileSystem == FAT32 ? FAT32_LBA :
                               /*  pEntry->FileSystem == FAT16 ? */
@@ -925,11 +925,11 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
 
       /* else its a diagnostic message only */
 #ifdef DEBUG
-      printf("found and using LBA partition %s FS %02x",
+      _printf("found and using LBA partition %s FS %02x",
              partitionName, pEntry->FileSystem);
       printCHS(" start ", &chs);
       printCHS(", end ", &end);
-      printf("\n");
+      _printf("\n");
 #endif
     }
 
@@ -971,7 +971,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 #if 0
   if (LBA_address >= driveParam->total_sectors)
   {
-    printf("LBA-Transfer error : address overflow = %lu, > %lu total sectors\n",
+    _printf("LBA-Transfer error : address overflow = %lu, > %lu total sectors\n",
            LBA_address, driveParam->total_sectors);
     return 1;
   }
@@ -1008,7 +1008,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 
       if (chs.Cylinder > 1023)
       {
-        printf("LBA-Transfer error : address = %lu, cylinder %u > 1023\n", LBA_address, chs.Cylinder);
+        _printf("LBA-Transfer error : address = %lu, cylinder %u > 1023\n", LBA_address, chs.Cylinder);
         return 1;
       }
 
@@ -1049,7 +1049,7 @@ int ProcessDisk(int scanType, unsigned drive, int PartitionsToIgnore)
 
   if (!LBA_Get_Drive_Parameters(drive, &driveParam))
   {
-    printf("can't get drive parameters for drive %02x\n", drive);
+    _printf("can't get drive parameters for drive %02x\n", drive);
     return PartitionsToIgnore;
   }
 
@@ -1066,7 +1066,7 @@ strange_restart:
   if (Read1LBASector
       (&driveParam, drive, RelSectorOffset, InitDiskTransferBuffer))
   {
-    printf("Error reading partition table drive %02Xh sector %lu", drive,
+    _printf("Error reading partition table drive %02Xh sector %lu", drive,
            RelSectorOffset);
     return PartitionsToIgnore;
   }
@@ -1081,7 +1081,7 @@ strange_restart:
     if (++strangeHardwareLoop < 3)
       goto strange_restart;
 
-    printf("illegal partition table - drive %02x sector %lu\n", drive,
+    _printf("illegal partition table - drive %02x sector %lu\n", drive,
            RelSectorOffset);
     return PartitionsToIgnore;
   }
@@ -1122,7 +1122,7 @@ strange_restart:
 
       if (num_extended_found > 30)
       {
-        printf("found more then 30 extended partitions, terminated\n");
+        _printf("found more then 30 extended partitions, terminated\n");
         return 0;
       }
 
@@ -1143,7 +1143,7 @@ int BIOS_nrdrives(void)
 
   if (regs.flags & 1)
   {
-    printf("no hard disks detected\n");
+    _printf("no hard disks detected\n");
     return 0;
   }
 
@@ -1322,7 +1322,7 @@ void ReadAllPartitionTables(void)
 
   if (InitKernelConfig.DLASortByDriveNo == 0)
   {
-    /* printf("Drive Letter Assignment - DOS order\n"); */
+    /* _printf("Drive Letter Assignment - DOS order\n"); */
 
     /* Process primary partition table   1 partition only      */
     for (HardDrive = 0; HardDrive < nHardDisk; HardDrive++)
@@ -1351,7 +1351,7 @@ void ReadAllPartitionTables(void)
   {
     UBYTE bootdrv = peekb(0,0x5e0);
 
-    /* printf("Drive Letter Assignment - sorted by drive\n"); */
+    /* _printf("Drive Letter Assignment - sorted by drive\n"); */
 
     /* Process primary partition table   1 partition only      */
     for (HardDrive = 0; HardDrive < nHardDisk; HardDrive++)
@@ -1390,7 +1390,7 @@ void ReadAllPartitionTables(void)
 /* disk initialization: returns number of units */
 COUNT dsk_init()
 {
-  printf(" - InitDisk");
+  _printf(" - InitDisk");
 
 #ifdef DEBUG
   {

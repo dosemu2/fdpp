@@ -92,7 +92,7 @@ void int3()
 #endif
 
 #ifdef DEBUG
-#define HMAInitPrintf(x) printf x
+#define HMAInitPrintf(x) _printf x
 #else
 #define HMAInitPrintf(x)
 #endif
@@ -106,7 +106,7 @@ VOID hdump(BYTE FAR * p)
   for (loop = 0; loop < 16; loop++)
     HMAInitPrintf(("%02x ", (const char)p[loop]));
 
-  printf("\n");
+  _printf("\n");
 }
 #else
 #define hdump(ptr)
@@ -131,7 +131,7 @@ int EnableHMA(VOID)
 
   if (!EnabledA20())
   {
-    printf("HMA can't be enabled\n");
+    _printf("HMA can't be enabled\n");
     return FALSE;
   }
 
@@ -140,14 +140,14 @@ int EnableHMA(VOID)
 #ifdef DEBUG
   if (EnabledA20())
   {
-    printf("HMA can't be disabled - no problem for us\n");
+    _printf("HMA can't be disabled - no problem for us\n");
   }
 #endif
 
   _EnableA20();
   if (!EnabledA20())
   {
-    printf("HMA can't be enabled second time\n");
+    _printf("HMA can't be enabled second time\n");
     return FALSE;
   }
 
@@ -187,7 +187,7 @@ int MoveKernelToHMA()
    */
   if (KeyboardShiftState() & 0x0f)
   {
-    printf("Keyboard state is %0x, NOT moving to HMA\n",
+    _printf("Keyboard state is %0x, NOT moving to HMA\n",
            KeyboardShiftState());
     return FALSE;
   }
@@ -197,7 +197,7 @@ int MoveKernelToHMA()
 
   if (!EnableHMA())
   {
-    printf("Can't enable HMA area (the famous A20), NOT moving to HMA\n");
+    _printf("Can't enable HMA area (the famous A20), NOT moving to HMA\n");
 
     return FALSE;
   }
@@ -208,7 +208,7 @@ int MoveKernelToHMA()
       (HMAclaimed =
        init_call_XMScall(xms_addr, 0x0100, 0xffff)) == 0)
   {
-    printf("Can't reserve HMA area ??\n");
+    _printf("Can't reserve HMA area ??\n");
 
     return FALSE;
   }
@@ -296,7 +296,7 @@ VOID FAR * HMAalloc(COUNT bytesToAllocate)
   /* align on 16 byte boundary */
   HMAFree = (HMAFree + bytesToAllocate + 0xf) & 0xfff0;
 
-  /*printf("HMA allocated %d byte at %x\n", bytesToAllocate, HMAptr); */
+  /*_printf("HMA allocated %d byte at %x\n", bytesToAllocate, HMAptr); */
 
   fmemset(HMAptr, 0, bytesToAllocate);
 
@@ -365,7 +365,7 @@ void MoveKernel(unsigned NewKernelSegment)
           rp->callNear != 0xe8 ||       /* call NEAR */
           0)
       {
-        printf("illegal relocation entry # %d\n",
+        _printf("illegal relocation entry # %ld\n",
                (FP_OFF(rp) -
                 FP_OFF((BYTE FAR *)_HMARelocationTableStart)) /
                sizeof(struct RelocationTable));

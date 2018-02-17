@@ -128,7 +128,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
 #ifdef DEBUG
   /* Non-portable message kludge alert!   */
-  printf("KERNEL: Boot drive = %c\n", 'A' + LoL->_BootDrive - 1);
+  _printf("KERNEL: Boot drive = %c\n", 'A' + LoL->_BootDrive - 1);
 #endif
 
   DoInstall();
@@ -278,7 +278,7 @@ STATIC void setup_int_vectors(void)
 
   /* these two are in the device driver area LOWTEXT (0x70) */
   setvec(0x1b, got_cbreak);
-  setvec(0x29, int29_handler);  /* required for printf! */
+  setvec(0x29, int29_handler);  /* required for _printf! */
 }
 
 STATIC void init_kernel(void)
@@ -416,7 +416,7 @@ STATIC VOID FsConfig(VOID)
 
 STATIC VOID signon()
 {
-  printf("\r%s\n"
+  _printf("\r%s\n"
          "Kernel compatibility %d.%d - "
 #if defined(__BORLANDC__)
   "BORLANDC"
@@ -648,7 +648,7 @@ STATIC void InitIO(void)
 /* issue an internal error message                              */
 VOID init_fatal(BYTE * err_msg)
 {
-  printf("\nInternal kernel error - %s\nSystem halted\n", err_msg);
+  _printf("\nInternal kernel error - %s\nSystem halted\n", err_msg);
   for (;;) ;
 }
 
@@ -752,7 +752,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
       bootedFrom = "Floppy";
   }
 
-  printf("\n"
+  _printf("\n"
          "\n"
          "\n"
          "     Hit any key within %d seconds to continue boot from %s\n"
@@ -767,7 +767,7 @@ STATIC void CheckContinueBootFromHarddisk(void)
   if (key != -1 && (key & 0xff) != 'h' && (key & 0xff) != 'H')
   {
     /* user has hit a key, continue to boot from floppy/CD */
-    printf("\n");
+    _printf("\n");
     return;
   }
 

@@ -403,7 +403,7 @@ dispatch:
   if (bDumpRegs)
   {
     fmemcpy_n(&error_regs, user_r, sizeof(iregs));
-    printf("System call (21h): %02x\n", user_r->AX);
+    _printf("System call (21h): %02x\n", user_r->AX);
     dump_regs = TRUE;
     dump();
   }
@@ -603,7 +603,7 @@ dispatch:
 
     default:
 #ifdef DEBUG
-      printf("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL);
+      _printf("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL);
 #endif
       /* Fall through. */
 
@@ -1428,10 +1428,10 @@ dispatch:
 #ifdef NLS_DEBUG
           if ((rc = DosGetData(lr.AL, lr.BX, lr.DX, lr.CX, FP_ES_DI)) < 0)
           {
-            printf("DosGetData() := %d\n", rc);
+            _printf("DosGetData() := %d\n", rc);
             goto error_exit;
           }
-          printf("DosGetData() returned successfully\n");
+          _printf("DosGetData() returned successfully\n");
           break;
 #else
           rc = DosGetData(lr.AL, lr.BX, lr.DX, lr.CX, FP_ES_DI);
@@ -2043,7 +2043,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
       break;
 
     case 0x2e:                 /* GET or SET error table addresse - ignored
-                                   called by MS debug with  DS != DOSDS, printf
+                                   called by MS debug with  DS != DOSDS, _printf
                                    doesn't work!! */
       break;
 

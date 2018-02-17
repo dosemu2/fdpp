@@ -254,7 +254,7 @@ f_node_ptr split_path(const char * path, f_node_ptr fnp)
 #ifdef DEBUG
   if (get_cds(path[0]-'A')->cdsFlags & CDSNETWDRV)
   {
-    printf("split path called for redirected file: `%s'\n", path);
+    _printf("split path called for redirected file: `%s'\n", path);
     return (f_node_ptr) 0;
   }
 #endif
@@ -697,7 +697,7 @@ STATIC CLUSTER find_fat_free(f_node_ptr fnp)
   struct dpb FAR *dpbp = fnp->f_dpb;
 
 #ifdef DISPLAY_GETBLOCK
-  printf("[find_fat_free]\n");
+  _printf("[find_fat_free]\n");
 #endif
 
   /* Start from optimized lookup point for start of FAT   */
@@ -769,7 +769,7 @@ STATIC int clear_dir(f_node_ptr fnp, CLUSTER cluster)
     bp = getblockOver(clus2phys(cluster, fnp->f_dpb) + idx,
                       fnp->f_dpb->dpb_unit);
 #ifdef DISPLAY_GETBLOCK
-    printf("DIR (clear_dir)\n");
+    _printf("DIR (clear_dir)\n");
 #endif
     if (bp == NULL)
       return DE_ACCESS;
@@ -962,7 +962,7 @@ COUNT map_cluster(REG f_node_ptr fnp, COUNT mode)
   CLUSTER relcluster, cluster;
 
 #ifdef DISPLAY_GETBLOCK
-  printf("map_cluster: current %lu, offset %lu, diff=%lu ",
+  _printf("map_cluster: current %lu, offset %lu, diff=%lu ",
          (ULONG)fnp->f_cluster_offset, fnp->f_offset,
          fnp->f_offset - fnp->f_cluster_offset);
 #endif
@@ -1032,7 +1032,7 @@ COUNT map_cluster(REG f_node_ptr fnp, COUNT mode)
   }
 
 #ifdef DISPLAY_GETBLOCK
-  printf("done.\n");
+  _printf("done.\n");
 #endif
 
   return SUCCESS;
@@ -1075,7 +1075,7 @@ STATIC COUNT dos_extend(f_node_ptr fnp)
     boff = (UWORD)(fnp->f_offset % secsize);
 
 #ifdef DSK_DEBUG
-    printf("write %d links; dir offset %ld, cluster %d\n",
+    _printf("write %d links; dir offset %ld, cluster %d\n",
            fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster);
 #endif
 
@@ -1200,7 +1200,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
 #if 0 /*DSK_DEBUG*/
   if (bDumpRdWrParms)
   {
-    printf("rwblock:fd %02x  buffer %04x:%04x count %x\n",
+    _printf("rwblock:fd %02x  buffer %04x:%04x count %x\n",
            fd, FP_SEG(buffer), FP_OFF(buffer), count);
   }
 #endif
@@ -1286,7 +1286,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
     /* the blockio block buffering scheme to simplify the   */
     /* task.                                                */
 #ifdef DISPLAY_GETBLOCK
-    printf("rwblock: ");
+    _printf("rwblock: ");
 #endif
     if (map_cluster(fnp, mode) != SUCCESS)
     {
@@ -1372,7 +1372,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
   normal_xfer:
 
 #ifdef DSK_DEBUG
-    printf("r/w %d links; dir offset %d, cluster %d, mode %x\n",
+    _printf("r/w %d links; dir offset %d, cluster %d, mode %x\n",
            fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster, mode);
 #endif
 
@@ -1382,7 +1382,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
                     , fnp->f_dpb->dpb_unit);
 
 #ifdef DISPLAY_GETBLOCK
-    printf("DATA (rwblock)\n");
+    _printf("DATA (rwblock)\n");
 #endif
     if (bp == NULL)             /* (struct buffer *)0 --> DS:0 !! */
     {

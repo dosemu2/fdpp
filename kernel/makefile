@@ -142,7 +142,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 		../utils/scopify.sh 1 MK_FAR _MK_FAR __MK_FAR >$@
 
 $(FDPPLIB): $(OBJECTS)
-	$(CL) -shared -o $@ $^
+	$(CL) $(LDFLAGS) -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc segs.inc

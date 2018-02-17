@@ -641,7 +641,7 @@ COUNT DosCloseSft(int sft_idx, BOOL commitonly)
  */
   if (sftp->sft_flags & SFT_FSHARED)
   {
-    /* printf("closing SFT %d = %P\n",sft_idx,GET_FP32(sftp)); */
+    /* _printf("closing SFT %d = %P\n",sft_idx,GET_FP32(sftp)); */
     return network_redirector_fp(commitonly ? REM_FLUSH: REM_CLOSE, sftp);
   }
 
@@ -891,14 +891,14 @@ COUNT DosChangeDir(BYTE FAR * s)
     return DE_PATHNOTFND;
 
 #if defined(CHDIR_DEBUG)
-  printf("Remote Chdir: n='%Fs' p='%Fs\n", s, PriPathName);
+  _printf("Remote Chdir: n='%Fs' p='%Fs\n", s, PriPathName);
 #endif
   /* now get fs to change to new          */
   /* directory                            */
   result = (result & IS_NETWORK ? network_redirector(REM_CHDIR) :
             dos_cd(PriPathName));
 #if defined(CHDIR_DEBUG)
-  printf("status = %04x, new_path='%Fs'\n", result, cdsd->cdsCurrentPath);
+  _printf("status = %04x, new_path='%Fs'\n", result, cdsd->cdsCurrentPath);
 #endif
   if (result != SUCCESS)
     return result;
@@ -957,7 +957,7 @@ COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
   SAttr = (BYTE) attr;
 
 #if defined(FIND_DEBUG)
-  printf("Remote Find: n='%Fs\n", PriPathName);
+  _printf("Remote Find: n='%Fs\n", PriPathName);
 #endif
 
   dta = &sda_tmp_dm;
@@ -1012,7 +1012,7 @@ COUNT DosFindNext(void)
  *  (12h, DE_NFILES)
  */
 #if 0
-  printf("findnext: %d\n", dmp->dm_drive);
+  _printf("findnext: %d\n", dmp->dm_drive);
 #endif
   fmemcpy(&sda_tmp_dm, dmp, 21);
 

@@ -49,7 +49,7 @@
 #ifdef DEBUG_PRINT_COMPORT
 #define DebugPrintf(x) dbgc_printf x
 #else
-#define DebugPrintf(x) printf x
+#define DebugPrintf(x) _printf x
 #endif
 #else
 #define DebugPrintf(x)
@@ -136,7 +136,7 @@
 #endif
 
 #ifdef DEBUG_NEED_PRINTF
-int VA_CDECL printf(CONST char * fmt, ...) PRINTF(1);
+int VA_CDECL _printf(CONST char * fmt, ...) PRINTF(1);
 #ifdef DEBUG_PRINT_COMPORT
 int VA_CDECL dbgc_printf(CONST char * fmt, ...) PRINTF(1);
 #endif

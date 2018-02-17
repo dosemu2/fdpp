@@ -44,14 +44,14 @@ static BYTE *RcsId =
 #endif
 
 #ifdef NLS_DEBUG
-#define log(a)	printf a
-#define log1(a)	printf a
+#define log(a)	_printf a
+#define log1(a)	_printf a
 #else
 #define log(a)
 #ifdef NDEBUG
 #define log1(a)
 #else
-#define log1(a)	printf a
+#define log1(a)	_printf a
 #endif
 #endif
 
@@ -263,8 +263,8 @@ STATIC VOID upMMem(UBYTE FAR * map, UBYTE FAR * str, unsigned len)
   log(("NLS: upMMem(): len=%u, %04x:%04x=\"", len, FP_SEG(str),
        FP_OFF(str)));
   for (c = 0; c < len; ++c)
-    printf("%c", str[c] > 32 ? str[c] : '.');
-  printf("\"\n");
+    _printf("%c", str[c] > 32 ? str[c] : '.');
+  _printf("\"\n");
 #endif
   if (len)
     do
@@ -277,10 +277,10 @@ STATIC VOID upMMem(UBYTE FAR * map, UBYTE FAR * str, unsigned len)
     }
     while (--len);
 #ifdef NLS_DEBUG
-  printf("NLS: upMMem(): result=\"");
+  _printf("NLS: upMMem(): result=\"");
   for (c = 0; c < oldLen; ++c)
-    printf("%c", oldStr[c] > 32 ? oldStr[c] : '.');
-  printf("\"\n");
+    _printf("%c", oldStr[c] > 32 ? oldStr[c] : '.');
+  _printf("\"\n");
 #endif
 }
 
@@ -525,8 +525,8 @@ VOID DosUpFMem(VOID FAR * str, unsigned len)
   log(("NLS: DosUpFMem(): len=%u, %04x:%04x=\"", len, FP_SEG(str),
        FP_OFF(str)));
   for (c = 0; c < len; ++c)
-    printf("%c", ((char FAR *)str)[c] > 32 ? ((char FAR *)str)[c] : '.');
-  printf("\"\n");
+    _printf("%c", ((char FAR *)str)[c] > 32 ? ((char FAR *)str)[c] : '.');
+  _printf("\"\n");
 #endif
   if (nlsInfo.actPkg->flags & NLS_FLAG_DIRECT_FUPCASE)
     nlsFUpMem(nlsInfo.actPkg, str, len);
@@ -699,8 +699,8 @@ UWORD ASMCFUNC syscall_MUX14(iregs FAR * regs)
         BYTE FAR *p;
         log(("NLS: MUX14(FILE_UPMEM): len=%u, %04x:%04x=\"", regs->CX, regs->ES, regs->DI));
         for (j = 0, p = MK_FP(regs->ES, regs->DI); j < regs->CX; ++j)
-          printf("%c", p[j] > 32 ? p[j] : '.');
-        printf("\"\n");
+          _printf("%c", p[j] > 32 ? p[j] : '.');
+        _printf("\"\n");
       }
 #endif
       nlsFUpMem(nls, MK_FP(regs->ES, regs->DI), regs->CX);

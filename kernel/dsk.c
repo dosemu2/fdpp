@@ -34,7 +34,7 @@ static BYTE *dskRcsId =
 #endif
 
 #if defined(DEBUG)
-#define DebugPrintf(x) printf x
+#define DebugPrintf(x) _printf x
 #else
 #define DebugPrintf(x)
 #endif
@@ -420,14 +420,14 @@ STATIC WORD getbpb(ddt * pddt)
   }
 
 #ifdef DSK_DEBUG
-  printf("BPB_NBYTE     = %04x\n", pbpbarray->bpb_nbyte);
-  printf("BPB_NSECTOR   = %02x\n", pbpbarray->bpb_nsector);
-  printf("BPB_NRESERVED = %04x\n", pbpbarray->bpb_nreserved);
-  printf("BPB_NFAT      = %02x\n", pbpbarray->bpb_nfat);
-  printf("BPB_NDIRENT   = %04x\n", pbpbarray->bpb_ndirent);
-  printf("BPB_NSIZE     = %04x\n", pbpbarray->bpb_nsize);
-  printf("BPB_MDESC     = %02x\n", pbpbarray->bpb_mdesc);
-  printf("BPB_NFSECT    = %04x\n", pbpbarray->bpb_nfsect);
+  _printf("BPB_NBYTE     = %04x\n", pbpbarray->bpb_nbyte);
+  _printf("BPB_NSECTOR   = %02x\n", pbpbarray->bpb_nsector);
+  _printf("BPB_NRESERVED = %04x\n", pbpbarray->bpb_nreserved);
+  _printf("BPB_NFAT      = %02x\n", pbpbarray->bpb_nfat);
+  _printf("BPB_NDIRENT   = %04x\n", pbpbarray->bpb_ndirent);
+  _printf("BPB_NSIZE     = %04x\n", pbpbarray->bpb_nsize);
+  _printf("BPB_MDESC     = %02x\n", pbpbarray->bpb_mdesc);
+  _printf("BPB_NFSECT    = %04x\n", pbpbarray->bpb_nfsect);
 #endif
 
   count =
@@ -447,10 +447,10 @@ STATIC WORD getbpb(ddt * pddt)
   tmark(pddt);
 
 #ifdef DSK_DEBUG
-  printf("BPB_NSECS     = %04x\n", pbpbarray->bpb_nsecs);
-  printf("BPB_NHEADS    = %04x\n", pbpbarray->bpb_nheads);
-  printf("BPB_HIDDEN    = %08lx\n", pbpbarray->bpb_hidden);
-  printf("BPB_HUGE      = %08lx\n", pbpbarray->bpb_huge);
+  _printf("BPB_NSECS     = %04x\n", pbpbarray->bpb_nsecs);
+  _printf("BPB_NHEADS    = %04x\n", pbpbarray->bpb_nheads);
+  _printf("BPB_HIDDEN    = %08lx\n", pbpbarray->bpb_hidden);
+  _printf("BPB_HUGE      = %08lx\n", pbpbarray->bpb_huge);
 #endif
 
   return 0;
@@ -839,7 +839,7 @@ STATIC WORD blk_noerr(rqptr rp, ddt * pddt)
 
 STATIC WORD dskerr(COUNT code)
 {
-/*      printf("diskette error:\nhead = %d\ntrack = %d\nsector = %d\ncount = %d\n",
+/*      _printf("diskette error:\nhead = %d\ntrack = %d\nsector = %d\ncount = %d\n",
    head, track, sector, count); */
   switch (code & 0x03)
   {
@@ -890,7 +890,7 @@ STATIC int LBA_to_CHS(ULONG LBA_address, struct CHS *chs, const ddt * pddt,
   if (LBA_address > 1023ul)
   {
 #ifdef DEBUG
-    printf("LBA-Transfer error : cylinder %lu > 1023\n", LBA_address);
+    _printf("LBA-Transfer error : cylinder %lu > 1023\n", LBA_address);
 #else
     put_string("LBA-Transfer error : cylinder > 1023\n");
 #endif
@@ -986,7 +986,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
 /*
     if (LBA_address+totaltodo > pddt->total_sectors)
         {
-        printf("LBA-Transfer error : address overflow = %lu > %lu max\n",LBA_address+totaltodo,driveParam->total_sectors);
+        _printf("LBA-Transfer error : address overflow = %lu > %lu max\n",LBA_address+totaltodo,driveParam->total_sectors);
         return 1;
         }
 */

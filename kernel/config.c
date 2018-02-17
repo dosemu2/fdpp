@@ -38,7 +38,7 @@ static BYTE *RcsId =
 #endif
 
 #ifdef DEBUG
-#define DebugPrintf(x) printf x
+#define DebugPrintf(x) _printf x
 #else
 #define DebugPrintf(x)
 #endif
@@ -91,7 +91,7 @@ STATIC void WriteMenuLine(struct MenuSelector *menu)
   r.d.b.h = menu->y;
   init_call_intr(0x10, &r);
 
-  printf("%s", pText);
+  _printf("%s", pText);
 }
 
 /* Deselect the previously selected line */
@@ -248,7 +248,7 @@ STATIC void config_init_buffers(int anzBuffers);     /* from BLOCKIO.C */
 
 STATIC VOID FAR * AlignParagraph(VOID FAR * lpPtr);
 
-#define EOF 0x1a
+#define _EOF 0x1a
 
 STATIC struct table * LookUp(struct table *p, BYTE * token);
 
@@ -344,12 +344,12 @@ void PreConfig(void)
 
 #ifdef DEBUG
   {
-    printf("SDA located at 0x%P\n", GET_FP32(internal_data));
+    _printf("SDA located at 0x%P\n", GET_FP32(internal_data));
   }
 #endif
   /* Begin by initializing our system buffers                     */
 #ifdef DEBUG
-/*  printf("Preliminary %d buffers allocated at 0x%P\n", Config.cfgBuffers, GET_FP32(buffers));*/
+/*  _printf("Preliminary %d buffers allocated at 0x%P\n", Config.cfgBuffers, GET_FP32(buffers));*/
 #endif
 
   LoL->_DPBp = (struct dpb FAR *)
@@ -368,16 +368,16 @@ void PreConfig(void)
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
 #ifdef DEBUG
-/*  printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
-  printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead));
-  printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
-  printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
+/*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
+  _printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead));
+  _printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
+  _printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
 #endif
 
   /* Done.  Now initialize the MCB structure                      */
   /* This next line is 8086 and 80x86 real mode specific          */
 #ifdef DEBUG
-  printf("Preliminary  allocation completed: top at %P\n", GET_FP32(lpTop));
+  _printf("Preliminary  allocation completed: top at %P\n", GET_FP32(lpTop));
 #endif
 }
 
@@ -449,7 +449,7 @@ void PostConfig(void)
   /* Begin by initializing our system buffers                     */
   /* dma_scratch = (BYTE FAR *) KernelAllocDma(BUFFERSIZE); */
 #ifdef DEBUG
-  /* printf("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch)); */
+  /* _printf("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch)); */
 #endif
 
   config_init_buffers(Config.cfgBuffers);
@@ -468,10 +468,10 @@ void PostConfig(void)
   LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
-/*  printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
-  printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead->sftt_next));
-  printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
-  printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
+/*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
+  _printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead->sftt_next));
+  _printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
+  _printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
 #endif
   if (Config.cfgStacks)
   {
@@ -831,7 +831,7 @@ VOID DoConfig(int nPass)
 #ifdef MEMDISK_ARGS
     if (mdsk != NULL)
     {
-      printf("MEMDISK version %u.%02u  (%lu sectors)\n", mdsk->version, mdsk->version_minor, mdsk->size);
+      _printf("MEMDISK version %u.%02u  (%lu sectors)\n", mdsk->version, mdsk->version_minor, mdsk->size);
       DebugPrintf(("MEMDISK args:{%s}\n", GET_PTR(mdsk->cmdline)));
     }
     else
@@ -903,11 +903,11 @@ VOID DoConfig(int nPass)
       if (pLine >= szLine + sizeof(szLine) - 3)
       {
         CfgFailure(pLine);
-        printf("error - line overflow line %d \n", nCfgLine);
+        _printf("error - line overflow line %d \n", nCfgLine);
         break;
       }
 
-      if (*pLine == '\n' || *pLine == EOF)      /* end of line */
+      if (*pLine == '\n' || *pLine == _EOF)      /* end of line */
         break;
 
       if (*pLine != '\r')       /* ignore CR */
@@ -1053,7 +1053,7 @@ STATIC BOOL SkipLine(char *pLine)
   {
 
     if (InitKernelConfig.SkipConfigSeconds > 0)
-      printf("Press F8 to trace or F5 to skip CONFIG.SYS/AUTOEXEC.BAT");
+      _printf("Press F8 to trace or F5 to skip CONFIG.SYS/AUTOEXEC.BAT");
 
     key = GetBiosKey(InitKernelConfig.SkipConfigSeconds);       /* wait 2 seconds */
 
@@ -1068,10 +1068,10 @@ STATIC BOOL SkipLine(char *pLine)
       singleStep = TRUE;
     }
 
-    printf("\r%79s\r", "");     /* clear line */
+    _printf("\r%79s\r", "");     /* clear line */
 
     if (SkipAllConfig)
-      printf("Skipping CONFIG.SYS/AUTOEXEC.BAT\n");
+      _printf("Skipping CONFIG.SYS/AUTOEXEC.BAT\n");
   }
 
   if (SkipAllConfig)
@@ -1091,8 +1091,8 @@ STATIC BOOL SkipLine(char *pLine)
     return FALSE;
 
   for (i = 0; i < nCurChain; i++)
-    printf(" ");
-  printf("%s[Y,N]?", pLine);
+    _printf(" ");
+  _printf("%s[Y,N]?", pLine);
 
   for (;;)
   {
@@ -1101,7 +1101,7 @@ STATIC BOOL SkipLine(char *pLine)
     switch (toupper(key & 0x00ff))
     {
       case 'N':
-        printf("N\n");
+        _printf("N\n");
         return TRUE;
 
       case 0x1b:               /* don't know where documented
@@ -1113,14 +1113,14 @@ STATIC BOOL SkipLine(char *pLine)
       case '\r':
       case '\n':
       case 'Y':
-        printf("Y\n");
+        _printf("Y\n");
         return FALSE;
 
     }
 
     if (key == 0x3f00)          /* YES, you may hit F5 here, too */
     {
-      printf("N\n");
+      _printf("N\n");
       SkipAllConfig = TRUE;
       return TRUE;
     }
@@ -1188,7 +1188,7 @@ STATIC void Config_Buffers(BYTE * pLine)
 STATIC void CfgBuffersHigh(BYTE * pLine)
 {
   Config_Buffers(pLine);
-  printf("Note: BUFFERS will be in HMA or low RAM, not in UMB\n");
+  _printf("Note: BUFFERS will be in HMA or low RAM, not in UMB\n");
 }
 
 /**
@@ -1239,7 +1239,7 @@ STATIC VOID sysVersion(BYTE * pLine)
   if (GetNumArg(p, &minor) == (BYTE *) 0)
     return;
 
-  printf("Changing reported version to %d.%d\n", major, minor);
+  _printf("Changing reported version to %d.%d\n", major, minor);
 
   LoL->_os_setver_major = major; /* not the internal os_major */
   LoL->_os_setver_minor = minor; /* not the internal os_minor */
@@ -1303,7 +1303,7 @@ STATIC VOID Dosmem(BYTE * pLine)
 
   strupr(szBuf);
 
-  /* printf("DOS called with %s\n", szBuf); */
+  /* _printf("DOS called with %s\n", szBuf); */
 
   for (pTmp = szBuf;;)
   {
@@ -1468,7 +1468,7 @@ STATIC VOID CfgKeyBuf(BYTE * pLine)
     startbuf = 0;		/* flag as bad: too small or page wrap */
   if (startbuf<0xac || (startbuf>=0x100 && startbuf<0x105) || startbuf>0x1de)
   {				/* 50:0 / 50:4 are for prtscr / A:/B: DJ */
-    printf("Must start at 0xac..0x1de, not 0x100..0x104\n");
+    _printf("Must start at 0xac..0x1de, not 0x100..0x104\n");
     return;
   }
   keyfill[0] = startbuf;
@@ -1537,17 +1537,18 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
   {
     if (filenam == NULL)
       return !LoadCountryInfoHardCoded(ctryCode);
-    printf("%s not found\n", filename);
+    _printf("%s not found\n", filename);
     return rc;
   }
   if (read(fd, &header, sizeof(header)) != sizeof(header))
   {
-    printf("Error reading %s\n", filename);
+    _printf("Error reading %s\n", filename);
     goto ret;
   }
   if (memcmp(header.name, "\377COUNTRY", sizeof(header.name)))
   {
-err:printf("%s has invalid format\n", filename);
+err:
+    _printf("%s has invalid format\n", filename);
     goto ret;
   }
   if (lseek(fd, header.offset) == 0xffffffffL
@@ -1614,7 +1615,7 @@ err:printf("%s has invalid format\n", filename);
     rc = TRUE;
     goto ret;
   }
-  printf("could not find country info for country ID %u\n", ctryCode);
+  _printf("could not find country info for country ID %u\n", ctryCode);
 ret:
   close(fd);
   return rc;
@@ -1740,13 +1741,13 @@ STATIC VOID DeviceHigh(BYTE * pLine)
   {
     if (LoadDevice(pLine, (char FAR *)MK_FP(umb_start + UMB_top, 0), TRUE) == DE_NOMEM)
     {
-      printf("Not enough free memory in UMBs: loading low\n");
+      _printf("Not enough free memory in UMBs: loading low\n");
       LoadDevice(pLine, lpTop, FALSE);
     }
   }
   else
   {
-    printf("UMBs unavailable!\n");
+    _printf("UMBs unavailable!\n");
     LoadDevice(pLine, lpTop, FALSE);
   }
 }
@@ -1787,7 +1788,7 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
   eb.load.reloc = eb.load.load_seg = base;
 
 #ifdef DEBUG
-  printf("Loading device driver %s at segment %04x\n", szBuf, base);
+  _printf("Loading device driver %s at segment %04x\n", szBuf, base);
 #endif
 
   if ((result = init_DosExec(3, &eb, szBuf)) != SUCCESS)
@@ -1846,11 +1847,11 @@ STATIC VOID CfgFailure(BYTE * pLine)
 
     ErrorAlreadyPrinted[nCfgLine/8] |= (1 << (nCfgLine%8));
   }
-  printf("CONFIG.SYS error in line %d\n", nCfgLine);
-  printf(">>>%s\n   ", pTmp);
+  _printf("CONFIG.SYS error in line %d\n", nCfgLine);
+  _printf(">>>%s\n   ", pTmp);
   while (++pTmp != pLine)
-    printf(" ");
-  printf("^\n");
+    _printf(" ");
+  _printf("^\n");
 }
 
 struct submcb
@@ -1883,7 +1884,7 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
   }
 
   /* create the special DOS data MCB if it doesn't exist yet */
-  DebugPrintf(("kernelallocpara: %x %x %x %c %d\n", start, base, nPara, type, mode));
+  DebugPrintf(("kernelallocpara: %x %x %zx %c %d\n", start, base, nPara, type, mode));
 
   if (base == start)
   {
@@ -2109,7 +2110,7 @@ STATIC void config_init_buffers(int wantedbuffers)
     wantedbuffers = 6;
   if (wantedbuffers > 99)        /* max 99 buffers                    */
   {
-    printf("BUFFERS=%u not supported, reducing to 99\n", wantedbuffers);
+    _printf("BUFFERS=%u not supported, reducing to 99\n", wantedbuffers);
     wantedbuffers = 99;
   }
   if (wantedbuffers > buffers)   /* more specified than available -> get em */
@@ -2137,7 +2138,7 @@ STATIC void config_init_buffers(int wantedbuffers)
   LoL->_deblock_buf = MK_FAR(DiskTransferBuffer);
   LoL->_firstbuf = pbuffer;
 
-  DebugPrintf(("init_buffers (size %u) at", sizeof(struct buffer)));
+  DebugPrintf(("init_buffers (size %zu) at", sizeof(struct buffer)));
   DebugPrintf((" (%P)", GET_FP32(LoL->_firstbuf)));
 
   buffers--;
@@ -2165,7 +2166,7 @@ STATIC void config_init_buffers(int wantedbuffers)
   if (FP_SEG(pbuffer) == 0xffff)
   {
     buffers++;
-    printf("Kernel: allocated %d Diskbuffers = %u Bytes in HMA\n",
+    _printf("Kernel: allocated %d Diskbuffers = %zu Bytes in HMA\n",
            buffers, buffers * sizeof(struct buffer));
   }
 }
@@ -2209,7 +2210,7 @@ STATIC VOID CfgMenu(BYTE * pLine)
   int nLen;
   BYTE *pNumber = pLine;
 
-  printf("%s\n",pLine);
+  _printf("%s\n",pLine);
   if (MenuColor == -1)
     return;
 
@@ -2247,7 +2248,7 @@ STATIC VOID CfgMenuEsc(BYTE * pLine)
   BYTE * check;
   for (check = pLine; check[0]; check++)
     if (check[0] == '$') check[0] = 27;	/* translate $ to ESC */
-  printf("%s\n",pLine);
+  _printf("%s\n",pLine);
 }
 
 STATIC VOID DoMenu(void)
@@ -2283,27 +2284,27 @@ RestartInput:
       init_call_intr(0x10, &r);  /* set cursor pos */
     }
 
-    printf("Select from Menu [");
+    _printf("Select from Menu [");
 
     for (i = 0, j = 1; i <= 9; i++, j<<=1)
       if (Menus & j)
-        printf("%c", '0' + i);
-    printf("], or press [ENTER]");
+        _printf("%c", '0' + i);
+    _printf("], or press [ENTER]");
 
     if (MenuColor != -1)
-      printf(" (Selection=%d) ", MenuSelected);
+      _printf(" (Selection=%d) ", MenuSelected);
 
     if (MenuTimeout >= 0)
-      printf("- %d \b", MenuTimeout);
+      _printf("- %d \b", MenuTimeout);
     else
-      printf("    \b\b\b\b\b");
+      _printf("    \b\b\b\b\b");
 
     if (MenuColor != -1)
-      printf("\r\n\n  ");
+      _printf("\r\n\n  ");
     else
-      printf(" -");
+      _printf(" -");
 
-    printf(" Singlestepping (F8) is: %s \r", singleStep ? "ON " : "OFF");
+    _printf(" Singlestepping (F8) is: %s \r", singleStep ? "ON " : "OFF");
 
     key = GetBiosKey(MenuTimeout >= 0 ? 1 : -1);
 
@@ -2354,10 +2355,10 @@ RestartInput:
       break;
     }
   }
-  printf("\n");
+  _printf("\n");
 
   /* export the current selected config  menu */
-  sprintf(envp, "CONFIG=%c", MenuSelected+'0');
+  _sprintf(envp, "CONFIG=%c", MenuSelected+'0');
   envp += 9;
   if (MenuColor != -1)
     ClearScreen(0x7);
@@ -2529,7 +2530,7 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode)
 {
   struct CountrySpecificInfoSmall *country;
 
-  /* printf("cntry: %u, CP%u, file=\"%s\"\n", ctryCode, codePage, filename);  */
+  /* _printf("cntry: %u, CP%u, file=\"%s\"\n", ctryCode, codePage, filename);  */
 
 
 
@@ -2555,16 +2556,16 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode)
     }
   }
 
-  printf("could not find country info for country ID %u\n", ctryCode);
-  printf("current supported countries are ");
+  _printf("could not find country info for country ID %u\n", ctryCode);
+  _printf("current supported countries are ");
 
   for (country = specificCountriesSupported;
        country < specificCountriesSupported + LENGTH(specificCountriesSupported);
        country++)
   {
-    printf("%u ", country->CountryID);
+    _printf("%u ", country->CountryID);
   }
-  printf("\n");
+  _printf("\n");
 
   return 1;
 }
@@ -2581,7 +2582,7 @@ struct instCmds {
 } InstallCommands[10] BSS_INIT({0});
 
 #ifdef DEBUG
-#define InstallPrintf(x) printf x
+#define InstallPrintf(x) _printf x
 #else
 #define InstallPrintf(x)
 #endif
@@ -2594,7 +2595,7 @@ STATIC VOID _CmdInstall(BYTE * pLine,int mode)
 
   if (numInstallCmds > LENGTH(InstallCommands))
   {
-    printf("Too many Install commands given (%d max)\n",LENGTH(InstallCommands));
+    _printf("Too many Install commands given (%zd max)\n",LENGTH(InstallCommands));
     CfgFailure(pLine);
     return;
   }
@@ -2745,8 +2746,8 @@ STATIC VOID CmdSet(BYTE *pLine)
       envp += size + 1;   /* add next variables starting at the second zero */
     }
     else
-      printf("Master environment is full - can't add \"%s\"\n", szBuf);
+      _printf("Master environment is full - can't add \"%s\"\n", szBuf);
   }
   else
-    printf("Invalid SET command: \"%s\"\n", szBuf);
+    _printf("Invalid SET command: \"%s\"\n", szBuf);
 }

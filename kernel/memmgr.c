@@ -454,7 +454,7 @@ VOID mcb_print(mcb FAR * mcbp)
 
   fmemcpy_n(buff, mcbp->m_name, 8);
   buff[8] = '\0';
-  printf
+  _printf
       ("%04x:%04x -> |%s| m_type = 0x%02x '%c'; m_psp = 0x%04x; m_size = 0x%04x\n",
        FP_SEG(mcbp), FP_OFF(mcbp), *buff == '\0' ? "*NO-ID*" : buff,
        mcbp->m_type, mcbp->m_type > ' ' ? mcbp->m_type : ' ', mcbp->m_psp,

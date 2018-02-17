@@ -199,7 +199,7 @@ COUNT dir_read(REG f_node_ptr fnp)
   bp = getblock(fnp->f_dirsector, fnp->f_dpb->dpb_unit);
 
 #ifdef DISPLAY_GETBLOCK
-  printf("DIR (dir_read)\n");
+  _printf("DIR (dir_read)\n");
 #endif
 
   /* Now that we have the block for our entry, get the    */
@@ -246,7 +246,7 @@ BOOL dir_write_update(REG f_node_ptr fnp, BOOL update)
       return FALSE;
 
 #ifdef DISPLAY_GETBLOCK
-    printf("DIR (dir_write)\n");
+    _printf("DIR (dir_write)\n");
 #endif
 
     swap_deleted(fnp->f_dir.dir_name);
@@ -287,7 +287,7 @@ COUNT dos_findfirst(UCOUNT attr, BYTE * name)
   REG f_node_ptr fnp;
   REG dmatch *dmp = &sda_tmp_dm;
 
-/*  printf("ff %Fs\n", name);*/
+/*  _printf("ff %Fs\n", name);*/
 
   /* The findfirst/findnext calls are probably the worst of the   */
   /* DOS calls. They must work somewhat on the fly (i.e. - open   */
@@ -391,7 +391,7 @@ COUNT dos_findnext(void)
 
 
 #ifdef DEBUG
-  printf("dos_findnext: %11s\n", fnp->f_dir.dir_name);
+  _printf("dos_findnext: %11s\n", GET_PTR((char FAR *)fnp->f_dir.dir_name));
 #endif
   /* return the result                                            */
   return DE_NFILES;
