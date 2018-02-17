@@ -3,11 +3,22 @@
 #include "dosobj.h"
 
 template <typename T>
-class FarObj : public ObjIf {
+class FarObjBase {
 protected:
     T *ptr;
     int size;
     __DOSFAR(uint8_t) fobj;
+
+public:
+    using obj_type = typename std::conditional<std::is_array<T>::value,
+        typename std::remove_extent<T>::type,
+        typename std::remove_const<T>::type>::type;
+
+    FarObjBase(T* obj, unsigned sz) : ptr(obj), size(sz) {}
+};
+
+template <typename T>
+class FarObj : public FarObjBase<T>, public ObjIf {
     bool have_obj = false;
 
     template <typename T1 = T,
@@ -15,36 +26,34 @@ protected:
     void RmObj() {
         if (!have_obj)
             return;
-        rm_dosobj(fobj);
+        rm_dosobj(this->fobj);
     }
     template <typename T1 = T,
         typename std::enable_if<!std::is_const<T1>::value>::type* = nullptr>
     void RmObj() {
         if (!have_obj)
             return;
-        cp_dosobj(ptr, fobj, size);
-        rm_dosobj(fobj);
+        cp_dosobj(this->ptr, this->fobj, this->size);
+        rm_dosobj(this->fobj);
     }
 
 public:
-    using obj_type = typename std::conditional<std::is_array<T>::value,
-        typename std::remove_extent<T>::type,
-        typename std::remove_const<T>::type>::type;
+    using obj_type = typename FarObjBase<T>::obj_type; // inherit type from parent
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
-    FarObj(T1& obj) : ptr(&obj), size(sizeof(T1)) {
-        fobj = mk_dosobj(ptr, size);
+    FarObj(T1& obj) : FarObjBase<T>(&obj, sizeof(T1)) {
+        this->fobj = mk_dosobj(this->ptr, this->size);
     }
-    FarObj(T* obj, unsigned sz) : ptr(obj), size(sz) {
-        fobj = mk_dosobj(ptr, size);
+    FarObj(T* obj, unsigned sz) : FarObjBase<T>(obj, sz) {
+        this->fobj = mk_dosobj(this->ptr, this->size);
     }
     virtual far_s get_obj() {
         _assert(!have_obj);
-        pr_dosobj(fobj, ptr, size);
+        pr_dosobj(this->fobj, this->ptr, this->size);
         have_obj = true;
-        return fobj.get_far();
+        return this->fobj.get_far();
     }
 
     NearPtr<obj_type> get_near() {
@@ -56,12 +65,16 @@ public:
 };
 
 template <typename T>
-class FarObjSt : public FarObj<T> {
+class FarObjSt : public FarObjBase<T> {
 public:
-    using obj_type = typename FarObj<T>::obj_type; // inherit type from parent
+    using obj_type = typename FarObjBase<T>::obj_type; // inherit type from parent
 
-    FarObjSt(T& obj) : FarObj<T>(obj) {}
-    FarObjSt(T* obj, unsigned sz) : FarObj<T>(obj, sz) {}
+    FarObjSt(T& obj) : FarObjBase<T>(&obj, sizeof(T)) {
+        this->fobj = mk_dosobj(this->ptr, this->size);
+    }
+    FarObjSt(T* obj, unsigned sz) : FarObjBase<T>(obj, sz) {
+        this->fobj = mk_dosobj(this->ptr, this->size);
+    }
 
     virtual far_s get_obj() {
         pr_dosobj(this->fobj, this->ptr, this->size);
