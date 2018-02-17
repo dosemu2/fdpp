@@ -101,7 +101,7 @@ void int3()
 VOID hdump(BYTE FAR * p)
 {
   int loop;
-  HMAInitPrintf(("%p", GET_FP32(p)));
+  HMAInitPrintf(("%P", GET_FP32(p)));
 
   for (loop = 0; loop < 16; loop++)
     HMAInitPrintf(("%02x ", (const char)p[loop]));
@@ -331,7 +331,7 @@ void MoveKernel(unsigned NewKernelSegment)
     len -= HMAOFFSET;
   }
 
-  HMAInitPrintf(("HMA moving %p up to %p for %04x bytes\n",
+  HMAInitPrintf(("HMA moving %P up to %P for %04x bytes\n",
                  GET_FP32(HMASource), GET_FP32(HMADest), len));
 
   if (NewKernelSegment < CurrentKernelSegment ||

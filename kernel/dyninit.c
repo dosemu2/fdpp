@@ -94,7 +94,7 @@ void DynFree(void *ptr)
 void FAR * DynLast()
 {
   struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(__ASMADDR(Dyn)));
-  DebugPrintf(("dynamic data end at %p\n",
+  DebugPrintf(("dynamic data end at %P\n",
                GET_FP32(Dynp->Buffer + Dynp->Allocated)));
 
   return Dynp->Buffer + Dynp->Allocated;

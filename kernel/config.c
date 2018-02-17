@@ -344,12 +344,12 @@ void PreConfig(void)
 
 #ifdef DEBUG
   {
-    printf("SDA located at 0x%p\n", GET_FP32(internal_data));
+    printf("SDA located at 0x%P\n", GET_FP32(internal_data));
   }
 #endif
   /* Begin by initializing our system buffers                     */
 #ifdef DEBUG
-/*  printf("Preliminary %d buffers allocated at 0x%p\n", Config.cfgBuffers, GET_FP32(buffers));*/
+/*  printf("Preliminary %d buffers allocated at 0x%P\n", Config.cfgBuffers, GET_FP32(buffers));*/
 #endif
 
   LoL->_DPBp = (struct dpb FAR *)
@@ -368,16 +368,16 @@ void PreConfig(void)
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
 #ifdef DEBUG
-/*  printf(" FCB table 0x%p\n",GET_FP32(LoL->FCBp));*/
-  printf(" sft table 0x%p\n", GET_FP32(LoL->_sfthead));
-  printf(" CDS table 0x%p\n", GET_FP32(LoL->_CDSp));
-  printf(" DPB table 0x%p\n", GET_FP32(LoL->_DPBp));
+/*  printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
+  printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead));
+  printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
+  printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
 #endif
 
   /* Done.  Now initialize the MCB structure                      */
   /* This next line is 8086 and 80x86 real mode specific          */
 #ifdef DEBUG
-  printf("Preliminary  allocation completed: top at %p\n", GET_FP32(lpTop));
+  printf("Preliminary  allocation completed: top at %P\n", GET_FP32(lpTop));
 #endif
 }
 
@@ -449,7 +449,7 @@ void PostConfig(void)
   /* Begin by initializing our system buffers                     */
   /* dma_scratch = (BYTE FAR *) KernelAllocDma(BUFFERSIZE); */
 #ifdef DEBUG
-  /* printf("DMA scratchpad allocated at 0x%p\n", GET_FP32(dma_scratch)); */
+  /* printf("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch)); */
 #endif
 
   config_init_buffers(Config.cfgBuffers);
@@ -468,10 +468,10 @@ void PostConfig(void)
   LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
-/*  printf(" FCB table 0x%p\n",GET_FP32(LoL->FCBp));*/
-  printf(" sft table 0x%p\n", GET_FP32(LoL->_sfthead->sftt_next));
-  printf(" CDS table 0x%p\n", GET_FP32(LoL->_CDSp));
-  printf(" DPB table 0x%p\n", GET_FP32(LoL->_DPBp));
+/*  printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
+  printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead->sftt_next));
+  printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
+  printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
 #endif
   if (Config.cfgStacks)
   {
@@ -480,7 +480,7 @@ void PostConfig(void)
                     Config.cfgStacksHigh);
     init_stacks(stackBase, Config.cfgStacks, Config.cfgStackSize);
 
-    DebugPrintf(("Stacks allocated at %p\n", GET_FP32(stackBase)));
+    DebugPrintf(("Stacks allocated at %P\n", GET_FP32(stackBase)));
   }
   DebugPrintf(("Allocation completed: top at 0x%x\n", base_seg));
 
@@ -832,7 +832,7 @@ VOID DoConfig(int nPass)
     if (mdsk != NULL)
     {
       printf("MEMDISK version %u.%02u  (%lu sectors)\n", mdsk->version, mdsk->version_minor, mdsk->size);
-      DebugPrintf(("MEMDISK args:{%S}\n", mdsk->cmdline));
+      DebugPrintf(("MEMDISK args:{%s}\n", GET_PTR(mdsk->cmdline)));
     }
     else
     {
@@ -2138,7 +2138,7 @@ STATIC void config_init_buffers(int wantedbuffers)
   LoL->_firstbuf = pbuffer;
 
   DebugPrintf(("init_buffers (size %u) at", sizeof(struct buffer)));
-  DebugPrintf((" (%p)", GET_FP32(LoL->_firstbuf)));
+  DebugPrintf((" (%P)", GET_FP32(LoL->_firstbuf)));
 
   buffers--;
   pbuffer->b_prev = FP_OFF((struct buffer FAR *)(pbuffer + buffers));

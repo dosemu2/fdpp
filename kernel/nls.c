@@ -101,7 +101,7 @@ STATIC long muxGo(int subfct, UWORD bp, UWORD cp, UWORD cntry, UWORD bufsize,
 		  void FAR *buf)
 {
   long ret;
-  log(("NLS: muxGo(): subfct=%x, cntry=%u, cp=%u, ES:DI=%p\n",
+  log(("NLS: muxGo(): subfct=%x, cntry=%u, cp=%u, ES:DI=%P\n",
        subfct, cntry, cp, GET_FP32(buf)));
   ret = call_nls(bp, buf, subfct, cp, cntry, bufsize);
   log(("NLS: muxGo(): return value = %lx\n", ret));
@@ -143,7 +143,7 @@ STATIC COUNT muxLoadPkg(int subfct, UWORD cp, UWORD cntry)
 STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
                     UWORD bufsize, VOID FAR * buf)
 {
-  log(("NLS: muxBufGo(): subfct=%x, BP=%u, cp=%u, cntry=%u, len=%u, buf=%p\n",
+  log(("NLS: muxBufGo(): subfct=%x, BP=%u, cp=%u, cntry=%u, len=%u, buf=%P\n",
        subfct, bp, cp, cntry, bufsize, GET_FP32(buf)));
 
   return (int)muxGo(subfct, bp, cp, cntry, bufsize, buf);

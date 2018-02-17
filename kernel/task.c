@@ -454,7 +454,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
   }
 
 #ifdef DEBUG
-  printf("DosComLoader. Loading '%S' at %04x\n", GET_FP32(namep), mem);
+  printf("DosComLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem);
 #endif
   /* Now load the executable                              */
   {
@@ -635,7 +635,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
       mode &= 0x7f; /* forget about high loading from now on */
 
 #ifdef DEBUG
-      printf("DosExeLoader. Loading '%S' at %04x\n", GET_FP32(namep), mem);
+      printf("DosExeLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem);
 #endif
 
       /* memory found large enough - continue processing      */

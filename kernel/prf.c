@@ -294,7 +294,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
         handle_char(va_arg(arg, int));
         continue;
 
-      case 'p':
+      case 'P':
         {
           UDWORD w0 = va_arg(arg, unsigned);
           char SSFAR *tmp = charp;
@@ -529,7 +529,7 @@ struct {
   {
   "32767", "%ld", 0x7fff, 0},
   {
-"ptr 1234:5678", "ptr %p", 0x5678, 0x1234}, {0}};
+"ptr 1234:5678", "ptr %P", 0x5678, 0x1234}, {0}};
 
 void test(char *should, char *format, unsigned lowint, unsigned highint)
 {

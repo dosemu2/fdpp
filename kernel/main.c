@@ -416,7 +416,7 @@ STATIC VOID FsConfig(VOID)
 
 STATIC VOID signon()
 {
-  printf("\r%S\n"
+  printf("\r%s\n"
          "Kernel compatibility %d.%d - "
 #if defined(__BORLANDC__)
   "BORLANDC"
@@ -442,7 +442,7 @@ STATIC VOID signon()
   " - FAT32 support"
 #endif
   "\n\n%s",
-         GET_FP32(MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release))),
+         GET_PTR(MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release))),
          MAJOR_RELEASE, MINOR_RELEASE, copyright);
 }
 
