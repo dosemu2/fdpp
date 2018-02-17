@@ -52,7 +52,7 @@ COUNT map_cluster(f_node_ptr, COUNT);
 STATIC int shrink_file(f_node_ptr fnp);
 
 /* FAT time notation in the form of hhhh hmmm mmmd dddd (d = double second) */
-STATIC time time_encode(struct dostime *t)
+STATIC _time time_encode(struct dostime *t)
 {
   return (t->hour << 11) | (t->minute << 5) | (t->second >> 1);
 }
@@ -678,7 +678,7 @@ date dos_getdate(void)
 /*                                                              */
 /* dos_gettime for the file time                                */
 /*                                                              */
-time dos_gettime(void)
+_time dos_gettime(void)
 {
   struct dostime dt;
 

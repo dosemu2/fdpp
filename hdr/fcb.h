@@ -87,7 +87,7 @@ typedef struct _fcb {
   /* default = 128                        */
   ULONG fcb_fsize;              /* File size in bytes                   */
   date fcb_date;                /* Date file created                    */
-  time fcb_time;                /* Time of last write                   */
+  _time fcb_time;                /* Time of last write                   */
   /* the following are reserved by system                         */
   BYTE fcb_sftno;               /* Device ID                            */
   BYTE fcb_attrib_hi;           /* share info, dev attrib word hi       */

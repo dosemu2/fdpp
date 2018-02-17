@@ -105,7 +105,7 @@ struct dirent {
   UWORD dir_crdate;             /* Creation date                */
   UWORD dir_accdate;            /* Last access date             */
   UWORD dir_start_high;         /* High word of the cluster     */
-  time dir_time;                /* Time file created/updated    */
+  _time dir_time;                /* Time file created/updated    */
   date dir_date;                /* Date file created/updated    */
   UWORD dir_start;              /* Starting cluster             */
   /* 1st available = 2            */

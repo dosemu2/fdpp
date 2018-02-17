@@ -1163,7 +1163,7 @@ dispatch:
         case 0x01:
           rc = DosSetFtime((COUNT) lr.BX,       /* Handle               */
                            (date) lr.DX,        /* FileDate             */
-                           (time) lr.CX);       /* FileTime             */
+                           (_time) lr.CX);       /* FileTime             */
           break;
 
         default:
