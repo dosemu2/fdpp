@@ -26,6 +26,7 @@ public:
     FarPtrBase() = default;
     FarPtrBase(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
     FarPtrBase(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
+    explicit FarPtrBase(const far_s& f) : ptr(f) {}
 
     T* operator ->() { return (T*)resolve_segoff(ptr); }
     operator T*() { return (T*)resolve_segoff(ptr); }
@@ -113,7 +114,7 @@ public:
     operator T0*() { return (T0*)resolve_segoff(this->ptr); }
 };
 
-#define _MK_F(f, s) ({ far_s __s = s; f(__s.seg, __s.off); })
+#define _MK_F(f, s) f(s)
 
 /* These SymWrp are tricky, and are needed only because we
  * can't provide 'operator.':

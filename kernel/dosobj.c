@@ -5,7 +5,7 @@
 #include "dosobj.h"
 
 static smpool pool;
-static uint8_t FAR *base;
+static __DOSFAR(uint8_t) base;
 static int initialized;
 
 void dosobj_init(void)
@@ -19,7 +19,7 @@ void dosobj_init(void)
     initialized = 1;
 }
 
-void FAR *mk_dosobj(const void *data, UWORD len)
+__DOSFAR(uint8_t) mk_dosobj(const void *data, UWORD len)
 {
     void *ptr;
     uint16_t offs;
@@ -31,21 +31,21 @@ void FAR *mk_dosobj(const void *data, UWORD len)
     return base + offs;
 }
 
-void pr_dosobj(void FAR *fa, const void *data, UWORD len)
+void pr_dosobj(__DOSFAR(uint8_t) fa, const void *data, UWORD len)
 {
     void *ptr = resolve_segoff(GET_FAR(fa));
 
     memcpy(ptr, data, len);
 }
 
-void cp_dosobj(void *data, const void FAR *fa, UWORD len)
+void cp_dosobj(void *data, __DOSFAR(uint8_t) fa, UWORD len)
 {
     void *ptr = resolve_segoff(GET_FAR(fa));
 
     memcpy(data, ptr, len);
 }
 
-void rm_dosobj(void FAR *fa)
+void rm_dosobj(__DOSFAR(uint8_t) fa)
 {
     void *ptr = resolve_segoff(GET_FAR(fa));
 

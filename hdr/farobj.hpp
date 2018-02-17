@@ -7,16 +7,8 @@ class FarObj {
 protected:
     T *ptr;
     int size;
-    FarPtr<void> fobj;
+    __DOSFAR(uint8_t) fobj;
     bool have_obj = false;
-
-    template <typename T1>
-    FarPtr<T1> GetObj() {
-        _assert(!have_obj);
-        pr_dosobj(fobj, ptr, size);
-        have_obj = true;
-        return fobj;
-    }
 
     template <typename T1 = T,
         typename std::enable_if<std::is_const<T1>::value>::type* = nullptr>
@@ -34,11 +26,11 @@ protected:
         rm_dosobj(fobj);
     }
 
+public:
     using obj_type = typename std::conditional<std::is_array<T>::value,
         typename std::remove_extent<T>::type,
         typename std::remove_const<T>::type>::type;
 
-public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
@@ -48,13 +40,16 @@ public:
     FarObj(T* obj, unsigned sz) : ptr(obj), size(sz) {
         fobj = mk_dosobj(ptr, size);
     }
-    FarPtr<obj_type> get_obj() {
-        return GetObj<obj_type>();
+    far_s get_obj() {
+        _assert(!have_obj);
+        pr_dosobj(fobj, ptr, size);
+        have_obj = true;
+        return fobj.get_far();
     }
 
     NearPtr<obj_type> get_near() {
-        FarPtr<obj_type> f = get_obj();
-        return NearPtr<obj_type>(f.off());
+        far_s f = get_obj();
+        return NearPtr<obj_type>(f.off);
     }
 
     ~FarObj() { RmObj(); }
@@ -62,19 +57,19 @@ public:
 
 template <typename T>
 class FarObjSt : public FarObj<T> {
+public:
     using obj_type = typename FarObj<T>::obj_type; // inherit type from parent
 
-public:
     FarObjSt(T& obj) : FarObj<T>(obj) {}
     FarObjSt(T* obj, unsigned sz) : FarObj<T>(obj, sz) {}
 
-    FarPtr<obj_type> get_obj() {
+    far_s get_obj() {
         pr_dosobj(this->fobj, this->ptr, this->size);
-        return this->fobj;
+        return this->fobj.get_far();
     }
     NearPtr<obj_type> get_near() {
-        FarPtr<obj_type> f = get_obj();
-        return NearPtr<obj_type>(f.off());
+        far_s f = get_obj();
+        return NearPtr<obj_type>(f.off);
     }
 };
 
@@ -88,10 +83,10 @@ public:
 #define _MK_FAR(n, o) FarObj<decltype(o)> __obj_##n(o)
 #define _MK_NEAR(n, o) FarObj<decltype(o)::type> __obj_##n(o, decltype(o)::len)
 #define _MK_FAR_PTR(n, o) FarObj<_R(o)> __obj_##n(*o)
-#define __MK_FAR(n) __obj_##n.get_obj()
+#define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o))
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
-#define MK_FAR_SCP(o) FarObj<decltype(o)>(o).get_obj()
-#define MK_FAR_PTR_SCP(o) FarObj<_R(o)>(*o).get_obj()
-#define MK_FAR_STR_SCP(o) FarObj<_R(o)>(o, strlen(o)).get_obj()
+#define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o).get_obj())
+#define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
+#define MK_FAR_STR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(o, strlen(o)).get_obj())
