@@ -449,7 +449,7 @@ COUNT dos_rmdir(BYTE * path)
 
   /* prevent removal of the current directory of that drive */
   REG struct cds FAR *cdsp = get_cds(path[0] - 'A');
-  if (!fstrcmp(MK_FAR_STR(path), cdsp->cdsCurrentPath))
+  if (!fstrcmp(MK_FAR_STR_SCP(path), cdsp->cdsCurrentPath))
     return DE_RMVCUDIR;
 
   /* Check that we're not trying to remove the root!      */
@@ -507,7 +507,7 @@ COUNT dos_rename(BYTE * path1, BYTE * path2, int attrib)
 
   /* prevent renaming of the current directory of that drive */
   REG struct cds FAR *cdsp = get_cds(path1[0] - 'A');
-  if (!fstrcmp(MK_FAR_STR(path1), cdsp->cdsCurrentPath))
+  if (!fstrcmp(MK_FAR_STR_SCP(path1), cdsp->cdsCurrentPath))
     return DE_RMVCUDIR;
 
   /* first check if the source file exists                        */

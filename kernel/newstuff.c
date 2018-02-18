@@ -334,7 +334,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
                                    included by original truename() */
   /* MUX succeeded and really something */
   {
-  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(MK_FAR_STR(dest), src) == SUCCESS && dest[0] != '\0')
+  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(MK_FAR_STR_SCP(dest), src) == SUCCESS && dest[0] != '\0')
   {
     tn_printf(("QRemoteFn() returned: \"%s\"\n", dest));
 #ifdef DEBUG_TRUENAME
@@ -370,7 +370,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
       if (froot == src + 5)
       {
         fmemcpy_n(dest + 3, src, 5);
-        DosUpMem(MK_FAR_STR(dest) + 3, 5);
+        DosUpMem(MK_FAR_STR_SCP(dest) + 3, 5);
         if (dest[3] == '/') dest[3] = '\\';
         if (dest[7] == '/') dest[7] = '\\';
       }
@@ -565,7 +565,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   }
 
   *p = '\0';				/* add the string terminator */
-  DosUpFString(MK_FAR_STR(rootPos));	        /* upcase the file/path name */
+  DosUpFString(MK_FAR_STR_SCP(rootPos));	        /* upcase the file/path name */
 
 /** Note:
     Only the portions passed in by the user are upcased, because it is
@@ -586,7 +586,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
       size_t j = fstrlen(cdsp->cdsCurrentPath);
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
-      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0') && fmemcmp(MK_FAR_STR(dest), cdsp->cdsCurrentPath, j) == 0)
+      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0') && fmemcmp(MK_FAR_STR_SCP(dest), cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';

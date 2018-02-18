@@ -465,7 +465,7 @@ STATIC void FcbNameInit(fcb FAR * lpFcb, BYTE * szBuffer, COUNT * pCurDrive)
     pszBuffer[1] = ':';
     pszBuffer += 2;
   }
-  ConvertName83ToNameSZ(MK_FAR_STR(pszBuffer), lpFcb->fcb_fname);
+  ConvertName83ToNameSZ(MK_FAR_STR_SCP(pszBuffer), lpFcb->fcb_fname);
 }
 
 UBYTE FcbDelete(xfcb FAR * lpXfcb)

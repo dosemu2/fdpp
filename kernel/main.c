@@ -98,7 +98,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   drv = LoL->_BootDrive + 1;
   p = (unsigned char FAR *)MK_FP(0, 0x5e0);
-  if (fmemcmp(p+2,MK_FAR_STR("CONFIG"),6) == 0)      /* UPX */
+  if (fmemcmp(p+2,MK_FAR_STR_SCP("CONFIG"),6) == 0)      /* UPX */
   {
     fmemcpy_n(&InitKernelConfig, p+2, sizeof(InitKernelConfig));
 
@@ -365,7 +365,7 @@ STATIC VOID FsConfig(VOID)
   {
     struct cds FAR *pcds_table = &LoL->_CDSp[i];
 
-    fmemcpy(pcds_table->cdsCurrentPath, MK_FAR_STR("A:\\\0"), 4);
+    fmemcpy(pcds_table->cdsCurrentPath, MK_FAR_STR_SCP("A:\\\0"), 4);
 
     pcds_table->cdsCurrentPath[0] += i;
 
@@ -572,7 +572,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_command = C_INIT;
   rq.r_length = sizeof(request);
   rq.r_endaddr = *r_top;
-  rq.r_cmdline = MK_FAR_STR(cmdLine ? cmdLine : "\n");
+  rq.r_cmdline = MK_FAR_STR_ST(cmdLine ? cmdLine : "\n");
   rq.r_firstunit = LoL->_nblkdev;
 
   execrh(MK_FAR_SCP(rq), dhp);
