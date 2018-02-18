@@ -104,7 +104,9 @@ public:
     static FarObjSt<_R(o)> __obj_##n; \
     __obj_##n.FarObjSet(o, strlen(o))
 #define MK_FAR(o) FarPtr<decltype(o)>(new FarObj<decltype(o)>(o))
-#define _MK_NEAR(n, o) FarObj<decltype(o)::type> __obj_##n(o, decltype(o)::len)
+#define _MK_NEAR_ST(n, o) \
+    static FarObjSt<decltype(o)::type> __obj_##n; \
+    __obj_##n.FarObjSet(o, decltype(o)::len)
 #define _MK_FAR_PTR(n, o) FarObj<_R(o)> __obj_##n(*o)
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()

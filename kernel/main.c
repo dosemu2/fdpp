@@ -493,7 +493,7 @@ STATIC void kernel()
         }
       }
       /* save buffer -- on the stack it's fine here */
-      Config.cfgInitTail = MK_NEAR(Cmd.ctBuffer);
+      Config.cfgInitTail = MK_NEAR_SYM_ST(Cmd.ctBuffer);
     }
   }
   init_call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
