@@ -132,13 +132,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 
 $(CFILES:.c=.cc): makefile
 .c.cc:
-	../utils/mkfar.sh FAR __FAR $< | \
-		../utils/scopify.sh 2 MK_FAR_ST _MK_FAR_ST __MK_FAR | \
-		../utils/scopify.sh 2 MK_NEAR_ST _MK_FAR_ST __MK_NEAR | \
-		../utils/scopify.sh 2 MK_NEAR_SYM_ST _MK_NEAR_ST __MK_NEAR | \
-		../utils/scopify.sh 2 MK_NEAR_STR_ST _MK_FAR_STR_ST __MK_NEAR | \
-		../utils/scopify.sh 4 MK_FAR_STR_ST _MK_FAR_STR_ST __MK_FAR | \
-		../utils/scopify.sh 4 MK_FAR_SZ_ST _MK_FAR_SZ_ST __MK_FAR >$@
+	../utils/mkfar.sh FAR __FAR $< >$@
 
 $(FDPPLIB): $(OBJECTS)
 	$(CL) $(LDFLAGS) -o $@ $^

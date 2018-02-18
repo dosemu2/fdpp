@@ -110,6 +110,10 @@ public:
 #define _MK_NEAR_ST(n, o) \
     static FarObjSt<decltype(o)::type> __obj_##n; \
     __obj_##n.FarObjSet(o, decltype(o)::len)
+#define MK_FAR_ST(o) ({ _MK_FAR_ST(_ddd, o); __MK_FAR(_ddd); })
+#define MK_NEAR_ST(o) ({ _MK_FAR_ST(_ddd, o); __MK_NEAR(_ddd); })
+#define MK_NEAR_SYM_ST(o) ({ _MK_NEAR_ST(_ddd, o);  __MK_NEAR(_ddd); })
+#define MK_NEAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_NEAR(_ddd); })
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()
@@ -117,10 +121,12 @@ public:
 #define _MK_FAR_STR_ST(n, o) \
     static FarObjSt<_R(o)> __obj_##n; \
     __obj_##n.FarObjSet(o, strlen(o))
+#define MK_FAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_FAR(_ddd); })
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
 #define _MK_FAR_SZ_ST(n, o, sz) \
     static FarObjSt<_R(o)> __obj_##n; \
     __obj_##n.FarObjSet(o, sz)
+#define MK_FAR_SZ_ST(o, sz) ({ _MK_FAR_SZ_ST(_ddd, o, sz); __MK_FAR(_ddd); })
 #define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o).get_obj())
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
 #define MK_FAR_STR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(o, strlen(o)).get_obj())
