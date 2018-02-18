@@ -79,7 +79,10 @@ public:
 
     FarObjSt() : FarObjBase<T>(NULL, 0) {}
 
-    void FarObjSet(T& obj) { MkObj(&obj, sizeof(T)); }
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value &&
+            !std::is_pointer<T1>::value>::type* = nullptr>
+    void FarObjSet(T1& obj) { MkObj(&obj, sizeof(T1)); }
     void FarObjSet(T* obj, unsigned sz) { MkObj(obj, sz); }
 
     virtual far_s get_obj() {
@@ -112,6 +115,9 @@ public:
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o))
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
+#define _MK_FAR_SZ_ST(n, o, sz) \
+    static FarObjSt<_R(o)> __obj_##n; \
+    __obj_##n.FarObjSet(o, sz)
 #define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o).get_obj())
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
 #define MK_FAR_STR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(o, strlen(o)).get_obj())
