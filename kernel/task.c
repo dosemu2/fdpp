@@ -487,7 +487,7 @@ COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     setvec(0x22, (intvec)MK_FP(user_r->CS, user_r->IP));
     child_psp(mem, cu_psp, mem + asize);
 
-    fcbcode = patchPSP(mem - 1, env, MK_FAR_PTR(exp), namep);
+    fcbcode = patchPSP(mem - 1, env, MK_FAR_PTR_SCP(exp), namep);
     /* set asize to end of segment */
     if (asize > 0x1000)
       asize = 0x1000;
@@ -744,7 +744,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
     setvec(0x22, (intvec)MK_FP(user_r->CS, user_r->IP));
     child_psp(mem, cu_psp, mem + asize);
 
-    fcbcode = patchPSP(mem - 1, env, MK_FAR_PTR(exp), namep);
+    fcbcode = patchPSP(mem - 1, env, MK_FAR_PTR_SCP(exp), namep);
     exp->exec.stack = _MK_DOS_FP(BYTE,
       ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
     exp->exec.start_addr = _MK_DOS_FP(BYTE,
@@ -780,7 +780,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
   }
 
   exe_header *eh = &ExeHeader;
-  rc = (int)DosRWSft(fd, sizeof(exe_header), MK_FAR_PTR(eh), XFR_READ);
+  rc = (int)DosRWSft(fd, sizeof(exe_header), MK_FAR_PTR_SCP(eh), XFR_READ);
 
   if (rc == sizeof(exe_header) &&
       (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))
