@@ -6,18 +6,18 @@ DIRSEP=/
 RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
-CC=clang++ -c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
-    -fno-exceptions -fno-threadsafe-statics
+CC=clang++
 CL=clang++
 
-TARGETOPT=
+TARGETOPT=-c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
+    -fno-exceptions -fno-threadsafe-statics
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
 endif
 
 TARGET=KMS
 
-ALLCFLAGS:=-iquote ../hdr $(TARGETOPT) $(ALLCFLAGS) -Wall -fpic -O2 \
+ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic -O2 \
     -ggdb3 -fno-strict-aliasing -Wno-format-invalid-specifier
 
 INITCFLAGS=$(ALLCFLAGS)
