@@ -1388,7 +1388,7 @@ void ReadAllPartitionTables(void)
 /* disk initialization: returns number of units */
 COUNT dsk_init()
 {
-  _printf(" - InitDisk");
+  _printf(" - InitDisk: ");
 
 #ifdef DEBUG
   {
