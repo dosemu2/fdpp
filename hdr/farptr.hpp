@@ -2,6 +2,7 @@
 #define FARPTR_HPP
 
 #include <type_traits>
+#include <memory>
 #include <cstring>
 #include "thunks_priv.h"
 #include "dosobj_priv.h"
@@ -101,13 +102,14 @@ public:
 template<typename T>
 class FarPtr : public FarPtrBase<T>
 {
-    ObjIf *obj = NULL;
+    std::shared_ptr<ObjIf> obj;
 
 public:
     using FarPtrBase<T>::FarPtrBase;
     FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {}
     explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
-    explicit FarPtr(ObjIf *o) : FarPtrBase<T>(o->get_obj()), obj(o) {}
+    explicit FarPtr(const std::shared_ptr<ObjIf>& o) :
+            FarPtrBase<T>(o->get_obj()), obj(o) {}
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
@@ -131,15 +133,6 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
     operator T0*() { return (T0*)resolve_segoff(this->ptr); }
-
-    FarPtr<T>& operator =(const FarPtr<T>& f) {
-        delete obj;
-        obj = NULL;
-        this->ptr = f.get_far();
-        return *this;
-    }
-
-    virtual ~FarPtr() { delete obj; }
 };
 
 #define _MK_F(f, s) f(s)

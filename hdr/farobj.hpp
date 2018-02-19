@@ -106,7 +106,7 @@ public:
 #define _MK_FAR_STR_ST(n, o) \
     static FarObjSt<_R(o)> __obj_##n; \
     __obj_##n.FarObjSet(o, strlen(o))
-#define MK_FAR(o) FarPtr<decltype(o)>(new FarObj<decltype(o)>(o))
+#define MK_FAR(o) FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o))
 #define _MK_NEAR_ST(n, o) \
     static FarObjSt<decltype(o)::type> __obj_##n; \
     __obj_##n.FarObjSet(o, decltype(o)::len)
