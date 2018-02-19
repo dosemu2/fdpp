@@ -10,7 +10,7 @@ CC=clang++
 CL=clang++
 
 TARGETOPT=-c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
-    -fno-exceptions -fno-threadsafe-statics
+    -fno-exceptions -fno-threadsafe-statics -fno-rtti
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
 endif
