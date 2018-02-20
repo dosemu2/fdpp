@@ -96,7 +96,7 @@ public:
 class ObjIf {
 public:
     virtual far_s get_obj() = 0;
-    virtual ~ObjIf() {}
+    virtual ~ObjIf() = default;
 };
 
 template<typename T>

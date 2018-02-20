@@ -62,6 +62,10 @@ public:
     }
 
     virtual ~FarObj() { RmObj(); }
+
+    /* make it non-copyable */
+    FarObj(const FarObj &) = delete;
+    FarObj& operator =(const FarObj &) = delete;
 };
 
 template <typename T>
@@ -93,6 +97,10 @@ public:
         far_s f = get_obj();
         return NearPtr<obj_type>(f.off);
     }
+
+    /* make it non-copyable */
+    FarObjSt(const FarObjSt &) = delete;
+    FarObjSt& operator =(const FarObjSt &) = delete;
 };
 
 #define _RP(t) typename std::remove_pointer<t>::type
