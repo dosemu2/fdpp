@@ -159,11 +159,28 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
     int i;
 
     for (i = 0; i < asm_tab_len; i++) {
-        if (asm_tab[i].num == num)
-            return fdpp->asm_call(asm_tab[i].seg, asm_tab[i].off, sp, len);
+        if (asm_tab[i].num == num) {
+            fdpp->asm_call(asm_tab[i].seg, asm_tab[i].off, sp, len);
+            return (fdpp->getreg(REG_edx) << 16) | (fdpp->getreg(REG_eax) & 0xffff);
+        }
     }
     _assert(0);
     return -1;
+}
+
+uint16_t getCS(void)
+{
+    return fdpp->getreg(REG_cs);
+}
+
+void setDS(uint16_t seg)
+{
+    fdpp->setreg(REG_ds, seg);
+}
+
+void setES(uint16_t seg)
+{
+    fdpp->setreg(REG_es, seg);
 }
 
 #define __ARG(t) t
@@ -466,5 +483,6 @@ struct far_s lookup_far_st(const void *ptr)
 
 uint32_t thunk_call_void(struct far_s fa)
 {
-    return fdpp->asm_call(fa.seg, fa.off, NULL, 0);
+    fdpp->asm_call(fa.seg, fa.off, NULL, 0);
+    return (fdpp->getreg(REG_edx) << 16) | (fdpp->getreg(REG_eax) & 0xffff);
 }
