@@ -22,7 +22,7 @@ ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic -O2 \
 
 INITCFLAGS=$(ALLCFLAGS)
 CFLAGS=$(ALLCFLAGS)
-LDFLAGS=-shared -Bsymbolic
+LDFLAGS=-shared -Bsymbolic -static-libstdc++ -static-libgcc
 CLDEF = 1
 CLC = clang
 CLT = clang
