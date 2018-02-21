@@ -7,10 +7,10 @@ RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
 CC=clang++
-CL=clang++
+CL=clang
 
 TARGETOPT=-c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
-    -fno-exceptions -fno-threadsafe-statics -fno-rtti
+    -fno-exceptions -fno-threadsafe-statics -fno-rtti -Wno-inline-new-delete
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
 endif
@@ -22,7 +22,7 @@ ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic -O2 \
 
 INITCFLAGS=$(ALLCFLAGS)
 CFLAGS=$(ALLCFLAGS)
-LDFLAGS=-shared -Bsymbolic -static-libstdc++ -static-libgcc
+LDFLAGS=-shared -Bsymbolic
 CLDEF = 1
 CLC = clang
 CLT = clang

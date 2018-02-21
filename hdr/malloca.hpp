@@ -14,3 +14,9 @@ template <class T, class U>
 bool operator==(const Mallocator<T>&, const Mallocator<U>&) { return true; }
 template <class T, class U>
 bool operator!=(const Mallocator<T>&, const Mallocator<U>&) { return false; }
+
+/* providing custom allocator doesn't seem to work right:
+ * https://stackoverflow.com/questions/48915888/allocate-shared-with-malloc
+ * So also kill operator delete. */
+inline void operator delete(void *, unsigned long) noexcept { std::abort(); }
+inline void operator delete(void *) noexcept { std::abort(); }
