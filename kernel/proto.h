@@ -484,7 +484,7 @@ ULONG ASMPASCAL lseek(int fd, long position);
 seg ASMPASCAL allocmem(UWORD size);
 void ASMPASCAL keycheck(void);
 void ASMPASCAL set_DTA(__FAR(void)_dta);
-WORD ASMPASCAL FAR execrh(__FAR(request),__FAR(struct dhdr));
+WORD ASMPASCAL execrh(__FAR(request),__FAR(struct dhdr));
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
 __FAR(void) ASMPASCAL DetectXMSDriver(VOID);
