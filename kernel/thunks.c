@@ -154,7 +154,7 @@ void cpu_relax(void)
     fdpp->cpu_relax();
 }
 
-static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
+static uint32_t do_asm_call_far(int num, uint8_t *sp, uint8_t len)
 {
     int i;
 
@@ -166,6 +166,12 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
     }
     _assert(0);
     return -1;
+}
+
+static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
+{
+    // FIXME: IMPLEMENT!!!
+    return do_asm_call_far(num, sp, len);
 }
 
 uint16_t getCS(void)
@@ -204,6 +210,13 @@ void setES(uint16_t seg)
 
 #define _CNV(c, at, nl, n) c(at, _a##n, a##n, a##nl)
 
+#define _THUNK_F_0_v(n, f) \
+void f(void) \
+{ \
+    _assert(n < asm_tab_len); \
+    do_asm_call_far(n, NULL, 0); \
+}
+
 #define _THUNK0_v(n, f) \
 void f(void) \
 { \
@@ -211,7 +224,7 @@ void f(void) \
     do_asm_call(n, NULL, 0); \
 }
 
-#define _THUNK1_v(n, f, t1, at1, c1, l1) \
+#define _THUNK_F_1_v(n, f, t1, at1, c1, l1) \
 void f(t1 a1) \
 { \
     _CNV(c1, at1, l1, 1); \
@@ -219,7 +232,7 @@ void f(t1 a1) \
 	at1 a1; \
     } PACKED _args = { _a1 }; \
     _assert(n < asm_tab_len); \
-    do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
+    do_asm_call_far(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK2_v(n, f, t1, at1, c1, l1, t2, at2, c2, l2) \
@@ -267,6 +280,13 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
+#define _THUNK_F_P_0_v(n, f) \
+void f(void) \
+{ \
+    _assert(n < asm_tab_len); \
+    do_asm_call_far(n, NULL, 0); \
+}
+
 #define _THUNK_P_0_v(n, f) \
 void f(void) \
 { \
@@ -274,12 +294,12 @@ void f(void) \
     do_asm_call(n, NULL, 0); \
 }
 
-#define _THUNK_P_0_vp(n, f) \
+#define _THUNK_F_P_0_vp(n, f) \
 void FAR *f(void) \
 { \
     uint32_t __ret; \
     _assert(n < asm_tab_len); \
-    __ret = do_asm_call(n, NULL, 0); \
+    __ret = do_asm_call_far(n, NULL, 0); \
     return FP_FROM_D(void, __ret); \
 }
 
@@ -288,6 +308,17 @@ r f(void) \
 { \
     _assert(n < asm_tab_len); \
     return do_asm_call(n, NULL, 0); \
+}
+
+#define _THUNK_F_P_1_v(n, f, t1, at1, c1, l1) \
+void f(t1 a1) \
+{ \
+    _CNV(c1, at1, l1, 1); \
+    struct { \
+	at1 a1; \
+    } PACKED _args = { _a1 }; \
+    _assert(n < asm_tab_len); \
+    do_asm_call_far(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_1_v(n, f, t1, at1, c1, l1) \
@@ -312,6 +343,19 @@ r f(t1 a1) \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
+#define _THUNK_F_P_2(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2) \
+r f(t1 a1, t2 a2) \
+{ \
+    _CNV(c1, at1, l1, 1); \
+    _CNV(c2, at2, l2, 2); \
+    struct { \
+	at2 a2; \
+	at1 a1; \
+    } PACKED _args = { _a2, _a1 }; \
+    _assert(n < asm_tab_len); \
+    return do_asm_call_far(n, (UBYTE *)&_args, sizeof(_args)); \
+}
+
 #define _THUNK_P_2(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2) \
 r f(t1 a1, t2 a2) \
 { \
@@ -323,6 +367,21 @@ r f(t1 a1, t2 a2) \
     } PACKED _args = { _a2, _a1 }; \
     _assert(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
+}
+
+#define _THUNK_F_P_3(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2, t3, at3, c3, l3) \
+r f(t1 a1, t2 a2, t3 a3) \
+{ \
+    _CNV(c1, at1, l1, 1); \
+    _CNV(c2, at2, l2, 2); \
+    _CNV(c3, at3, l3, 3); \
+    struct { \
+	at3 a3; \
+	at2 a2; \
+	at1 a1; \
+    } PACKED _args = { _a3, _a2, _a1 }; \
+    _assert(n < asm_tab_len); \
+    return do_asm_call_far(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_3(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2, t3, at3, c3, l3) \
@@ -391,6 +450,27 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5) \
     } PACKED _args = { _a5, _a4, _a3, _a2, _a1 }; \
     _assert(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
+}
+
+#define _THUNK_F_P_6(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2, t3, at3, c3, l3, t4, at4, c4, l4, t5, at5, c5, l5, t6, at6, c6, l6) \
+r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
+{ \
+    _CNV(c1, at1, l1, 1); \
+    _CNV(c2, at2, l2, 2); \
+    _CNV(c3, at3, l3, 3); \
+    _CNV(c4, at4, l4, 4); \
+    _CNV(c5, at5, l5, 5); \
+    _CNV(c6, at6, l6, 6); \
+    struct { \
+	at6 a6; \
+	at5 a5; \
+	at4 a4; \
+	at3 a3; \
+	at2 a2; \
+	at1 a1; \
+    } PACKED _args = { _a6, _a5, _a4, _a3, _a2, _a1 }; \
+    _assert(n < asm_tab_len); \
+    return do_asm_call_far(n, (UBYTE *)&_args, sizeof(_args)); \
 }
 
 #define _THUNK_P_6(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2, t3, at3, c3, l3, t4, at4, c4, l4, t5, at5, c5, l5, t6, at6, c6, l6) \
