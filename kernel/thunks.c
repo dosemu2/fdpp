@@ -17,8 +17,9 @@ static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
 static struct far_s *sym_tab;
 static int sym_tab_len;
+static uint16_t near_wrp;
 
-void FdppSetAsmCalls(struct asm_dsc_s *tab, int size)
+static void FdppSetAsmCalls(struct asm_dsc_s *tab, int size)
 {
     asm_tab = tab;
     asm_tab_len = size / sizeof(struct asm_dsc_s);
@@ -85,7 +86,7 @@ void *resolve_segoff(struct far_s fa)
     return so2lin(fa.seg, fa.off);
 }
 
-int FdppSetAsmThunks(struct far_s *ptrs, int size)
+static int FdppSetAsmThunks(struct far_s *ptrs, int size)
 {
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
     int i;
@@ -103,6 +104,28 @@ int FdppSetAsmThunks(struct far_s *ptrs, int size)
     memcpy(sym_tab, ptrs, size);
     sym_tab_len = len;
     return 0;
+}
+
+struct fdpp_symtab {
+    uint16_t symtab;
+    uint16_t symtab_len;
+    uint16_t calltab;
+    uint16_t calltab_len;
+    uint16_t near_wrp;
+};
+
+void FdppSetSymTab(void *tab)
+{
+    int err;
+    struct fdpp_symtab *symtab = (struct fdpp_symtab *)tab;
+    uint16_t ds = fdpp->getreg(REG_ds);
+    struct asm_dsc_s *asmtab = (struct asm_dsc_s *)so2lin(ds, symtab->calltab);
+    struct far_s *thtab = (struct far_s *)so2lin(ds, symtab->symtab);
+
+    FdppSetAsmCalls(asmtab, symtab->calltab_len);
+    err = FdppSetAsmThunks(thtab, symtab->symtab_len);
+    _assert(!err);
+    near_wrp = symtab->near_wrp;
 }
 
 #define _ARG(n, t, ap) (*(t *)(ap + n))
@@ -154,6 +177,9 @@ void cpu_relax(void)
     fdpp->cpu_relax();
 }
 
+
+// TODO: remove args from stack
+// TODO: align args by 2 bytes
 static uint32_t do_asm_call_far(int num, uint8_t *sp, uint8_t len)
 {
     int i;
@@ -170,8 +196,18 @@ static uint32_t do_asm_call_far(int num, uint8_t *sp, uint8_t len)
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 {
-    // FIXME: IMPLEMENT!!!
-    return do_asm_call_far(num, sp, len);
+    int i;
+
+    for (i = 0; i < asm_tab_len; i++) {
+        if (asm_tab[i].num == num) {
+            fdpp->setreg(REG_eax, asm_tab[i].off);
+            fdpp->setreg(REG_ecx, len >> 1);
+            fdpp->asm_call(asm_tab[i].seg, near_wrp, sp, len);
+            return (fdpp->getreg(REG_edx) << 16) | (fdpp->getreg(REG_eax) & 0xffff);
+        }
+    }
+    _assert(0);
+    return -1;
 }
 
 uint16_t getCS(void)

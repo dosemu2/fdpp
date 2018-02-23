@@ -59,14 +59,34 @@ __asm_symtab_end:
 
 segment INIT_TEXT
 
+near_wrp:
+    push bp
+    mov bp, sp
+    mov bx, cx
+    dec bx
+    add bx, bx
+nw1:
+    mov di, sp
+    push word [bx + di + 6]
+    loop nw1
+    call ax
+    mov sp, bp
+    pop bp
+    retf
+
     global plt_init
 plt_init:
+    push bp
+    mov bp, sp
     mov al, DOS_HELPER_DL
     mov ah, DOS_HELPER_DL_VERSION
     mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
-    mov cx, __asm_callsymtab_end - __asm_callsymtab_start
-    mov si, __asm_callsymtab_start
-    mov dx, __asm_symtab_end - __asm_symtab_start
-    mov di, __asm_symtab_start
+    push word near_wrp
+    push word __asm_callsymtab_end - __asm_callsymtab_start
+    push word __asm_callsymtab_start
+    push word __asm_symtab_end - __asm_symtab_start
+    push word __asm_symtab_start
     int DOS_HELPER_INT
+    mov sp, bp
+    pop bp
     ret
