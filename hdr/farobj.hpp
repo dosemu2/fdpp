@@ -1,6 +1,7 @@
 #include <cstring>
 #include "malloca.hpp"
 #include "farptr.hpp"
+#include "cppstubs.hpp"
 #include "dosobj.h"
 
 template <typename T>

@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <memory>
 #include <cstring>
+#include "cppstubs.hpp"
 #include "thunks_priv.h"
 #include "dosobj_priv.h"
 #include "farhlp.h"
