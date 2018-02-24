@@ -114,7 +114,7 @@ void put_console(int c)
     int 0x29;
   }
 #else
-  iregs r;
+  iregs r = {};
   r.a.b.h = 0x0e;
   r.a.b.l = c;
   r.b.x = 0;

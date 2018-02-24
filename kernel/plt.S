@@ -62,17 +62,37 @@ segment INIT_TEXT
 near_wrp:
     push bp
     mov bp, sp
+    sub sp, 2
     mov bx, cx
     dec bx
     add bx, bx
 nw1:
     mov di, sp
-    push word [bx + di + 6]
+    push word [ss : bx + di + 8]
     loop nw1
+    mov [bp - 2], sp
     call ax
+    mov bx, sp
+    sub bx, [bp - 2]
     mov sp, bp
     pop bp
+    ; see if C or pascal stack
+    or bx, bx
+    jz do_retf
+    ; remove pascal arguments
+    cmp bx, 2
+    je do_retf2
+    mov di, sp
+    ; move return addr upwards
+    pop word [ss : di + bx]
+    pop word [ss : di + bx + 2]
+    ; remove whatever remained
+    sub bx, 4
+    add sp, bx
+do_retf:
     retf
+do_retf2:
+    retf 2
 
     global plt_init
 plt_init:

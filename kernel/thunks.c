@@ -178,7 +178,6 @@ void cpu_relax(void)
 }
 
 
-// TODO: remove args from stack
 // TODO: align args by 2 bytes
 static uint32_t do_asm_call_far(int num, uint8_t *sp, uint8_t len)
 {
@@ -208,6 +207,16 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
     }
     _assert(0);
     return -1;
+}
+
+static uint8_t *clean_stk(size_t len)
+{
+    uint16_t ss = fdpp->getreg(REG_ss);
+    uint32_t sp = fdpp->getreg(REG_esp);
+    uint8_t *ret = (uint8_t *)so2lin(ss, sp);
+    sp += len;
+    fdpp->setreg(REG_esp, sp);
+    return ret;
 }
 
 uint16_t getCS(void)
@@ -269,6 +278,7 @@ void f(t1 a1) \
     } PACKED _args = { _a1 }; \
     _assert(n < asm_tab_len); \
     do_asm_call_far(n, (UBYTE *)&_args, sizeof(_args)); \
+    clean_stk(sizeof(_args)); \
 }
 
 #define _THUNK2_v(n, f, t1, at1, c1, l1, t2, at2, c2, l2) \
@@ -282,6 +292,7 @@ void f(t1 a1, t2 a2) \
     } PACKED _args = { _a1, _a2 }; \
     _assert(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
+    clean_stk(sizeof(_args)); \
 }
 
 #define _THUNK3_v(n, f, t1, at1, c1, l1, t2, at2, c2, l2, t3, at3, c3, l3) \
@@ -297,6 +308,7 @@ void f(t1 a1, t2 a2, t3 a3) \
     } PACKED _args = { _a1, _a2, _a3 }; \
     _assert(n < asm_tab_len); \
     do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
+    clean_stk(sizeof(_args)); \
 }
 
 #define _THUNK4(n, r, f, t1, at1, c1, l1, t2, at2, c2, l2, t3, at3, c3, l3, t4, at4, c4, l4) \
@@ -314,6 +326,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
     } PACKED _args = { _a1, _a2, _a3, _a4 }; \
     _assert(n < asm_tab_len); \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args)); \
+    clean_stk(sizeof(_args)); \
 }
 
 #define _THUNK_F_P_0_v(n, f) \
