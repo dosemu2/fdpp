@@ -1,5 +1,6 @@
-#define DOS_HELPER_DL                0x60
-#define DOS_HELPER_DL_VERSION        1
+#define DOS_HELPER_PLUGIN            0x60
+#define DOS_HELPER_PLUGIN_ID_FDPP    0
+#define DOS_HELPER_PLUGIN_VERSION    1
 #define DOS_SUBHELPER_DL_SET_SYMTAB  0
 #define DOS_SUBHELPER_DL_CCALL       1
 
@@ -11,7 +12,8 @@
 segment %3
     global _%1
     _%1:
-    mov al, DOS_HELPER_DL
+    mov al, DOS_HELPER_PLUGIN
+    mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_CCALL
     mov cx, %2
     int DOS_HELPER_INT
@@ -98,8 +100,9 @@ do_retf2:
 plt_init:
     push bp
     mov bp, sp
-    mov al, DOS_HELPER_DL
-    mov ah, DOS_HELPER_DL_VERSION
+    mov al, DOS_HELPER_PLUGIN
+    mov ah, DOS_HELPER_PLUGIN_VERSION
+    mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
     push word near_wrp
     push word __asm_callsymtab_end - __asm_callsymtab_start

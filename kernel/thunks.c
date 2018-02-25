@@ -76,6 +76,36 @@ static union asm_thunks_u {
 #undef SEMIC
 }};
 
+struct vm86_regs {
+/*
+ * normal regs, with special meaning for the segment descriptors..
+ */
+	int ebx;
+	int ecx;
+	int edx;
+	int esi;
+	int edi;
+	int ebp;
+	int eax;
+	int __null_ds;
+	int __null_es;
+	int __null_fs;
+	int __null_gs;
+	int orig_eax;
+	int eip;
+	unsigned short cs, __csh;
+	int eflags;
+	int esp;
+	unsigned short ss, __ssh;
+/*
+ * these are specific to v86 mode:
+ */
+	unsigned short es, __esh;
+	unsigned short ds, __dsh;
+	unsigned short fs, __fsh;
+	unsigned short gs, __gsh;
+};
+
 static void *so2lin(uint16_t seg, uint16_t off)
 {
     return fdpp->mem_base() + (seg << 4) + off;
@@ -114,7 +144,7 @@ struct fdpp_symtab {
     uint16_t near_wrp;
 };
 
-void FdppSetSymTab(void *tab)
+static void FdppSetSymTab(void *tab)
 {
     int err;
     struct fdpp_symtab *symtab = (struct fdpp_symtab *)tab;
@@ -135,7 +165,7 @@ void FdppSetSymTab(void *tab)
     FP_FROM_D(t, __d); \
 })
 
-UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
+static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
     UDWORD ret = 0;
     UBYTE rsz = 0;
@@ -150,6 +180,20 @@ UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     if (r_len)
         *r_len = rsz;
     return ret;
+}
+
+void FdppCall(struct vm86_regs *regs)
+{
+    switch (regs->ebx & 0xff) {
+    case 0:
+        FdppSetSymTab(so2lin(regs->ss, regs->esp + 6));
+        break;
+    case 1:
+        regs->eax = FdppThunkCall(regs->ecx,
+                (UBYTE *)so2lin(regs->ss, regs->esp),
+                NULL);
+        break;
+    }
 }
 
 void do_abort(const char *file, int line)

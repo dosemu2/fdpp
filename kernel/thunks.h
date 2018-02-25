@@ -9,11 +9,10 @@ extern "C" {
 #endif
 #include "thunkapi.h"
 
-uint32_t FdppThunkCall(int fn, uint8_t *sp, uint8_t *r_len);
+struct vm86_regs;
+void FdppCall(struct vm86_regs *regs);
 
 typedef void (*FdppAsmCall_t)(uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len);
-void FdppSetSymTab(void *tab);
-
 enum FdppReg { REG_es, REG_cs, REG_ss, REG_ds, REG_fs, REG_gs,
   REG_eax, REG_ebx, REG_ecx, REG_edx, REG_esi, REG_edi,
   REG_ebp, REG_esp, REG_eip, REG_eflags };
