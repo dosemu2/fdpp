@@ -12,10 +12,8 @@ extern "C" {
 struct vm86_regs;
 void FdppCall(struct vm86_regs *regs);
 
-typedef void (*FdppAsmCall_t)(uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len);
-enum FdppReg { REG_es, REG_cs, REG_ss, REG_ds, REG_fs, REG_gs,
-  REG_eax, REG_ebx, REG_ecx, REG_edx, REG_esi, REG_edi,
-  REG_ebp, REG_esp, REG_eip, REG_eflags };
+typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
+        uint16_t off, uint8_t *sp, uint8_t len);
 
 struct fdpp_api {
     uint8_t *(*mem_base)(void);
@@ -23,8 +21,6 @@ struct fdpp_api {
     void (*print_handler)(const char *format, va_list ap);
     void (*cpu_relax)(void);
     FdppAsmCall_t asm_call;
-    uint32_t (*getreg)(enum FdppReg reg);
-    void (*setreg)(enum FdppReg reg, uint32_t value);
     struct fdthunk_api thunks;
 };
 void FdppInit(struct fdpp_api *api);

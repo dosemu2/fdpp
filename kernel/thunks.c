@@ -106,6 +106,8 @@ struct vm86_regs {
 	unsigned short gs, __gsh;
 };
 
+static struct vm86_regs s_regs;
+
 static void *so2lin(uint16_t seg, uint16_t off)
 {
     return fdpp->mem_base() + (seg << 4) + off;
@@ -144,13 +146,12 @@ struct fdpp_symtab {
     uint16_t near_wrp;
 };
 
-static void FdppSetSymTab(void *tab)
+static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
 {
     int err;
-    struct fdpp_symtab *symtab = (struct fdpp_symtab *)tab;
-    uint16_t ds = fdpp->getreg(REG_ds);
-    struct asm_dsc_s *asmtab = (struct asm_dsc_s *)so2lin(ds, symtab->calltab);
-    struct far_s *thtab = (struct far_s *)so2lin(ds, symtab->symtab);
+    struct asm_dsc_s *asmtab =
+            (struct asm_dsc_s *)so2lin(regs->ds, symtab->calltab);
+    struct far_s *thtab = (struct far_s *)so2lin(regs->ds, symtab->symtab);
 
     FdppSetAsmCalls(asmtab, symtab->calltab_len);
     err = FdppSetAsmThunks(thtab, symtab->symtab_len);
@@ -186,7 +187,8 @@ void FdppCall(struct vm86_regs *regs)
 {
     switch (regs->ebx & 0xff) {
     case 0:
-        FdppSetSymTab(so2lin(regs->ss, regs->esp + 6));
+        FdppSetSymTab(regs,
+                (struct fdpp_symtab *)so2lin(regs->ss, regs->esp + 6));
         break;
     case 1:
         regs->eax = FdppThunkCall(regs->ecx,
@@ -194,6 +196,8 @@ void FdppCall(struct vm86_regs *regs)
                 NULL);
         break;
     }
+
+    s_regs = *regs;
 }
 
 void do_abort(const char *file, int line)
@@ -229,8 +233,8 @@ static uint32_t do_asm_call_far(int num, uint8_t *sp, uint8_t len)
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
-            fdpp->asm_call(asm_tab[i].seg, asm_tab[i].off, sp, len);
-            return (fdpp->getreg(REG_edx) << 16) | (fdpp->getreg(REG_eax) & 0xffff);
+            fdpp->asm_call(&s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
+            return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
     _assert(0);
@@ -243,10 +247,10 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
-            fdpp->setreg(REG_eax, asm_tab[i].off);
-            fdpp->setreg(REG_ecx, len >> 1);
-            fdpp->asm_call(asm_tab[i].seg, near_wrp, sp, len);
-            return (fdpp->getreg(REG_edx) << 16) | (fdpp->getreg(REG_eax) & 0xffff);
+            s_regs.eax = asm_tab[i].off;
+            s_regs.ecx = len >> 1;
+            fdpp->asm_call(&s_regs, asm_tab[i].seg, near_wrp, sp, len);
+            return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
     _assert(0);
@@ -255,27 +259,24 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 
 static uint8_t *clean_stk(size_t len)
 {
-    uint16_t ss = fdpp->getreg(REG_ss);
-    uint32_t sp = fdpp->getreg(REG_esp);
-    uint8_t *ret = (uint8_t *)so2lin(ss, sp);
-    sp += len;
-    fdpp->setreg(REG_esp, sp);
+    uint8_t *ret = (uint8_t *)so2lin(s_regs.ss, s_regs.esp);
+    s_regs.esp += len;
     return ret;
 }
 
 uint16_t getCS(void)
 {
-    return fdpp->getreg(REG_cs);
+    return s_regs.cs;
 }
 
 void setDS(uint16_t seg)
 {
-    fdpp->setreg(REG_ds, seg);
+    s_regs.ds = seg;
 }
 
 void setES(uint16_t seg)
 {
-    fdpp->setreg(REG_es, seg);
+    s_regs.es = seg;
 }
 
 #define __ARG(t) t
@@ -656,6 +657,6 @@ struct far_s lookup_far_st(const void *ptr)
 
 uint32_t thunk_call_void(struct far_s fa)
 {
-    fdpp->asm_call(fa.seg, fa.off, NULL, 0);
-    return (fdpp->getreg(REG_edx) << 16) | (fdpp->getreg(REG_eax) & 0xffff);
+    fdpp->asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
+    return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
 }
