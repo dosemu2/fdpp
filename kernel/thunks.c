@@ -279,6 +279,21 @@ void setES(uint16_t seg)
     s_regs.es = seg;
 }
 
+#define VIF_MASK	0x00080000	/* virtual interrupt flag */
+#define VIF VIF_MASK
+#define set_IF() (s_regs.eflags |= VIF)
+#define clear_IF() (s_regs.eflags &= ~VIF)
+
+void disable(void)
+{
+    clear_IF();
+}
+
+void enable(void)
+{
+    set_IF();
+}
+
 #define __ARG(t) t
 #define __ARG_PTR(t) t *
 #define __ARG_PTR_FAR(t) t FAR *
