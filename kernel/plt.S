@@ -41,6 +41,42 @@ _%1_ptr:
     dw _%1, SEG _%1
 %endmacro
 
+%macro nearwrp 0
+    push bp
+    mov bp, sp
+    sub sp, 2
+    mov bx, cx
+    dec bx
+    add bx, bx
+%%1:
+    mov di, sp
+    push word [ss : bx + di + 8]
+    loop %%1
+    mov [bp - 2], sp
+    call ax
+    mov bx, sp
+    sub bx, [bp - 2]
+    mov sp, bp
+    pop bp
+    ; see if C or pascal stack
+    or bx, bx
+    jz %%2
+    ; remove pascal arguments
+    cmp bx, 2
+    je %%3
+    mov di, sp
+    ; move return addr upwards
+    pop word [ss : di + bx]
+    pop word [ss : di + bx + 2]
+    ; remove whatever remained
+    sub bx, 4
+    add sp, bx
+%%2:
+    retf
+%%3:
+    retf 2
+%endmacro
+
 segment IC
 
 __asm_callsymtab_start:
@@ -59,42 +95,15 @@ __asm_symtab_start:
 #include "glob_asm.h"
 __asm_symtab_end:
 
-segment INIT_TEXT
+segment HMA_TEXT
 
 near_wrp:
-    push bp
-    mov bp, sp
-    sub sp, 2
-    mov bx, cx
-    dec bx
-    add bx, bx
-nw1:
-    mov di, sp
-    push word [ss : bx + di + 8]
-    loop nw1
-    mov [bp - 2], sp
-    call ax
-    mov bx, sp
-    sub bx, [bp - 2]
-    mov sp, bp
-    pop bp
-    ; see if C or pascal stack
-    or bx, bx
-    jz do_retf
-    ; remove pascal arguments
-    cmp bx, 2
-    je do_retf2
-    mov di, sp
-    ; move return addr upwards
-    pop word [ss : di + bx]
-    pop word [ss : di + bx + 2]
-    ; remove whatever remained
-    sub bx, 4
-    add sp, bx
-do_retf:
-    retf
-do_retf2:
-    retf 2
+    nearwrp
+
+segment INIT_TEXT
+
+init_near_wrp:
+    nearwrp
 
     global plt_init
 plt_init:
@@ -104,7 +113,11 @@ plt_init:
     mov ah, DOS_HELPER_PLUGIN_VERSION
     mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
+    push word SEG init_near_wrp
+    push word init_near_wrp
+    push word SEG near_wrp
     push word near_wrp
+    push word 2    ; amount of near wrappers
     push word __asm_callsymtab_end - __asm_callsymtab_start
     push word __asm_callsymtab_start
     push word __asm_symtab_end - __asm_symtab_start

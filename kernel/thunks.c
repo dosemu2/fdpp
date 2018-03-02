@@ -17,7 +17,8 @@ static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
 static struct far_s *sym_tab;
 static int sym_tab_len;
-static uint16_t near_wrp;
+static struct far_s *near_wrp;
+static int num_wrps;
 
 static void FdppSetAsmCalls(struct asm_dsc_s *tab, int size)
 {
@@ -143,7 +144,8 @@ struct fdpp_symtab {
     uint16_t symtab_len;
     uint16_t calltab;
     uint16_t calltab_len;
-    uint16_t near_wrp;
+    uint16_t num_wrps;
+    struct far_s near_wrp[0];
 };
 
 static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
@@ -156,7 +158,9 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FdppSetAsmCalls(asmtab, symtab->calltab_len);
     err = FdppSetAsmThunks(thtab, symtab->symtab_len);
     _assert(!err);
-    near_wrp = symtab->near_wrp;
+    num_wrps = symtab->num_wrps;
+    near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
+    memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
 }
 
 #define _ARG(n, t, ap) (*(t *)(ap + n))
@@ -241,15 +245,28 @@ static uint32_t do_asm_call_far(int num, uint8_t *sp, uint8_t len)
     return -1;
 }
 
+static uint16_t find_wrp(uint16_t seg)
+{
+    int i;
+
+    for (i = 0; i < num_wrps; i++) {
+        if (near_wrp[i].seg == seg)
+            return near_wrp[i].off;
+    }
+    _assert(0);
+    return -1;
+}
+
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
 {
     int i;
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
+            uint16_t wrp = find_wrp(asm_tab[i].seg);
             s_regs.eax = asm_tab[i].off;
             s_regs.ecx = len >> 1;
-            fdpp->asm_call(&s_regs, asm_tab[i].seg, near_wrp, sp, len);
+            fdpp->asm_call(&s_regs, asm_tab[i].seg, wrp, sp, len);
             return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
