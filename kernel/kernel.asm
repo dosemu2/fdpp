@@ -982,17 +982,17 @@ _int19_handler: jmp 0:reloc_call_int19_handler
 _cpm_entry:     jmp 0:reloc_call_cpm_entry
                 call near forceEnableA20
 
-                global  _reloc_call_blk_driver
-                extern  _blk_driver
-_reloc_call_blk_driver:
-                jmp 0:_blk_driver
-                call near forceEnableA20
-
-                global  _reloc_call_clk_driver
-                extern  _clk_driver
-_reloc_call_clk_driver:
-                jmp 0:_clk_driver
-                call near forceEnableA20
+;                global  _reloc_call_blk_driver
+;                extern  _blk_driver
+;_reloc_call_blk_driver:
+;                jmp 0:_blk_driver
+;                call near forceEnableA20
+;
+;                global  _reloc_call_clk_driver
+;                extern  _clk_driver
+;_reloc_call_clk_driver:
+;                jmp 0:_clk_driver
+;                call near forceEnableA20
 
                 global  _CharMapSrvc ; in _DATA (see AARD)
                 extern  _reloc_call_CharMapSrvc
