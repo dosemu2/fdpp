@@ -283,7 +283,7 @@ public:
 template<typename T, int max_len = 0>
 class ArSymBase {
 protected:
-    FarPtr<T> sym;
+    FarPtrBase<T> sym;
 
 public:
     template <typename T1 = T,
@@ -377,10 +377,11 @@ public:
 
 template<typename T>
 class FarPtrAsm {
-    FarPtr<FarPtr<T>> ptr;
+    FarPtr<FarPtrBase<T>> ptr;
 
 public:
-    explicit FarPtrAsm(const FarPtr<FarPtr<T>>& f) : ptr(f) {}
+    explicit FarPtrAsm(const FarPtr<FarPtrBase<T>>& f) : ptr(f) {}
+    operator FarPtrBase<T> *() { return ptr.get_ptr(); }
     /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
     explicit operator uint16_t *() { return &ptr->get_ref().off; }
     uint16_t seg() const { return ptr.seg(); }
@@ -389,10 +390,10 @@ public:
 
 template<typename T>
 class AsmFarPtr {
-    FarPtr<FarPtr<T>> ptr;
+    FarPtr<FarPtrBase<T>> ptr;
 
 public:
-    FarPtr<T>& get_sym() { return *ptr.get_ptr(); }
+    FarPtrBase<T>& get_sym() { return *ptr.get_ptr(); }
     FarPtrAsm<T> operator &() { return FarPtrAsm<T>(ptr); }
 
     AsmFarPtr() = default;

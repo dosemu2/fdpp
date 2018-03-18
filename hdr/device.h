@@ -477,10 +477,10 @@ typedef struct {
 
 /*
  */
-typedef __FAR(request)rqptr;
-typedef __FAR(bpb)bpbptr;
-typedef __FAR(BYTE)byteptr;
-typedef __FAR(struct dhdr)dhdrptr;
+typedef __DOSFAR(request)rqptr;
+typedef __DOSFAR(bpb)bpbptr;
+typedef __DOSFAR(BYTE)byteptr;
+typedef __DOSFAR(struct dhdr)dhdrptr;
 
 /* dsk.c */
 COUNT ASMCFUNC FAR blk_driver(rqptr rp);

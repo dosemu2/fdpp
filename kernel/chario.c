@@ -37,7 +37,7 @@ static BYTE *charioRcsId =
 
 #include "globals.h"
 
-STATIC int CharRequest(struct dhdr FAR **pdev, unsigned command)
+STATIC int CharRequest(__DOSFAR(struct dhdr) *pdev, unsigned command)
 {
   struct dhdr FAR *dev = *pdev;
   CharReqHdr.r_command = command;
@@ -64,7 +64,7 @@ STATIC int CharRequest(struct dhdr FAR **pdev, unsigned command)
   return SUCCESS;
 }
 
-long BinaryCharIO(struct dhdr FAR **pdev, size_t n, void FAR * bp,
+long BinaryCharIO(__DOSFAR(struct dhdr) *pdev, size_t n, void FAR * bp,
                   unsigned command)
 {
   int err;
@@ -77,7 +77,7 @@ long BinaryCharIO(struct dhdr FAR **pdev, size_t n, void FAR * bp,
   return err == SUCCESS ? (long)CharReqHdr.r_count : err;
 }
 
-STATIC int CharIO(struct dhdr FAR **pdev, unsigned char ch, unsigned command)
+STATIC int CharIO(__DOSFAR(struct dhdr) *pdev, unsigned char ch, unsigned command)
 {
   int err = (int)BinaryCharIO(pdev, 1, MK_FAR_SCP(ch), command);
   if (err == 0)
@@ -89,18 +89,18 @@ STATIC int CharIO(struct dhdr FAR **pdev, unsigned char ch, unsigned command)
 
 /* STATE FUNCTIONS */
 
-STATIC void CharCmd(struct dhdr FAR **pdev, unsigned command)
+STATIC void CharCmd(__DOSFAR(struct dhdr) *pdev, unsigned command)
 {
   while (CharRequest(pdev, command) == 1);
 }
 
-STATIC int Busy(struct dhdr FAR **pdev)
+STATIC int Busy(__DOSFAR(struct dhdr) *pdev)
 {
   CharCmd(pdev, C_ISTAT);
   return CharReqHdr.r_status & S_BUSY;
 }
 
-void con_flush(struct dhdr FAR **pdev)
+void con_flush(__DOSFAR(struct dhdr) *pdev)
 {
   CharCmd(pdev, C_IFLUSH);
 }
@@ -128,7 +128,7 @@ int StdinBusy(void)
 
 /* get character from the console - this is how DOS gets
    CTL_C/CTL_S/CTL_P when outputting */
-int ndread(struct dhdr FAR **pdev)
+int ndread(__DOSFAR(struct dhdr) *pdev)
 {
   CharCmd(pdev, C_NDREAD);
   if (CharReqHdr.r_status & S_BUSY)
@@ -174,9 +174,9 @@ void update_scr_pos(unsigned char c, unsigned char count)
   scr_pos = scrpos;
 }
 
-STATIC int raw_get_char(struct dhdr FAR **pdev, BOOL check_break);
+STATIC int raw_get_char(__DOSFAR(struct dhdr) *pdev, BOOL check_break);
 
-long cooked_write(struct dhdr FAR **pdev, size_t n, const char FAR *bp)
+long cooked_write(__DOSFAR(struct dhdr) *pdev, size_t n, const char FAR *bp)
 {
   size_t xfer;
 
@@ -293,7 +293,7 @@ long cooked_read(struct dhdr FAR **pdev, size_t n, char FAR *bp)
 }
 
 STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
-                                       struct dhdr FAR **pdev,
+                                       __DOSFAR(struct dhdr) *pdev,
                                        BOOL check_break)
 {
   unsigned c;
@@ -313,7 +313,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
         break;
       }
       if (check_break && *pdev != syscon)
-        check_handle_break(&syscon);
+        check_handle_break(__ASMADDR(syscon));
       /* the idle int is only safe if we're using the character stack */
       if (user_r->AH < 0xd)
         DosIdle_int();
@@ -335,7 +335,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
   return c;
 }
 
-STATIC int raw_get_char(struct dhdr FAR **pdev, BOOL check_break)
+STATIC int raw_get_char(__DOSFAR(struct dhdr) *pdev, BOOL check_break)
 {
   return read_char_sft_dev(-1, -1, pdev, check_break);
 }
