@@ -19,6 +19,16 @@ segment %3
     int DOS_HELPER_INT
 %endmacro
 
+%macro asmcfunc_f 3
+    asmcfunc %1, %2, %3
+    retf
+%endmacro
+
+%macro asmcfunc_n 3
+    asmcfunc %1, %2, %3
+    ret
+%endmacro
+
 %include "plt.inc"
 
 %macro asmcsym 2
