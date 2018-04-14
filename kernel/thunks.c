@@ -176,7 +176,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     UBYTE rsz = 0;
 #define _RET ret
 #define _RSZ rsz
-#define _SP sp
+#define _SP (sp + 10)
 
     switch (fn) {
         #include "thunk_calls.h"

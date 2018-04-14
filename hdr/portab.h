@@ -231,7 +231,7 @@ void int3(void);
 #define _MK_DOS_FP(t, seg, off) (t *)MK_FP(seg, off)
 #define __ASMCALL(t, f) t (* f)(void)
 #endif
-#define FP_FROM_D(t, l) (__FAR(t))MK_FP((l) >> 16, (l) & 0xffff)
+#define FP_FROM_D(t, l) (__DOSFAR(t))MK_FP((l) >> 16, (l) & 0xffff)
 typedef struct far_s far_t;
 
 #define FAR                     /* linear architecture  */
