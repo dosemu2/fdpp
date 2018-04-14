@@ -309,7 +309,9 @@ protected:
     FarPtr<T> lookup_sym() const {
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - F();
-        return _MK_F(FarPtr<uint8_t>, lookup_far_st(ptr)) + F();
+        far_s f = lookup_far_st(ptr);
+        _assert(f.seg || f.off);
+        return _MK_F(FarPtr<uint8_t>, f) + F();
     }
 };
 

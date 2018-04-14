@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "../hdr/portab.h"
 #include "globals.h"
 #include "proto.h"
@@ -15,8 +16,7 @@ struct asm_dsc_s {
 };
 static struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
-static struct far_s *sym_tab;
-static int sym_tab_len;
+static struct farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
 
@@ -130,12 +130,13 @@ static int FdppSetAsmThunks(struct far_s *ptrs, int size)
         fdprintf("len=%i expected %i\n", len, exp);
         return -1;
     }
-    for (i = 0; i < len; i++)
-        *asm_thunks.arr[i] = ptrs[i];
 
-    sym_tab = (struct far_s *)malloc(size);
-    memcpy(sym_tab, ptrs, size);
-    sym_tab_len = len;
+    farhlp_init(&sym_tab);
+    for (i = 0; i < len; i++) {
+        *asm_thunks.arr[i] = ptrs[i];
+        store_far(&sym_tab, resolve_segoff(ptrs[i]), ptrs[i]);
+    }
+
     return 0;
 }
 
@@ -678,13 +679,7 @@ void pokel(UWORD seg, UWORD ofs, UDWORD l)
  * only look them up in symtab. */
 struct far_s lookup_far_st(const void *ptr)
 {
-    int i;
-    for (i = 0; i < sym_tab_len; i++) {
-        if (resolve_segoff(sym_tab[i]) == ptr)
-            return sym_tab[i];
-    }
-    _assert(0);
-    return (struct far_s){0, 0};
+    return lookup_far(&sym_tab, ptr);
 }
 
 uint32_t thunk_call_void(struct far_s fa)
