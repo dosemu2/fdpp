@@ -398,8 +398,8 @@ VOID ASMFUNC exec_user(__FAR(iregs) irp, int disable_a20);
 
 #define ASSERT_CONST(x) { typedef struct { char _xx[x ? 1 : -1]; } xx ; }
 
-WORD ASMCFUNC SEGM(HMA_TEXT) FAR clk_driver(rqptr rp);
-COUNT ASMCFUNC SEGM(HMA_TEXT) FAR blk_driver(rqptr rp);
+WORD ASMCFUNC SEGM(HMA_TEXT) FAR clk_driver(__DOSFAR(request) rp);
+COUNT ASMCFUNC SEGM(HMA_TEXT) FAR blk_driver(__DOSFAR(request) rp);
 VOID ASMCFUNC SEGM(INIT_TEXT) FreeDOSmain(void);
 VOID ASMCFUNC SEGM(HMA_TEXT) int21_syscall(__FAR(iregs) irp);
 VOID ASMCFUNC SEGM(HMA_TEXT) int21_service(__FAR(iregs) r);

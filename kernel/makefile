@@ -147,7 +147,8 @@ cdata.asm: cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
 thunk_calls.tmp: proto.h makefile
-	grep ASMCFUNC $< | sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
+	grep ASMCFUNC $< | sed -e 's/__FAR(\([^)]\+\))/\1 FAR */g' \
+		-e 's/__DOSFAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 
 plt.inc: thunk_calls.tmp
 	grep ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_f \4,\t\t\1,\t\3/' >$@
