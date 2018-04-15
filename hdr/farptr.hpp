@@ -11,14 +11,19 @@
 
 static inline far_s _lookup_far(const void *ptr)
 {
-    far_s f = lookup_far(&g_farhlp, ptr);
+    far_s f = lookup_far(&g_farhlp[FARHLP1], ptr);
     _assert(f.seg || f.off);
     return f;
 }
 
 static inline void _store_far(const void *ptr, far_s fptr)
 {
-    store_far(&g_farhlp, ptr, fptr);
+    store_far(&g_farhlp[FARHLP1], ptr, fptr);
+}
+
+static inline void do_store_far(far_s fptr)
+{
+    store_far_replace(&g_farhlp[FARHLP2], resolve_segoff(fptr), fptr);
 }
 
 #define _MK_S(s, o) (far_s){o, s}
@@ -310,6 +315,8 @@ protected:
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - F();
         far_s f = lookup_far_st(ptr);
+        if (!f.seg && !f.off)
+            f = lookup_far(&g_farhlp[FARHLP2], ptr);
         _assert(f.seg || f.off);
         return _MK_F(FarPtr<uint8_t>, f) + F();
     }
@@ -464,7 +471,12 @@ public:
 #define PTR_MEMB(t) NearPtr<t>
 #define FP_SEG(fp)            ((fp).seg())
 #define FP_OFF(fp)            ((fp).off())
-#define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
+#define MK_FP(seg, ofs) ({ \
+    uint16_t _s = seg; \
+    uint16_t _o = ofs; \
+    do_store_far(_MK_S(_s, _o)); \
+    __FAR(void)(_s, _o); \
+})
 #define __DOSFAR(t) FarPtrBase<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)(MK_FP(s, o))
 #define GET_FP32(f) (f).get_fp32()
