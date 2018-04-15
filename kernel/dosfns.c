@@ -909,10 +909,10 @@ COUNT DosChangeDir(BYTE FAR * s)
         Some redirectors do not write back to the CDS.
         SHSUCdX needs this. jt
 */
-  fstrcpy(current_ldt->cdsCurrentPath, PriPathName);
+  fstrcpy_n(current_ldt->cdsCurrentPath, PriPathName);
   if (FP_OFF(current_ldt) != 0xFFFF)
   {
-     fstrcpy(current_ldt->cdsCurrentPath, PriPathName);
+     fstrcpy_n(current_ldt->cdsCurrentPath, PriPathName);
      if (PriPathName[7] == 0)
        current_ldt->cdsCurrentPath[8] = 0; /* Need two Zeros at the end */
   }

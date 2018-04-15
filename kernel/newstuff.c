@@ -319,7 +319,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
 
   fmemcpy(&TempCDS, cdsEntry, sizeof(TempCDS));
   tn_printf(("CDS entry: #%u @%P (%u) '%s'\n", result, GET_FP32(cdsEntry),
-            TempCDS.cdsBackslashOffset, GET_PTR((char FAR *)TempCDS.cdsCurrentPath)));
+            TempCDS.cdsBackslashOffset, TempCDS.cdsCurrentPath));
   /* is the current_ldt thing necessary for compatibly??
      -- 2001/09/03 ska*/
   current_ldt = cdsEntry;
@@ -583,10 +583,10 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     for(i = 0; i < lastdrive; ++i, ++cdsp)
     {
       /* How many bytes must match */
-      size_t j = fstrlen(cdsp->cdsCurrentPath);
+      size_t j = strlen(cdsp->cdsCurrentPath);
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
-      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0') && fmemcmp(MK_FAR_STR_SCP(dest), cdsp->cdsCurrentPath, j) == 0)
+      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0') && memcmp(dest, cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';

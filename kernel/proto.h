@@ -334,6 +334,7 @@ int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 #else    // USE_STDLIB
 #define fstrlen strlen
 #define fstrcpy strcpy
+#define fstrcpy_n strcpy
 #define fstrcmp strcmp
 #define fstrncmp strncmp
 

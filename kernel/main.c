@@ -365,7 +365,7 @@ STATIC VOID FsConfig(VOID)
   {
     struct cds FAR *pcds_table = &LoL->_CDSp[i];
 
-    fmemcpy(pcds_table->cdsCurrentPath, MK_FAR_STR_SCP("A:\\\0"), 4);
+    memcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
 
     pcds_table->cdsCurrentPath[0] += i;
 
