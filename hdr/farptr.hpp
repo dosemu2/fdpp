@@ -417,6 +417,11 @@ public:
     SymMemb(const SymMemb&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *(SymWrp<T> *)this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
+    /* XXX for things like p->memb1.memb2 store memb1. */
+    T& use() {
+        do_store_far(this->lookup_sym().get_far());
+        return *this;
+    }
 };
 
 template<typename T, int (*F)(void)>
@@ -482,6 +487,7 @@ public:
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()
+#define _USE_FP(p) p.use()
 
 #undef NULL
 #define NULL           nullptr

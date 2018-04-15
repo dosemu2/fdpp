@@ -228,6 +228,7 @@ void int3(void);
 #define _FP_SEG(f) FP_SEG(f)
 #define _FP_OFF(f) FP_OFF(f)
 #define _DOS_FP(p) (p)
+#define _USE_FP(p) (p)
 #define _MK_DOS_FP(t, seg, off) (t *)MK_FP(seg, off)
 #define __ASMCALL(t, f) t (* f)(void)
 #endif

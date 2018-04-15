@@ -208,14 +208,14 @@ STATIC void PSPInit(void)
 
   /* first command line argument                          */
   /* p->ps_fcb1.fcb_drive = 0; already set                */
-  fmemset(p->ps_fcb1.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(_USE_FP(p->ps_fcb1).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
   /* second command line argument                         */
   /* p->ps_fcb2.fcb_drive = 0; already set                */
-  fmemset(p->ps_fcb2.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(_USE_FP(p->ps_fcb2).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
 
   /* local command line                                   */
   /* p->ps_cmd.ctCount = 0;     command tail, already set */
-  p->ps_cmd.ctBuffer[0] = 0xd; /* command tail            */
+  _USE_FP(p->ps_cmd).ctBuffer[0] = 0xd; /* command tail            */
 }
 
 #ifndef __WATCOMC__
