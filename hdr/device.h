@@ -383,7 +383,7 @@ typedef struct {
       } _r_par;                 /* Pointer to param. block from 440C/440D */
     } _r_gen;
   } _r_x;
-} request;
+} PACKED request;
 
 #define HUGECOUNT       0xffff
 #define MAXSHORT        0xffffl
