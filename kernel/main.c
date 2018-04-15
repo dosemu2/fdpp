@@ -580,7 +580,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
 /*
  *  Added needed Error handle
  */
-  if ((rq.r_status & (S_ERROR | S_DONE)) == S_ERROR)
+  if ((rq.r_status & (S_ERROR | S_DONE)) != S_DONE)
     return TRUE;
 
   if (cmdLine)
