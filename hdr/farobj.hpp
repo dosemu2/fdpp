@@ -117,8 +117,11 @@ public:
     static FarObjSt<_R(o)> __obj_##n; \
     __obj_##n.FarObjSet(o, strlen(o) + 1)
 #define MK_FAR(o) \
-        FarPtr<decltype(o)>(std::allocate_shared<FarObj<decltype(o)>>\
+        FarPtr<decltype(o)>(std::allocate_shared<FarObj<decltype(o)>> \
         (Mallocator<FarObj<decltype(o)>>(), o))
+#define MK_FAR_SZ(o, sz) \
+        FarPtr<_R(o)>(std::allocate_shared<FarObj<_R(o)>> \
+        (Mallocator<FarObj<_R(o)>>(), o, sz))
 #define _MK_NEAR_ST(n, o) \
     static FarObjSt<decltype(o)::type> __obj_##n; \
     __obj_##n.FarObjSet(o, decltype(o)::len)

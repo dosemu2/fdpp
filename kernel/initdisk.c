@@ -1010,7 +1010,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         return 1;
       }
 
-      f_buf = MK_FAR_SZ_ST(buffer, MAX_SEC_SIZE);
+      f_buf = MK_FAR_SZ(buffer, MAX_SEC_SIZE);
       regs.a.x = 0x0201;
       regs.b.x = FP_OFF(f_buf);
       regs.c.x =
