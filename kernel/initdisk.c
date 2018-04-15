@@ -749,7 +749,7 @@ StandardBios:                  /* old way to get parameters */
                drive,
                driveParam->chs.Cylinder,
                driveParam->chs.Head, driveParam->chs.Sector));
-  DebugPrintf((" total size %luMB\n\n", driveParam->total_sectors / 2048));
+  DebugPrintf((" total size %luMB\n", driveParam->total_sectors / 2048));
 
 ErrorReturn:
 
@@ -1390,7 +1390,7 @@ COUNT dsk_init()
 {
   _printf(" - InitDisk: ");
 
-#ifdef DEBUG
+#if 0
   {
     iregs regs;
     regs.a.x = 0x1112;          /* select 43 line mode - more space for partinfo */
