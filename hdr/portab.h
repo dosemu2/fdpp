@@ -175,6 +175,7 @@ unsigned short getSS(void);
 #elif defined(__GNUC__)
 #include <stdint.h>
 #include <stddef.h>
+#include <stdarg.h>
 
 struct far_s {
     UWORD off;
@@ -186,6 +187,7 @@ struct far_s {
 void do_abort(const char *file, int line);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
 void fdprintf(const char *format, ...) PRINTF(1);
+void fdvprintf(const char *format, va_list vl);
 void cpu_relax(void);
 
 #ifdef __cplusplus

@@ -216,12 +216,17 @@ void FdppInit(struct fdpp_api *api)
     api_calls = &api->thunks;
 }
 
+void fdvprintf(const char *format, va_list vl)
+{
+    fdpp->print_handler(format, vl);
+}
+
 void fdprintf(const char *format, ...)
 {
     va_list vl;
 
     va_start(vl, format);
-    fdpp->print_handler(format, vl);
+    fdvprintf(format, vl);
     va_end(vl);
 }
 

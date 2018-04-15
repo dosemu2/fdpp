@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdarg.h>
 #include "portab.h"
 #include "dyndata.h"
 #include "smalloc.h"
@@ -10,12 +11,23 @@ static __DOSFAR(uint8_t) base;
 static struct farhlp hlp;
 static int initialized;
 
+static void err_printf(int prio, const char *fmt, ...) PRINTF(2);
+static void err_printf(int prio, const char *fmt, ...)
+{
+    va_list vl;
+
+    va_start(vl, fmt);
+    fdvprintf(fmt, vl);
+    va_end(vl);
+}
+
 void dosobj_init(int size)
 {
     void FAR *fa = DynAlloc("dosobj", 1, size);
     void *ptr = resolve_segoff(GET_FAR(fa));
 
     sminit(&pool, ptr, size);
+    smregister_error_notifier(&pool, err_printf);
     base = fa;
     farhlp_init(&hlp);
     initialized = 1;
