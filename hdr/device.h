@@ -207,7 +207,8 @@ typedef struct ddtstruct {
   /* pointer to next table (offset FFFFh if last table) */
   UBYTE ddt_driveno;            /* physical unit number (for INT 13)     */
   UBYTE ddt_logdriveno;         /* logical drive number (0=A:)        */
-  SYM_MEMB(struct ddtstruct, bpb, ddt_bpb);                  /* BIOS Parameter Block */
+//  SYM_MEMB(struct ddtstruct, bpb, ddt_bpb);                  /* BIOS Parameter Block */
+  bpb ddt_bpb;                  /* BIOS Parameter Block */
   UBYTE ddt_flags;
   /* bit 6: 16-bit FAT instead of 12-bit
      bit 7: unsupportable disk (all accesses will return Not Ready) */
@@ -216,7 +217,8 @@ typedef struct ddtstruct {
   UWORD ddt_descflags;          /* bit flags describing drive */
   UWORD ddt_ncyl;               /* number of cylinders
                                    (for partition only, if hard disk) */
-  SYM_MEMB(struct ddtstruct, bpb, ddt_defbpb);               /* BPB for default (highest) capacity supported */
+//  SYM_MEMB(struct ddtstruct, bpb, ddt_defbpb);               /* BPB for default (highest) capacity supported */
+  bpb ddt_defbpb;               /* BPB for default (highest) capacity supported */
   UBYTE ddt_reserved[6];        /* (part of BPB above) */
   UBYTE ddt_ltrack;             /* last track accessed */
   union {
