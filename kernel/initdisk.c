@@ -1036,7 +1036,7 @@ int ProcessDisk(int scanType, unsigned drive, int PartitionsToIgnore)
   ULONG RelSectorOffset;
   ULONG ExtendedPartitionOffset;
   int iPart;
-  int strangeHardwareLoop;
+//  int strangeHardwareLoop;
 
   int num_extended_found = 0;
 
@@ -1058,8 +1058,8 @@ int ProcessDisk(int scanType, unsigned drive, int PartitionsToIgnore)
 
 ReadNextPartitionTable:
 
-  strangeHardwareLoop = 0;
-strange_restart:
+//  strangeHardwareLoop = 0;
+//strange_restart:
 
   if (Read1LBASector
       (&driveParam, drive, RelSectorOffset, InitDiskTransferBuffer))
@@ -1071,6 +1071,7 @@ strange_restart:
 
   if (!ConvPartTableEntryToIntern(PTable, InitDiskTransferBuffer))
   {
+#if 0
     /* there is some strange hardware out in the world,
        which returns OK on first read, but the data are
        rubbish. simply retrying works fine.
@@ -1078,7 +1079,7 @@ strange_restart:
 
     if (++strangeHardwareLoop < 3)
       goto strange_restart;
-
+#endif
     _printf("illegal partition table - drive %02x sector %lu\n", drive,
            RelSectorOffset);
     return PartitionsToIgnore;
