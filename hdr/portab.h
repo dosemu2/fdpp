@@ -181,7 +181,8 @@ struct far_s {
     UWORD seg;
 };
 
-#define _assert(c) if (!(c)) do_abort(__FILE__, __LINE__)
+#define _fail() do_abort(__FILE__, __LINE__)
+#define _assert(c) if (!(c)) _fail()
 void do_abort(const char *file, int line);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
 void fdprintf(const char *format, ...) PRINTF(1);

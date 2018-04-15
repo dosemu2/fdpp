@@ -10,9 +10,8 @@ static __DOSFAR(uint8_t) base;
 static struct farhlp hlp;
 static int initialized;
 
-void dosobj_init(void)
+void dosobj_init(int size)
 {
-    const int size = 512;
     void FAR *fa = DynAlloc("dosobj", 1, size);
     void *ptr = resolve_segoff(GET_FAR(fa));
 
@@ -29,7 +28,10 @@ __DOSFAR(uint8_t) mk_dosobj(const void *data, UWORD len)
 
     _assert(initialized);
     ptr = smalloc(&pool, len);
-    _assert(ptr);
+    if (!ptr) {
+        fdprintf("dosobj: OOM! len=%i\n", len);
+        _fail();
+    }
     offs = (uintptr_t)ptr - (uintptr_t)smget_base_addr(&pool);
     return base + offs;
 }
