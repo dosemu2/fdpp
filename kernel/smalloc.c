@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <assert.h>
 #include "portab.h"
 #include "smalloc.h"
 
@@ -46,15 +47,23 @@ void do_smerror(int prio, struct mempool *mp, const char *fmt, ...)
     char buf[1024];
     int pos;
     va_list al;
+    struct memnode *mn;
 
     _assert(prio != -1);
     va_start(al, fmt);
     pos = vsnprintf(buf, sizeof(buf), fmt, al);
     va_end(al);
-#define DO_PRN(...) pos += snprintf(buf + pos, sizeof(buf) - pos, __VA_ARGS__)
+#define DO_PRN(...) do { \
+    assert(pos < sizeof(buf)); \
+    pos += snprintf(buf + pos, sizeof(buf) - pos, __VA_ARGS__); \
+} while (0)
     DO_PRN("Total size: %zi\n", mp->size);
     DO_PRN("Available space: %zi\n", mp->avail);
     DO_PRN("Largest free area: %zi\n", smget_largest_free_area(mp));
+    DO_PRN("Memory pool dump:\n");
+    for (mn = &mp->mn; mn; mn = mn->next)
+        DO_PRN("\tarea: %zi bytes, %s\n",
+                mn->size, mn->used ? "used" : "free");
 
     mp->smerr(prio, "%s", buf);
 }
