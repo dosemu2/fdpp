@@ -46,9 +46,9 @@ unsigned init_oem(void)
   return r.a.x;
 }
 
-void movebda(size_t bytes, unsigned new_seg)
+void movebda(size_t bytes, UWORD new_seg)
 {
-  unsigned old_seg = peekw(0, EBDASEG);
+  UWORD old_seg = peekw(0, EBDASEG);
   fmemcpy(MK_FP(new_seg, 0), MK_FP(old_seg, 0), bytes);
   pokew(0, EBDASEG, new_seg);
   pokew(0, RAMSIZE, ram_top);

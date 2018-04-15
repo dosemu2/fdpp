@@ -105,7 +105,7 @@ int DosDevIOctl(lregs * r)
 
       /* Test that the handle is valid and                    */
       /* get the SFT block that contains the SFT              */
-      if ((s = get_sft(r->BX)) == (sft FAR *)MK_FP(-1, -1))
+      if ((s = get_sft(r->BX)) == (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1))
         return DE_INVLDHNDL;
 
       flags = s->sft_flags;

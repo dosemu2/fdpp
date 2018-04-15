@@ -303,9 +303,9 @@ VOID FAR * HMAalloc(COUNT bytesToAllocate)
   return HMAptr;
 }
 
-unsigned CurrentKernelSegment = 0;
+UWORD CurrentKernelSegment = 0;
 
-void MoveKernel(unsigned NewKernelSegment)
+void MoveKernel(UWORD NewKernelSegment)
 {
   UBYTE FAR *HMADest;
   UBYTE FAR *HMASource;
@@ -319,7 +319,7 @@ void MoveKernel(unsigned NewKernelSegment)
     return;
 
   HMASource = (UBYTE FAR *)
-      MK_FP(CurrentKernelSegment, (FP_OFF(_HMATextStart) & 0xfff0));
+      MK_FP(CurrentKernelSegment, (UWORD)(FP_OFF(_HMATextStart) & 0xfff0));
   HMADest = (UBYTE FAR *)MK_FP(NewKernelSegment, 0x0000);
 
   len = (FP_OFF((BYTE FAR *)_HMATextEnd) | 0x000f) - (FP_OFF((BYTE FAR *)_HMATextStart) & 0xfff0);

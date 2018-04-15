@@ -71,7 +71,7 @@ extern struct _KernelConfig InitKernelConfig;
 
 /*inithma.c*/
 extern BYTE DosLoadedInHMA;
-void MoveKernel(unsigned NewKernelSegment);
+void MoveKernel(UWORD NewKernelSegment);
 
 void setvec(unsigned char intno, intvec vector);
 #ifndef __WATCOMC__
@@ -116,7 +116,7 @@ __FAR(VOID) HMAalloc(COUNT bytesToAllocate);
 
 /* initoem.c */
 unsigned init_oem(void);
-void movebda(size_t bytes, unsigned new_seg);
+void movebda(size_t bytes, UWORD new_seg);
 unsigned ebdasize(void);
 
 /* main.c */
@@ -135,7 +135,7 @@ extern void Init_clk_driver(void);
 
 extern UWORD HMAFree;            /* first byte in HMA not yet used      */
 
-extern unsigned CurrentKernelSegment;
+extern UWORD CurrentKernelSegment;
 extern WORD days[2][13];
 extern __FAR(BYTE)lpTop;
 extern UWORD ram_top;               /* How much ram in Kbytes               */

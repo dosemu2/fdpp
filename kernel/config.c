@@ -411,7 +411,7 @@ void PreConfig2(void)
 
   sp = LoL->_sfthead;
   sp = sp->sftt_next = (sfttbl FAR *)KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
-  sp->sftt_next = (sfttbl FAR *)MK_FP(-1, -1);
+  sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = 3;
 
   if (ebda_size)  /* move the Extended BIOS Data Area from top of RAM here */
@@ -462,7 +462,7 @@ void PostConfig(void)
   sp = sp->sftt_next = (sfttbl FAR *)
     KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 8) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
-  sp->sftt_next = (sfttbl FAR *)MK_FP(-1, -1);
+  sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = Config.cfgFiles - 8;
 
   LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
@@ -499,7 +499,7 @@ VOID configDone(VOID)
     unsigned short hma_paras = (HMAFree+0xf)/16;
 
     kernel_seg = allocmem(hma_paras);
-    p = para2far(kernel_seg - 1);
+    p = para2far((UWORD)(kernel_seg - 1));
 
     p->m_name[0] = 'S';
     p->m_name[1] = 'C';
@@ -532,7 +532,8 @@ STATIC seg prev_mcb(seg cur_mcb, seg start)
 
 STATIC void umb_init(void)
 {
-  UCOUNT umb_seg, umb_size;
+  UWORD umb_seg;
+  UCOUNT umb_size;
   seg umb_max;
   void FAR *xms_addr;
 
@@ -1739,7 +1740,7 @@ STATIC VOID DeviceHigh(BYTE * pLine)
 {
   if (UmbState == 1)
   {
-    if (LoadDevice(pLine, (char FAR *)MK_FP(umb_start + UMB_top, 0), TRUE) == DE_NOMEM)
+    if (LoadDevice(pLine, (char FAR *)MK_FP((UWORD)(umb_start + UMB_top), 0), TRUE) == DE_NOMEM)
     {
       _printf("Not enough free memory in UMBs: loading low\n");
       LoadDevice(pLine, lpTop, FALSE);
@@ -1910,7 +1911,7 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
     umb_base_seg = base;
   else
     base_seg = base;
-  return MK_FP(FP_SEG(p)+1, 0);
+  return MK_FP((UWORD)(FP_SEG(p)+1), 0);
 }
 
 void FAR * KernelAlloc(size_t nBytes, char type, int mode)
@@ -1921,7 +1922,7 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
   if (LoL->_first_mcb == 0)
   {
     /* prealloc */
-    lpTop = (BYTE FAR *)MK_FP(FP_SEG(lpTop) - nPara, FP_OFF(lpTop));
+    lpTop = (BYTE FAR *)MK_FP((UWORD)(FP_SEG(lpTop) - nPara), FP_OFF(lpTop));
     p = AlignParagraph(lpTop);
   }
   else
@@ -2047,7 +2048,7 @@ STATIC VOID strupr(char *s)
 /* The following code is 8086 dependant                         */
 
 #if 1                           /* ifdef KERNEL */
-STATIC VOID mcb_init_copy(UCOUNT seg, UWORD size, mcb *near_mcb)
+STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
   fmemcpy(MK_FP(seg, 0), MK_FAR_PTR_SCP(near_mcb), sizeof(mcb));
@@ -2659,7 +2660,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   exb.exec.env_seg  = 0;
   size_t sz = sizeof(CommandTail);
   exb.exec.cmd_line = MK_FAR_SZ_ST(args, sz);
-  exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, -1, -1);
+  exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, (UWORD)-1, (UWORD)-1);
 
 
   InstallPrintf(("cmd[%s] args [%u,%s]\n",filename,*args,args+1));

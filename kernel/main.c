@@ -224,7 +224,7 @@ intvec getvec(unsigned char intno)
 {
   intvec iv;
   disable();
-  iv = *(intvec FAR *)MK_FP(0,4 * (intno));
+  iv = *(intvec FAR *)MK_FP(0, (UWORD)(4 * (intno)));
   enable();
   return iv;
 }
@@ -232,7 +232,7 @@ intvec getvec(unsigned char intno)
 void setvec(unsigned char intno, intvec vector)
 {
   disable();
-  *(intvec FAR *)MK_FP(0,4 * intno) = vector;
+  *(intvec FAR *)MK_FP(0, (UWORD)(4 * intno)) = vector;
   enable();
 }
 #endif
@@ -242,7 +242,7 @@ STATIC void setup_int_vectors(void)
   struct vec
   {
     unsigned char intno;
-    size_t handleroff;
+    UWORD handleroff;
   } vectors[] =
     {
       /* all of these are in the DOS DS */
@@ -295,11 +295,11 @@ STATIC void init_kernel(void)
 #ifdef __WATCOMC__
   lpTop = MK_FP(_CS, 0);
 #else
-  lpTop = MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
+  lpTop = MK_FP((UWORD)(_CS - (FP_OFF(_HMATextEnd) + 15) / 16), 0);
 #endif
 
   MoveKernel(FP_SEG(lpTop));
-  lpTop = (BYTE FAR *)MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
+  lpTop = (BYTE FAR *)MK_FP((UWORD)(FP_SEG(lpTop) - 0xfff), 0xfff0);
 
   /* Initialize IO subsystem                                      */
   InitIO();
@@ -369,7 +369,7 @@ STATIC VOID FsConfig(VOID)
 
     pcds_table->cdsCurrentPath[0] += i;
 
-    if (i < LoL->_nblkdev && dpb != _MK_DOS_FP(struct dpb, -1, -1))
+    if (i < LoL->_nblkdev && dpb != _MK_DOS_FP(struct dpb, (UWORD)-1, (UWORD)-1))
     {
       pcds_table->cdsDpb = dpb;
       pcds_table->cdsFlags = CDSPHYSDRV;
@@ -510,7 +510,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; _dpb->dpb_next != _MK_DOS_FP(struct dpb, -1, -1);
+    for (_dpb = LoL->_DPBp; _dpb->dpb_next != _MK_DOS_FP(struct dpb, (UWORD)-1, (UWORD)-1);
          _dpb = _dpb->dpb_next)
       ;
     _dpb = (struct dpb FAR *)
@@ -533,7 +533,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     ++_dpb;
     ++LoL->_nblkdev;
   }
-  (_dpb - 1)->dpb_next = _MK_DOS_FP(struct dpb, -1, -1);
+  (_dpb - 1)->dpb_next = _MK_DOS_FP(struct dpb, (UWORD)-1, (UWORD)-1);
 }
 
 /* If cmdLine is NULL, this is an internal driver */

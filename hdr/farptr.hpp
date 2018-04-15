@@ -466,7 +466,7 @@ public:
 #define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg,ofs)        (__FAR(void)(seg, ofs))
 #define __DOSFAR(t) FarPtrBase<t>
-#define _MK_DOS_FP(t, s, o) __FAR(t)MK_FP(s, o)
+#define _MK_DOS_FP(t, s, o) __FAR(t)(MK_FP(s, o))
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()

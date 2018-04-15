@@ -65,7 +65,7 @@ STATIC BOOL flush1(struct buffer FAR * bp);
         recycled anymore.
 */
 
-STATIC void move_buffer(struct buffer FAR *bp, size_t firstbp)
+STATIC void move_buffer(struct buffer FAR *bp, UWORD firstbp)
 {
   /* connect bp->b_prev and bp->b_next */
   b_next(bp)->b_prev = bp->b_prev;
@@ -82,10 +82,10 @@ STATIC struct buffer FAR *searchblock(ULONG blkno, COUNT dsk)
 {
   int fat_count = 0;
   struct buffer FAR *bp;
-  size_t lastNonFat = 0;
-  size_t uncacheBuf = 0;
+  UWORD lastNonFat = 0;
+  UWORD uncacheBuf = 0;
   seg bufseg = FP_SEG(firstbuf);
-  size_t firstbp = FP_OFF(firstbuf);
+  UWORD firstbp = FP_OFF(firstbuf);
 
 #ifdef DISPLAY_GETBLOCK
   _printf("[searchblock %d, blk %ld, buf ", dsk, blkno);
