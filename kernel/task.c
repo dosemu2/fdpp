@@ -813,9 +813,9 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   /* build exec block and save all parameters here as init part will vanish! */
   exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, (UWORD)-1, (UWORD)-1);
   exb.exec.env_seg = DOS_PSP + 8;
-  fstrcpy(Shell, MK_FP(FP_SEG(Config), Config->cfgInit));
+  fstrcpy(Shell, _MK_DOS_FP(char, FP_SEG(Config), Config->cfgInit));
   /* join name and tail */
-  fstrcpy(Shell + strlen(Shell), MK_FP(FP_SEG(Config), Config->cfgInitTail));
+  fstrcpy(Shell + strlen(Shell), _MK_DOS_FP(char, FP_SEG(Config), Config->cfgInitTail));
   endp =  Shell + strlen(Shell);
 
   for ( ; ; )   /* endless shell load loop - reboot or shut down to exit it! */

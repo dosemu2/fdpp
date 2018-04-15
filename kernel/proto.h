@@ -288,17 +288,16 @@ void put_unsigned(unsigned n, int base, int width);
 void put_string(const char *s);
 void put_console(int);
 
+#ifndef USE_STDLIB
 /* strings.c */
 //size_t strlen(const char * s);
 size_t fstrlen(__FAR(const char) s);
-__FAR(char) _fstrcpy(__FAR(char) d,__FAR(const char) s);
+//__FAR(char) _fstrcpy(__FAR(char) d,__FAR(const char) s);
 //int strcmp(const char * d, const char * s);
 int fstrcmp(__FAR(const char) d,__FAR(const char) s);
 int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
 //int strncmp(const char * d, const char * s, size_t l);
 //char * strchr(const char * s, int c);
-__FAR(char) fstrchr(__FAR(const char) s, int c);
-__FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);
 
 /* misc.c */
 //char * strcpy(char * d, const char * s);
@@ -332,6 +331,19 @@ int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 #pragma aux (pascal) strchr modify exact [ax dx] nomemory
 #pragma aux (pascal) fstrchr modify exact [ax dx] nomemory
 #endif
+#else    // USE_STDLIB
+#define fstrlen strlen
+#define fstrcpy strcpy
+#define fstrcmp strcmp
+#define fstrncmp strncmp
+
+#define fmemcpy memcpy
+#define fmemcpy_n memcpy
+#define fmemset memset
+#define fmemcmp memcmp
+#endif
+__FAR(char) fstrchr(__FAR(const char) s, int c);
+__FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);
 
 /* sysclk.c */
 COUNT BcdToByte(COUNT x);

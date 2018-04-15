@@ -33,7 +33,6 @@ static BYTE *stringsRcsId =
     "$Id: strings.c 653 2003-08-09 09:35:18Z bartoldeman $";
 #endif
 
-#ifndef I86
 #ifndef USE_STDLIB
 size_t strlen(REG CONST BYTE * s)
 {
@@ -43,7 +42,6 @@ size_t strlen(REG CONST BYTE * s)
     ++cnt;
   return cnt;
 }
-#endif
 
 size_t fstrlen(REG CONST BYTE FAR * s)
 {
@@ -54,14 +52,15 @@ size_t fstrlen(REG CONST BYTE FAR * s)
   return cnt;
 }
 
+#if 0
 VOID _fstrcpy(REG BYTE FAR * d, REG BYTE FAR * s)
 {
   while (*s != 0)
     *d++ = *s++;
   *d = 0;
 }
+#endif
 
-#ifndef USE_STDLIB
 int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
 {
   while (*s != '\0' && *d != '\0')
@@ -73,7 +72,6 @@ int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
   }
   return *d - *s;
 }
-#endif
 
 COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
 {
@@ -87,7 +85,6 @@ COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
   return *d - *s;
 }
 
-#ifndef USE_STDLIB
 int strncmp(REG const char *d, REG const char *s, size_t l)
 {
   size_t index = 1;
@@ -100,7 +97,6 @@ int strncmp(REG const char *d, REG const char *s, size_t l)
   }
   return *d - *s;
 }
-#endif
 
 COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
 {
@@ -115,7 +111,6 @@ COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
   return *d - *s;
 }
 
-#ifndef USE_STDLIB
 char *strchr(const char * s, int c)
 {
   REG CONST BYTE *p;
@@ -186,7 +181,6 @@ int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)
   }
   return *d - *s;
 }
-#endif
 
 int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
 {
@@ -202,5 +196,4 @@ int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
   }
   return *d - *s;
 }
-
 #endif
