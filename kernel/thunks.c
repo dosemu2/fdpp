@@ -177,7 +177,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     UBYTE rsz = 0;
 #define _RET ret
 #define _RSZ rsz
-#define _SP (sp + 10)
+#define _SP sp
 
     switch (fn) {
         #include "thunk_calls.h"
@@ -197,7 +197,7 @@ void FdppCall(struct vm86_regs *regs)
         break;
     case 1:
         regs->eax = FdppThunkCall(regs->ecx,
-                (UBYTE *)so2lin(regs->ss, regs->esp),
+                (UBYTE *)so2lin(regs->ss, regs->edx),
                 NULL);
         break;
     }

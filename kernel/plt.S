@@ -8,7 +8,7 @@
 
 %include "segs.inc"
 
-%macro asmcfunc 3
+%macro asmcfunc 4
 segment %3
     global _%1
     _%1:
@@ -16,16 +16,18 @@ segment %3
     mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_CCALL
     mov cx, %2
+    mov dx, sp
+    add dx, %4
     int DOS_HELPER_INT
 %endmacro
 
 %macro asmcfunc_f 3
-    asmcfunc %1, %2, %3
+    asmcfunc %1, %2, %3, 4
     retf
 %endmacro
 
 %macro asmcfunc_n 3
-    asmcfunc %1, %2, %3
+    asmcfunc %1, %2, %3, 2
     ret
 %endmacro
 
