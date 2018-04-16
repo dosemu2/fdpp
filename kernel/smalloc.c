@@ -25,10 +25,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include <assert.h>
-#include "portab.h"
 #include "smalloc.h"
 
 #define POOL_USED(p) (p->mn.used || p->mn.next)
+#ifndef min
+#define min(x, y) ((x) < (y) ? (x) : (y))
+#endif
 
 static void smerror_dummy(int prio, const char *fmt, ...) FORMAT(printf, 2, 3);
 
@@ -49,7 +51,7 @@ void do_smerror(int prio, struct mempool *mp, const char *fmt, ...)
     va_list al;
     struct memnode *mn;
 
-    _assert(prio != -1);
+    assert(prio != -1);
     va_start(al, fmt);
     pos = vsnprintf(buf, sizeof(buf), fmt, al);
     va_end(al);
@@ -82,7 +84,7 @@ static int get_oom_pr(struct mempool *mp, size_t size)
 static void sm_uncommit(struct mempool *mp, void *addr, size_t size)
 {
     mp->avail += size;
-    _assert(mp->avail <= mp->size);
+    assert(mp->avail <= mp->size);
     if (!mp->uncommit)
       return;
     mp->uncommit(addr, size);
@@ -107,7 +109,7 @@ static int sm_commit(struct mempool *mp, void *addr, size_t size,
 {
     int ok = __sm_commit(mp, addr, size, e_addr, e_size);
     if (ok) {
-	_assert(mp->avail >= size);
+	assert(mp->avail >= size);
 	mp->avail -= size;
     }
     return ok;
@@ -128,7 +130,7 @@ static void mntruncate(struct memnode *pmn, size_t size)
   if (pmn->next && !pmn->next->used) {
     struct memnode *nmn = pmn->next;
 
-    _assert(size > 0 && nmn->size + delta >= 0);
+    assert(size > 0 && nmn->size + delta >= 0);
 
     nmn->size += delta;
     nmn->mem_area -= delta;
@@ -136,12 +138,12 @@ static void mntruncate(struct memnode *pmn, size_t size)
     if (nmn->size == 0) {
       pmn->next = nmn->next;
       free(nmn);
-      _assert(!pmn->next || pmn->next->used);
+      assert(!pmn->next || pmn->next->used);
     }
   } else {
     struct memnode *new_mn;
 
-    _assert(size < pmn->size);
+    assert(size < pmn->size);
 
     new_mn = (struct memnode *)malloc(sizeof(struct memnode));
     new_mn->next = pmn->next;
@@ -200,7 +202,7 @@ static struct memnode *sm_alloc_mn(struct mempool *mp, size_t size)
     return NULL;
   mn->used = 1;
   mntruncate(mn, size);
-  _assert(mn->size == size);
+  assert(mn->size == size);
   memset(mn->mem_area, 0, size);
   return mn;
 }
@@ -226,17 +228,17 @@ void smfree(struct mempool *mp, void *ptr)
     smerror(mp, "SMALLOC: attempt to free the not allocated region (double-free)\n");
     return;
   }
-  _assert(mn->size > 0);
+  assert(mn->size > 0);
   sm_uncommit(mp, mn->mem_area, mn->size);
   mn->used = 0;
   if (mn->next && !mn->next->used) {
     /* merge with next */
-    _assert(mn->next->mem_area >= mn->mem_area);
+    assert(mn->next->mem_area >= mn->mem_area);
     mntruncate(mn, mn->size + mn->next->size);
   }
   if (pmn && !pmn->used) {
     /* merge with prev */
-    _assert(pmn->mem_area <= mn->mem_area);
+    assert(pmn->mem_area <= mn->mem_area);
     mntruncate(pmn, pmn->size + mn->size);
     mn = pmn;
   }
@@ -325,7 +327,7 @@ void *smrealloc(struct mempool *mp, void *ptr, size_t size)
         return NULL;
     }
   }
-  _assert(mn->size == size);
+  assert(mn->size == size);
   return mn->mem_area;
 }
 
@@ -360,10 +362,10 @@ void smfree_all(struct mempool *mp)
     mn = &mp->mn;
     if (!mn->used)
       mn = mn->next;
-    _assert(mn && mn->used);
+    assert(mn && mn->used);
     smfree(mp, mn->mem_area);
   }
-  _assert(!mp->mn.next);
+  assert(!mp->mn.next);
 }
 
 int smdestroy(struct mempool *mp)
@@ -371,7 +373,7 @@ int smdestroy(struct mempool *mp)
   unsigned avail = mp->avail;
 
   smfree_all(mp);
-  _assert(mp->mn.size >= avail);
+  assert(mp->mn.size >= avail);
   /* return leaked size */
   return mp->mn.size - avail;
 }
