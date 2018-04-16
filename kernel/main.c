@@ -208,14 +208,14 @@ STATIC void PSPInit(void)
 
   /* first command line argument                          */
   /* p->ps_fcb1.fcb_drive = 0; already set                */
-  fmemset(_USE_FP(p->ps_fcb1).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(p->ps_fcb1.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
   /* second command line argument                         */
   /* p->ps_fcb2.fcb_drive = 0; already set                */
-  fmemset(_USE_FP(p->ps_fcb2).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(p->ps_fcb2.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
 
   /* local command line                                   */
   /* p->ps_cmd.ctCount = 0;     command tail, already set */
-  _USE_FP(p->ps_cmd).ctBuffer[0] = 0xd; /* command tail            */
+  p->ps_cmd.ctBuffer[0] = 0xd; /* command tail            */
 }
 
 #ifndef __WATCOMC__
@@ -493,7 +493,7 @@ STATIC void kernel()
         }
       }
       /* save buffer -- on the stack it's fine here */
-      Config.cfgInitTail = MK_NEAR_SYM_ST(Cmd.ctBuffer);
+      Config.cfgInitTail = MK_NEAR_ST(Cmd.ctBuffer);
     }
   }
   init_call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
