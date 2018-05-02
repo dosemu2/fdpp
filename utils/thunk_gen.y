@@ -101,6 +101,7 @@ static void do_start_arg(int anum)
 
 static void fin_arg(int last)
 {
+    int real_arg_size;
     if (!atype[0])
 	return;
     if (!is_ptr && is_void)
@@ -123,15 +124,17 @@ static void fin_arg(int last)
     }
     if (is_ptr) {
 	if (is_far)
-	    arg_size = 4;
+	    real_arg_size = 4;
 	else
-	    arg_size = 2;
+	    real_arg_size = 2;
+    } else {
+	real_arg_size = arg_size;
     }
     if (!last) {
-        assert(arg_size != -1);
-        arg_offs += arg_size;
+        assert(real_arg_size != -1);
+        arg_offs += real_arg_size;
     }
-    if (arg_size) {
+    if (real_arg_size) {
 	arg_num++;
     } else if (arg_num) {
 	fprintf(stderr, "parse error, void argument?\n");

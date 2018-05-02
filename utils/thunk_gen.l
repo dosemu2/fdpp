@@ -38,6 +38,8 @@
 "WORD"		{ return WORD; }
 "COUNT"		{ return INT; }
 "BOOL"		{ return INT; }
+"char"		{ return BYTE; }
+"short"		{ return WORD; }
 "int"		{ return INT; }
 "unsigned"	{ return UINT; }
 "long"		{ return LONG; }
