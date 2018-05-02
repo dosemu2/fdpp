@@ -18,6 +18,7 @@ segment %3
     mov cx, %2
     mov dx, sp
     add dx, %4
+    mov si, cs
     int DOS_HELPER_INT
 %endmacro
 

@@ -190,6 +190,8 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 
 void FdppCall(struct vm86_regs *regs)
 {
+    s_regs = *regs;
+
     switch (regs->ebx & 0xff) {
     case 0:
         FdppSetSymTab(regs,
@@ -201,8 +203,6 @@ void FdppCall(struct vm86_regs *regs)
                 NULL);
         break;
     }
-
-    s_regs = *regs;
 }
 
 void do_abort(const char *file, int line)
@@ -289,7 +289,8 @@ static uint8_t *clean_stk(size_t len)
 
 uint16_t getCS(void)
 {
-    return s_regs.cs;
+    /* we pass CS in SI */
+    return s_regs.esi;
 }
 
 void setDS(uint16_t seg)
