@@ -403,6 +403,8 @@ void MoveKernel(UWORD NewKernelSegment)
     }
   }
 
+  RelocHook(CurrentKernelSegment, NewKernelSegment);
+
   CurrentKernelSegment = NewKernelSegment;
   return;
 

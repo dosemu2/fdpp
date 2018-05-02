@@ -90,7 +90,7 @@ _%1_ptr:
     retf 2
 %endmacro
 
-segment IC
+segment INIT_TEXT
 
 __asm_callsymtab_start:
 %include "plt_asmc.inc"
@@ -132,9 +132,17 @@ plt_init:
     push word near_wrp
     push word 2    ; amount of near wrappers
     push word __asm_callsymtab_end - __asm_callsymtab_start
+    push word SEG __asm_callsymtab_start
     push word __asm_callsymtab_start
     push word __asm_symtab_end - __asm_symtab_start
+    push word SEG __asm_symtab_start
     push word __asm_symtab_start
+    push cs
+    push word SEG plt_init wrt INIT_TEXT
+    push word SEG __InitTextEnd wrt INIT_TEXT
+    push word __InitTextEnd wrt INIT_TEXT
+    push word SEG __InitTextStart wrt INIT_TEXT
+    push word __InitTextStart wrt INIT_TEXT
     int DOS_HELPER_INT
     mov sp, bp
     pop bp

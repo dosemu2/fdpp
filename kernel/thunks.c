@@ -14,17 +14,12 @@ struct asm_dsc_s {
     UWORD off;
     UWORD seg;
 };
-static struct asm_dsc_s *asm_tab;
+#define asm_tab ((struct asm_dsc_s *)resolve_segoff(asm_tab_fp))
 static int asm_tab_len;
+static struct far_s asm_tab_fp;
 static struct farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
-
-static void FdppSetAsmCalls(struct asm_dsc_s *tab, int size)
-{
-    asm_tab = tab;
-    asm_tab_len = size / sizeof(struct asm_dsc_s);
-}
 
 #define SEMIC ;
 #define __ASM(t, v) __ASMSYM(t) __##v
@@ -119,11 +114,10 @@ void *resolve_segoff(struct far_s fa)
     return so2lin(fa.seg, fa.off);
 }
 
-static int FdppSetAsmThunks(struct far_s *ptrs, int size)
+static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 {
 #define _countof(a) (sizeof(a)/sizeof(*(a)))
     int i;
-    int len = size / (sizeof(struct far_s));
     int exp = _countof(asm_thunks.arr);
 
     if (len != exp) {
@@ -134,34 +128,88 @@ static int FdppSetAsmThunks(struct far_s *ptrs, int size)
     farhlp_init(&sym_tab);
     for (i = 0; i < len; i++) {
         *asm_thunks.arr[i] = ptrs[i];
-        store_far(&sym_tab, resolve_segoff(ptrs[i]), ptrs[i]);
+        /* there are conflicts, for example InitTextStart will collide
+         * with the first sym. So use _replace. */
+        store_far_replace(&sym_tab, resolve_segoff(ptrs[i]), ptrs[i]);
     }
 
     return 0;
 }
 
 struct fdpp_symtab {
-    uint16_t symtab;
+    struct far_s text_start;
+    struct far_s text_end;
+    uint16_t orig_cs;
+    uint16_t cur_cs;
+    struct far_s symtab;
     uint16_t symtab_len;
-    uint16_t calltab;
+    struct far_s calltab;
     uint16_t calltab_len;
     uint16_t num_wrps;
     struct far_s near_wrp[0];
 };
 
+static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
+{
+    int i;
+    int reloc;
+    struct asm_dsc_s *t;
+
+    reloc = 0;
+    for (i = 0; i < num_wrps; i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(near_wrp[i]);
+        if (ptr >= start_p && ptr < end_p) {
+            near_wrp[i].seg += delta;
+            reloc++;
+        }
+    }
+    fdprintf("processed %i relocs\n", reloc);
+    t = asm_tab;
+    reloc = 0;
+    for (i = 0; i < asm_tab_len; i++) {
+        uint8_t *ptr = (uint8_t *)so2lin(t[i].seg, t[i].off);
+        if (ptr >= start_p && ptr < end_p) {
+            t[i].seg += delta;
+            reloc++;
+        }
+    }
+    fdprintf("processed %i relocs\n", reloc);
+}
+
 static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
 {
     int err;
-    struct asm_dsc_s *asmtab =
-            (struct asm_dsc_s *)so2lin(regs->ds, symtab->calltab);
-    struct far_s *thtab = (struct far_s *)so2lin(regs->ds, symtab->symtab);
+    struct far_s *thtab = (struct far_s *)resolve_segoff(symtab->symtab);
+    int stab_len = symtab->symtab_len / sizeof(struct far_s);
 
-    FdppSetAsmCalls(asmtab, symtab->calltab_len);
-    err = FdppSetAsmThunks(thtab, symtab->symtab_len);
-    _assert(!err);
     num_wrps = symtab->num_wrps;
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
+    asm_tab_fp = symtab->calltab;
+    asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
+    /* now relocate */
+    if (symtab->cur_cs > symtab->orig_cs) {
+        int i;
+        int reloc;
+        uint8_t *start_p = (uint8_t *)resolve_segoff(symtab->text_start);
+        uint8_t *end_p = (uint8_t *)resolve_segoff(symtab->text_end);
+        uint16_t delta = symtab->cur_cs - symtab->orig_cs;
+        asm_tab_fp.seg += delta;
+        do_relocs(start_p, end_p, delta);
+        /* sym_tab table is patched in non-relocated code, never used later */
+        reloc = 0;
+        for (i = 0; i < stab_len; i++) {
+            uint8_t *ptr = (uint8_t *)resolve_segoff(thtab[i]);
+            if (ptr >= start_p && ptr < end_p) {
+                thtab[i].seg += delta;
+                reloc++;
+            }
+        }
+        fdprintf("processed %i relocs\n", reloc);
+    }
+
+    err = FdppSetAsmThunks(thtab, stab_len);
+    _assert(!err);
 }
 
 #define _ARG(n, t, ap) (*(t *)(ap + n))
@@ -692,4 +740,12 @@ uint32_t thunk_call_void(struct far_s fa)
 {
     fdpp->asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
     return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
+}
+
+void RelocHook(UWORD old_seg, UWORD new_seg)
+{
+    uint8_t *start_p = (uint8_t *)so2lin(old_seg, 0);
+    uint8_t *end_p = (uint8_t *)so2lin(old_seg + 0x1000, 0);
+    uint16_t delta = new_seg - old_seg;
+    do_relocs(start_p, end_p, delta);
 }
