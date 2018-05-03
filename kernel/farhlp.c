@@ -127,7 +127,8 @@ far_t lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm)
     far_t ret;
     int idx = do_lookup(ctx, ptr);
 
-    _assert(idx != -1);
+    if (idx == -1)
+        return (far_t){0, 0};
     fm = &ctx->far_map[idx];
     ret = fm->f;
     fm->refcnt--;

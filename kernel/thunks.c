@@ -744,8 +744,28 @@ uint32_t thunk_call_void(struct far_s fa)
 
 void RelocHook(UWORD old_seg, UWORD new_seg)
 {
+    int i;
+    int reloc = 0;
+    int miss = 0;
+    int len = _countof(asm_thunks.arr);
     uint8_t *start_p = (uint8_t *)so2lin(old_seg, 0);
     uint8_t *end_p = (uint8_t *)so2lin(old_seg + 0x1000, 0);
     uint16_t delta = new_seg - old_seg;
     do_relocs(start_p, end_p, delta);
+    for (i = 0; i < len; i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);
+        if (ptr >= start_p && ptr < end_p) {
+            int rm;
+            far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
+            if (!f.seg && !f.off)
+                miss++;
+            else
+                _assert(rm);
+            asm_thunks.arr[i]->seg += delta;
+            store_far_replace(&sym_tab, resolve_segoff(*asm_thunks.arr[i]),
+                    *asm_thunks.arr[i]);
+            reloc++;
+        }
+    }
+    fdprintf("processed %i relocs (%i missed)\n", reloc, miss);
 }
