@@ -119,11 +119,11 @@ static void fin_arg(int last)
 	sprintf(abuf + strlen(abuf), "%s)", atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
-	sprintf(abuf + strlen(abuf), "%s)", (atype2[0] && !is_ptr) ? atype2 : atype);
+	sprintf(abuf + strlen(abuf), "%s)", atype2[0] ? atype2 : atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
 	if (is_ptr)
-	    sprintf(abuf + strlen(abuf), "%s)", atype);
+	    sprintf(abuf + strlen(abuf), "%s)", atype2[0] ? atype2 : atype);
 	else
 	    sprintf(abuf + strlen(abuf), "%s)", atype3[0] ?
 		atype3 : (atype2[0] ? atype2 : atype));

@@ -132,6 +132,7 @@ public:
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()
+#define __MK_NEAR2(n, t) t(__obj_##n.get_near().off())
 #define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o) + 1)
 #define MK_FAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_FAR(_ddd); })
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)

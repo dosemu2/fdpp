@@ -375,8 +375,8 @@ void enable(void)
 
 #define __CNV_PTR_FAR(t, d, f, l) t d = (f)
 #define __CNV_PTR(t, d, f, l) \
-    _MK_FAR_SZ(__##d, f, sizeof(*f)); \
-    t d = __MK_NEAR(__##d)
+    _MK_FAR_SZ(__##d, f, sizeof(t)); \
+    t d = __MK_NEAR2(__##d, t)
 #define __CNV_PTR_CHAR(t, d, f, l) \
     _MK_FAR_STR(__##d, f); \
     t d = __MK_NEAR(__##d)
