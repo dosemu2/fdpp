@@ -319,6 +319,8 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len)
         if (asm_tab[i].num == num) {
             uint16_t wrp = find_wrp(asm_tab[i].seg);
             s_regs.eax = asm_tab[i].off;
+            /* argpack should be aligned */
+            _assert(!(len & 1));
             s_regs.ecx = len >> 1;
             fdpp->asm_call(&s_regs, asm_tab[i].seg, wrp, sp, len);
             return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
