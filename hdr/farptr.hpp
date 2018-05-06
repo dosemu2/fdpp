@@ -112,7 +112,11 @@ class FarPtr : public FarPtrBase<T>
 
 public:
     using FarPtrBase<T>::FarPtrBase;
-    FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {}
+    FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {
+        /* XXX for things like "p = sym->ptr; a = p->arr[i];"
+         * All sym pointer members should be marked with __DOSFAR(). */
+        do_store_far(f.get_far());
+    }
     explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
     explicit FarPtr(const std::shared_ptr<ObjIf>& o) :
             FarPtrBase<T>(o->get_obj()), obj(o) {}
@@ -417,11 +421,6 @@ public:
     SymMemb(const SymMemb&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *(SymWrp<T> *)this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
-    /* XXX for things like p->memb1.memb2 store memb1. */
-    T& use() {
-        do_store_far(this->lookup_sym().get_far());
-        return *this;
-    }
 };
 
 template<typename T, int (*F)(void)>
@@ -487,7 +486,7 @@ public:
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()
-#define _USE_FP(p) p.use()
+#define _DOS_FP(p) ({ do_store_far(p.get_far()); p; })
 
 #undef NULL
 #define NULL           nullptr
