@@ -58,6 +58,8 @@ _%1_ptr:
     push bp
     mov bp, sp
     sub sp, 2
+    ; cx = number of argument words
+    jcxz %%11
     mov bx, cx
     dec bx
     add bx, bx
@@ -65,6 +67,7 @@ _%1_ptr:
     mov di, sp
     push word [ss : bx + di + 8]
     loop %%1
+%%11:
     mov [bp - 2], sp
     call ax
     mov bx, sp
