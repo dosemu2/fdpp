@@ -31,6 +31,7 @@ static char rbuf[256];
 static char abuf[1024];
 static char atype[256];
 static char atype2[256];
+static char atype3[256];
 static char rtbuf[256];
 
 
@@ -42,6 +43,7 @@ static void beg_arg(void)
     is_const = 0;
     atype[0] = 0;
     atype2[0] = 0;
+    atype3[0] = 0;
 }
 
 static void do_start_arg(int anum)
@@ -118,6 +120,13 @@ static void fin_arg(int last)
 	strcat(abuf, ", ");
 	do_start_arg(1);
 	sprintf(abuf + strlen(abuf), "%s)", (atype2[0] && !is_ptr) ? atype2 : atype);
+	strcat(abuf, ", ");
+	do_start_arg(1);
+	if (is_ptr)
+	    sprintf(abuf + strlen(abuf), "%s)", atype);
+	else
+	    sprintf(abuf + strlen(abuf), "%s)", atype3[0] ?
+		atype3 : (atype2[0] ? atype2 : atype));
 	strcat(abuf, ", ");
 	do_start_arg(2);
 	break;
@@ -275,10 +284,12 @@ atype:		  VOID		{
 		| BYTE		{
 				  arg_size = 1;
 				  strcpy(atype, "BYTE");
+				  strcpy(atype3, "WORD");
 				}
 		| UBYTE		{
 				  arg_size = 1;
 				  strcpy(atype, "UBYTE");
+				  strcpy(atype3, "UWORD");
 				}
 		| STRUCT sname	{
 				  arg_size = -1;
