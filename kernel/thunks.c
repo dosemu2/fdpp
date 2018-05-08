@@ -104,6 +104,29 @@ struct vm86_regs {
 
 static struct vm86_regs s_regs;
 
+union dword {
+  uint32_t d;
+  struct { uint16_t l, h; } w;
+  struct { uint8_t l, h, b2, b3; } b;
+};
+
+#define LO_WORD(dwrd)    (((union dword *)&(dwrd))->w.l)
+#define HI_WORD(dwrd)    (((union dword *)&(dwrd))->w.h)
+#define LO_BYTE(dwrd)    (((union dword *)&(dwrd))->b.l)
+#define HI_BYTE(dwrd)    (((union dword *)&(dwrd))->b.h)
+#define _AL(regs)         LO_BYTE(regs->eax)
+#define _AH(regs)         HI_BYTE(regs->eax)
+#define _AX(regs)         LO_WORD(regs->eax)
+#define _BL(regs)         LO_BYTE(regs->ebx)
+#define _BH(regs)         HI_BYTE(regs->ebx)
+#define _BX(regs)         LO_WORD(regs->ebx)
+#define _CL(regs)         LO_BYTE(regs->ecx)
+#define _CH(regs)         HI_BYTE(regs->ecx)
+#define _CX(regs)         LO_WORD(regs->ecx)
+#define _DL(regs)         LO_BYTE(regs->edx)
+#define _DH(regs)         HI_BYTE(regs->edx)
+#define _DX(regs)         LO_WORD(regs->edx)
+
 static void *so2lin(uint16_t seg, uint16_t off)
 {
     return fdpp->mem_base() + (seg << 4) + off;
@@ -239,6 +262,8 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 void FdppCall(struct vm86_regs *regs)
 {
     s_regs = *regs;
+    UBYTE len;
+    UDWORD res;
 
     switch (regs->ebx & 0xff) {
     case 0:
@@ -246,9 +271,25 @@ void FdppCall(struct vm86_regs *regs)
                 (struct fdpp_symtab *)so2lin(regs->ss, regs->esp + 6));
         break;
     case 1:
-        regs->eax = FdppThunkCall(regs->ecx,
-                (UBYTE *)so2lin(regs->ss, regs->edx),
-                NULL);
+        res = FdppThunkCall(regs->ecx,
+                (UBYTE *)so2lin(regs->ss, regs->edx), &len);
+        switch (len) {
+            case 0:
+                break;
+            case 1:
+                _AL(regs) = res;
+                break;
+            case 2:
+                _AX(regs) = res;
+                break;
+            case 4:
+                _AX(regs) = res & 0xffff;
+                _DX(regs) = res >> 16;
+                break;
+            default:
+                _fail();
+                break;
+        }
         break;
     }
 }
