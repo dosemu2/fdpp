@@ -478,7 +478,7 @@ VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
       maxcl = FAT16MAX;
     }
 
-    DebugPrintf(("%ld sectors for FAT+data, starting with %d sectors/cluster\n", fatdata, defbpb->bpb_nsector));
+    DebugPrintf(("%d sectors for FAT+data, starting with %d sectors/cluster\n", fatdata, defbpb->bpb_nsector));
     do
     {
       DebugPrintf(("Trying with %d sectors/cluster:\n", defbpb->bpb_nsector));
@@ -622,7 +622,7 @@ void DosDefinePartition(struct DriveParamS *driveParam,
 
     printCHS(", CHS= ", &chs);
 
-    _printf(", start=%6lu MB, size=%6lu MB\n",
+    _printf(", start=%6u MB, size=%6u MB\n",
            StartSector / 2048, pEntry->NumSect / 2048);
   }
 
@@ -697,7 +697,7 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
       lba_bios_parameters.totalSectHigh != 0)
   {
     _printf("Drive is too large to handle, using only 1st 8 GB\n"
-           " drive %02x heads %lu sectors %lu , total=0x%lx-%08lx\n",
+           " drive %02x heads %u sectors %u , total=0x%x-%08x\n",
            drive,
            (ULONG) lba_bios_parameters.heads,
            (ULONG) lba_bios_parameters.sectors,
@@ -749,7 +749,7 @@ StandardBios:                  /* old way to get parameters */
                drive,
                driveParam->chs.Cylinder,
                driveParam->chs.Head, driveParam->chs.Sector));
-  DebugPrintf((" total size %luMB\n", driveParam->total_sectors / 2048));
+  DebugPrintf((" total size %uMB\n", driveParam->total_sectors / 2048));
 
 ErrorReturn:
 
@@ -1006,7 +1006,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 
       if (chs.Cylinder > 1023)
       {
-        _printf("LBA-Transfer error : address = %lu, cylinder %u > 1023\n", LBA_address, chs.Cylinder);
+        _printf("LBA-Transfer error : address = %u, cylinder %u > 1023\n", LBA_address, chs.Cylinder);
         return 1;
       }
 
@@ -1064,7 +1064,7 @@ ReadNextPartitionTable:
   if (Read1LBASector
       (&driveParam, drive, RelSectorOffset, InitDiskTransferBuffer))
   {
-    _printf("Error reading partition table drive %02Xh sector %lu", drive,
+    _printf("Error reading partition table drive %02Xh sector %u", drive,
            RelSectorOffset);
     return PartitionsToIgnore;
   }
@@ -1080,7 +1080,7 @@ ReadNextPartitionTable:
     if (++strangeHardwareLoop < 3)
       goto strange_restart;
 #endif
-    _printf("illegal partition table - drive %02x sector %lu\n", drive,
+    _printf("illegal partition table - drive %02x sector %u\n", drive,
            RelSectorOffset);
     return PartitionsToIgnore;
   }

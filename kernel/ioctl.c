@@ -74,7 +74,7 @@ STATIC const UBYTE cmd [] = {
   /* 0x11 */ C_IOCTLQRY,
 };
 
-int DosDevIOctl(lregs * r)
+COUNT DosDevIOctl(lregs * r)
 {
   struct dhdr FAR *dev;
 

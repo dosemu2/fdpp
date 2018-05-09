@@ -88,7 +88,7 @@ void BinarySftIO(int sft_idx, void *bp, int mode);
 long DosRWSft(int sft_idx, size_t n,__FAR(void) bp, int mode);
 #define DosRead(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_READ)
 #define DosWrite(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_WRITE)
-ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, int *rc);
+ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc);
 long DosOpen(__FAR(char) fname, unsigned flags, unsigned attrib);
 COUNT CloneHandle(unsigned hndl);
 long DosDup(unsigned Handle);
@@ -218,7 +218,7 @@ UBYTE FcbFindFirstNext(__FAR(xfcb) lpXfcb, BOOL First);
 
 /* intr.asm */
 COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, BYTE * lp);
-UCOUNT ASMPASCAL res_read(int fd, void *buf, UCOUNT count);
+UCOUNT ASMPASCAL res_read(UWORD fd, void *buf, UCOUNT count);
 #ifdef __WATCOMC__
 #pragma aux (pascal) res_DosExec modify exact [ax bx dx es]
 #pragma aux (pascal) res_read modify exact [ax bx cx dx]
@@ -385,7 +385,7 @@ COUNT truename(__FAR(const char) src, char * dest, COUNT t);
 /* network.c */
 int network_redirector(unsigned cmd);
 int network_redirector_fp(unsigned cmd, __FAR(void)s);
-long ASMPASCAL network_redirector_mx(unsigned cmd, __FAR(void)s, UDWORD arg);
+DWORD ASMPASCAL network_redirector_mx(UWORD cmd, __FAR(void)s, UDWORD arg);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
 #define remote_getfree(s,d) (int)network_redirector_mx(REM_GETSPACE, s, GET_FP32(d))
 #define remote_lseek(s,new_pos) network_redirector_mx(REM_LSEEK, s, GET_FP32(new_pos))
@@ -397,7 +397,7 @@ UWORD get_machine_name(__FAR(BYTE) netname);
 VOID set_machine_name(__FAR(BYTE) netname, UWORD name_num);
 
 /* procsupt.asm */
-VOID ASMFUNC exec_user(__FAR(iregs) irp, int disable_a20);
+VOID ASMFUNC exec_user(__FAR(iregs) irp, BOOL disable_a20);
 
 /* new by TE */
 
@@ -450,11 +450,11 @@ UWORD ASMPASCAL floppy_change(UWORD);
            error.  If < 0 is returned, it is the negated error return
            code, so DOS simply negates this value and returns it in
            AX. */
-int ASMPASCAL share_open_check(char * filename, unsigned short pspseg, int openmode, int sharemode);     /* SHARE_COMPAT, etc... */
+WORD ASMPASCAL share_open_check(char * filename, unsigned short pspseg, WORD openmode, WORD sharemode);     /* SHARE_COMPAT, etc... */
 
         /* DOS calls this to record the fact that it has successfully
            closed a file, or the fact that the open for this file failed. */
-void ASMPASCAL share_close_file(int fileno);       /* file_table entry number */
+void ASMPASCAL share_close_file(WORD fileno);       /* file_table entry number */
 
         /* DOS calls this to determine whether it can access (read or
            write) a specific section of a file.  We call it internally
@@ -467,33 +467,32 @@ void ASMPASCAL share_close_file(int fileno);       /* file_table entry number */
            generates a critical error (if allowcriter is non-zero).
            If non-zero is returned, it is the negated return value for
            the DOS call. */
-int ASMPASCAL share_access_check(unsigned short pspseg, int fileno, unsigned long ofs, unsigned long len, int allowcriter); /* allow a critical error to be generated */
+WORD ASMPASCAL share_access_check(unsigned short pspseg, WORD fileno, UDWORD ofs, UDWORD len, WORD allowcriter); /* allow a critical error to be generated */
 
         /* DOS calls this to lock or unlock a specific section of a file.
            Returns zero if successfully locked or unlocked.  Otherwise
            returns non-zero.
            If the return value is non-zero, it is the negated error
            return code for the DOS 0x5c call. */
-int ASMPASCAL share_lock_unlock(unsigned short pspseg, int fileno, unsigned long ofs, unsigned long len, int unlock);       /* one to unlock; zero to lock */
+WORD ASMPASCAL share_lock_unlock(unsigned short pspseg, WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       /* one to unlock; zero to lock */
 
 unsigned char ASMPASCAL share_check(void);
 
-long ASMPASCAL call_nls(UWORD,__FAR(VOID), UWORD, UWORD, UWORD, UWORD);
+DWORD ASMPASCAL call_nls(UWORD,__FAR(VOID), UWORD, UWORD, UWORD, UWORD);
 
 ULONG ASMPASCAL ReadPCClock(VOID);
 VOID ASMPASCAL WriteATClock(BYTE *, BYTE, BYTE, BYTE);
 VOID ASMPASCAL WritePCClock(ULONG);
 
-VOID ASMFUNC FAR cpm_entry(VOID);
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);
 VOID ASMFUNC FAR CharMapSrvc(VOID);
 
-unsigned ASMPASCAL init_call_intr(int nr, iregs * rp);
-unsigned ASMPASCAL read(int fd, void *buf, unsigned count);
-int ASMPASCAL init_DosOpen(const char *pathname, int flags);
-int ASMPASCAL close(int fd);
-int ASMPASCAL dup2(int oldfd, int newfd);
-ULONG ASMPASCAL lseek(int fd, long position);
+UWORD ASMPASCAL init_call_intr(WORD nr, iregs * rp);
+UWORD ASMPASCAL read(WORD fd, void *buf, UWORD count);
+WORD ASMPASCAL init_DosOpen(const char *pathname, WORD flags);
+WORD ASMPASCAL close(WORD fd);
+WORD ASMPASCAL dup2(WORD oldfd, WORD newfd);
+ULONG ASMPASCAL lseek(WORD fd, DWORD position);
 seg ASMPASCAL allocmem(UWORD size);
 void ASMPASCAL keycheck(void);
 void ASMPASCAL set_DTA(__FAR(void)_dta);
@@ -501,12 +500,12 @@ WORD ASMPASCAL execrh(__FAR(request),__FAR(struct dhdr));
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
 __FAR(void) ASMPASCAL DetectXMSDriver(VOID);
-int ASMPASCAL init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
+WORD ASMPASCAL init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
 
 void ASMPASCAL init_PSPSet(seg psp_seg);
-int ASMPASCAL init_DosExec(int mode, exec_blk * ep, char * lp);
-int ASMPASCAL init_setdrive(int drive);
-int ASMPASCAL init_switchar(int chr);
+WORD ASMPASCAL init_DosExec(WORD mode, exec_blk * ep, char * lp);
+WORD ASMPASCAL init_setdrive(WORD drive);
+WORD ASMPASCAL init_switchar(WORD chr);
 //COUNT ASMPASCAL Umb_Test(void);
 COUNT ASMPASCAL UMB_get_largest(__FAR(void) driverAddress, UWORD * __seg, UCOUNT * size);
 VOID ASMFUNC init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);

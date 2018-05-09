@@ -154,7 +154,7 @@ static void fin_arg(int last)
 %}
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
-%token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG STRUCT CONST
+%token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG DWORD UDWORD STRUCT CONST
 
 %define api.value.type union
 %type <int> num lnum NUM
@@ -240,6 +240,12 @@ rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
 		| UWORD		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
 				  strcpy(rtbuf, "UWORD");
 				}
+		| DWORD		{ strcpy(rbuf, "\t\t_RSZ = 4;\n\t\t_RET = ");
+				  strcpy(rtbuf, "DWORD");
+				}
+		| UDWORD	{ strcpy(rbuf, "\t\t_RSZ = 4;\n\t\t_RET = ");
+				  strcpy(rtbuf, "UDWORD");
+				}
 		| BYTE		{ strcpy(rbuf, "\t\t_RSZ = 1;\n\t\t_RET = ");
 				  strcpy(rtbuf, "BYTE");
 				}
@@ -260,6 +266,14 @@ atype:		  VOID		{
 		| UWORD		{
 				  arg_size = 2;
 				  strcpy(atype, "UWORD");
+				}
+		| DWORD		{
+				  arg_size = 4;
+				  strcpy(atype, "DWORD");
+				}
+		| UDWORD	{
+				  arg_size = 4;
+				  strcpy(atype, "UDWORD");
 				}
 		| INT		{
 				  arg_size = 2;

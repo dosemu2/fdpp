@@ -134,7 +134,7 @@ sft FAR * idx_to_sft(int SftIndex)
   return lpCurSft;
 }
 
-int get_sft_idx(unsigned hndl)
+int get_sft_idx(UCOUNT hndl)
 {
   psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
   int idx;
@@ -296,7 +296,7 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
   return SUCCESS;
 }
 
-ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, int *rc)
+ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc)
 {
   int sft_idx = get_sft_idx(hndl);
 

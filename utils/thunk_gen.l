@@ -36,14 +36,14 @@
 "VOID"		{ return VOID; }
 "void"		{ return VOID; }
 "WORD"		{ return WORD; }
-"COUNT"		{ return INT; }
-"BOOL"		{ return INT; }
+"COUNT"		{ return WORD; }
+"BOOL"		{ return WORD; }
 "char"		{ return BYTE; }
 "short"		{ return WORD; }
 "int"		{ return INT; }
 "unsigned"	{ return UINT; }
 "long"		{ return LONG; }
-"UCOUNT"	{ return UINT; }
+"UCOUNT"	{ return UWORD; }
 "UWORD"		{ return UWORD; }
 "seg"		{ return UWORD; }
 "BYTE"		{ return BYTE; }
@@ -51,7 +51,9 @@
 "unsigned char"	{ return UBYTE; }
 "unsigned short"	{ return UWORD; }
 "unsigned long"	{ return ULONG; }
-"ULONG"		{ return ULONG; }
+"ULONG"		{ return UDWORD; }
+"DWORD"		{ return DWORD; }
+"UDWORD"	{ return UDWORD; }
 "struct"	{ return STRUCT; }
 "const"		{ return CONST; }
 "/*".*"*/"	{ /* comments */ }

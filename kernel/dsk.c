@@ -888,7 +888,7 @@ STATIC int LBA_to_CHS(ULONG LBA_address, struct CHS *chs, const ddt * pddt,
   if (LBA_address > 1023ul)
   {
 #ifdef DEBUG
-    _printf("LBA-Transfer error : cylinder %lu > 1023\n", LBA_address);
+    _printf("LBA-Transfer error : cylinder %u > 1023\n", LBA_address);
 #else
     put_string("LBA-Transfer error : cylinder > 1023\n");
 #endif

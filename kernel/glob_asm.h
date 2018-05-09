@@ -139,5 +139,6 @@ __ASM_FUNC(int29_handler) SEMIC
 __ASM_FUNC(int2a_handler) SEMIC
 __ASM_FUNC(int2f_handler) SEMIC
 __ASM_FUNC(got_cbreak) SEMIC
+__ASM_FUNC(cpm_entry) SEMIC
 __ASM_ARRI_F(const BYTE, os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC

@@ -66,7 +66,7 @@ void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
 
   if ((ULONG) total + Dynp->Allocated > 0xffff)
   {
-    fdprintf("PANIC:Dyn %lu\n", (ULONG) total + Dynp->Allocated);
+    fdprintf("PANIC:Dyn %u\n", (ULONG) total + Dynp->Allocated);
     for (;;) cpu_relax();
   }
 

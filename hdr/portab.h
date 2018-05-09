@@ -78,7 +78,7 @@ typedef unsigned int            uintptr_t;
 /*                                                              */
 typedef char BYTE;
 typedef short WORD;
-typedef long DWORD;
+//typedef long DWORD;
 
 typedef unsigned char UBYTE;
 typedef unsigned short UWORD;
@@ -86,11 +86,10 @@ typedef unsigned short UWORD;
 
 typedef short SHORT;
 
-typedef unsigned int BITS;      /* for use in bit fields(!)     */
+typedef UWORD BITS;      /* for use in bit fields(!)     */
 
-typedef int COUNT;
-typedef unsigned int UCOUNT;
-typedef unsigned long ULONG;
+typedef WORD COUNT;
+typedef UWORD UCOUNT;
 
 #if defined(__TURBOC__)
 
@@ -200,7 +199,9 @@ UWORD getCS(void);
 void setDS(UWORD);
 void setES(UWORD);
 #define _CS getCS()
+typedef int32_t  DWORD;
 typedef uint32_t UDWORD;
+typedef UDWORD ULONG;
 UBYTE peekb(UWORD seg, UWORD ofs);
 UWORD peekw(UWORD seg, UWORD ofs);
 UDWORD peekl(UWORD seg, UWORD ofs);
@@ -306,7 +307,7 @@ typedef unsigned       size_t;
 /*                                                              */
 /* Boolean type & definitions of TRUE and FALSE boolean values  */
 /*                                                              */
-typedef int BOOL;
+typedef WORD BOOL;
 #define FALSE           (1==0)
 #define TRUE            (1==1)
 

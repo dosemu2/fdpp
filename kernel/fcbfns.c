@@ -277,7 +277,7 @@ UBYTE FcbReadWrite(xfcb FAR * lpXfcb, UCOUNT recno, int mode)
 
 UBYTE FcbGetFileSize(xfcb FAR * lpXfcb)
 {
-  int FcbDrive, sft_idx;
+  WORD FcbDrive, sft_idx;
   unsigned recsiz;
 
   /* Build a traditional DOS file name                            */

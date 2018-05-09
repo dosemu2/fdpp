@@ -233,9 +233,9 @@ STATIC VOID StacksHigh(BYTE * pLine);
 STATIC VOID SetAnyDos(BYTE * pLine);
 STATIC VOID SetIdleHalt(BYTE * pLine);
 STATIC VOID Numlock(BYTE * pLine);
-STATIC BYTE * GetNumArg(BYTE * pLine, COUNT * pnArg);
+STATIC char *GetNumArg(char * pLine, COUNT * pnArg);
 BYTE *GetStringArg(BYTE * pLine, BYTE * pszString);
-STATIC int SkipLine(char *pLine);
+STATIC BOOL SkipLine(char *pLine);
 #if 0
 STATIC char * stristr(char *s1, char *s2);
 #endif
@@ -1131,7 +1131,7 @@ STATIC BOOL SkipLine(char *pLine)
 
 /* JPP - changed so will accept hex number. */
 /* ea - changed to accept hex digits in hex numbers */
-STATIC char *GetNumArg(char *p, int *num)
+STATIC char *GetNumArg(char *p, COUNT *num)
 {
   static char digits[] = "0123456789ABCDEF";
   unsigned char base = 10;
@@ -1380,7 +1380,7 @@ STATIC VOID CfgSwitches(BYTE * pLine)
         break;
       case 'E': /* /E[[:]nnnn]  Set the desired EBDA amount to move in bytes */
         {       /* Note that if there is no EBDA, this will have no effect */
-          int n = 0;
+          COUNT n = 0;
           if (*++pLine == ':')
             pLine++;                    /* skip optional separator */
           if (!(isnum(*pLine) || (*pLine == '-')))
@@ -2418,7 +2418,7 @@ STATIC void ClearScreen(unsigned char attr)
 */
 STATIC void CfgMenuColor(BYTE * pLine)
 {
-  int num = 0;
+  COUNT num = 0;
   unsigned char fg, bg = 0;
 
   pLine = skipwh(pLine);
