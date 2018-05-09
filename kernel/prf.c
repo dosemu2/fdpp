@@ -278,7 +278,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
       size = size * 10 + c;
     }
 
-    if (*fmt == 'l')
+    if (*fmt == 'l' || *fmt == 'z')
     {
       flags |= LONGARG;
       fmt++;
