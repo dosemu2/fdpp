@@ -54,7 +54,7 @@ VOID panic(const BYTE * s)
   put_string("\nPANIC: ");
   put_string(s);
   put_string("\nSystem halted");
-  for (;;) ;
+  for (;;) cpu_relax();
 }
 
 #ifdef IPL
@@ -92,4 +92,3 @@ COUNT block_error(request * rq, COUNT nDrive, struct dhdr FAR * lpDevice,
                        (mode == DSKWRITE ? EFLG_WRITE : 0),
                        nDrive, rq->r_status & S_MASK, lpDevice);
 }
-
