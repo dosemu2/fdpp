@@ -97,6 +97,7 @@ public:
     far_s get_far() const { return ptr; }
     far_s& get_ref() { return ptr; }
     T* get_ptr() { return (T*)resolve_segoff(ptr); }
+    explicit operator uint32_t () const { return get_fp32(); }
 };
 
 class ObjIf {

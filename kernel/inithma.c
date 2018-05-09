@@ -399,7 +399,7 @@ void MoveKernel(UWORD NewKernelSegment)
     {
       /* jmp FAR cpm_entry (copy from 0:c0) */
       pokeb(0xffff, 0x30 * 4 + 0x10, 0xea);
-      pokel(0xffff, 0x30 * 4 + 0x11, GET_FP32(cpm_entry));
+      pokel(0xffff, 0x30 * 4 + 0x11, (ULONG)cpm_entry);
     }
   }
 
