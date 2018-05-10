@@ -65,5 +65,4 @@ typedef struct _mcb {
   UWORD m_size;                 /* size of segment in paragraphs        */
   BYTE m_fill[3];
   AR_MEMB(struct _mcb, BYTE, m_name, 8);               /* owner name limited to 8 bytes        */
-} mcb;
-
+} PACKED mcb;
