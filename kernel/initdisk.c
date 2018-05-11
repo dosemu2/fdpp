@@ -1400,6 +1400,7 @@ COUNT dsk_init()
   }
 #endif
 
+  DiskTransferBuffer = DynAlloc("DTB", 1, MAX_SEC_SIZE);
   /* Reset the drives                                             */
   BIOS_drive_reset(0);
 

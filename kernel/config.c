@@ -2136,7 +2136,7 @@ STATIC void config_init_buffers(int wantedbuffers)
       firstAvailableBuf = (char FAR *)(pbuffer + wantedbuffers);
     }
   }
-  LoL->_deblock_buf = MK_FAR_ST(DiskTransferBuffer);
+  LoL->_deblock_buf = DiskTransferBuffer;
   LoL->_firstbuf = pbuffer;
 
   DebugPrintf(("init_buffers (size %zu) at", sizeof(struct buffer)));

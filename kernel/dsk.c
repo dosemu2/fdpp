@@ -58,7 +58,7 @@ UWORD LBA_WRITE_VERIFY = 0x4302;
                    this is certainly true, if located somewhere
                    at 0xf+1000 and must hold already during BOOT time
                  */
-UBYTE DiskTransferBuffer[MAX_SEC_SIZE];
+UBYTE FAR *DiskTransferBuffer;
 
 struct FS_info {
   ULONG serialno;
@@ -264,7 +264,9 @@ STATIC WORD RWzero(ddt * pddt, UWORD mode)
 {
   UWORD done;
 
-  return LBA_Transfer(pddt, mode, (UBYTE FAR *) MK_FAR_SCP(DiskTransferBuffer), pddt->ddt_offset, 1, &done);
+  return LBA_Transfer(pddt, mode,
+                      DiskTransferBuffer,
+                      pddt->ddt_offset, 1, &done);
 }
 
 /*
@@ -602,7 +604,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
             if ((fv->gbfv_spcfunbit & 1) &&
                 (ret =
                  fl_read(pddt->ddt_driveno, 0, 0, 1, 1,
-                         MK_FAR_SCP(DiskTransferBuffer))) != 0)
+                         DiskTransferBuffer)) != 0)
             {
               fv->gbfv_spcfunbit = 3;   /* no disk in drive */
               return dskerr(ret);
@@ -649,7 +651,8 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
                afentry.sector <= pddt->ddt_bpb.bpb_nsecs; afentry.sector++)
             memcpy(addrfield++, &afentry, sizeof(afentry));
 
-          ret = Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0, pddt->ddt_bpb.bpb_nsecs, MK_FAR_SCP(DiskTransferBuffer));
+          ret = Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0,
+                           pddt->ddt_bpb.bpb_nsecs, DiskTransferBuffer);
           if (ret != 0)
             return dskerr(ret);
         }
@@ -670,7 +673,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
         ret = Genblockio(pddt, LBA_VERIFY, fv->gbfv_head, fv->gbfv_cyl, 0,
                          (fv->gbfv_spcfunbit ?
                           fv->gbfv_ntracks * pddt->ddt_defbpb.bpb_nsecs :
-                          pddt->ddt_defbpb.bpb_nsecs), MK_FAR_SCP(DiskTransferBuffer));
+                          pddt->ddt_defbpb.bpb_nsecs), DiskTransferBuffer);
         if (ret != 0)
           return dskerr(ret);
         fv->gbfv_spcfunbit = 0; /* success */
@@ -997,12 +1000,12 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
 
     if (FP_SEG(buffer) >= 0xa000 || count == 0)
     {
-      transfer_address = MK_FAR(DiskTransferBuffer);
+      transfer_address = DiskTransferBuffer;
       count = 1;
 
       if ((mode & 0xff00) == (LBA_WRITE & 0xff00))
       {
-        fmemcpy_n(DiskTransferBuffer, buffer, bytes_sector);
+        fmemcpy(DiskTransferBuffer, buffer, bytes_sector);
       }
     }
     else
@@ -1083,7 +1086,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
     if (transfer_address == DiskTransferBuffer &&
         (mode & 0xff00) == (LBA_READ & 0xff00))
     {
-      fmemcpy(buffer, MK_FAR_SCP(DiskTransferBuffer), bytes_sector);
+      fmemcpy(buffer, DiskTransferBuffer, bytes_sector);
     }
 
     *transferred += count;

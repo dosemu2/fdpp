@@ -238,7 +238,7 @@ struct __SecPathBuffer                  /* Alternate path name parsing buffer   
 /*extern WORD
   NumFloppies; !!*//* How many floppies we have            */
 
-extern UBYTE DiskTransferBuffer[MAX_SEC_SIZE];
+extern __FAR(UBYTE) DiskTransferBuffer;
 
 /* start of uncontrolled variables                                      */
 
