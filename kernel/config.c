@@ -510,7 +510,7 @@ VOID configDone(VOID)
 
     kernel_seg += hma_paras + 1;
 
-    DebugPrintf(("kernel is low, start alloc at %x", kernel_seg));
+    DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
 
   /* The standard handles should be reopened here, because

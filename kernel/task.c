@@ -807,6 +807,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
 VOID ASMCFUNC P_0(struct config FAR *Config)
 {
   BYTE *tailp, *endp;
+  COUNT rd;
   exec_blk exb;
   UBYTE mode = Config->cfgP_0_startmode;
 
@@ -842,7 +843,11 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     put_string(Shell);
     put_string(tailp + 2);
     put_string(" Enter the full shell command line: ");
-    endp = Shell + res_read(STDIN, Shell, NAMEMAX);
+    rd = res_read(STDIN, Shell, NAMEMAX);
+    if (rd == -1)
+      break;
+    endp = Shell + rd;
     *endp = '\0';                             /* terminate string for strchr */
   }
+  panic("Unable to start shell");
 }
