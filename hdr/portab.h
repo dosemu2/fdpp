@@ -211,7 +211,7 @@ void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void disable(void);
 void enable(void);
 void int3(void);
-void RelocHook(UWORD old_seg, UWORD new_seg);
+void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len);
 
 #ifndef __cplusplus
 #define __FAR(t) t FAR *

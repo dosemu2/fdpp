@@ -177,10 +177,16 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
     int i;
     int reloc;
     struct asm_dsc_s *t;
+    uint8_t *ptr;
 
     reloc = 0;
+    ptr = (uint8_t *)resolve_segoff(asm_tab_fp);
+    if (ptr >= start_p && ptr < end_p) {
+        asm_tab_fp.seg += delta;
+        reloc++;
+    }
     for (i = 0; i < num_wrps; i++) {
-        uint8_t *ptr = (uint8_t *)resolve_segoff(near_wrp[i]);
+        ptr = (uint8_t *)resolve_segoff(near_wrp[i]);
         if (ptr >= start_p && ptr < end_p) {
             near_wrp[i].seg += delta;
             reloc++;
@@ -190,7 +196,7 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
     t = asm_tab;
     reloc = 0;
     for (i = 0; i < asm_tab_len; i++) {
-        uint8_t *ptr = (uint8_t *)so2lin(t[i].seg, t[i].off);
+        ptr = (uint8_t *)so2lin(t[i].seg, t[i].off);
         if (ptr >= start_p && ptr < end_p) {
             t[i].seg += delta;
             reloc++;
@@ -217,7 +223,6 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
         uint8_t *start_p = (uint8_t *)resolve_segoff(symtab->text_start);
         uint8_t *end_p = (uint8_t *)resolve_segoff(symtab->text_end);
         uint16_t delta = symtab->cur_cs - symtab->orig_cs;
-        asm_tab_fp.seg += delta;
         do_relocs(start_p, end_p, delta);
         /* sym_tab table is patched in non-relocated code, never used later */
         reloc = 0;
@@ -793,17 +798,16 @@ uint32_t thunk_call_void(struct far_s fa)
     return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
 }
 
-void RelocHook(UWORD old_seg, UWORD new_seg)
+void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
 {
     int i;
     int reloc = 0;
     int miss = 0;
-    int len = _countof(asm_thunks.arr);
     uint8_t *start_p = (uint8_t *)so2lin(old_seg, 0);
-    uint8_t *end_p = (uint8_t *)so2lin(old_seg + 0x1000, 0);
+    uint8_t *end_p = (uint8_t *)so2lin(old_seg + (len >> 4), len & 0xf);
     uint16_t delta = new_seg - old_seg;
     do_relocs(start_p, end_p, delta);
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < _countof(asm_thunks.arr); i++) {
         uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);
         if (ptr >= start_p && ptr < end_p) {
             int rm;
