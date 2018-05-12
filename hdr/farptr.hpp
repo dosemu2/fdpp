@@ -91,12 +91,6 @@ public:
     FarPtrBase<T> operator -(int dec) { return FarPtrBase<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
     bool operator == (std::nullptr_t) { return (!ptr.seg && !ptr.off); }
     bool operator != (std::nullptr_t) { return (ptr.seg || ptr.off); }
-    template <typename T0, typename T1 = T,
-        typename std::enable_if<!std::is_void<T0>::value>::type* = nullptr,
-        typename std::enable_if<std::is_void<T1>::value>::type* = nullptr>
-    bool operator == (const FarPtrBase<T0>& f) const {
-        return ((f.seg() == this->ptr.seg) && (f.off() == this->ptr.off));
-    }
     uint16_t seg() const { return ptr.seg; }
     uint16_t off() const { return ptr.off; }
     uint32_t get_fp32() const { return ((ptr.seg << 16) | ptr.off); }
@@ -153,6 +147,14 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
     operator T0*() { return (T0*)resolve_segoff(this->ptr); }
+
+    using FarPtrBase<T>::operator ==;
+    template <typename T0, typename T1 = T,
+        typename std::enable_if<!std::is_void<T0>::value>::type* = nullptr,
+        typename std::enable_if<std::is_void<T1>::value>::type* = nullptr>
+    bool operator == (const FarPtrBase<T0>& f) const {
+        return ((f.seg() == this->ptr.seg) && (f.off() == this->ptr.off));
+    }
 };
 
 #define _MK_F(f, s) f(s)
