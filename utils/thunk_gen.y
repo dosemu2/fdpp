@@ -151,6 +151,15 @@ static void fin_arg(int last)
     }
 }
 
+static int get_flags(void)
+{
+    int flg = 0;
+#define FLG_FAR 1
+    if (is_rfar)
+	flg |= FLG_FAR;
+    return flg;
+}
+
 %}
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
@@ -175,20 +184,16 @@ line:		lnum rdecls fname lb args rb SEMIC
 			    break;
 			  case 1:
 			    if (!is_rvoid)
-			      printf("_THUNK%s%s%s%i(%i, %s, %s",
-			          is_rfar ? "_F" : "",
-			          is_pas ? "_P" : "",
-			          (is_rfar || is_pas) ? "_" : "",
+			      printf("_THUNK%s%i(%i, %s, %s",
+			          is_pas ? "_P_" : "",
 			          arg_num, $1, rtbuf, $3);
 			    else
-			      printf("_THUNK%s%s%s%i_v%s(%i, %s",
-			          is_rfar ? "_F" : "",
-			          is_pas ? "_P" : "",
-			          (is_rfar || is_pas) ? "_" : "",
+			      printf("_THUNK%s%i_v%s(%i, %s",
+			          is_pas ? "_P_" : "",
 			          arg_num, is_rptr ? "p" : "", $1, $3);
 			    if (arg_num)
 			      printf(", %s", abuf);
-			    printf(")\n");
+			    printf(", %i)\n", get_flags());
 			    break;
 			  }
 			}
