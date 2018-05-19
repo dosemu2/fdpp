@@ -8,7 +8,6 @@
 #include "thunks.h"
 
 static struct fdpp_api *fdpp;
-static struct fdthunk_api *api_calls;
 
 struct asm_dsc_s {
     UWORD num;
@@ -315,7 +314,6 @@ void do_abort(const char *file, int line)
 void FdppInit(struct fdpp_api *api)
 {
     fdpp = api;
-    api_calls = &api->thunks;
 }
 
 void fdvprintf(const char *format, va_list vl)
@@ -691,27 +689,6 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
 #include "thunk_asms.h"
 
 
-#define _THUNK_API_v(n) \
-void n(void) \
-{ \
-    api_calls->n(); \
-}
-
-#define _THUNK_API_0(r, n) \
-r n(void) \
-{ \
-    return api_calls->n(); \
-}
-
-#define _THUNK_API_1v(n, t1, a1) \
-void n(t1 a1) \
-{ \
-    api_calls->n(a1); \
-}
-
-#include "thunkapi_tmpl.h"
-
-
 UBYTE peekb(UWORD seg, UWORD ofs)
 {
     return *(UBYTE *)so2lin(seg, ofs);
@@ -753,6 +730,11 @@ uint32_t thunk_call_void(struct far_s fa)
 {
     fdpp->asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
     return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
+}
+
+void int3(void)
+{
+    fdpp->debug("int3");
 }
 
 void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)

@@ -84,7 +84,7 @@ HDRS=\
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h dyndata.h
-GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h thunkapi.h
+GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
 HEADERS=$(HDRS) globals.h proto.h $(GEN_HEADERS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
@@ -169,9 +169,6 @@ plt_asmc.inc: thunk_asms.tmp makefile
 plt_asmp.inc: thunk_asms.tmp makefile
 	grep ASMPASCAL $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmpsym \U\2,\t\t\1/' >$@
 
-thunkapi.h: thunkapi_gen.h thunkapi_tmpl.h makefile
-	cpp -P $< | sed 's/\(^[^s}]\+\)/\t\1/' >$@
-
 glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM(" $< | grep -v '^/' | \
 		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >$@
@@ -186,6 +183,6 @@ glob_asmdefs.h: glob_asm.h makefile
 	grep "__ASM_FUNC(" $< | grep -v '^/' | \
 		sed 's/.\+(\(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 
-install: $(FDPPLIB) thunkapi.h
+install: $(FDPPLIB)
 	install -t /usr/local/lib $(FDPPLIB)
-	install -D -m 0644 -t /usr/local/include/fdpp thunkapi.h thunks.h
+	install -D -m 0644 -t /usr/local/include/fdpp thunks.h
