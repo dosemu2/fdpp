@@ -17,10 +17,11 @@ typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
 
 struct fdpp_api {
     uint8_t *(*mem_base)(void);
-    void (*abort_handler)(const char *, int);
-    void (*print_handler)(const char *format, va_list ap);
+    void (*abort)(const char *, int);
+    void (*print)(const char *format, va_list ap);
     void (*cpu_relax)(void);
     FdppAsmCall_t asm_call;
+    FdppAsmCall_t asm_call_noret;
     struct fdthunk_api thunks;
 };
 void FdppInit(struct fdpp_api *api);

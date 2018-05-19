@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
 #include "../hdr/portab.h"
 #include "globals.h"
 #include "proto.h"
@@ -20,6 +21,7 @@ static struct far_s asm_tab_fp;
 static struct farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
+static jmp_buf *noret_jmp;
 
 #define SEMIC ;
 #define __ASM(t, v) __ASMSYM(t) __##v
@@ -266,6 +268,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 
 void FdppCall(struct vm86_regs *regs)
 {
+    jmp_buf jmp, *prev_jmp = noret_jmp;
     s_regs = *regs;
     UBYTE len;
     UDWORD res;
@@ -276,32 +279,37 @@ void FdppCall(struct vm86_regs *regs)
                 (struct fdpp_symtab *)so2lin(regs->ss, regs->esp + 6));
         break;
     case 1:
+        noret_jmp = &jmp;
+        if (setjmp(jmp))
+            break;
         res = FdppThunkCall(regs->ecx,
                 (UBYTE *)so2lin(regs->ss, regs->edx), &len);
         switch (len) {
-            case 0:
-                break;
-            case 1:
-                _AL(regs) = res;
-                break;
-            case 2:
-                _AX(regs) = res;
-                break;
-            case 4:
-                _AX(regs) = res & 0xffff;
-                _DX(regs) = res >> 16;
-                break;
-            default:
-                _fail();
-                break;
+        case 0:
+            break;
+        case 1:
+            _AL(regs) = res;
+            break;
+        case 2:
+            _AX(regs) = res;
+            break;
+        case 4:
+            _AX(regs) = res & 0xffff;
+            _DX(regs) = res >> 16;
+            break;
+        default:
+            _fail();
+            break;
         }
         break;
     }
+
+    noret_jmp = prev_jmp;
 }
 
 void do_abort(const char *file, int line)
 {
-    fdpp->abort_handler(file, line);
+    fdpp->abort(file, line);
 }
 
 void FdppInit(struct fdpp_api *api)
@@ -312,7 +320,7 @@ void FdppInit(struct fdpp_api *api)
 
 void fdvprintf(const char *format, va_list vl)
 {
-    fdpp->print_handler(format, vl);
+    fdpp->print(format, vl);
 }
 
 void fdprintf(const char *format, ...)
@@ -330,14 +338,16 @@ void cpu_relax(void)
 }
 
 #define FLG_FAR 1
+#define FLG_NORET 2
 
-static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len, int flags)
+static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
+        FdppAsmCall_t call)
 {
     int i;
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
-            fdpp->asm_call(&s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
+            call(&s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
             return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
@@ -357,7 +367,8 @@ static uint16_t find_wrp(uint16_t seg)
     return -1;
 }
 
-static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
+static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
+        FdppAsmCall_t call)
 {
     int i;
 
@@ -368,7 +379,7 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
             /* argpack should be aligned */
             _assert(!(len & 1));
             s_regs.ecx = len >> 1;
-            fdpp->asm_call(&s_regs, asm_tab[i].seg, wrp, sp, len);
+            call(&s_regs, asm_tab[i].seg, wrp, sp, len);
             return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
@@ -376,13 +387,23 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
     return -1;
 }
 
+static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
+        uint16_t off, uint8_t *sp, uint8_t len)
+{
+    fdpp->asm_call_noret(regs, seg, off, sp, len);
+    longjmp(*noret_jmp, 1);
+}
+
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
 {
-    if (flags & FLG_FAR) {
-        flags &= ~FLG_FAR;
-        return _do_asm_call_far(num, sp, len, flags);
-    }
-    return _do_asm_call(num, sp, len, flags);
+    uint32_t ret;
+    FdppAsmCall_t call = ((flags & FLG_NORET) ?
+            asm_call_noret : fdpp->asm_call);
+    if (flags & FLG_FAR)
+        ret = _do_asm_call_far(num, sp, len, call);
+    else
+        ret = _do_asm_call(num, sp, len, call);
+    return ret;
 }
 
 static uint8_t *clean_stk(size_t len)

@@ -27,6 +27,7 @@ static int is_void;
 static int is_rvoid;
 static int is_const;
 static int is_pas;
+static int is_noret;
 static char rbuf[256];
 static char abuf[1024];
 static char atype[256];
@@ -44,6 +45,16 @@ static void beg_arg(void)
     atype[0] = 0;
     atype2[0] = 0;
     atype3[0] = 0;
+}
+
+static void init_line(void)
+{
+    is_pas = 0;
+    is_rvoid = 0;
+    is_rptr = 0;
+    is_rfar = 0;
+    is_noret = 0;
+    beg_arg();
 }
 
 static void do_start_arg(int anum)
@@ -155,8 +166,11 @@ static int get_flags(void)
 {
     int flg = 0;
 #define FLG_FAR 1
+#define FLG_NORET 2
     if (is_rfar)
 	flg |= FLG_FAR;
+    if (is_noret)
+	flg |= FLG_NORET;
     return flg;
 }
 
@@ -164,6 +178,7 @@ static int get_flags(void)
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
 %token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG DWORD UDWORD STRUCT CONST
+%token NORETURN
 
 %define api.value.type union
 %type <int> num lnum NUM
@@ -204,7 +219,7 @@ lb:		LB	{ arg_offs = 0; arg_num = 0; is_rptr = is_ptr; is_rfar = is_far, beg_arg
 rb:		RB	{ fin_arg(1); }
 ;
 
-lnum:		num	{ is_pas = 0; is_rvoid = 0; is_rptr = 0; is_rfar = 0, beg_arg(); }
+lnum:		num	{ init_line(); }
 ;
 num:		NUM
 ;
@@ -219,6 +234,7 @@ decls:		  ASMCFUNC decls
 		| SEGM LB STRING RB decls
 		| ASMPASCAL decls	{ is_pas = 1; }
 		| FAR decls	{ is_far = 1; }
+		| NORETURN decls	{ is_noret = 1; }
 		| ASTER decls	{ is_ptr = 1; }
 		|
 ;

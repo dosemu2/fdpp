@@ -249,6 +249,7 @@ typedef struct far_s far_t;
 #define NATIVE
 #define USE_STDLIB
 #define PACKED         __attribute__((packed))
+#define NORETURN
 #define DEBUG
 
 #include "dosobj.h"

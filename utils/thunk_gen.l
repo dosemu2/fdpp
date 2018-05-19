@@ -56,6 +56,7 @@
 "UDWORD"	{ return UDWORD; }
 "struct"	{ return STRUCT; }
 "const"		{ return CONST; }
+"NORETURN"	{ return NORETURN; }
 "/*".*"*/"	{ /* comments */ }
 [\t ]+		{ /* skip spaces */ }
 [_A-Za-z][_A-Za-z0-9]*	{
