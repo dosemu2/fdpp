@@ -18,7 +18,8 @@ static inline far_s _lookup_far(const void *ptr)
 
 static inline void _store_far(const void *ptr, far_s fptr)
 {
-    store_far(&g_farhlp[FARHLP1], ptr, fptr);
+    /* because of things like adjust_far() we can have clashes */
+    store_far_replace(&g_farhlp[FARHLP1], ptr, fptr);
 }
 
 static inline void do_store_far(far_s fptr)
@@ -328,13 +329,17 @@ template<typename T, int (*F)(void)>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
+        FarPtr<T> fp;
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - F();
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off)
             f = lookup_far(&g_farhlp[FARHLP2], ptr);
         _assert(f.seg || f.off);
-        return _MK_F(FarPtr<uint8_t>, f) + F();
+        fp = _MK_F(FarPtr<uint8_t>, f) + F();
+        /* for arrays of struct that contain arrays */
+        do_store_far(fp.get_far());
+        return fp;
     }
 };
 
