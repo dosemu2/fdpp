@@ -355,6 +355,10 @@ STATIC void init_kernel(void)
   InitializeAllBPBs();
 }
 
+#define safe_open(n, m) \
+  if (open(n, m) == -1) \
+    init_fatal("unable to open " n)
+
 STATIC VOID FsConfig(VOID)
 {
   struct dpb FAR *dpb = LoL->_DPBp;
@@ -393,10 +397,10 @@ STATIC VOID FsConfig(VOID)
   /* a little bit of shuffling is necessary for compatibility */
 
   /* sft_idx=0 is /dev/aux                                        */
-  open("AUX", O_RDWR);
+  safe_open("AUX", O_RDWR);
 
   /* handle 1, sft_idx=1 is /dev/con (stdout) */
-  open("CON", O_RDWR);
+  safe_open("CON", O_RDWR);
 
   /* 3 is /dev/aux                */
   dup2(STDIN, STDAUX);
@@ -408,7 +412,7 @@ STATIC VOID FsConfig(VOID)
   dup2(STDOUT, STDERR);
 
   /* 4 is /dev/prn                                                */
-  open("PRN", O_WRONLY);
+  safe_open("PRN", O_WRONLY);
 
   /* Initialize the disk buffer management functions */
   /* init_call_init_buffers(); done from CONFIG.C   */
@@ -646,10 +650,10 @@ STATIC void InitIO(void)
 }
 
 /* issue an internal error message                              */
-VOID init_fatal(BYTE * err_msg)
+VOID init_fatal(const BYTE * err_msg)
 {
   _printf("\nInternal kernel error - %s\nSystem halted\n", err_msg);
-  for (;;) ;
+  for (;;) cpu_relax();
 }
 
 /*

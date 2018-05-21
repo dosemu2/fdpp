@@ -122,7 +122,7 @@ unsigned ebdasize(void);
 /* main.c */
 BOOL init_device(__FAR(struct dhdr) dhp, char * cmdLine,
                       COUNT mode, __FAR(char)*top);
-VOID init_fatal(BYTE * err_msg);
+VOID init_fatal(const BYTE * err_msg);
 
 #if 0
 /* prf.c */
