@@ -27,9 +27,6 @@
 /* Cambridge, MA 02139, USA.                                    */
 /****************************************************************/
 
-/* one byte alignment */
-#include "algnbyte.h"
-
 /*
  *	Description of the organization of NLS information -- 2000/02/13 ska
  *
@@ -406,7 +403,7 @@ struct nlsExtCntryInfo {
     VOID(FAR * upCaseFct) (VOID);       /* far call to a function upcasing the
                                            character in register AL */
   char dataSep[2];              /* ASCIZ of separator in data records */
-};
+} PACKED;
 
 struct nlsPointer {             /* Information of DOS-65-0X is addressed
                                    by a pointer */
@@ -415,7 +412,7 @@ struct nlsPointer {             /* Information of DOS-65-0X is addressed
                                    of DOS-65 is called (Note: won't work for
                                    subfunctions 0, 1, 0x20, 0x21, 0x22, 0x23,
                                    0xA0, 0xA1,& 0xA2 */
-};
+} PACKED;
 
 struct nlsPackage {             /* the contents of one chain item of the
                                    list of NLS packages */
@@ -599,16 +596,13 @@ struct nlsCSys_fileHeader {     /* COUNTRY.SYS header */
   								file into this buffer without any
   								overflow. */
 	DWORD csys_posIndex;	/* absolute position of index table */
-};
+} PACKED;
 
 /* Structure created by CountryInfoLoad() */
 struct nlsCSys_loadPackage {
 	UWORD csys_size;
 	struct nlsPackage csys_pkg;
-};
-
-/* standard alignment */
-#include "algndflt.h"
+} PACKED;
 
 #ifdef DEBUG
         /* Enable debugging of NLS part */

@@ -56,8 +56,6 @@ static BYTE *pcb_hRcsId =
 #endif
 #endif
 
-   /* Force one-byte alignment for all the internal structures, see above */
-#include "algnbyte.h"
 /*                                                                      */
 /* interrupt handler structure definition                               */
 /*                                                                      */
@@ -177,9 +175,6 @@ typedef struct {
 
 #define FLG_ZERO        0x0040
 #define FLG_CARRY       0x0001
-
-   /* Allow default alignment from now on */
-#include "algndflt.h"
 
 #endif
 
