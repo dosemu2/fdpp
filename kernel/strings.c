@@ -139,30 +139,28 @@ char FAR * fstrchr(const char FAR * s, int c)
 }
 
 #ifndef USE_STDLIB
-void *memchr(const void * s, int c)
+void *memchr(const void * s, int c, size_t n)
 {
-  REG unsigned char *p;
-  p = (unsigned char *)s - 1;
-  do
+  const unsigned char *p = s;
+  while (n--)
   {
-    if (*++p == (unsigned char)c)
+    if (*p == (unsigned char)c)
       return (void *)p;
+    p++;
   }
-  while (*p);
-  return 0;
+  return NULL;
 }
 #endif
 
 void FAR * fmemchr(const void FAR * s, int c, size_t n)
 {
-  const unsigned char FAR *p;
-  p = (const unsigned char FAR *)s - 1;
-  do
+  const unsigned char FAR *p = s;
+  while (n--)
   {
-    if (*++p == (unsigned char)c)
+    if (*p == (unsigned char)c)
       return (void FAR *)p;
+    p++;
   }
-  while (*p);
   return NULL;
 }
 
