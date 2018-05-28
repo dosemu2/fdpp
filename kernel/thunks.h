@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 2
+#define FDPP_API_VER 3
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +19,7 @@ typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
 struct fdpp_api {
     uint8_t *(*mem_base)(void);
     void (*abort)(const char *, int);
-    void (*print)(const char *format, va_list ap);
+    void (*print)(int prio, const char *format, va_list ap);
     void (*debug)(const char *msg);
     void (*cpu_relax)(void);
     FdppAsmCall_t asm_call;

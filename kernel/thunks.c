@@ -193,7 +193,7 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
             reloc++;
         }
     }
-    fdprintf("processed %i relocs\n", reloc);
+    fdlogprintf("processed %i relocs\n", reloc);
     t = asm_tab;
     reloc = 0;
     for (i = 0; i < asm_tab_len; i++) {
@@ -203,7 +203,7 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
             reloc++;
         }
     }
-    fdprintf("processed %i relocs\n", reloc);
+    fdlogprintf("processed %i relocs\n", reloc);
 }
 
 static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
@@ -234,7 +234,7 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
                 reloc++;
             }
         }
-        fdprintf("processed %i relocs\n", reloc);
+        fdlogprintf("processed %i relocs\n", reloc);
     }
 
     err = FdppSetAsmThunks(thtab, stab_len);
@@ -318,7 +318,12 @@ void FdppInit(struct fdpp_api *api)
 
 void fdvprintf(const char *format, va_list vl)
 {
-    fdpp->print(format, vl);
+    fdpp->print(0, format, vl);
+}
+
+void fdlogvprintf(const char *format, va_list vl)
+{
+    fdpp->print(1, format, vl);
 }
 
 void fdprintf(const char *format, ...)
@@ -327,6 +332,15 @@ void fdprintf(const char *format, ...)
 
     va_start(vl, format);
     fdvprintf(format, vl);
+    va_end(vl);
+}
+
+void fdlogprintf(const char *format, ...)
+{
+    va_list vl;
+
+    va_start(vl, format);
+    fdlogvprintf(format, vl);
     va_end(vl);
 }
 
@@ -761,5 +775,5 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
             reloc++;
         }
     }
-    fdprintf("processed %i relocs (%i missed)\n", reloc, miss);
+    fdlogprintf("processed %i relocs (%i missed)\n", reloc, miss);
 }
