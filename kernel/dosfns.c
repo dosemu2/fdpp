@@ -339,7 +339,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
           current_sft_idx = sys_idx;
         }
 
-        return sfti;
+        return _DOS_FP(sfti);
       }
     }
   }
