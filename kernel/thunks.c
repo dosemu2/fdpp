@@ -272,6 +272,9 @@ void FdppCall(struct vm86_regs *regs)
     UBYTE len;
     UDWORD res;
 
+    if (!fdpp)
+        return;
+
     switch (regs->ebx & 0xff) {
     case 0:
         FdppSetSymTab(regs,
@@ -311,9 +314,12 @@ void do_abort(const char *file, int line)
     fdpp->abort(file, line);
 }
 
-void FdppInit(struct fdpp_api *api)
+int FdppInit(struct fdpp_api *api, int ver)
 {
+    if (ver != FDPP_API_VER)
+        return -1;
     fdpp = api;
+    return 0;
 }
 
 void fdvprintf(const char *format, va_list vl)
