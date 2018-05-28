@@ -46,7 +46,10 @@ public:
     FarPtrBase(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
     explicit FarPtrBase(const far_s& f) : ptr(f) {}
 
-    T* operator ->() { return (T*)resolve_segoff(ptr); }
+    T* operator ->() {
+        do_store_far(get_far());
+        return (T*)resolve_segoff(ptr);
+    }
     operator T*() { return (T*)resolve_segoff(ptr); }
 
     template <typename T1 = T,
