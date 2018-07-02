@@ -759,7 +759,7 @@ void int3(void)
 
 void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
 {
-    int i;
+    unsigned i;
     int reloc = 0;
     int miss = 0;
     uint8_t *start_p = (uint8_t *)so2lin(old_seg, 0);
