@@ -3,6 +3,12 @@
 #include "farptr.hpp"
 #include "cppstubs.hpp"
 #include "dosobj.h"
+#include "dosobj_priv.h"
+
+template<typename T>
+class NearPtr_DO : public NearPtr<T, dosobj_seg> {
+    using NearPtr<T, dosobj_seg>::NearPtr;
+};
 
 template <typename T>
 class FarObjBase {
@@ -58,9 +64,9 @@ public:
         return this->fobj.get_far();
     }
 
-    NearPtr<obj_type> get_near() {
+    NearPtr_DO<obj_type> get_near() {
         far_s f = get_obj();
-        return NearPtr<obj_type>(f.off);
+        return NearPtr_DO<obj_type>(f.off);
     }
 
     virtual ~FarObj() { RmObj(); }
@@ -95,9 +101,9 @@ public:
         pr_dosobj(this->fobj, this->ptr, this->size);
         return this->fobj.get_far();
     }
-    NearPtr<obj_type> get_near() {
+    NearPtr_DO<obj_type> get_near() {
         far_s f = get_obj();
-        return NearPtr<obj_type>(f.off);
+        return NearPtr_DO<obj_type>(f.off);
     }
 
     /* make it non-copyable */
@@ -143,3 +149,6 @@ public:
 #define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o).get_obj())
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
 #define MK_FAR_STR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(o, strlen(o) + 1).get_obj())
+
+#define PTR_MEMB(t) NearPtr_DO<t>
+#define NEAR_PTR_DO(t) NearPtr_DO<t>

@@ -6,7 +6,6 @@
 #include <cstring>
 #include "cppstubs.hpp"
 #include "thunks_priv.h"
-#include "dosobj_priv.h"
 #include "farhlp.h"
 
 static inline far_s _lookup_far(const void *ptr)
@@ -288,7 +287,7 @@ public:
     CallSym<T>& operator *() { return sym; }
 };
 
-template<typename T>
+template<typename T, uint16_t (*SEG)(void)>
 class NearPtr {
     uint16_t _off;
 
@@ -296,9 +295,9 @@ public:
     explicit NearPtr(uint16_t o) : _off(o) {}    // for farobj only
     NearPtr(std::nullptr_t) : _off(0) {}
     operator uint16_t () { return _off; }
-    operator T *() { return FarPtr<T>(dosobj_seg(), _off); }
-    NearPtr<T> operator - (const NearPtr<T>& n) const {
-        return NearPtr<T>(_off - n.off());
+    operator T *() { return FarPtr<T>(SEG(), _off); }
+    NearPtr<T, SEG> operator - (const NearPtr<T, SEG>& n) const {
+        return NearPtr<T, SEG>(_off - n.off());
     }
     uint16_t off() const { return _off; }
 
@@ -492,7 +491,6 @@ public:
         return offsetof(p, n); \
     } \
     SymMemb2<t, off_##n> n
-#define PTR_MEMB(t) NearPtr<t>
 #define FP_SEG(fp)            ((fp).seg())
 #define FP_OFF(fp)            ((fp).off())
 #define MK_FP(seg, ofs) ({ \

@@ -466,7 +466,7 @@ void enable(void)
 #define __ARG_PTR(t) t *
 #define __ARG_PTR_FAR(t) t FAR *
 #define __ARG_A(t) t
-#define __ARG_PTR_A(t) PTR_MEMB(t)
+#define __ARG_PTR_A(t) NEAR_PTR_DO(t)
 #define __ARG_PTR_FAR_A(t) __DOSFAR(t)
 
 #define __CNV_PTR_FAR(t, d, f, l) t d = (f)
