@@ -25,6 +25,7 @@ static jmp_buf *noret_jmp;
 #define SEMIC ;
 #define __ASM(t, v) __ASMSYM(t) __##v
 #define __ASM_FAR(t, v) __ASMFAR(t) __##v
+#define __ASM_NEAR(t, v) __ASMNEAR(t, data_seg) __##v
 #define __ASM_ARR(t, v, l) __ASMARSYM(t, __##v, l)
 #define __ASM_ARRI(t, v) __ASMARISYM(t, __##v)
 #define __ASM_ARRI_F(t, v) __ASMARIFSYM(t, __##v)
@@ -32,6 +33,7 @@ static jmp_buf *noret_jmp;
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR
+#undef __ASM_NEAR
 #undef __ASM_ARR
 #undef __ASM_ARRI
 #undef __ASM_ARRI_F
@@ -41,6 +43,7 @@ static union asm_thunks_u {
   struct _thunks {
 #define __ASM(t, v) struct far_s * __##v
 #define __ASM_FAR(t, v) struct far_s * __##v
+#define __ASM_NEAR(t, v) struct far_s * __##v
 #define __ASM_ARR(t, v, l) struct far_s * __##v
 #define __ASM_ARRI(t, v) struct far_s * __##v
 #define __ASM_ARRI_F(t, v) struct far_s * __##v
@@ -48,6 +51,7 @@ static union asm_thunks_u {
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR
+#undef __ASM_NEAR
 #undef __ASM_ARR
 #undef __ASM_ARRI
 #undef __ASM_ARRI_F
@@ -59,6 +63,7 @@ static union asm_thunks_u {
 #define SEMIC ,
 #define __ASM(t, v) __ASMREF(__##v)
 #define __ASM_FAR(t, v) __ASMREF(__##v)
+#define __ASM_NEAR(t, v) __ASMREF(__##v)
 #define __ASM_ARR(t, v, l) __ASMREF(__##v)
 #define __ASM_ARRI(t, v) __ASMREF(__##v)
 #define __ASM_ARRI_F(t, v) __ASMREF(__##v)
@@ -66,6 +71,7 @@ static union asm_thunks_u {
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR
+#undef __ASM_NEAR
 #undef __ASM_ARR
 #undef __ASM_ARRI
 #undef __ASM_ARRI_F
@@ -445,6 +451,11 @@ void setDS(uint16_t seg)
 void setES(uint16_t seg)
 {
     s_regs.es = seg;
+}
+
+uint16_t data_seg(void)
+{
+    return FP_SEG(__ASMADDR(DATASTART));
 }
 
 #define VIF_MASK	0x00080000	/* virtual interrupt flag */

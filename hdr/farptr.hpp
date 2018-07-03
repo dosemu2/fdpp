@@ -89,7 +89,7 @@ public:
         ptr.off -= sizeof(T);
         return *this;
     }
-    void operator +=(int inc) { ptr.off += inc * sizeof(T); }
+    FarPtrBase<T> operator +=(int inc) { ptr.off += inc * sizeof(T); return *this; }
     FarPtrBase<T> operator +(int inc) { return FarPtrBase<T>(ptr.seg, ptr.off + inc * sizeof(T)); }
     FarPtrBase<T> operator -(int dec) { return FarPtrBase<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
     bool operator == (std::nullptr_t) { return (!ptr.seg && !ptr.off); }
@@ -294,10 +294,18 @@ class NearPtr {
 public:
     explicit NearPtr(uint16_t o) : _off(o) {}    // for farobj only
     NearPtr(std::nullptr_t) : _off(0) {}
-    operator uint16_t () { return _off; }
+    explicit operator uint16_t () { return _off; }
     operator T *() { return FarPtr<T>(SEG(), _off); }
     NearPtr<T, SEG> operator - (const NearPtr<T, SEG>& n) const {
         return NearPtr<T, SEG>(_off - n.off());
+    }
+    NearPtr<T, SEG> operator +=(const int inc) {
+        _off += inc * sizeof(T);
+        return *this;
+    }
+    NearPtr<T, SEG> operator -=(const int dec) {
+        _off -= dec * sizeof(T);
+        return *this;
     }
     uint16_t off() const { return _off; }
 
@@ -361,6 +369,12 @@ public:
         typename std::enable_if<!_C(T1)>::type* = nullptr>
     operator FarPtr<const T1> () { return this->lookup_sym(); }
     operator FarPtr<T> () { return this->lookup_sym(); }
+    template <uint16_t (*SEG)(void)>
+    operator NearPtr<T, SEG> () {
+        FarPtr<T> f = this->lookup_sym();
+        _assert(f.seg() == SEG());
+        return NearPtr<T, SEG>(f.off());
+    }
     operator T *() { return sym; }
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
@@ -433,6 +447,18 @@ public:
     far_s* get_ref() { return &ptr.get_ref(); }
 };
 
+template<typename T, uint16_t (*SEG)(void)>
+class AsmNearPtr {
+    FarPtr<NearPtr<T, SEG>> ptr;
+
+public:
+    NearPtr<T, SEG>& get_sym() { return *ptr.get_ptr(); }
+
+    AsmNearPtr() = default;
+    AsmNearPtr(const AsmNearPtr<T, SEG> &) = delete;
+    far_s* get_ref() { return &ptr.get_ref(); }
+};
+
 template<typename T, int (*F)(void)>
 class SymMemb : public T, public MembBase<T, F> {
 public:
@@ -466,6 +492,7 @@ public:
 #define __ASMARIFSYM(t, v) AsmArFSym<t> v
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
+#define __ASMNEAR(t, s) AsmNearPtr<t, s>
 #define __ASMREF(f) f.get_ref()
 #define __ASMADDR(v) &__##v
 #define __ASMCALL(t, f) AsmCSym<t> f

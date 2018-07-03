@@ -180,6 +180,8 @@ glob_asmdefs.h: glob_asm.h makefile
 		sed 's/.\+(.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 	grep "__ASM_FAR(" $< | grep -v '^/' | \
 		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
+	grep "__ASM_NEAR(" $< | grep -v '^/' | \
+		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 	grep "__ASM_FUNC(" $< | grep -v '^/' | \
 		sed 's/.\+(\(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 

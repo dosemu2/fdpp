@@ -200,6 +200,7 @@ UWORD getCS(void);
 void setDS(UWORD);
 void setES(UWORD);
 #define _CS getCS()
+uint16_t data_seg(void);
 typedef int32_t  DWORD;
 typedef uint32_t UDWORD;
 typedef UDWORD ULONG;

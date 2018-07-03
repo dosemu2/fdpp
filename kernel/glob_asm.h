@@ -3,7 +3,7 @@
 __ASM(UWORD, NetBios) SEMIC
 __ASM(BYTE *, net_name) SEMIC
 __ASM(BYTE, net_set_count) SEMIC
-__ASM(char *, inputptr) SEMIC         /* pointer to unread CON input          */
+__ASM_NEAR(char, inputptr) SEMIC         /* pointer to unread CON input          */
 __ASM_FAR(sfttbl, sfthead) SEMIC    /* System File Table head               */
 __ASM(WORD, maxsecsize) SEMIC
 __ASM(unsigned char, bufloc) SEMIC    /* 0=conv, 1=HMA                        */
