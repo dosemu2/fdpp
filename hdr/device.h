@@ -348,17 +348,17 @@ typedef struct {
         __DOSFAR(char) _r_cmdline;
       } _r_cmd;
       UBYTE _r_firstunit;
-    } _r_init;
+    } PACKED _r_init;
     struct {
       BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       BYTE _r_retcode;          /*  Return Code         */
       __DOSFAR(BYTE) _r_vid;        /* volume id */
-    } _r_media;
+    } PACKED _r_media;
     struct {
       BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       __DOSFAR(boot) _r_fat;        /*  boot sector pointer */
       __DOSFAR(bpb) _r_bpbpt;       /*  ptr to BPB table    */
-    } _r_bpb;
+    } PACKED _r_bpb;
     struct {
       BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       __DOSFAR(BYTE) _r_trans;      /*  Transfer Address    */
@@ -366,7 +366,7 @@ typedef struct {
       UWORD _r_start;           /*  Starting Sector No. */
       __DOSFAR(BYTE) _r_vid;        /* Pointer to volume id */
       LONG _r_huge;             /* for > 32Mb drives    */
-    } _r_rw;
+    } PACKED _r_rw;
     struct {
       unsigned char _r_ndbyte;  /*  Byte Read From Device       */
     } _r_nd;
@@ -384,7 +384,7 @@ typedef struct {
         __DOSFAR(struct Access_info)_r_ai;
       } _r_par;                 /* Pointer to param. block from 440C/440D */
     } _r_gen;
-  } _r_x;
+  } PACKED _r_x;
 } PACKED request;
 
 #define HUGECOUNT       0xffff
