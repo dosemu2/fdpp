@@ -204,6 +204,7 @@ uint16_t data_seg(void);
 typedef int32_t  DWORD;
 typedef uint32_t UDWORD;
 typedef UDWORD ULONG;
+typedef DWORD LONG;
 UBYTE peekb(UWORD seg, UWORD ofs);
 UWORD peekw(UWORD seg, UWORD ofs);
 UDWORD peekl(UWORD seg, UWORD ofs);
@@ -333,7 +334,7 @@ typedef WORD BOOL;
 #endif
 
 #ifdef WITHFAT32
-typedef unsigned long CLUSTER;
+typedef ULONG CLUSTER;
 #else
 typedef unsigned short CLUSTER;
 #endif
@@ -349,12 +350,6 @@ typedef unsigned short UNICODE;
 typedef char FAR *ADDRESS;
 #else
 typedef void FAR *ADDRESS;
-#endif
-
-#ifdef STRICT
-typedef signed long LONG;
-#else
-#define LONG long
 #endif
 
 #define MK_UWORD(hib,lob) (((UWORD)(hib) <<  8u) | (UBYTE)(lob))
