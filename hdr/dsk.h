@@ -28,4 +28,7 @@
 
 #ifndef MAX_SEC_SIZE
 #define MAX_SEC_SIZE    (1*512) /* max supported size of sector in bytes */
+
+#define INT1E_TABLE_SIZE 0xe
+
 #endif
