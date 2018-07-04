@@ -307,6 +307,8 @@ public:
         _off -= dec * sizeof(T);
         return *this;
     }
+    bool operator == (std::nullptr_t) { return (!_off); }
+    bool operator != (std::nullptr_t) { return (_off); }
     uint16_t off() const { return _off; }
 
     NearPtr() = default;
