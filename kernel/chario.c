@@ -155,6 +155,10 @@ STATIC void fast_put_char(unsigned char chr)
       mov al, byte ptr chr;
       int 0x29;
     }
+#else
+  iregs r = {};
+  r.a.b.l = chr;
+  init_call_intr(0x29, &r);
 #endif
 }
 #endif
