@@ -86,7 +86,7 @@ HDRS=\
     $(HDR)version.h dyndata.h
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
-HEADERS=$(HDRS) globals.h proto.h $(GEN_HEADERS)
+HEADERS=$(HDRS) globals.h proto.h thunks.h $(GEN_HEADERS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
 CFILES = blockio.c \
