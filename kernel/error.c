@@ -48,6 +48,7 @@ VOID dump(void)
 }
 #endif
 
+#ifndef __GNUC__
 /* issue a panic message for corrupted data structures          */
 VOID panic(const BYTE * s)
 {
@@ -56,6 +57,7 @@ VOID panic(const BYTE * s)
   put_string("\nSystem halted");
   for (;;) cpu_relax();
 }
+#endif
 
 #ifdef IPL
 /* issue an internal error message                              */

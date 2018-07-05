@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 4
+#define FDPP_API_VER 5
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,11 +21,12 @@ struct fdpp_api {
     void (*abort)(const char *, int);
     void (*print)(int prio, const char *format, va_list ap);
     void (*debug)(const char *msg);
+    void (*panic)(const char *msg);
     void (*cpu_relax)(void);
     FdppAsmCall_t asm_call;
     FdppAsmCall_t asm_call_noret;
 };
-int FdppInit(struct fdpp_api *api, int ver);
+int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 
 #ifdef __cplusplus
 }

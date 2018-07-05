@@ -320,8 +320,9 @@ void do_abort(const char *file, int line)
     fdpp->abort(file, line);
 }
 
-int FdppInit(struct fdpp_api *api, int ver)
+int FdppInit(struct fdpp_api *api, int ver, int *req_ver)
 {
+    *req_ver = FDPP_API_VER;
     if (ver != FDPP_API_VER)
         return -1;
     fdpp = api;
@@ -766,6 +767,11 @@ uint32_t thunk_call_void(struct far_s fa)
 void int3(void)
 {
     fdpp->debug("int3");
+}
+
+void panic(const BYTE * s)
+{
+    fdpp->panic(s);
 }
 
 void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)

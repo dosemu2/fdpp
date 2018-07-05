@@ -184,6 +184,7 @@ struct far_s {
 #define _fail() do_abort(__FILE__, __LINE__)
 #define _assert(c) if (!(c)) _fail()
 void do_abort(const char *file, int line);
+void panic(const BYTE * s);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
 void fdprintf(const char *format, ...) PRINTF(1);
 void fdlogprintf(const char *format, ...) PRINTF(1);
