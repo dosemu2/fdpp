@@ -571,7 +571,7 @@ void f(void) \
     do_asm_call(n, NULL, 0, z); \
 }
 
-#define _THUNK_P_0_vp(n, f, z) \
+#define _THUNK_P_0_vpf(n, f, z) \
 void FAR *f(void) \
 { \
     uint32_t __ret; \

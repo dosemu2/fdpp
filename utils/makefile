@@ -13,7 +13,7 @@ exeflat.exe: exeflat.c ../hdr/exe.h
 	$(CLC) $(CFLAGS) -o $@ exeflat.c
 
 thunk_gen: lex.yy.c thunk_gen.tab.c
-	$(CLC) -o $@ $^
+	$(CLC) -g -o $@ $^
 
 thunk_gen.tab.c: thunk_gen.y
 	bison -d $^

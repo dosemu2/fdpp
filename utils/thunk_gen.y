@@ -23,6 +23,7 @@ static int is_ptr;
 static int is_rptr;
 static int is_far;
 static int is_rfar;
+static int is_ffar;
 static int is_void;
 static int is_rvoid;
 static int is_const;
@@ -53,6 +54,7 @@ static void init_line(void)
     is_rvoid = 0;
     is_rptr = 0;
     is_rfar = 0;
+    is_ffar = 0;
     is_noret = 0;
     beg_arg();
 }
@@ -167,7 +169,7 @@ static int get_flags(void)
     int flg = 0;
 #define FLG_FAR 1
 #define FLG_NORET 2
-    if (is_rfar)
+    if (is_ffar)
 	flg |= FLG_FAR;
     if (is_noret)
 	flg |= FLG_NORET;
@@ -199,13 +201,17 @@ line:		lnum rdecls fname lb args rb SEMIC
 			    break;
 			  case 1:
 			    if (!is_rvoid)
-			      printf("_THUNK%s%i(%i, %s, %s",
+			      printf("_THUNK%s%i%s(%i, %s, %s",
 			          is_pas ? "_P_" : "",
-			          arg_num, $1, rtbuf, $3);
+			          arg_num,
+			          is_rptr ? (is_rfar ? "pf" : "p") : "",
+			          $1, rtbuf, $3);
 			    else
 			      printf("_THUNK%s%i_v%s(%i, %s",
 			          is_pas ? "_P_" : "",
-			          arg_num, is_rptr ? "p" : "", $1, $3);
+			          arg_num,
+			          is_rptr ? (is_rfar ? "pf" : "p") : "",
+			          $1, $3);
 			    if (arg_num)
 			      printf(", %s", abuf);
 			    printf(", %i)\n", get_flags());
@@ -214,7 +220,7 @@ line:		lnum rdecls fname lb args rb SEMIC
 			}
 ;
 
-lb:		LB	{ arg_offs = 0; arg_num = 0; is_rptr = is_ptr; is_rfar = is_far, beg_arg(); }
+lb:		LB	{ arg_offs = 0; arg_num = 0; beg_arg(); }
 ;
 rb:		RB	{ fin_arg(1); }
 ;
@@ -230,12 +236,29 @@ sname:		STRING
 tname:		STRING
 ;
 
-decls:		  ASMCFUNC decls
-		| SEGM LB STRING RB decls
-		| ASMPASCAL decls	{ is_pas = 1; }
-		| FAR decls	{ is_far = 1; }
-		| NORETURN decls	{ is_noret = 1; }
-		| ASTER decls	{ is_ptr = 1; }
+rquals:		  FAR ASTER	{ is_rfar = 1; is_rptr = 1; }
+		| ASTER		{ is_rptr = 1; }
+;
+
+quals:		  FAR quals	{ is_far = 1; }
+		| ASTER quals	{ is_ptr = 1; }
+		|
+;
+
+fatr:		  ASMCFUNC
+		| ASMPASCAL	{ is_pas = 1; }
+		| NORETURN	{ is_noret = 1; }
+		| FAR		{ is_ffar = 1; }
+		| SEGM LB STRING RB
+;
+
+fatrs:		  fatr fatrs
+		| fatr
+;
+
+rq_fa:		  rquals fatrs
+		| rquals
+		| fatrs
 		|
 ;
 
@@ -336,11 +359,11 @@ atype:		  VOID		{
 				}
 ;
 
-rdecls:		rtype decls	{ abuf[0] = 0; }
+rdecls:		rtype rq_fa	{ abuf[0] = 0; }
 ;
 
-adecls:		  atype decls
-		| CONST atype decls	{ is_const = 1; }
+adecls:		  atype quals
+		| CONST atype quals	{ is_const = 1; }
 ;
 
 argsep:		COMMA		{ fin_arg(0); strcat(abuf, ", "); beg_arg(); }
@@ -361,6 +384,8 @@ int main(int argc, char *argv[])
 
     if (argc >= 2)
 	thunk_type = atoi(argv[1]);
+    if (argc >= 3 && argv[2][0] == 'd')
+	yydebug = 1;
     yyparse();
     return 0;
 }
