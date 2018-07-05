@@ -652,8 +652,9 @@ STATIC void InitIO(void)
 /* issue an internal error message                              */
 VOID init_fatal(const BYTE * err_msg)
 {
-  _printf("\nInternal kernel error - %s\nSystem halted\n", err_msg);
-  for (;;) cpu_relax();
+  char buf[256];
+  snprintf(buf, sizeof(buf), "\nInternal kernel error - %s\nSystem halted\n", err_msg);
+  panic(buf);
 }
 
 /*

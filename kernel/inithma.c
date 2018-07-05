@@ -409,6 +409,6 @@ void MoveKernel(UWORD NewKernelSegment)
   return;
 
 errorReturn:
-  for (;;) cpu_relax();
+  panic("HMA init failure");
 }
 
