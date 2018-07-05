@@ -124,7 +124,7 @@ static int exeflat(const char *srcfile, const char *dstfile,
   size =
     ((DWORD) (header->exPages - 1) << 9) + header->exExtraBytes -
     header->exHeaderSize * 16UL;
-  printf("image size (less header) = %lu = 0x%lx\n", size, size);
+  printf("image size (less header) = %u = 0x%x\n", size, size);
   printf("first relocation offset = %u = 0x%u\n", header->exOverlay,
          header->exOverlay);
 
@@ -150,7 +150,7 @@ static int exeflat(const char *srcfile, const char *dstfile,
     }
     if (fread(*curbuf, sizeof(char), bufsize, src) != bufsize)
     {
-      printf("Source file read error %ld %zd\n", to_xfer, bufsize);
+      printf("Source file read error %d %zd\n", to_xfer, bufsize);
       exit(1);
     }
   }

@@ -15,6 +15,7 @@
 #include <stdio.h>
 #ifdef __GNUC__
 #include <unistd.h>
+#define PACKED __attribute__((packed))
 #else
 #include <io.h>
 #endif
@@ -119,13 +120,11 @@ int main(int argc, char *argv[])
 
 }
 
-#include "algnbyte.h"
 struct record {
   unsigned char rectyp;
   unsigned short datalen;
   char buffer[0x2000];
-} Record, Outrecord;
-#include "algndflt.h"
+} PACKED Record, Outrecord;
 
 struct verify_pack1 { char x[ sizeof(struct record) == 0x2003 ? 1 : -1];};
 
