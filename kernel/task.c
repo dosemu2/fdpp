@@ -844,7 +844,10 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     put_string(tailp + 2);
     put_string(" Enter the full shell command line: ");
     rd = res_read(STDIN, Shell, NAMEMAX);
-    if (rd == -1)
+    if (rd <= 0)
+      break;
+    /* handle EOT, EOF */
+    if (Shell[0] == '\x4' || Shell[0] == '\x1a')
       break;
     endp = Shell + rd;
     *endp = '\0';                             /* terminate string for strchr */
