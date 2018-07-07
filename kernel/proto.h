@@ -509,6 +509,6 @@ WORD ASMPASCAL init_switchar(WORD chr);
 //COUNT ASMPASCAL Umb_Test(void);
 COUNT ASMPASCAL UMB_get_largest(__FAR(void) driverAddress, UWORD * __seg, UCOUNT * size);
 VOID ASMFUNC init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
-void ASMFUNC spawn_int23(void);        /* procsupt.asm */
+void ASMFUNC NORETURN spawn_int23(void);        /* procsupt.asm */
 /* kernel.asm */
 VOID ASMFUNC FAR NORETURN init_call_p_0(__FAR(struct config)Config); /* P_0, actually */
