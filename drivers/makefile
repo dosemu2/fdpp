@@ -46,7 +46,7 @@ clobber:        clean
 	-$(RM) device.lib status.me ..$(DIRSEP)lib$(DIRSEP)device.lib
 
 clean:
-	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err
+	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.lib
 
 device.lib : $(OBJS)
 	-$(RM) device.lib
