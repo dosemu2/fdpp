@@ -124,6 +124,8 @@ public:
     explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
     explicit FarPtr(const std::shared_ptr<ObjIf>& o) :
             FarPtrBase<T>(o->get_obj()), obj(o) {}
+    FarPtr(const FarPtr<T>& f) = default;
+    const std::shared_ptr<ObjIf>& get_owned() const { return obj; }
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
@@ -135,10 +137,18 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
+    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()),
+        obj(f.get_owned()) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
     explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
+    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()),
+        obj(f.get_owned()) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>

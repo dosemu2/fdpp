@@ -962,6 +962,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
   struct CHS chs;
   iregs regs;
   int num_retries;
+  UBYTE FAR *f_buf;
 
 /* disabled because this should not happen and if it happens the BIOS
    should complain; also there are weird disks around with
@@ -1001,7 +1002,6 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
     }
     else
     {                           /* transfer data, using old bios functions */
-      UBYTE FAR *f_buf;
       /* avoid overflow at end of track */
 
       if (chs.Cylinder > 1023)
