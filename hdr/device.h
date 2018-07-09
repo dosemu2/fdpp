@@ -236,7 +236,8 @@ typedef struct ddtstruct {
                                    (apparently taken from extended boot record
                                    rather than root directory) */
   ULONG ddt_serialno;           /* serial number */
-  AR_MEMB(struct ddtstruct, UBYTE, ddt_fstype, 9);          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
+//  AR_MEMB(struct ddtstruct, UBYTE, ddt_fstype, 9);          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
+  UBYTE ddt_fstype[9];          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
   ULONG ddt_offset;             /* relative partition offset */
 } ddt;
 
