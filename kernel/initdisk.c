@@ -634,6 +634,7 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
 {
   iregs regs;
   struct _bios_LBA_disk_parameterS lba_bios_parameters;
+  struct _bios_LBA_disk_parameterS FAR *bp;
 
   ExtLBAForce = FALSE;
 
@@ -676,15 +677,12 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
   memset(&lba_bios_parameters, 0, sizeof(lba_bios_parameters));
   lba_bios_parameters.size = sizeof(lba_bios_parameters);
 
-  {    // fdpp scope hack
-  struct _bios_LBA_disk_parameterS FAR *bp;
   bp = MK_FAR(lba_bios_parameters);
   regs.si = FP_OFF(bp);
   regs.ds = FP_SEG(bp);
   regs.a.b.h = 0x48;
   regs.d.b.l = drive;
   init_call_intr(0x13, &regs);
-  }
 
   /* error or DMA boundary errors not handled transparently */
   if (regs.flags & 0x01)
