@@ -549,6 +549,7 @@ void f(t1 a1, t2 a2, t3 a3) \
     c2, l2, t3, at3, aat3, c3, l3, t4, at4, aat4, c4, l4, z) \
 r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 { \
+    r _ret; \
     _CNV(c1, at1, l1, 1); \
     _CNV(c2, at2, l2, 2); \
     _CNV(c3, at3, l3, 3); \
@@ -560,8 +561,9 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4) \
 	aat4 a4; \
     } PACKED _args = { _a1, _a2, _a3, _a4 }; \
     _assert(n < asm_tab_len); \
-    return do_asm_call(n, (UBYTE *)&_args, sizeof(_args), z); \
+    _ret = do_asm_call(n, (UBYTE *)&_args, sizeof(_args), z); \
     clean_stk(sizeof(_args)); \
+    return _ret; \
 }
 
 #define _THUNK_P_0_v(n, f, z) \
