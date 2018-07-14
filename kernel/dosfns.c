@@ -56,7 +56,7 @@ struct cds FAR *get_cds(unsigned drive)
 
   if (drive >= lastdrive)
     return NULL;
-  cdsp = __ASMADDR(CDSp[drive]);
+  cdsp = &CDSp[drive];
   flags = cdsp->cdsFlags;
   /* Entry is disabled or JOINed drives are accessable by the path only */
   if (!(flags & CDSVALID) || (flags & CDSJOINED) != 0)
