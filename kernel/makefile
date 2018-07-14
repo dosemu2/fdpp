@@ -84,9 +84,12 @@ HDRS=\
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h dyndata.h
+PLPHDRS = $(wildcard $(HDR)*.hpp)
+PPHDRS = $(PLPHDRS) $(HDR)dosobj.h $(HDR)dosobj_priv.h $(HDR)farhlp.h \
+    $(HDR)thunks_priv.h
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
-HEADERS=$(HDRS) globals.h proto.h thunks.h $(GEN_HEADERS)
+HEADERS=$(HDRS) globals.h proto.h thunks.h $(GEN_HEADERS) $(PPHDRS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
 CFILES = blockio.c \
@@ -124,16 +127,21 @@ CFILES = blockio.c \
     dosobj.c \
     farhlp.c
 
+CPPFILES = objhlp.cpp
+
 OBJECTS = $(CFILES:.c=.o)
 
 $(OBJECTS): %.o: %.cc $(HEADERS)
+	$(CC) $(CFLAGS) -o $@ $<
+
+.cpp.o: %.cc $(PLPHDRS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(CFILES:.c=.cc): makefile
 .c.cc:
 	../utils/mkfar.sh FAR __FAR $< >$@
 
-$(FDPPLIB): $(OBJECTS)
+$(FDPPLIB): $(OBJECTS) $(CPPFILES:.cpp=.o)
 	$(CL) $(LDFLAGS) -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 

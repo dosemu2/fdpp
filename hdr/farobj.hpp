@@ -1,9 +1,12 @@
 #include <cstring>
+#include <unordered_set>
+#include <algorithm>
 #include "malloca.hpp"
 #include "farptr.hpp"
-#include "cppstubs.hpp"
+//#include "cppstubs.hpp"
 #include "dosobj.h"
 #include "dosobj_priv.h"
+#include "objhlp.hpp"
 
 template<typename T>
 class NearPtr_DO : public NearPtr<T, dosobj_seg> {
@@ -26,22 +29,39 @@ public:
 };
 
 template <typename T>
-class FarObj : public FarObjBase<T>, public ObjIf {
+class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
     bool have_obj = false;
+    int refcnt = 0;
+    std::unordered_set<ObjRef *> owned;
+
+    void ctor() {
+        this->fobj = mk_dosobj(this->ptr, this->size);
+        owned = get_owned_list(this->ptr);
+    }
 
     template <typename T1 = T,
-        typename std::enable_if<std::is_const<T1>::value>::type* = nullptr>
-    void RmObj() {
-        if (!have_obj)
-            return;
-        rm_dosobj(this->fobj);
-    }
-    template <typename T1 = T,
         typename std::enable_if<!std::is_const<T1>::value>::type* = nullptr>
+    void do_cp1() { cp_dosobj(this->ptr, this->fobj, this->size); }
+    template <typename T1 = T,
+        typename std::enable_if<std::is_const<T1>::value>::type* = nullptr>
+    void do_cp1() {}
+
+    void own_cp() {
+        std::for_each(owned.begin(), owned.end(), [] (ObjRef *o) {
+            o->cp();
+        });
+    }
+    void own_unref() {
+        std::for_each(owned.begin(), owned.end(), [] (ObjRef *o) {
+            o->unref();
+        });
+    }
+    void do_cp() { do_cp1(); own_cp(); }
     void RmObj() {
         if (!have_obj)
             return;
-        cp_dosobj(this->ptr, this->fobj, this->size);
+        do_cp();
+        own_unref();
         rm_dosobj(this->fobj);
     }
 
@@ -52,10 +72,10 @@ public:
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
     FarObj(T1& obj) : FarObjBase<T>(&obj, sizeof(T1)) {
-        this->fobj = mk_dosobj(this->ptr, this->size);
+        ctor();
     }
     FarObj(T* obj, unsigned sz) : FarObjBase<T>(obj, sz) {
-        this->fobj = mk_dosobj(this->ptr, this->size);
+        ctor();
     }
     virtual far_s get_obj() {
         _assert(!have_obj);
@@ -63,13 +83,19 @@ public:
         have_obj = true;
         return this->fobj.get_far();
     }
+    virtual void ref(const void *owner) {
+        if (track_owner(owner, this))
+            refcnt++;
+    }
+    virtual void cp() { do_cp(); }
+    virtual void unref() { refcnt--; }
 
     NearPtr_DO<obj_type> get_near() {
         far_s f = get_obj();
         return NearPtr_DO<obj_type>(f.off);
     }
 
-    virtual ~FarObj() { RmObj(); }
+    virtual ~FarObj() { _assert(!refcnt); RmObj(); }
 
     /* make it non-copyable */
     FarObj(const FarObj &) = delete;

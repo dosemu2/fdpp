@@ -678,8 +678,8 @@ STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
   lba_bios_parameters.size = sizeof(lba_bios_parameters);
 
   bp = MK_FAR(lba_bios_parameters);
-  regs.si = FP_OFF(bp);
-  regs.ds = FP_SEG(bp);
+  regs.si = FP_OFF_OBJ(&regs, bp);
+  regs.ds = FP_SEG_OBJ(&regs, bp);
   regs.a.b.h = 0x48;
   regs.d.b.l = drive;
   init_call_intr(0x13, &regs);
@@ -1012,12 +1012,12 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 
       f_buf = MK_FAR_SZ(buffer, MAX_SEC_SIZE);
       regs.a.x = 0x0201;
-      regs.b.x = FP_OFF(f_buf);
+      regs.b.x = FP_OFF_OBJ(&regs, f_buf);
       regs.c.x =
           ((chs.Cylinder & 0xff) << 8) + ((chs.Cylinder & 0x300) >> 2) +
           chs.Sector;
       regs.d.b.h = chs.Head;
-      regs.es = FP_SEG(f_buf);
+      regs.es = FP_SEG_OBJ(&regs, f_buf);
     }                           /* end of retries */
     init_call_intr(0x13, &regs);
     if ((regs.flags & FLG_CARRY) == 0)

@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <memory>
 #include <cstring>
-#include "cppstubs.hpp"
+//#include "cppstubs.hpp"
 #include "thunks_priv.h"
 #include "farhlp.h"
 
@@ -106,6 +106,7 @@ public:
 class ObjIf {
 public:
     virtual far_s get_obj() = 0;
+    virtual void ref(const void *owner) = 0;
     virtual ~ObjIf() = default;
 };
 
@@ -139,7 +140,7 @@ public:
     FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()),
+    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
         obj(f.get_owned()) {}
 
     template<typename T0, typename T1 = T,
@@ -147,7 +148,7 @@ public:
     explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()),
+    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
         obj(f.get_owned()) {}
 
     template<typename T0, typename T1 = T,
@@ -168,6 +169,21 @@ public:
     bool operator == (const FarPtrBase<T0>& f) const {
         return ((f.seg() == this->ptr.seg) && (f.off() == this->ptr.off));
     }
+
+    uint16_t seg() const { _assert(!obj); return this->ptr.seg; }
+    uint16_t off() const { _assert(!obj); return this->ptr.off; }
+    uint16_t seg(void *owner) const {
+        _assert(obj);
+        obj->ref(owner);
+        return this->ptr.seg;
+    }
+    uint16_t off(void *owner) const {
+        _assert(obj);
+        obj->ref(owner);
+        return this->ptr.off;
+    }
+    uint16_t _seg() const { return this->ptr.seg; }
+    uint16_t _off() const { return this->ptr.off; }
 };
 
 #define _MK_F(f, s) f(s)
@@ -530,8 +546,10 @@ public:
         return offsetof(p, n); \
     } \
     SymMemb2<t, off_##n> n
-#define FP_SEG(fp)            ((fp).seg())
-#define FP_OFF(fp)            ((fp).off())
+#define FP_SEG(fp) ((fp).seg())
+#define FP_OFF(fp) ((fp).off())
+#define FP_SEG_OBJ(o, fp) ((fp).seg(o))
+#define FP_OFF_OBJ(o, fp) ((fp).off(o))
 #define MK_FP(seg, ofs) ({ \
     uint16_t _s = seg; \
     uint16_t _o = ofs; \
