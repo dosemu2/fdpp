@@ -543,6 +543,7 @@ STATIC void push_ddt(ddt *pddt)
     if (pddt->ddt_driveno == 0 && pddt->ddt_logdriveno == 1)
       (fddt - 1)->ddt_descflags |= DF_CURLOG | DF_MULTLOG;
   }
+  ddt_buf[nUnits] = fddt;
 }
 
 void DosDefinePartition(struct DriveParamS *driveParam,
@@ -1285,6 +1286,7 @@ void ReadAllPartitionTables(void)
 
   /* Setup media info and BPBs arrays for floppies */
   make_ddt(&nddt, 0, 0, 0);
+  nUnits++;
 
   /*
      this is a quick patch - see if B: exists
@@ -1304,7 +1306,7 @@ void ReadAllPartitionTables(void)
   }
 
   /* Initial number of disk units                                 */
-  nUnits = 2;
+  nUnits++;
 
   nHardDisk = BIOS_nrdrives();
   if (nHardDisk > LENGTH(foundPartitions))

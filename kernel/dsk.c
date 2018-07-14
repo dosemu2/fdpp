@@ -59,6 +59,7 @@ UWORD LBA_WRITE_VERIFY = 0x4302;
                    at 0xf+1000 and must hold already during BOOT time
                  */
 UBYTE FAR *DiskTransferBuffer;
+ddt FAR *ddt_buf[26];
 
 struct FS_info {
   ULONG serialno;
@@ -69,7 +70,8 @@ struct FS_info {
 /*TE - array access functions */
 ddt *getddt(int dev)
 {
-  return &(((ddt *) Dyn.Buffer)[dev]);
+  _assert(dev < 26);
+  return ddt_buf[dev];
 }
 
 STATIC VOID tmark(ddt *pddt)

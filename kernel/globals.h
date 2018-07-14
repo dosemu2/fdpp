@@ -241,6 +241,7 @@ struct __SecPathBuffer                  /* Alternate path name parsing buffer   
   NumFloppies; !!*//* How many floppies we have            */
 
 extern __FAR(UBYTE) DiskTransferBuffer;
+extern __FAR(ddt) ddt_buf[26];
 
 /* start of uncontrolled variables                                      */
 
