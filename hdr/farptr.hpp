@@ -49,7 +49,11 @@ public:
         do_store_far(get_far());
         return (T*)resolve_segoff(ptr);
     }
-    operator T*() { return (T*)resolve_segoff(ptr); }
+    operator T*() {
+        if (!ptr.seg && !ptr.off)
+            return NULL;
+        return (T*)resolve_segoff(ptr);
+    }
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
@@ -114,6 +118,7 @@ template<typename T>
 class FarPtr : public FarPtrBase<T>
 {
     std::shared_ptr<ObjIf> obj;
+    bool nonnull = false;
 
 public:
     using FarPtrBase<T>::FarPtrBase;
@@ -126,7 +131,11 @@ public:
     explicit FarPtr(const std::shared_ptr<ObjIf>& o) :
             FarPtrBase<T>(o->get_obj()), obj(o) {}
     FarPtr(const FarPtr<T>& f) = default;
+    FarPtr(uint16_t s, uint16_t o, bool nnull) :
+            FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
+
     const std::shared_ptr<ObjIf>& get_owned() const { return obj; }
+    bool get_nonnull() const { return nonnull; }
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
@@ -141,7 +150,7 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
-        obj(f.get_owned()) {}
+        obj(f.get_owned()), nonnull(f.get_nonnull()) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
@@ -149,7 +158,7 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
     explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
-        obj(f.get_owned()) {}
+        obj(f.get_owned()), nonnull(f.get_nonnull()) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
@@ -184,6 +193,11 @@ public:
     }
     uint16_t _seg() const { return this->ptr.seg; }
     uint16_t _off() const { return this->ptr.off; }
+    operator T*() {
+        if (!nonnull && !this->ptr.seg && !this->ptr.off)
+            return NULL;
+        return (T*)resolve_segoff(this->ptr);
+    }
 };
 
 #define _MK_F(f, s) f(s)
@@ -556,6 +570,7 @@ public:
     do_store_far(_MK_S(_s, _o)); \
     __FAR(void)(_s, _o); \
 })
+#define MK_FP_N(seg, ofs) (__FAR(void)(seg, ofs, true))
 #define __DOSFAR(t) FarPtrBase<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)(MK_FP(s, o))
 #define GET_FP32(f) (f).get_fp32()

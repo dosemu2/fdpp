@@ -224,7 +224,7 @@ intvec getvec(unsigned char intno)
 {
   intvec iv;
   disable();
-  iv = *(intvec FAR *)MK_FP(0, (UWORD)(4 * (intno)));
+  iv = *(intvec FAR *)MK_FP_N(0, (UWORD)(4 * (intno)));
   enable();
   return iv;
 }
@@ -232,7 +232,7 @@ intvec getvec(unsigned char intno)
 void setvec(unsigned char intno, intvec vector)
 {
   disable();
-  *(intvec FAR *)MK_FP(0, (UWORD)(4 * intno)) = vector;
+  *(intvec FAR *)MK_FP_N(0, (UWORD)(4 * intno)) = vector;
   enable();
 }
 #endif
