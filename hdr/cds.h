@@ -60,7 +60,7 @@ struct cds {
   __DOSFAR(BYTE)cdsIfs;        /* Pointer to Installable File System Header */
   UWORD cdsNetFlags2;      /* File System specific data */
 
-};
+} PACKED;
 
 #define cdsStrtClst _cdsUnion._cdsRedir._cdsStrtClst
 #define cdsRedirRec _cdsUnion._cdsRedirRec
