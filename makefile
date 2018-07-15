@@ -115,3 +115,6 @@ clobber:
 	cd boot && $(MAKE) clobber
 	cd sys && $(MAKE) clobber
 	cd kernel && $(MAKE) clobber
+
+install:
+	cd kernel && $(MAKE) install
