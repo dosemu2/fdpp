@@ -121,7 +121,10 @@ class FarPtr : public FarPtrBase<T>
     bool nonnull = false;
 
 public:
+    /* first, tell a few secret phrases to the compiler :) */
+    template <typename> friend class FarPtr;
     using FarPtrBase<T>::FarPtrBase;
+
     FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {
         /* XXX for things like "p = sym->ptr; a = p->arr[i];"
          * All sym pointer members should be marked with __DOSFAR(). */
@@ -134,8 +137,6 @@ public:
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
 
-    const std::shared_ptr<ObjIf>& get_owned() const { return obj; }
-    bool get_nonnull() const { return nonnull; }
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
         std::is_void<T1>::value || \
@@ -150,7 +151,7 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
-        obj(f.get_owned()), nonnull(f.get_nonnull()) {}
+        obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
@@ -158,7 +159,7 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
     explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
-        obj(f.get_owned()), nonnull(f.get_nonnull()) {}
+        obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
