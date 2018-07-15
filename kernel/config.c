@@ -221,8 +221,9 @@ STATIC BOOL isnum(char ch);
 #if 0
 STATIC COUNT tolower(COUNT c);
 #endif
-//STATIC char toupper(char c);
-#define toupper(c)      ((c) >= 'a' && (c) <= 'z' ? (c) + ('A' - 'a') : (c))
+#ifndef USE_STDLIB
+STATIC char toupper(const char c);
+#endif
 STATIC VOID strupr(char *s);
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type);
 STATIC VOID mumcb_init(UCOUNT seg, UWORD size);
@@ -2026,7 +2027,7 @@ STATIC BOOL isnum(char ch)
   return (ch >= '0' && ch <= '9');
 }
 
-#if 0
+#ifndef USE_STDLIB
 /* Yet another change for true portability (PJV) */
 STATIC char toupper(char c)
 {
