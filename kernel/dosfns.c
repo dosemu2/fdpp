@@ -929,7 +929,7 @@ STATIC int pop_dmp(int rc, dmatch FAR * dmp)
     dmp->dm_time = SearchDir.dir_time;
     dmp->dm_date = SearchDir.dir_date;
     dmp->dm_size = (LONG) SearchDir.dir_size;
-    ConvertName83ToNameSZ(dmp->dm_name, (BYTE FAR *) SearchDir.dir_name);
+    ConvertName83ToNameSZ(dmp->dm_name, (BYTE FAR *) MK_FAR_SCP(SearchDir.dir_name));
   }
   return rc;
 }

@@ -1947,7 +1947,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
       {
         struct dhdr FAR *dhp;
 
-        dhp = IsDevice((BYTE FAR *) DirEntBuffer.dir_name);
+        dhp = IsDevice((BYTE FAR *) MK_FAR_SCP(DirEntBuffer.dir_name));
 
         if (dhp == NULL)
         {
