@@ -116,8 +116,8 @@
 struct dhdr {
   __DOSFAR(struct dhdr)dh_next;
   UWORD dh_attr;
-    PTR_MEMB(VOID) dh_strategy;
-    PTR_MEMB(VOID) dh_interrupt;
+  PTR_MEMB(VOID) dh_strategy;
+  PTR_MEMB(VOID) dh_interrupt;
   AR_MEMB(struct dhdr, UBYTE, dh_name, 8);
 };
 
@@ -173,7 +173,7 @@ typedef struct {
   UWORD bpb_xbackupsec;         /* backup boot sector number    */
   /* 0xFFFF if unknown            */
 #endif
-} bpb;
+} PACKED bpb;
 
 #define N_RETRY         5       /* number of retries permitted  */
 
@@ -191,8 +191,8 @@ struct _bios_LBA_address_packet
   unsigned char number_of_blocks;       /* 0 < number_of_blocks < 128       */
   unsigned char reserved_2;     /* set to 0...unused                */
   __DOSFAR(UBYTE)buffer_address;    /* addr of transfer buffer          */
-  unsigned long block_address;  /* LBA address                      */
-  unsigned long block_address_high;     /* high bytes of LBA addr...unused  */
+  UDWORD block_address;  /* LBA address                      */
+  UDWORD block_address_high;     /* high bytes of LBA addr...unused  */
 };
 
 struct CHS {
@@ -239,7 +239,7 @@ typedef struct ddtstruct {
 //  AR_MEMB(struct ddtstruct, UBYTE, ddt_fstype, 9);          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
   UBYTE ddt_fstype[9];          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
   ULONG ddt_offset;             /* relative partition offset */
-} ddt;
+} PACKED ddt;
 
 /* description flag bits */
 #define DF_FIXED      0x001     /* fixed media, ie hard drive */
@@ -274,7 +274,7 @@ struct gblkfv                   /* for format / verify track */
   UWORD gbfv_head;
   UWORD gbfv_cyl;
   UWORD gbfv_ntracks;
-};
+} PACKED;
 
 struct gblkrw                   /* for read / write track */
 {
@@ -284,14 +284,14 @@ struct gblkrw                   /* for read / write track */
   UWORD gbrw_sector;
   UWORD gbrw_nsecs;
   __DOSFAR(UBYTE)gbrw_buffer;
-};
+} PACKED;
 
 struct Gioc_media {
   WORD ioc_level;
   ULONG ioc_serialno;
   AR_MEMB(struct Gioc_media, BYTE, ioc_volume, 11);
   AR_MEMB(struct Gioc_media, BYTE, ioc_fstype, 8);
-};
+} PACKED;
 
 struct Access_info {
   BYTE AI_spec;
@@ -322,7 +322,7 @@ typedef struct {
   ULONG bt_serialno;
   BYTE bt_volume[11];
   BYTE bt_fstype[8];
-} boot;
+} PACKED boot;
 
 /* File system information structure */
 struct fsinfo {
