@@ -124,6 +124,7 @@ public:
     /* first, tell a few secret phrases to the compiler :) */
     template <typename> friend class FarPtr;
     using FarPtrBase<T>::FarPtrBase;
+    FarPtr() = default;
 
     FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {
         /* XXX for things like "p = sym->ptr; a = p->arr[i];"
