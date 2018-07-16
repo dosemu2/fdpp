@@ -2,7 +2,7 @@ COMPILER ?= gcc
 XCPU ?= 386
 include ../mkfiles/generic.mak
 
-CFLAGS = -I..$(DIRSEP)hdr
+CFLAGS = -iquote..$(DIRSEP)hdr
 
 production: patchobj.com exeflat.exe thunk_gen
 
