@@ -365,7 +365,7 @@ void MoveKernel(UWORD NewKernelSegment)
           rp->callNear != 0xe8 ||       /* call NEAR */
           0)
       {
-        _printf("illegal relocation entry # %ld\n",
+        _printf("illegal relocation entry # %zd\n",
                (FP_OFF(rp) -
                 FP_OFF((BYTE FAR *)_HMARelocationTableStart)) /
                sizeof(struct RelocationTable));

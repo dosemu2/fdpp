@@ -64,7 +64,7 @@ public:
     }
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](unsigned idx) {
+    SymWrp<T1>& operator [](int idx) {
         return FarPtrBase<T1>(*this + idx).get_wrp();
     }
     template <typename T1 = T,
@@ -76,7 +76,7 @@ public:
     }
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](unsigned idx) {
+    SymWrp2<T1>& operator [](int idx) {
         return FarPtrBase<T1>(*this + idx).get_wrp();
     }
 
@@ -363,14 +363,14 @@ protected:
 public:
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](unsigned idx) {
+    SymWrp<T1>& operator [](int idx) {
         _assert(!max_len || idx < max_len);
         return sym[idx];
     }
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](unsigned idx) {
+    SymWrp2<T1>& operator [](int idx) {
         _assert(!max_len || idx < max_len);
         return sym[idx];
     }
@@ -423,13 +423,11 @@ public:
         typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
     explicit operator T0 *() { return (T0 *)sym; }
     FarPtr<T> operator +(int inc) { return this->lookup_sym() + inc; }
-    FarPtr<T> operator +(unsigned inc) { return this->lookup_sym() + inc; }
-    FarPtr<T> operator +(size_t inc) { return this->lookup_sym() + inc; }
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
 
     template <typename T1 = T,
         typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](unsigned idx) {
+    SymWrp<T1>& operator [](int idx) {
         _assert(!max_len || idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
@@ -437,7 +435,7 @@ public:
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](unsigned idx) {
+    SymWrp2<T1>& operator [](int idx) {
         _assert(!max_len || idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
