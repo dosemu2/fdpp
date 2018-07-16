@@ -15,7 +15,7 @@ ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
 endif
 
-TARGET=KMS
+TARGET=fdppkrnl
 
 ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic -O2 \
     -ggdb3 -fno-strict-aliasing -Wno-format-invalid-specifier

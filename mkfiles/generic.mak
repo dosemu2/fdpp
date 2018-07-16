@@ -44,7 +44,9 @@ CLT=$(CL) $(CFLAGST) $(TINY) -I$(INCLUDEPATH)
 CLC=$(CL) $(CFLAGSC) -I$(INCLUDEPATH)
 endif
 
-TARGET:=$(TARGET)$(XCPU)$(XFAT)
+ifeq ($(TARGET),)
+TARGET=$(TARG)$(XCPU)$(XFAT)
+endif
 
 .SUFFIXES: .c .cpp .cc .obj .asm .o
 .asm.obj:
