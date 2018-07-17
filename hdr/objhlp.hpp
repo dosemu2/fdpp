@@ -1,5 +1,5 @@
-#ifndef FAROBJ_PRIV_HPP
-#define FAROBJ_PRIV_HPP
+#ifndef OBJHLP_HPP
+#define OBJHLP_HPP
 
 class ObjRef {
 public:

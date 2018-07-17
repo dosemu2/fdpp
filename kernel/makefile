@@ -134,7 +134,7 @@ OBJECTS = $(CFILES:.c=.o)
 $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
-.cpp.o: %.cc $(PLPHDRS)
+.cpp.o: $(PLPHDRS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(CFILES:.c=.cc): makefile
