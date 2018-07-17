@@ -33,12 +33,6 @@ static BYTE *dskRcsId =
     "$Id: dsk.c 1702 2012-02-04 08:46:16Z perditionc $";
 #endif
 
-#if defined(DEBUG)
-#define DebugPrintf(x) _printf x
-#else
-#define DebugPrintf(x)
-#endif
-
 /* #define STATIC  */
 
 STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
