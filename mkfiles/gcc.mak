@@ -18,7 +18,7 @@ endif
 TARGET=fdppkrnl
 
 ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic -O2 \
-    -ggdb3 -fno-strict-aliasing -Wno-format-invalid-specifier
+    -ggdb3 -fdebug-macro -fno-strict-aliasing -Wno-format-invalid-specifier
 
 INITCFLAGS=$(ALLCFLAGS)
 CFLAGS=$(ALLCFLAGS)
