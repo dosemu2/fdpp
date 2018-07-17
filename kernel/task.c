@@ -34,7 +34,9 @@ static BYTE *RcsId =
     "$Id: task.c 1563 2011-04-08 16:04:24Z bartoldeman $";
 #endif
 
+#ifndef USE_STDLIB
 #define toupper(c)	((c) >= 'a' && (c) <= 'z' ? (char)((c) + ('A' - 'a')) : (char)(c))
+#endif
 
 #define LOADNGO 0
 #define LOAD    1
