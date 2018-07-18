@@ -4,7 +4,7 @@ include ../mkfiles/generic.mak
 
 CFLAGS = -iquote..$(DIRSEP)hdr
 
-production: patchobj.com exeflat.exe thunk_gen
+production: patchobj.com exeflat.exe
 
 patchobj.com: patchobj.c
 	$(CLT) $(CFLAGS) -o $@ patchobj.c
@@ -12,19 +12,9 @@ patchobj.com: patchobj.c
 exeflat.exe: exeflat.c ../hdr/exe.h
 	$(CLC) $(CFLAGS) -o $@ exeflat.c
 
-thunk_gen: lex.yy.c thunk_gen.tab.c
-	$(CLC) -g -o $@ $^
-
-thunk_gen.tab.c: thunk_gen.y
-	bison -d $^
-
-lex.yy.c: thunk_gen.l
-	lex $^
-
 clobber: clean
 
 clean:
 	$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.las *.cod *.err status.me
-	$(RM) *.tab.*
-	$(RM) exeflat.exe patchobj.com thunk_gen
+	$(RM) exeflat.exe patchobj.com
 

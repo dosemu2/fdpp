@@ -48,9 +48,10 @@ kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 		$(NASM) -o $@ $<
 
 clean:
-		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
-			*.lnk *.o $(GEN_CC) *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
-			plt*.inc kernel.exe kernel.sys
+	cd utils && make clean
+	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
+		*.lnk *.o $(GEN_CC) *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
+		plt*.inc kernel.exe kernel.sys kernel.sym
 
 #               *Individual File Dependencies*
 apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -136,7 +137,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 $(FDPP_COBJS): %.o: %.c $(PPHDRS)
 	$(CLC) $(CFLAGS) -o $@ $<
 
-$(FDPP_CCOBJS): %.o: %.cc $(PPHDRS)
+$(FDPP_CCOBJS): %.o: %.cc $(PPHDRS) $(GEN_HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJS): %.obj: $(SRC)%.asm
@@ -149,7 +150,7 @@ $(PPOBJS): %.obj: %.asm
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(CFILES:.c=.cc): %.cc: $(SRC)%.c makefile
-	../utils/mkfar.sh FAR __FAR $< >$@
+	utils/mkfar.sh FAR __FAR $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(CPPFILES:.cpp=.o)
 	$(CL) $(LDFLAGS) -o $@ $^
@@ -171,15 +172,15 @@ plt.inc: thunk_calls.tmp
 	grep ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_f \4,\t\t\1,\t\3/' >$@
 	grep -v ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_n \4,\t\t\1,\t\3/' >>$@
 
-thunk_calls.h: thunk_calls.tmp
-	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
+thunk_calls.h: thunk_calls.tmp utils/thunk_gen
+	cat $< | utils/thunk_gen >$@ || (rm -f $@ ; false)
 
 thunk_asms.tmp: $(SRC)proto.h makefile
 	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | \
 		sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 
-thunk_asms.h: thunk_asms.tmp makefile
-	cat $< | ../utils/thunk_gen 1 >$@ || (rm -f $@ ; false)
+thunk_asms.h: thunk_asms.tmp utils/thunk_gen
+	cat $< | utils/thunk_gen 1 >$@ || (rm -f $@ ; false)
 
 plt_asmc.inc: thunk_asms.tmp makefile
 	grep ASMFUNC $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmcsym \2,\t\t\1/' >$@
@@ -202,6 +203,9 @@ glob_asmdefs.h: glob_asm.h makefile
 		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 	grep "__ASM_FUNC(" $< | grep -v '^/' | \
 		sed 's/.\+(\(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
+
+utils/thunk_gen:
+	cd utils && make
 
 install: $(FDPPLIB)
 	install -t /usr/local/lib $(FDPPLIB)
