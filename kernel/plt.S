@@ -1,3 +1,21 @@
+/*
+ *  FDPP - freedos port to modern C++
+ *  Copyright (C) 2018  Stas Sergeev (stsp)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #define DOS_HELPER_PLUGIN            0x60
 #define DOS_HELPER_PLUGIN_ID_FDPP    0
 #define DOS_HELPER_PLUGIN_VERSION    1
