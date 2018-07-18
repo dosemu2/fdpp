@@ -11,7 +11,11 @@ include ../mkfiles/generic.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
 HDR=../hdr/
+SRC=../kernel/
 FDPPLIB = libfdpp.so
+
+ALLCFLAGS += -I $(SRC) -I .
+NASMFLAGS += -i$(SRC)
 
 # *List Macros*
 # Only 8 files per definition; this is limitation of DOS batch
@@ -20,7 +24,8 @@ FDPPLIB = libfdpp.so
 OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
     execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
     nls_hc.obj apisupt.obj intr.obj irqstack.obj memdisk.obj \
-    cpu.obj plt.obj cdata.obj
+    cpu.obj
+PPOBJS = plt.obj cdata.obj
 
 #               *Explicit Rules*
 
@@ -36,60 +41,49 @@ production:     $(FDPPLIB) ../bin/$(TARGET).sys ../bin/country.sys
 kernel.sys:	kernel.exe ../utils/exeflat.exe
 		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe kernel.sys $(LOADSEG) -S0x10 -S0x78 -S0x79 $(UPXOPT) $(XUPX)
 
-kernel.exe:	$(OBJS) $(LIBS)
-		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) } L ../lib/device.lib N $@
+kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
+		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L ../lib/device.lib N $@
 
-../bin/country.sys: country.asm
-		$(NASM) -o $@ country.asm
-
-clobber:        clean
-		-$(RM) kernel.exe kernel.sys status.me
+../bin/country.sys: $(SRC)country.asm
+		$(NASM) -o $@ $<
 
 clean:
 		-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
-			*.lnk *.o *.cc *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS)
-
-# XXX: This is a very ugly way of linking the kernel, forced upon us by the
-# inability of Turbo `make' 2.0 to perform command line redirection. -- ror4
-
-$(TARGET).lnk: turboc.cfg makefile ../mkfiles/generic.mak ../mkfiles/$(COMPILER).mak
-		-$(RM) *.lnk
-		$(ECHOTO) $(TARGET).lnk $(OBJS)
-		$(ECHOTO) $(TARGET).lnk kernel.exe
-		$(ECHOTO) $(TARGET).lnk kernel.map
-		$(ECHOTO) $(TARGET).lnk $(LIBS)
+			*.lnk *.o $(GEN_CC) *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
+			plt*.inc kernel.exe kernel.sys
 
 #               *Individual File Dependencies*
-apisupt.obj:	apisupt.asm segs.inc
-console.obj:	console.asm io.inc
-cpu.obj:	cpu.asm  segs.inc
-dosidle.obj:	dosidle.asm segs.inc
-entry.obj:	entry.asm   segs.inc $(HDR)stacks.inc
-execrh.obj:	execrh.asm  segs.inc
-int2f.obj:	int2f.asm   segs.inc $(HDR)stacks.inc
-intr.obj:	intr.asm    segs.inc
-io.obj:		io.asm	    segs.inc $(HDR)stacks.inc
-irqstack.obj:   irqstack.asm segs.inc
-kernel.obj:	kernel.asm  segs.inc ludivmul.inc
-memdisk.obj:	memdisk.asm  segs.inc
-nls_hc.obj:	nls_hc.asm  segs.inc
-nlssupt.obj:	nlssupt.asm segs.inc $(HDR)stacks.inc
-printer.obj:	printer.asm io.inc
-procsupt.obj:	procsupt.asm segs.inc $(HDR)stacks.inc
-serial.obj:	serial.asm  io.inc
+apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
+console.obj:	$(SRC)console.asm $(SRC)io.inc
+cpu.obj:	$(SRC)cpu.asm  $(SRC)segs.inc
+dosidle.obj:	$(SRC)dosidle.asm $(SRC)segs.inc
+entry.obj:	$(SRC)entry.asm   $(SRC)segs.inc $(HDR)stacks.inc
+execrh.obj:	$(SRC)execrh.asm  $(SRC)segs.inc
+int2f.obj:	$(SRC)int2f.asm   $(SRC)segs.inc $(HDR)stacks.inc
+intr.obj:	$(SRC)intr.asm    $(SRC)segs.inc
+io.obj:		$(SRC)io.asm	    $(SRC)segs.inc $(HDR)stacks.inc
+irqstack.obj:   $(SRC)irqstack.asm $(SRC)segs.inc
+kernel.obj:	$(SRC)kernel.asm  $(SRC)segs.inc $(SRC)ludivmul.inc
+memdisk.obj:	$(SRC)memdisk.asm  $(SRC)segs.inc
+nls_hc.obj:	$(SRC)nls_hc.asm  $(SRC)segs.inc
+nlssupt.obj:	$(SRC)nlssupt.asm $(SRC)segs.inc $(HDR)stacks.inc
+printer.obj:	$(SRC)printer.asm $(SRC)io.inc
+procsupt.obj:	$(SRC)procsupt.asm $(SRC)segs.inc $(HDR)stacks.inc
+serial.obj:	$(SRC)serial.asm  $(SRC)io.inc
 
 HDRS=\
     $(HDR)portab.h $(HDR)device.h $(HDR)mcb.h $(HDR)pcb.h \
     $(HDR)fat.h $(HDR)fcb.h $(HDR)tail.h $(HDR)time.h $(HDR)process.h \
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
-    $(HDR)version.h dyndata.h
+    $(HDR)version.h $(SRC)dyndata.h
 PLPHDRS = $(wildcard $(HDR)*.hpp)
 PPHDRS = $(PLPHDRS) $(HDR)dosobj.h $(HDR)dosobj_priv.h $(HDR)farhlp.h \
-    $(HDR)thunks_priv.h
+    $(HDR)thunks_priv.h thunks.h smalloc.h
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
-HEADERS=$(HDRS) globals.h proto.h thunks.h $(GEN_HEADERS) $(PPHDRS)
+GEN_CC = $(CFILES:.c=.cc)
+HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(GEN_HEADERS) $(PPHDRS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
 
 CFILES = blockio.c \
@@ -121,31 +115,47 @@ CFILES = blockio.c \
     dyninit.c \
     initdisk.c \
     initclk.c \
-    prf.c \
-    thunks.c \
+    prf.c
+
+FDPP_CFILES = \
     smalloc.c \
     dosobj.c \
     farhlp.c
+FDPP_CCFILES = \
+    thunks.cc
 
 CPPFILES = objhlp.cpp
 
 OBJECTS = $(CFILES:.c=.o)
+FDPP_COBJS = $(FDPP_CFILES:.c=.o)
+FDPP_CCOBJS = $(FDPP_CCFILES:.cc=.o)
 
 $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
+$(FDPP_COBJS): %.o: %.c $(PPHDRS)
+	$(CLC) $(CFLAGS) -o $@ $<
+
+$(FDPP_CCOBJS): %.o: %.cc $(PPHDRS)
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(OBJS): %.obj: $(SRC)%.asm
+	$(NASM) -D$(COMPILER) $(NASMFLAGS) -f obj -o $@ $<
+
+$(PPOBJS): %.obj: %.asm
+	$(NASM) -D$(COMPILER) $(NASMFLAGS) -f obj -o $@ $<
+
 .cpp.o: $(PLPHDRS)
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(CFILES:.c=.cc): makefile
-.c.cc:
+$(CFILES:.c=.cc): %.cc: $(SRC)%.c makefile
 	../utils/mkfar.sh FAR __FAR $< >$@
 
-$(FDPPLIB): $(OBJECTS) $(CPPFILES:.cpp=.o)
+$(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(CPPFILES:.cpp=.o)
 	$(CL) $(LDFLAGS) -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc segs.inc
+plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
 
 plt.asm: plt.S glob_asm.h
 	cpp -P $< >$@
@@ -153,7 +163,7 @@ plt.asm: plt.S glob_asm.h
 cdata.asm: cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
-thunk_calls.tmp: proto.h makefile
+thunk_calls.tmp: $(SRC)proto.h makefile
 	grep ASMCFUNC $< | sed -e 's/__FAR(\([^)]\+\))/\1 FAR */g' \
 		-e 's/__DOSFAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 
@@ -164,7 +174,7 @@ plt.inc: thunk_calls.tmp
 thunk_calls.h: thunk_calls.tmp
 	cat $^ | ../utils/thunk_gen >$@ || (rm -f $@ ; false)
 
-thunk_asms.tmp: proto.h makefile
+thunk_asms.tmp: $(SRC)proto.h makefile
 	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | \
 		sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 

@@ -6,10 +6,10 @@ DIRSEP=/
 RM=rm -f
 CP=cp
 ECHOTO=../utils/echoto
-CC=clang++
-CL=clang++ -static-libstdc++
+CC=clang++ -std=c++11
+CL=clang++
 
-TARGETOPT=-c -std=c++11 -fno-unwind-tables -fno-asynchronous-unwind-tables \
+TARGETOPT=-c -fno-unwind-tables -fno-asynchronous-unwind-tables \
     -fno-exceptions -fno-threadsafe-statics -fno-rtti -Wno-inline-new-delete
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)

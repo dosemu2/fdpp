@@ -19,6 +19,12 @@
 #ifndef DOSOBJ_PRIV_H
 #define DOSOBJ_PRIV_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 uint16_t dosobj_seg(void);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

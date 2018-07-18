@@ -98,7 +98,7 @@ all:
 	cd drivers && $(MAKE) production
 	cd boot && $(MAKE) production
 #	cd sys && $(MAKE) production
-	cd kernel && $(MAKE) production
+	cd fdpp && $(MAKE) production
 
 clean:
 	cd utils && $(MAKE) clean
@@ -106,7 +106,7 @@ clean:
 	cd drivers && $(MAKE) clean
 	cd boot && $(MAKE) clean
 	cd sys && $(MAKE) clean
-	cd kernel && $(MAKE) clean
+	cd fdpp && $(MAKE) clean
 
 clobber:
 	cd utils && $(MAKE) clobber
@@ -117,4 +117,4 @@ clobber:
 	cd kernel && $(MAKE) clobber
 
 install:
-	cd kernel && $(MAKE) install
+	cd fdpp && $(MAKE) install

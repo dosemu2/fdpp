@@ -494,7 +494,7 @@ void enable(void)
 
 #define __ARG(t) t
 #define __ARG_PTR(t) t *
-#define __ARG_PTR_FAR(t) t FAR *
+#define __ARG_PTR_FAR(t) __FAR(t)
 #define __ARG_A(t) t
 #define __ARG_PTR_A(t) NEAR_PTR_DO(t)
 #define __ARG_PTR_FAR_A(t) __DOSFAR(t)
@@ -592,7 +592,7 @@ void f(void) \
 }
 
 #define _THUNK_P_0_vpf(n, f, z) \
-void FAR *f(void) \
+__FAR(void) f(void) \
 { \
     uint32_t __ret; \
     _assert(n < asm_tab_len); \

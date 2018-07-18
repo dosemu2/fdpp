@@ -19,8 +19,18 @@
 #ifndef THUNKS_PRIV_H
 #define THUNKS_PRIV_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void *resolve_segoff(struct far_s fa);
 uint32_t thunk_call_void(struct far_s fa);
 struct far_s lookup_far_st(const void *ptr);
+void fdprintf(const char *format, ...) PRINTF(1);
+void fdlogprintf(const char *format, ...) PRINTF(1);
+void fdvprintf(const char *format, va_list vl);
+void do_abort(const char *file, int line);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

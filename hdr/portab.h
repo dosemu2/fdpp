@@ -180,15 +180,12 @@ struct far_s {
     UWORD off;
     UWORD seg;
 };
+typedef struct far_s far_t;
 
 #define _fail() do_abort(__FILE__, __LINE__)
 #define _assert(c) if (!(c)) _fail()
-void do_abort(const char *file, int line);
 void panic(const BYTE * s);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
-void fdprintf(const char *format, ...) PRINTF(1);
-void fdlogprintf(const char *format, ...) PRINTF(1);
-void fdvprintf(const char *format, va_list vl);
 void cpu_relax(void);
 
 #ifdef __cplusplus
@@ -242,7 +239,6 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len);
 #define __ASMCALL(t, f) t (* f)(void)
 #endif
 #define FP_FROM_D(t, l) (__DOSFAR(t))MK_FP((UWORD)((l) >> 16), (UWORD)((l) & 0xffff))
-typedef struct far_s far_t;
 
 #define FAR                     /* linear architecture  */
 #define REG

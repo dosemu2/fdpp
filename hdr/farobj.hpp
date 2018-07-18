@@ -53,13 +53,13 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
     std::unordered_set<ObjRef *> owned;
 
     void ctor() {
-        this->fobj = mk_dosobj(this->ptr, this->size);
+        this->fobj = (__DOSFAR(uint8_t))mk_dosobj(this->ptr, this->size);
         owned = get_owned_list(this->ptr);
     }
 
     template <typename T1 = T,
         typename std::enable_if<!std::is_const<T1>::value>::type* = nullptr>
-    void do_cp1() { cp_dosobj(this->ptr, this->fobj, this->size); }
+    void do_cp1() { cp_dosobj(this->ptr, this->fobj.get_far(), this->size); }
     template <typename T1 = T,
         typename std::enable_if<std::is_const<T1>::value>::type* = nullptr>
     void do_cp1() {}
@@ -80,7 +80,7 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
             return;
         do_cp();
         own_unref();
-        rm_dosobj(this->fobj);
+        rm_dosobj(this->fobj.get_far());
     }
 
 public:
@@ -97,7 +97,7 @@ public:
     }
     virtual far_s get_obj() {
         _assert(!have_obj);
-        pr_dosobj(this->fobj, this->ptr, this->size);
+        pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
         have_obj = true;
         return this->fobj.get_far();
     }
@@ -127,7 +127,7 @@ class FarObjSt : public FarObjBase<T> {
             rm_dosobj_st(this->ptr);
         this->ptr = obj;
         this->size = sz;
-        this->fobj = mk_dosobj_st(obj, sz);
+        this->fobj = (__DOSFAR(uint8_t))mk_dosobj_st(obj, sz);
     }
 
 public:
@@ -142,7 +142,7 @@ public:
     void FarObjSet(T* obj, unsigned sz) { MkObj(obj, sz); }
 
     virtual far_s get_obj() {
-        pr_dosobj(this->fobj, this->ptr, this->size);
+        pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
         return this->fobj.get_far();
     }
     NearPtr_DO<obj_type> get_near() {

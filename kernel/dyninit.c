@@ -41,7 +41,10 @@ additionally:
 #include "dyndata.h"
 #include "debug.h"
 
-/*extern struct DynS FAR Dyn;*/
+struct DynS {
+  unsigned Allocated;
+  AR_MEMB(struct DynS, char, Buffer, 0);
+};
 
 #ifndef __TURBOC__
 #include "init-dat.h"
@@ -49,7 +52,7 @@ additionally:
 extern struct DynS FAR ASM Dyn;
 #endif
 
-void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
+far_t DynAlloc(const char *what, unsigned num, unsigned size)
 {
   void FAR *now;
   unsigned total = num * size;
@@ -78,7 +81,7 @@ void FAR *DynAlloc(const char *what, unsigned num, unsigned size)
 
   Dynp->Allocated += total;
 
-  return now;
+  return GET_FAR(now);
 }
 
 void DynFree(void *ptr)
@@ -87,11 +90,11 @@ void DynFree(void *ptr)
   Dynp->Allocated = (char *)ptr - (char *)Dynp->Buffer;
 }
 
-void FAR * DynLast()
+far_t DynLast()
 {
   struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(__ASMADDR(Dyn)));
   DebugPrintf(("dynamic data end at %P\n",
                GET_FP32(Dynp->Buffer + Dynp->Allocated)));
 
-  return Dynp->Buffer + Dynp->Allocated;
+  return GET_FAR(Dynp->Buffer + Dynp->Allocated);
 }

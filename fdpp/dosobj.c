@@ -22,10 +22,11 @@
 #include "dyndata.h"
 #include "smalloc.h"
 #include "farhlp.h"
+#include "thunks_priv.h"
 #include "dosobj.h"
 
 static smpool pool;
-static __DOSFAR(uint8_t) base;
+static far_t base;
 static struct farhlp hlp;
 static int initialized;
 
@@ -41,8 +42,8 @@ static void err_printf(int prio, const char *fmt, ...)
 
 void dosobj_init(int size)
 {
-    void FAR *fa = DynAlloc("dosobj", 1, size);
-    void *ptr = resolve_segoff(GET_FAR(fa));
+    far_t fa = DynAlloc("dosobj", 1, size);
+    void *ptr = resolve_segoff(fa);
 
     sminit(&pool, ptr, size);
     smregister_error_notifier(&pool, err_printf);
@@ -51,10 +52,11 @@ void dosobj_init(int size)
     initialized = 1;
 }
 
-__DOSFAR(uint8_t) mk_dosobj(const void *data, UWORD len)
+far_t mk_dosobj(const void *data, UWORD len)
 {
     void *ptr;
     uint16_t offs;
+    far_t ret;
 
     _assert(initialized);
     ptr = smalloc(&pool, len);
@@ -63,46 +65,48 @@ __DOSFAR(uint8_t) mk_dosobj(const void *data, UWORD len)
         _fail();
     }
     offs = (uintptr_t)ptr - (uintptr_t)smget_base_addr(&pool);
-    return base + offs;
+    ret = base;
+    ret.off += offs;
+    return ret;
 }
 
-void pr_dosobj(__DOSFAR(uint8_t) fa, const void *data, UWORD len)
+void pr_dosobj(far_t fa, const void *data, UWORD len)
 {
-    void *ptr = resolve_segoff(GET_FAR(fa));
+    void *ptr = resolve_segoff(fa);
 
     memcpy(ptr, data, len);
 }
 
-void cp_dosobj(void *data, __DOSFAR(uint8_t) fa, UWORD len)
+void cp_dosobj(void *data, far_t fa, UWORD len)
 {
-    void *ptr = resolve_segoff(GET_FAR(fa));
+    void *ptr = resolve_segoff(fa);
 
     memcpy(data, ptr, len);
 }
 
-void rm_dosobj(__DOSFAR(uint8_t) fa)
+void rm_dosobj(far_t fa)
 {
-    void *ptr = resolve_segoff(GET_FAR(fa));
+    void *ptr = resolve_segoff(fa);
 
     smfree(&pool, ptr);
 }
 
 uint16_t dosobj_seg(void)
 {
-    return FP_SEG(base);
+    return base.seg;
 }
 
-__DOSFAR(uint8_t) mk_dosobj_st(const void *data, UWORD len)
+far_t mk_dosobj_st(const void *data, UWORD len)
 {
     far_t f;
-    __DOSFAR(uint8_t) ret;
+    far_t ret;
 
     _assert(initialized);
     f = lookup_far_ref(&hlp, data);
     if (f.seg || f.off)
-        return __DOSFAR(uint8_t)(f);
+        return f;
     ret = mk_dosobj(data, len);
-    store_far(&hlp, data, GET_FAR(ret));
+    store_far(&hlp, data, ret);
     return ret;
 }
 

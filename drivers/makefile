@@ -51,3 +51,6 @@ clean:
 device.lib : $(OBJS)
 	-$(RM) device.lib
 	$(LIBUTIL) $(LIBFLAGS) $@ $(LIBOBJS) $(LIBTERM)
+
+.asm.obj:
+	$(NASM) -D$(COMPILER) $(NASMFLAGS) -f obj -o $@ $<

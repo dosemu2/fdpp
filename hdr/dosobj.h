@@ -19,12 +19,18 @@
 #ifndef DOSOBJ_H
 #define DOSOBJ_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void dosobj_init(int size);
-__DOSFAR(uint8_t) mk_dosobj(const void *data, UWORD len);
-void pr_dosobj(__DOSFAR(uint8_t) fa, const void *data, UWORD len);
-void cp_dosobj(void *data, __DOSFAR(uint8_t) fa, UWORD len);
-void rm_dosobj(__DOSFAR(uint8_t) fa);
-__DOSFAR(uint8_t) mk_dosobj_st(const void *data, UWORD len);
+far_t mk_dosobj(const void *data, UWORD len);
+void pr_dosobj(far_t fa, const void *data, UWORD len);
+void cp_dosobj(void *data, far_t fa, UWORD len);
+void rm_dosobj(far_t fa);
+far_t mk_dosobj_st(const void *data, UWORD len);
 void rm_dosobj_st(const void *data);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

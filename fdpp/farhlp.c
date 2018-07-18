@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include "portab.h"
+#include "thunks_priv.h"
 #include "farhlp.h"
 
 /* hackish helper to store/lookup far pointers - using static
