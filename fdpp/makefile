@@ -78,8 +78,8 @@ HDRS=\
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h $(SRC)dyndata.h
 PLPHDRS = $(wildcard $(HDR)*.hpp)
-PPHDRS = $(PLPHDRS) $(HDR)dosobj.h $(HDR)dosobj_priv.h $(HDR)farhlp.h \
-    $(HDR)thunks_priv.h thunks.h smalloc.h
+PPHDRS = $(PLPHDRS) dosobj.h dosobj_priv.h farhlp.h \
+    thunks_priv.h thunks.h smalloc.h
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
 GEN_CC = $(CFILES:.c=.cc)

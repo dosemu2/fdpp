@@ -252,8 +252,6 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len);
 #define NORETURN
 #define DEBUG
 
-#include "dosobj.h"
-
 #else
 #error Unknown compiler
 We might even deal with a pre-ANSI compiler. This will certainly not compile.
