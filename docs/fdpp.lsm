@@ -1,0 +1,13 @@
+Begin3
+Title:          FDPP Project
+Version:        GIT
+Entered-date:   N/A
+Description:    FreeDOS port to modern C++
+Keywords:       FDPP, FreeDOS, DOS, C++
+Author:         Stas Sergeev (stsp)
+Maintained-by:  stsp@users.sourceforge.net
+Primary-site:   https://github.com/stsp/fdpp
+Original-site:  https://github.com/stsp/fdpp
+Platforms:      linux, dosemu2
+Copying-policy: GPL3+
+End
