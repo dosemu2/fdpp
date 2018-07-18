@@ -7,7 +7,7 @@ XNASM ?= nasm
 XCPU ?= 386
 XLINK = ../contrib/jwlink
 XFAT ?= 32
-include ../mkfiles/generic.mak
+include clang.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
 HDR=../hdr/
