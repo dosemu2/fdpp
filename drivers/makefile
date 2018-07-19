@@ -8,7 +8,7 @@
 COMPILER = gcc
 XNASM = nasm
 XCPU = 386
-LIBUTIL = ../contrib/JWlib
+LIBUTIL = ../fdpp/contrib/JWlib
 LIBFLAGS = -fo -n
 include ../mkfiles/generic.mak
 

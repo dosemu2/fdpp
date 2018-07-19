@@ -3,7 +3,7 @@
 #
 
 include ../config.mak
-XLINK = ../contrib/jwlink
+XLINK = contrib/jwlink
 include clang.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
