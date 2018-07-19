@@ -23,7 +23,6 @@
 #include "farptr.hpp"
 //#include "cppstubs.hpp"
 #include "dosobj.h"
-#include "dosobj_priv.h"
 #include "objhlp.hpp"
 
 template<typename T>
