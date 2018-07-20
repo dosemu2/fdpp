@@ -32,5 +32,6 @@ endif
 
 NASM=$(XNASM)
 NASMFLAGS   := $(NASMFLAGS) -i../hdr/ -DXCPU=$(XCPU)
+LOADSEG = 0x60
 
 LINK=$(XLINK)
