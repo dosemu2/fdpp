@@ -1859,7 +1859,7 @@ struct submcb
   unsigned short size;
   char unused[3];
   char name[8];
-};
+} PACKED;
 
 void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
 {
