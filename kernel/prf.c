@@ -206,6 +206,13 @@ int VA_CDECL _printf(CONST char *fmt, ...)
   return 0;
 }
 
+int _vprintf(CONST char *fmt, va_list arg)
+{
+  charp = 0;
+  do_printf(fmt, arg);
+  return 0;
+}
+
 #if defined(DEBUG_NEED_PRINTF) && !defined(_INIT) && !defined(FORSYS)
 PRINTF(2)
 STATIC int VA_CDECL _fsprintf(char FAR * buff, CONST char * fmt, ...)
@@ -232,6 +239,14 @@ int VA_CDECL _sprintf(char * buff, CONST char * fmt, ...)
   charp = buff;
   do_printf(fmt, arg);
   va_end(arg);
+  handle_char('\0');
+  return 0;
+}
+
+int _vsprintf(char * buff, CONST char * fmt, va_list arg)
+{
+  charp = buff;
+  do_printf(fmt, arg);
   handle_char('\0');
   return 0;
 }
@@ -285,7 +300,6 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
     switch (*fmt)
     {
       case '\0':
-        va_end(arg);
         return;
 
       case 'c':
@@ -377,7 +391,6 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
     for (; size > 0; size--)
       handle_char(' ');
   }
-  va_end(arg);
 }
 
 #endif

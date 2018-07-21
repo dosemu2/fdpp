@@ -282,6 +282,8 @@ UWORD ASMCFUNC SEGM(HMA_TEXT) syscall_MUX14(__FAR(iregs) regs);
 #ifdef DEBUG
 int VA_CDECL _printf(CONST char * fmt, ...) PRINTF(1);
 int VA_CDECL _sprintf(char * buff, CONST char * fmt, ...) PRINTF(2);
+int _vprintf(CONST char *fmt, va_list arg);
+int _vsprintf(char * buff, CONST char * fmt, va_list arg);
 #endif
 VOID hexd(const char *title,__FAR(VOID) p, COUNT numBytes);
 void put_unsigned(unsigned n, int base, int width);
