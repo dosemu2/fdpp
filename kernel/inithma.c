@@ -281,7 +281,7 @@ STATIC void InstallVDISK(void)
     only available if DOS=HIGH was successful
 */
 
-VOID FAR * HMAalloc(COUNT bytesToAllocate)
+VOID FAR * HMAalloc(UCOUNT bytesToAllocate)
 {
   VOID FAR *HMAptr;
 
