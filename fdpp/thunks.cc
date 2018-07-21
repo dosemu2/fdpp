@@ -357,7 +357,8 @@ void fdlogvprintf(const char *format, va_list vl)
     fdpp->print(1, format, vl);
 }
 
-void fdprintf(const char *format, ...)
+
+static void _fdprintf(const char *format, ...)
 {
     va_list vl;
 
@@ -366,13 +367,37 @@ void fdprintf(const char *format, ...)
     va_end(vl);
 }
 
-void fdlogprintf(const char *format, ...)
+void fdprintf(const char *format, ...)
+{
+  va_list vl;
+  char buf[1024];
+
+  va_start(vl, format);
+  _vsprintf(buf, format, vl); // FreeDOS kernel version
+  va_end(vl);
+
+  _fdprintf("%s", buf);
+}
+
+static void _fdlogprintf(const char *format, ...)
 {
     va_list vl;
 
     va_start(vl, format);
     fdlogvprintf(format, vl);
     va_end(vl);
+}
+
+void fdlogprintf(const char *format, ...)
+{
+  va_list vl;
+  char buf[1024];
+
+  va_start(vl, format);
+  _vsprintf(buf, format, vl); // FreeDOS kernel version
+  va_end(vl);
+
+  _fdlogprintf("%s", buf);
 }
 
 void cpu_relax(void)

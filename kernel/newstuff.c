@@ -33,6 +33,11 @@ static BYTE *mainRcsId =
 #include        "portab.h"
 #include        "globals.h"
 
+#ifdef DEBUG
+#define DEBUG_TRUENAME
+#endif
+#include        "debug.h"
+
 /*
     TE-TODO: if called repeatedly by same process,
     last allocation must be freed. if handle count < 20, copy back to PSP
@@ -103,10 +108,6 @@ long DosMkTmp(BYTE FAR * pathname, UWORD attr)
 
   return rc;
 }
-
-#ifdef DEBUG
-#define DEBUG_TRUENAME
-#endif
 
 #define drLetterToNr(dr) ((unsigned char)((dr) - 'A'))
 /* Convert an uppercased drive letter into the drive index */
@@ -232,12 +233,6 @@ long DosMkTmp(BYTE FAR * pathname, UWORD attr)
     TRUENAME A:\NUL     A:\NUL
 
 */
-
-#ifdef DEBUG_TRUENAME
-#define tn_printf(x) _printf x
-#else
-#define tn_printf(x)
-#endif
 
 #define PNE_WILDCARD 1
 #define PNE_DOT 2
