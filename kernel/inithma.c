@@ -121,7 +121,7 @@ VOID hdump(BYTE FAR * p)
 
 STATIC int EnabledA20(void)
 {
-  return fmemcmp(MK_FP(0, 0), MK_FP(0xffff, 0x0010), 128);
+  return fmemcmp(MK_FP_N(0, 0), MK_FP(0xffff, 0x0010), 128);
 }
 
 int EnableHMA(VOID)
