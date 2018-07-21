@@ -177,7 +177,7 @@ int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)
     else
       return *d - *s;
   }
-  return *d - *s;
+  return 0;
 }
 
 int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
@@ -192,6 +192,6 @@ int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
     else
       return *d - *s;
   }
-  return *d - *s;
+  return 0;
 }
 #endif
