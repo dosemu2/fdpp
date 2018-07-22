@@ -2,11 +2,8 @@
 # Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
 #
 
-COMPILER ?= gcc
-XNASM ?= nasm
-XCPU ?= 386
+include ../config.mak
 XLINK = ../contrib/jwlink
-XFAT ?= 32
 include clang.mak
 
 LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
@@ -14,7 +11,7 @@ HDR=../hdr/
 SRC=../kernel/
 FDPPLIB = libfdpp.so
 
-ALLCFLAGS += -I $(SRC) -I .
+ALLCFLAGS += -I $(SRC) -I . -DDATADIR=$(DATADIR)
 NASMFLAGS += -i$(SRC)
 
 # *List Macros*
@@ -140,10 +137,10 @@ $(FDPP_CCOBJS): %.o: %.cc $(PPHDRS) $(GEN_HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJS): %.obj: $(SRC)%.asm
-	$(NASM) -D$(COMPILER) $(NASMFLAGS) -f obj -o $@ $<
+	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
 
 $(PPOBJS): %.obj: %.asm
-	$(NASM) -D$(COMPILER) $(NASMFLAGS) -f obj -o $@ $<
+	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
 
 .cpp.o: $(PLPHDRS)
 	$(CC) $(CFLAGS) -o $@ $<
@@ -207,5 +204,5 @@ utils/thunk_gen:
 	cd utils && make
 
 install: $(FDPPLIB)
-	install -t /usr/local/lib $(FDPPLIB)
-	install -D -m 0644 -t /usr/local/include/fdpp thunks.h
+	install -t $(DESTDIR)$(PREFIX)/lib $(FDPPLIB)
+	install -D -m 0644 -t $(DESTDIR)$(PREFIX)/include/fdpp thunks.h

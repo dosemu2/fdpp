@@ -46,6 +46,8 @@ struct fdpp_api {
 };
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 
+const char *FdppDataDir(void);
+
 #ifdef __cplusplus
 }
 #endif

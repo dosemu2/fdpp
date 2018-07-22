@@ -820,3 +820,8 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
     }
     fdlogprintf("processed %i relocs (%i missed)\n", reloc, miss);
 }
+
+const char *FdppDataDir(void)
+{
+    return __STRING(DATADIR);
+}
