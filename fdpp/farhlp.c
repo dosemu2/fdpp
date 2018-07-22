@@ -144,6 +144,7 @@ far_t lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm)
 {
     struct f_m *fm;
     far_t ret;
+    int r;
     int idx = do_lookup(ctx, ptr);
 
     if (idx == -1)
@@ -151,11 +152,20 @@ far_t lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm)
     fm = &ctx->far_map[idx];
     ret = fm->f;
     fm->refcnt--;
-    *rm = 0;
+    r = 0;
     if (!fm->refcnt) {
-        *rm = 1;
+        r = 1;
         while (ctx->f_m_len && !ctx->far_map[ctx->f_m_len - 1].refcnt)
             ctx->f_m_len--;
     }
+    if (rm)
+        *rm = r;
     return ret;
+}
+
+int purge_far(struct farhlp *ctx)
+{
+    int old = ctx->f_m_len;
+    ctx->f_m_len = 0;
+    return old;
 }

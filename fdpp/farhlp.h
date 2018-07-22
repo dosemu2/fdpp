@@ -39,6 +39,7 @@ void store_far_replace(struct farhlp *ctx, const void *ptr, far_t fptr);
 struct far_s lookup_far(struct farhlp *ctx, const void *ptr);
 struct far_s lookup_far_ref(struct farhlp *ctx, const void *ptr);
 struct far_s lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm);
+int purge_far(struct farhlp *ctx);
 #ifdef __cplusplus
 }
 #endif

@@ -30,6 +30,8 @@ static inline far_s _lookup_far(const void *ptr)
 {
     far_s f = lookup_far(&g_farhlp[FARHLP1], ptr);
     _assert(f.seg || f.off);
+    /* purge for faster look-ups - very risky! */
+    purge_far(&g_farhlp[FARHLP1]);
     return f;
 }
 
@@ -405,8 +407,13 @@ protected:
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - F();
         far_s f = lookup_far_st(ptr);
-        if (!f.seg && !f.off)
+        if (!f.seg && !f.off) {
             f = lookup_far(&g_farhlp[FARHLP2], ptr);
+            if (f.seg || f.off) {
+                /* purge for faster look-ups - very risky! */
+                purge_far(&g_farhlp[FARHLP2]);
+            }
+        }
         _assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + F();
         /* for arrays of struct that contain arrays */
