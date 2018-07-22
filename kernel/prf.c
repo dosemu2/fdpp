@@ -144,7 +144,8 @@ static BYTE SSFAR *charp = 0;
 
 STATIC VOID handle_char(COUNT);
 STATIC void ltob(LONG, BYTE SSFAR *, COUNT);
-STATIC void do_printf(const char *, REG va_list);
+STATIC void do_printf(CONST BYTE *, va_list);
+STATIC void do_printf_n(size_t size, CONST BYTE * fmt, va_list arg);
 
 /* special handler to switch between sprintf and printf */
 STATIC VOID handle_char(COUNT c)
@@ -251,19 +252,40 @@ int _vsprintf(char * buff, CONST char * fmt, va_list arg)
   return 0;
 }
 
-STATIC void do_printf(CONST BYTE * fmt, va_list arg)
+PRINTF(3)
+int VA_CDECL _snprintf(char * buff, size_t size, CONST char * fmt, ...)
 {
-  int base;
-  BYTE s[11], * p;
-  int size;
-  unsigned char flags;
+  va_list arg;
 
-  for (;*fmt != '\0'; fmt++)
-  {
+  va_start(arg, fmt);
+  charp = buff;
+  do_printf_n(size, fmt, arg);
+  va_end(arg);
+  handle_char('\0');
+  return 0;
+}
+
+int _vsnprintf(char * buff, size_t size, CONST char * fmt, va_list arg)
+{
+  charp = buff;
+  do_printf_n(size, fmt, arg);
+  handle_char('\0');
+  return 0;
+}
+
+enum { RET_CONT, RET_RET };
+STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list arg)
+{
+#define fmt (*_fmt)
+    int base;
+    BYTE s[11], * p;
+    int size;
+    unsigned char flags;
+
     if (*fmt != '%')
     {
       handle_char(*fmt);
-      continue;
+      return RET_CONT;
     }
 
     fmt++;
@@ -300,11 +322,11 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
     switch (*fmt)
     {
       case '\0':
-        return;
+        return RET_RET;
 
       case 'c':
         handle_char(va_arg(arg, int));
-        continue;
+        return RET_CONT;
 
       case 'P':
         {
@@ -369,7 +391,7 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
       case '%':
 
         handle_char(*fmt);
-        continue;
+        return RET_CONT;
 
     }
     {
@@ -390,6 +412,34 @@ STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 
     for (; size > 0; size--)
       handle_char(' ');
+
+    return RET_CONT;
+#undef fmt
+}
+
+STATIC void do_printf(CONST BYTE * fmt, va_list arg)
+{
+  for (;*fmt != '\0'; fmt++)
+  {
+    switch (printf_handle_char(&fmt, arg)) {
+    case RET_CONT:
+      continue;
+    case RET_RET:
+      return;
+    }
+  }
+}
+
+STATIC void do_printf_n(size_t size, CONST BYTE * fmt, va_list arg)
+{
+  for (;*fmt != '\0' && size > 0; fmt++, size--)
+  {
+    switch (printf_handle_char(&fmt, arg)) {
+    case RET_CONT:
+      continue;
+    case RET_RET:
+      return;
+    }
   }
 }
 

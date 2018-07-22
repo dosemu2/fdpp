@@ -65,7 +65,7 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
   if ((ULONG) total + Dynp->Allocated > 0xffff)
   {
     char buf[256];
-    snprintf(buf, sizeof(buf), "Dyn %u\n", (ULONG) total + Dynp->Allocated);
+    _snprintf(buf, sizeof(buf), "Dyn %u\n", (ULONG) total + Dynp->Allocated);
     panic(buf);
   }
 
