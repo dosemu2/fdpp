@@ -19,10 +19,10 @@
 /* silly farobj helpers */
 
 #include <unordered_set>
-#include <map>
+#include <unordered_map>
 #include "objhlp.hpp"
 
-static std::map<const void *, std::unordered_set<ObjRef *> > omap;
+static std::unordered_map<const void *, std::unordered_set<ObjRef *> > omap;
 
 bool track_owner(const void *owner, ObjRef *obj)
 {
