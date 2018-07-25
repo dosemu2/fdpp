@@ -118,5 +118,3 @@ clobber:
 
 install:
 	cd fdpp && $(MAKE) install
-	install -d $(DESTDIR)$(DATADIR)
-	install -t $(DESTDIR)$(DATADIR) -m 0644 bin/fdppkrnl.sys

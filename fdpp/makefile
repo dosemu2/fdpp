@@ -26,17 +26,12 @@ PPOBJS = plt.obj cdata.obj
 
 #               *Explicit Rules*
 
-production:     $(FDPPLIB) ../bin/$(TARGET).sys ../bin/country.sys
-
-../bin/$(TARGET).sys: kernel.sys
-		$(CP) kernel.sys ..$(DIRSEP)bin
-		$(CP) kernel.sys ..$(DIRSEP)bin$(DIRSEP)$(TARGET).sys
-		$(CP) kernel.map ..$(DIRSEP)bin$(DIRSEP)$(TARGET).map
+production:     $(FDPPLIB) $(TARGET).sys ../bin/country.sys
 
 # -S to avoid showing expected relocations
 # 0x10 & 0x78 or 0x79 depending on compilation options
-kernel.sys:	kernel.exe ../utils/exeflat.exe
-		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe kernel.sys $(LOADSEG) -S0x10 -S0x78 -S0x79 $(UPXOPT) $(XUPX)
+$(TARGET).sys:	kernel.exe ../utils/exeflat.exe
+		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
 
 kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L ../lib/device.lib N $@
@@ -206,3 +201,5 @@ utils/thunk_gen:
 install: $(FDPPLIB)
 	install -t $(DESTDIR)$(PREFIX)/lib $(FDPPLIB)
 	install -D -m 0644 -t $(DESTDIR)$(PREFIX)/include/fdpp thunks.h
+	install -d $(DESTDIR)$(DATADIR)
+	install -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
