@@ -11,7 +11,7 @@ HDR=../hdr/
 SRC=../kernel/
 FDPPLIB = libfdpp.so
 
-ALLCFLAGS += -I $(SRC) -I . -DDATADIR=$(DATADIR)
+ALLCFLAGS += -I $(SRC) -I . -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
 NASMFLAGS += -i$(SRC)
 
 # *List Macros*

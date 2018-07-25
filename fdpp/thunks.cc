@@ -826,3 +826,8 @@ const char *FdppDataDir(void)
 {
     return _S(DATADIR);
 }
+
+const char *FdppKernelName(void)
+{
+    return _S(KRNL_NAME);
+}
