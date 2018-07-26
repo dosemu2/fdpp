@@ -308,6 +308,7 @@ int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
 //void ASMPASCAL fmemcpyBack(__FAR(void) d,__FAR(const void) s, size_t n);
 void fmemcpy(__FAR(void) d,__FAR(const void) s, size_t n);
 void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
+void fmemmove(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n);
 void fstrcpy(__FAR(char) d,__FAR(const char) s);
 //void * memcpy(void *d, const void * s, size_t n);
 void fmemset(__FAR(void) s, int ch, size_t n);
@@ -344,6 +345,7 @@ int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 
 #define fmemcpy memcpy
 #define fmemcpy_n memcpy
+#define fmemmove memmove
 #define fmemset memset
 #define fmemcmp memcmp
 #endif

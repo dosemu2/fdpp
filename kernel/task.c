@@ -811,6 +811,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   BYTE *tailp, *endp;
   COUNT rd;
   exec_blk exb;
+  BYTE retried = 0;
   UBYTE mode = Config->cfgP_0_startmode;
 
   /* build exec block and save all parameters here as init part will vanish! */
@@ -844,6 +845,16 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
     put_string(Shell);
     put_string(tailp + 2);
+    if (!retried && default_drive > 2 && fstrlen(Shell) > 3 && Shell[1] != ':')
+    {
+      retried++;
+      memmove(tailp, tailp + 2, strlen(tailp + 2) + 1);
+      fmemmove(Shell + 3, Shell, fstrlen(Shell) + 1);
+      memcpy(Shell, "c:\\", 3);
+      strcat(Shell, "\r\n");
+      endp = Shell + fstrlen(Shell);
+      continue;
+    }
     put_string(" Enter the full shell command line: ");
     rd = res_read(STDIN, Shell, NAMEMAX);
     if (rd <= 0)

@@ -73,6 +73,18 @@ VOID fmemcpy(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n)
     ((BYTE FAR *) d)[n] = ((BYTE FAR *) s)[n];
 }
 
+VOID fmemmove(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n)
+{
+  if (d < s) {
+    size_t l;
+    for (l = 0; l < n; l++)
+      ((BYTE FAR *) d)[l] = ((BYTE FAR *) s)[l];
+  } else {
+    while (n--)
+      ((BYTE FAR *) d)[n] = ((BYTE FAR *) s)[n];
+  }
+}
+
 VOID fmemcpy_n(REG VOID * d, REG CONST VOID FAR * s, REG size_t n)
 {
   while (n--)

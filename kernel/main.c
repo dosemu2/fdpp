@@ -112,7 +112,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   }
 
   if (drv >= 0x80)
-    drv = 3; /* C: */
+    drv = (LoL->_BootDrive & ~0x80) + 3; /* HDD */
   LoL->_BootDrive = drv;
 
   /* install DOS API and other interrupt service routines, basic kernel functionality works */

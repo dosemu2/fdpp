@@ -850,22 +850,49 @@ VOID DoConfig(int nPass)
   else
   {
     DebugPrintf(("FDCONFIG.SYS not found\n"));
-    if ((nFileDesc = open("config.sys", 0)) < 0)
-    {
-      DebugPrintf(("CONFIG.SYS not found\n"));
-      /* at this point no config file was found, may return early */
-#ifdef MEMDISK_ARGS
-      /* if memdisk in use then only assume end of file reached and proceed, else return early */
-      if (mdsk != NULL)
-        bEof = TRUE;
-      else
-#endif
-        return;
-    }
-    else
+  }
+  if (nFileDesc < 0) {
+    if ((nFileDesc = open("config.sys", 0)) >= 0)
     {
       DebugPrintf(("Reading CONFIG.SYS...\n"));
     }
+    else
+    {
+      DebugPrintf(("CONFIG.SYS not found\n"));
+    }
+  }
+  if (nFileDesc < 0 && default_drive > 2)
+  {
+    if ((nFileDesc = open("c:\\fdconfig.sys", 0)) >= 0)
+    {
+      DebugPrintf(("Reading C:\\FDCONFIG.SYS...\n"));
+    }
+    else
+    {
+      DebugPrintf(("C:\\FDCONFIG.SYS not found\n"));
+    }
+  }
+  if (nFileDesc < 0 && default_drive > 2)
+  {
+    if ((nFileDesc = open("c:\\config.sys", 0)) >= 0)
+    {
+      DebugPrintf(("Reading C:\\CONFIG.SYS...\n"));
+    }
+    else
+    {
+      DebugPrintf(("C:\\CONFIG.SYS not found\n"));
+    }
+  }
+
+  if (nFileDesc < 0)
+  {
+#ifdef MEMDISK_ARGS
+    /* if memdisk in use then only assume end of file reached and proceed, else return early */
+    if (mdsk != NULL)
+      bEof = TRUE;
+    else
+#endif
+      return;
   }
 
   nCfgLine = 0;  /* keep track of which line in file for errors   */
