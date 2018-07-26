@@ -126,7 +126,7 @@ char master_env[128] BSS_INIT({0});
 static char *envp = master_env;
 
 static const char *_cfgInit = "command.com";
-static const char *_cfgInitTail = " /P /E:256\r\n";
+static const char *_cfgInitTail = " /P /E:1024\r\n";
 
 struct config Config = {
   0,
