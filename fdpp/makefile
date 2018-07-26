@@ -2,7 +2,7 @@
 # Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
 #
 
-include ../config.mak
+include config.mak
 XLINK = contrib/jwlink
 include clang.mak
 
