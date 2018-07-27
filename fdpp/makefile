@@ -43,7 +43,7 @@ clean:
 	cd utils && make clean
 	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
 		*.lnk *.o $(GEN_CC) *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
-		plt*.inc kernel.exe kernel.sys kernel.sym
+		plt*.inc kernel.exe $(TARGET).sys kernel.sym
 
 #               *Individual File Dependencies*
 apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
