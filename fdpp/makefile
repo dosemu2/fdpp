@@ -10,6 +10,7 @@ LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
 HDR=../hdr/
 SRC=../kernel/
 FDPPLIB = libfdpp.so
+PKG = fdpp-0.1.tar.gz
 
 ALLCFLAGS += -I $(SRC) -I . -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
 NASMFLAGS += -i$(SRC)
@@ -205,6 +206,13 @@ install: $(FDPPLIB)
 	install -d $(DESTDIR)$(DATADIR)
 	install -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
-rpm:
+$(PKG):
 	cd .. && git archive -o fdpp/fdpp-0.1.tar.gz --prefix=fdpp-0.1/ HEAD
-	rpmbuild -tb fdpp-0.1.tar.gz
+
+tar: $(PKG)
+
+rpm: $(PKG)
+	rpmbuild -tb $(PKG)
+
+deb:
+	debuild -i -us -uc -b

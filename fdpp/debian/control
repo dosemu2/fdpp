@@ -1,0 +1,20 @@
+Source: fdpp
+Section: contrib/otherosfs
+Priority: optional
+Maintainer: Stas Sergeev <stsp@users.sourceforge.net>
+Standards-Version: 3.9.7
+Build-Depends:
+    bison,
+    flex,
+    sed,
+    bash,
+    clang,
+    libstdc++-dev
+Homepage: http://www.github.com/stsp/fdpp
+
+Package: fdpp
+Architecture: i386 amd64
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: DOS compatibility layer
+    fdpp provides the DOS compatibility layer.
+    It is a FreeDOS port to modern C++.
