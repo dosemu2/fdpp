@@ -9,6 +9,7 @@ Build-Depends:
     sed,
     bash,
     clang,
+    nasm,
     libstdc++-dev,
     debhelper (>= 9~)
 Homepage: http://www.github.com/stsp/fdpp
