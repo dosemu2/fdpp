@@ -64,5 +64,6 @@ XFAT=32
 #         -DDOSEMU : printf output goes to dosemu log
 # set ALLCFLAGS=-DDEBUG
 
-PREFIX=/usr/local
-DATADIR=$(PREFIX)/share/fdpp
+PREFIX ?= /usr/local
+DATADIR ?= $(PREFIX)/share/fdpp
+LIBDIR ?= $(PREFIX)/lib

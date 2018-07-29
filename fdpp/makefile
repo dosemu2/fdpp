@@ -199,7 +199,12 @@ utils/thunk_gen:
 	cd utils && make
 
 install: $(FDPPLIB)
-	install -t $(DESTDIR)$(PREFIX)/lib $(FDPPLIB)
+	install -d $(DESTDIR)$(LIBDIR)
+	install -t $(DESTDIR)$(LIBDIR) $(FDPPLIB)
 	install -D -m 0644 -t $(DESTDIR)$(PREFIX)/include/fdpp thunks.h
 	install -d $(DESTDIR)$(DATADIR)
 	install -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
+
+rpm:
+	cd .. && git archive -o fdpp/fdpp-0.1.tar.gz --prefix=fdpp-0.1/ HEAD
+	rpmbuild -tb fdpp-0.1.tar.gz
