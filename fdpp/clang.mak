@@ -16,8 +16,14 @@ endif
 
 TARGET=fdppkrnl
 
-ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic -O2 \
-    -ggdb3 -fdebug-macro -fno-strict-aliasing -Wno-format-invalid-specifier
+EXTRA_DEBUG = 0
+ALLCFLAGS += -iquote ../hdr $(TARGETOPT) -Wall -fpic \
+    -fno-strict-aliasing -Wno-format-invalid-specifier
+ifeq ($(EXTRA_DEBUG),1)
+ALLCFLAGS += -ggdb3 -fdebug-macro -O0
+else
+ALLCFLAGS += -ggdb3 -O2
+endif
 
 CFLAGS=$(ALLCFLAGS)
 LDFLAGS=-shared -Wl,-Bsymbolic
