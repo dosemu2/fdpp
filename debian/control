@@ -17,5 +17,5 @@ Package: fdpp
 Architecture: i386 amd64
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: DOS compatibility layer
-    fdpp provides the DOS compatibility layer.
-    It is a FreeDOS port to modern C++.
+ fdpp provides the DOS compatibility layer.
+ It is a FreeDOS port to modern C++.
