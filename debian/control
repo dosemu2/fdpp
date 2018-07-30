@@ -7,7 +7,6 @@ Build-Depends:
     bison,
     flex,
     sed,
-    bash,
     clang,
     nasm,
     libstdc++-dev,

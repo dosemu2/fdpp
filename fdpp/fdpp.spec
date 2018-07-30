@@ -10,13 +10,12 @@ Summary: DOS compatibility layer
 Group: System/Emulator
 
 License: GPL-3.0+
-URL: www.github.com/stsp/fdpp
+URL: http://www.github.com/stsp/fdpp
 Source0: %{name}-%{version}.tar.gz
 
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: sed
-BuildRequires: bash
 BuildRequires: clang
 BuildRequires: nasm
 BuildRequires: libstdc++-devel
