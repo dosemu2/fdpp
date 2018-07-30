@@ -22,7 +22,7 @@ BuildRequires: libstdc++-devel
 
 %description
 fdpp provides the DOS compatibility layer.
-It is a FreeDOS port to modern C++.
+It is a FreeDOS kernel port to modern C++.
 
 %prep
 %setup -q
