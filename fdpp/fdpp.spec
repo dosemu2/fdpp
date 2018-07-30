@@ -37,7 +37,8 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir} install
 
 %files
 %defattr(-,root,root)
-%{_libdir}/libfdpp.so
+%{_libdir}/fdpp/libfdpp.so
+%{_libdir}/pkgconfig/fdpp.pc
 %{_includedir}/fdpp/thunks.h
 %{_datadir}/fdpp/fdppkrnl.sys
 

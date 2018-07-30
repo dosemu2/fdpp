@@ -27,7 +27,11 @@ PPOBJS = plt.obj cdata.obj
 
 #               *Explicit Rules*
 
-production:     $(FDPPLIB) $(TARGET).sys ../bin/country.sys
+ALL = $(FDPPLIB) $(TARGET).sys fdpp.pc
+
+all: $(ALL)
+
+production:     $(ALL) ../bin/country.sys
 
 # -S to avoid showing expected relocations
 # 0x10 & 0x78 or 0x79 depending on compilation options
@@ -199,12 +203,11 @@ glob_asmdefs.h: glob_asm.h makefile
 utils/thunk_gen:
 	cd utils && make
 
-install: $(FDPPLIB)
-	install -d $(DESTDIR)$(LIBDIR)
-	install -t $(DESTDIR)$(LIBDIR) $(FDPPLIB)
-	install -D -m 0644 -t $(DESTDIR)$(PREFIX)/include/fdpp thunks.h
-	install -d $(DESTDIR)$(DATADIR)
-	install -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
+install: $(FDPPLIB) fdpp.pc
+	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
+	install -D -t $(DESTDIR)$(PKGCONFIGDIR) -m 0644 fdpp.pc
+	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 thunks.h
+	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
 $(PKG):
 	cd .. && git archive -o fdpp/fdpp-0.1.tar.gz --prefix=fdpp-0.1/ HEAD
@@ -216,3 +219,9 @@ rpm: $(PKG)
 
 deb:
 	debuild -i -us -uc -b
+
+fdpp.pc: fdpp.pc.in makefile
+	sed \
+		-e 's!@PREFIX[@]!$(PREFIX)!g' \
+		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
+		$< >$@

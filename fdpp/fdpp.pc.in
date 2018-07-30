@@ -1,0 +1,9 @@
+prefix=@PREFIX@
+fdpplibdir=@LIBDIR@/fdpp
+fdppincdir=${prefix}/include/fdpp
+
+Name: fdpp
+Description: DOS compatibility layer
+Version: 0.1
+Libs: -Wl,-rpath,${fdpplibdir} -L${fdpplibdir} -lfdpp
+Cflags: -I${fdppincdir}
