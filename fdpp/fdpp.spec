@@ -28,7 +28,7 @@ It is a FreeDOS kernel port to modern C++.
 %setup -q
 
 %build
-make PREFIX=%{_prefix} %{?_smp_mflags}
+make PREFIX=%{_prefix} LIBDIR=%{_libdir} %{?_smp_mflags}
 
 %check
 

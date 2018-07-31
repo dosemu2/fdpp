@@ -211,6 +211,7 @@ install: $(FDPPLIB) fdpp.pc
 
 $(PKG):
 	cd .. && git archive -o fdpp/fdpp-0.1.tar.gz --prefix=fdpp-0.1/ HEAD
+.PHONY: $(PKG)
 
 tar: $(PKG)
 
