@@ -2,17 +2,18 @@
 # Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
 #
 
-include config.mak
-XLINK = contrib/jwlink
-include clang.mak
+srcdir ?= $(CURDIR)
+include $(srcdir)/config.mak
+XLINK = $(srcdir)/contrib/jwlink
+include $(srcdir)/clang.mak
 
-LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
-HDR=../hdr/
-SRC=../kernel/
+LIBS=$(srcdir)/..$(DIRSEP)lib$(DIRSEP)device.lib
+HDR=$(srcdir)/../hdr/
+SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
 PKG = fdpp-0.1.tar.gz
 
-ALLCFLAGS += -I $(SRC) -I . -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
+ALLCFLAGS += -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
 NASMFLAGS += -i$(SRC)
 
 # *List Macros*
@@ -35,20 +36,20 @@ production:     $(ALL) ../bin/country.sys
 
 # -S to avoid showing expected relocations
 # 0x10 & 0x78 or 0x79 depending on compilation options
-$(TARGET).sys:	kernel.exe ../utils/exeflat.exe
-		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
+$(TARGET).sys:	kernel.exe $(srcdir)/../utils/exeflat.exe
+		$(srcdir)/..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
 
 kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
-		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L ../lib/device.lib N $@
+		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(srcdir)/../lib/device.lib N $@
 
 ../bin/country.sys: $(SRC)country.asm
 		$(NASM) -o $@ $<
 
 clean:
-	cd utils && make clean
+	cd utils && make srcdir=$(abspath $(srcdir))/utils clean
 	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
-		*.lnk *.o $(GEN_CC) *.so *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
-		plt*.inc kernel.exe $(TARGET).sys kernel.sym
+		*.lnk *.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
+		plt*.inc kernel.exe $(TARGET).sys kernel.sym *.pc
 
 #               *Individual File Dependencies*
 apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -75,8 +76,9 @@ HDRS=\
     $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
     $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
     $(HDR)version.h $(SRC)dyndata.h
-PLPHDRS = $(wildcard $(HDR)*.hpp)
-PPHDRS = $(PLPHDRS) dosobj.h farhlp.h thunks_priv.h thunks.h smalloc.h
+PLPHDRS = farobj.hpp farptr.hpp
+_PPHDRS = $(PLPHDRS) dosobj.h farhlp.h thunks_priv.h thunks.h smalloc.h
+PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
 GEN_CC = $(CFILES:.c=.cc)
@@ -126,14 +128,18 @@ CPPFILES = objhlp.cpp
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)
 FDPP_CCOBJS = $(FDPP_CCFILES:.cc=.o)
+FDPP_CPPOBJS = $(CPPFILES:.cpp=.o)
 
 $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(FDPP_COBJS): %.o: %.c $(PPHDRS)
+$(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS)
 	$(CLC) $(CFLAGS) -o $@ $<
 
-$(FDPP_CCOBJS): %.o: %.cc $(PPHDRS) $(GEN_HEADERS)
+$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(GEN_HEADERS)
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJS): %.obj: $(SRC)%.asm
@@ -146,18 +152,18 @@ $(PPOBJS): %.obj: %.asm
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(CFILES:.c=.cc): %.cc: $(SRC)%.c makefile
-	utils/mkfar.sh FAR __FAR $< >$@
+	$(srcdir)/utils/mkfar.sh FAR __FAR $< >$@
 
-$(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(CPPFILES:.cpp=.o)
+$(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) $(LDFLAGS) -o $@ $^
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
 
-plt.asm: plt.S glob_asm.h
+plt.asm: $(srcdir)/plt.S $(srcdir)/glob_asm.h
 	cpp -P $< >$@
 
-cdata.asm: cdata.S
+cdata.asm: $(srcdir)/cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
 thunk_calls.tmp: $(SRC)proto.h makefile
@@ -184,7 +190,7 @@ plt_asmc.inc: thunk_asms.tmp makefile
 plt_asmp.inc: thunk_asms.tmp makefile
 	grep ASMPASCAL $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmpsym \U\2,\t\t\1/' >$@
 
-glob_asmdefs.h: glob_asm.h makefile
+glob_asmdefs.h: $(srcdir)/glob_asm.h makefile
 	grep "__ASM(" $< | grep -v '^/' | \
 		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >$@
 	grep "__ASM_ARR(" $< | grep -v '^/' | \
@@ -201,12 +207,16 @@ glob_asmdefs.h: glob_asm.h makefile
 		sed 's/.\+(\(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 
 utils/thunk_gen:
-	cd utils && make
+	if [ ! -d utils ]; then \
+	    mkdir utils ; \
+	    ln -s $(abspath $(srcdir))/utils/makefile utils/makefile ; \
+	fi
+	cd utils && make srcdir=$(abspath $(srcdir))/utils
 
 install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
 	install -D -t $(DESTDIR)$(PKGCONFIGDIR) -m 0644 fdpp.pc
-	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 thunks.h
+	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(srcdir)/thunks.h
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
 $(PKG):
@@ -221,7 +231,7 @@ rpm: $(PKG)
 deb:
 	debuild -i -us -uc -b
 
-fdpp.pc: fdpp.pc.in makefile
+fdpp.pc: $(srcdir)/fdpp.pc.in makefile
 	sed \
 		-e 's!@PREFIX[@]!$(PREFIX)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \

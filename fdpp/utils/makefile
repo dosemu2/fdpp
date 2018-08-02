@@ -1,13 +1,13 @@
 XCPU ?= 386
-include ../../mkfiles/gcc.mak
+include $(srcdir)/../../mkfiles/gcc.mak
 
 thunk_gen: lex.yy.c thunk_gen.tab.c
 	$(CLC) -g -o $@ $^
 
-thunk_gen.tab.c: thunk_gen.y
+thunk_gen.tab.c: $(srcdir)/thunk_gen.y
 	bison -d $^
 
-lex.yy.c: thunk_gen.l
+lex.yy.c: $(srcdir)/thunk_gen.l
 	lex $^
 
 clean:
