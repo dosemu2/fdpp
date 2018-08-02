@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ --parallel
+	dh $@ --parallel --builddirectory=build
 
 override_dh_auto_build:
 	dh_auto_build $@ -- PREFIX=/usr

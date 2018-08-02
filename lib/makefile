@@ -5,8 +5,11 @@
 #
 
 
-include ../mkfiles/generic.mak
+srcdir ?= $(CURDIR)
+include $(srcdir)/../mkfiles/generic.mak
 
+production:
+	touch libm.lib
 
 libm.lib:	$(CLIB)
 	-$(RM) libm.lib

@@ -1,0 +1,5 @@
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+if [ ! -f makefile ]; then
+    ln -s "$SCRIPTPATH"/makefile makefile
+    echo "srcdir = $SCRIPTPATH" >config.mak
+fi

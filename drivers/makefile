@@ -5,12 +5,14 @@
 #
 
 
+srcdir ?= $(CURDIR)
+vpath %.asm $(srcdir)
 COMPILER = gcc
 XNASM = nasm
 XCPU = 386
-LIBUTIL = ../fdpp/contrib/JWlib
+LIBUTIL = $(srcdir)/../fdpp/contrib/JWlib
 LIBFLAGS = -fo -n
-include ../mkfiles/generic.mak
+include $(srcdir)/../mkfiles/generic.mak
 
 
 # MICROSOFT C

@@ -88,17 +88,26 @@ XLINK=ld
 #ALLCFLAGS=-DDEBUG
 
 -include config.mak
+srcdir ?= $(CURDIR)
 ifdef XUPX
   UPXOPT=-U
 endif
 
+define mdir
+	if [ ! -d $(1) ]; then \
+	    mkdir $(1) ; \
+	    ln -s $(srcdir)/$(1)/makefile $(1)/makefile ; \
+	fi
+	cd $(1) && $(MAKE) srcdir=$(srcdir)/$(1) $(2)
+endef
+
 all:
-	cd utils && $(MAKE) production
-	cd lib && ( $(TEST_F) libm.lib || touch libm.lib )
-	cd drivers && $(MAKE) production
-	cd boot && $(MAKE) production
+	$(call mdir,utils,production)
+	$(call mdir,lib,production)
+	$(call mdir,drivers,production)
+#	cd boot && $(MAKE) production
 #	cd sys && $(MAKE) production
-	cd fdpp && $(MAKE) production
+	$(call mdir,fdpp,all)
 
 clean:
 	cd utils && $(MAKE) clean
@@ -117,4 +126,4 @@ clobber:
 	cd kernel && $(MAKE) clobber
 
 install:
-	cd fdpp && $(MAKE) install
+	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp install

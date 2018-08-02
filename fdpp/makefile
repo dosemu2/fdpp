@@ -43,7 +43,10 @@ kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(srcdir)/../lib/device.lib N $@
 
 ../bin/country.sys: $(SRC)country.asm
-		$(NASM) -o $@ $<
+	if [ ! -d ../bin ]; then \
+	    mkdir ../bin ; \
+	fi
+	$(NASM) -o $@ $<
 
 clean:
 	cd utils && make srcdir=$(abspath $(srcdir))/utils clean
@@ -151,7 +154,7 @@ $(PPOBJS): %.obj: %.asm
 .cpp.o: $(PLPHDRS)
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(CFILES:.c=.cc): %.cc: $(SRC)%.c makefile
+$(GEN_CC): %.cc: $(SRC)%.c makefile
 	$(srcdir)/utils/mkfar.sh FAR __FAR $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)

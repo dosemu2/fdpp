@@ -1,20 +1,20 @@
+srcdir ?= $(CURDIR)
 COMPILER ?= gcc
 XCPU ?= 386
-include ../mkfiles/generic.mak
+include $(srcdir)/../mkfiles/generic.mak
 
-CFLAGS = -iquote..$(DIRSEP)hdr
+CFLAGS = -iquote $(srcdir)/..$(DIRSEP)hdr
 
 production: patchobj.com exeflat.exe
 
-patchobj.com: patchobj.c
-	$(CLT) $(CFLAGS) -o $@ patchobj.c
+patchobj.com: $(srcdir)/patchobj.c
+	$(CLT) $(CFLAGS) -o $@ $<
 
-exeflat.exe: exeflat.c ../hdr/exe.h
-	$(CLC) $(CFLAGS) -o $@ exeflat.c
+exeflat.exe: $(srcdir)/exeflat.c $(srcdir)/../hdr/exe.h
+	$(CLC) $(CFLAGS) -o $@ $<
 
 clobber: clean
 
 clean:
 	$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.las *.cod *.err status.me
 	$(RM) exeflat.exe patchobj.com
-

@@ -1,5 +1,7 @@
 # These are generic definitions
 
+srcdir ?= $(CURDIR)
+
 #**********************************************************************
 #* TARGET    : we create a %TARGET%.sys file
 #* TARGETOPT : options, handled down to the compiler
@@ -22,7 +24,7 @@ NASMFLAGS:=$(NASMFLAGS) -DWITHFAT32
 endif
 
 NASM=$(XNASM)
-NASMFLAGS   := $(NASMFLAGS) -i../hdr/ -DXCPU=$(XCPU)
+NASMFLAGS   := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU)
 
 LINK=$(XLINK)
 
@@ -37,7 +39,7 @@ ifeq ($(LOADSEG)0,0)
 LOADSEG=0x60
 endif
 
-include ../mkfiles/$(COMPILER).mak
+include $(srcdir)/../mkfiles/$(COMPILER).mak
 
 ifeq ($(CLDEF),0)
 CLT=$(CL) $(CFLAGST) $(TINY) -I$(INCLUDEPATH)
