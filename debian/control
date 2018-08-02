@@ -19,11 +19,3 @@ Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: DOS compatibility layer
  fdpp provides the DOS compatibility layer.
  It is a FreeDOS kernel port to modern C++.
-
-Package: fdpp-dbg
-Architecture: i386 amd64
-Section: debug
-Priority: optional
-Depends: fdpp (= ${binary:Version}), ${misc:Depends}
-Description: debugging symbols for fdpp
- This package contains the debugging symbols for fdpp.
