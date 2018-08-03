@@ -36,8 +36,8 @@ production:     $(ALL) ../bin/country.sys
 
 # -S to avoid showing expected relocations
 # 0x10 & 0x78 or 0x79 depending on compilation options
-$(TARGET).sys:	kernel.exe $(srcdir)/../utils/exeflat.exe
-		$(srcdir)/..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
+$(TARGET).sys:	kernel.exe ../utils/exeflat.exe
+		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
 
 kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(LIBS) N $@
