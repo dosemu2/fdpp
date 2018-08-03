@@ -26,7 +26,7 @@ ALLCFLAGS += -ggdb3 -O2
 endif
 
 CFLAGS=$(ALLCFLAGS)
-LDFLAGS=-shared -Wl,-Bsymbolic -Wl,--build-id=sha1
+LDFLAGS=-shared -Wl,-Bsymbolic -Wl,--build-id=sha1 -static-libgcc
 CLC = clang
 
 ALLCFLAGS:=$(ALLCFLAGS) -DI386
