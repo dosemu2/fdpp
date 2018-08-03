@@ -7,7 +7,7 @@ include $(srcdir)/config.mak
 XLINK = $(srcdir)/contrib/jwlink
 include $(srcdir)/clang.mak
 
-LIBS=$(srcdir)/..$(DIRSEP)lib$(DIRSEP)device.lib
+LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
 HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
@@ -40,7 +40,7 @@ $(TARGET).sys:	kernel.exe $(srcdir)/../utils/exeflat.exe
 		$(srcdir)/..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
 
 kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
-		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(srcdir)/../lib/device.lib N $@
+		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(LIBS) N $@
 
 ../bin/country.sys: $(SRC)country.asm
 	if [ ! -d ../bin ]; then \
