@@ -22,7 +22,7 @@ NASMFLAGS += -i$(SRC)
 
 OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
     execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
-    nls_hc.obj apisupt.obj intr.obj irqstack.obj memdisk.obj \
+    nls_hc.obj intr.obj irqstack.obj memdisk.obj \
     cpu.obj
 PPOBJS = plt.obj cdata.obj
 
@@ -55,7 +55,7 @@ clean:
 		plt*.inc kernel.exe $(TARGET).sys kernel.sym *.pc
 
 #               *Individual File Dependencies*
-apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
+#apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
 console.obj:	$(SRC)console.asm $(SRC)io.inc
 cpu.obj:	$(SRC)cpu.asm  $(SRC)segs.inc
 dosidle.obj:	$(SRC)dosidle.asm $(SRC)segs.inc
