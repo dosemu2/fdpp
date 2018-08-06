@@ -49,7 +49,7 @@ kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 	$(NASM) -o $@ $<
 
 clean:
-	cd utils && make srcdir=$(abspath $(srcdir))/utils clean
+	cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
 		*.lnk *.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
 		plt*.inc kernel.exe $(TARGET).sys kernel.sym *.pc
@@ -155,7 +155,7 @@ $(PPOBJS): %.obj: %.asm
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(GEN_CC): %.cc: $(SRC)%.c makefile
-	$(srcdir)/utils/mkfar.sh FAR __FAR $< >$@
+	$(srcdir)/parsers/mkfar.sh FAR __FAR $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) $(LDFLAGS) -o $@ $^
@@ -177,15 +177,15 @@ plt.inc: thunk_calls.tmp
 	grep ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_f \4,\t\t\1,\t\3/' >$@
 	grep -v ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_n \4,\t\t\1,\t\3/' >>$@
 
-thunk_calls.h: thunk_calls.tmp utils/thunk_gen
-	cat $< | utils/thunk_gen >$@ || (rm -f $@ ; false)
+thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
+	cat $< | parsers/thunk_gen >$@ || (rm -f $@ ; false)
 
 thunk_asms.tmp: $(SRC)proto.h makefile
 	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | \
 		sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
 
-thunk_asms.h: thunk_asms.tmp utils/thunk_gen
-	cat $< | utils/thunk_gen 1 >$@ || (rm -f $@ ; false)
+thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
+	cat $< | parsers/thunk_gen 1 >$@ || (rm -f $@ ; false)
 
 plt_asmc.inc: thunk_asms.tmp makefile
 	grep ASMFUNC $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmcsym \2,\t\t\1/' >$@
@@ -209,12 +209,12 @@ glob_asmdefs.h: $(srcdir)/glob_asm.h makefile
 	grep "__ASM_FUNC(" $< | grep -v '^/' | \
 		sed 's/.\+(\(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
 
-utils/thunk_gen:
-	if [ ! -d utils ]; then \
-	    mkdir utils ; \
-	    ln -s $(abspath $(srcdir))/utils/makefile utils/makefile ; \
+parsers/thunk_gen:
+	if [ ! -d parsers ]; then \
+	    mkdir parsers ; \
+	    ln -s $(abspath $(srcdir))/parsers/makefile parsers/makefile ; \
 	fi
-	cd utils && make srcdir=$(abspath $(srcdir))/utils
+	cd parsers && make srcdir=$(abspath $(srcdir))/parsers
 
 install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
