@@ -282,6 +282,11 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 
     switch (fn) {
         #include "thunk_calls.h"
+
+        default:
+            fdprintf("unknown fn %i\n", fn);
+            _fail();
+            return 0;
     }
 
     if (r_len)
@@ -299,17 +304,17 @@ void FdppCall(struct vm86_regs *regs)
     if (!fdpp)
         return;
 
-    switch (regs->ebx & 0xff) {
+    switch (LO_BYTE(regs->ebx)) {
     case 0:
         FdppSetSymTab(regs,
-                (struct fdpp_symtab *)so2lin(regs->ss, regs->esp + 6));
+                (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esp) + 6));
         break;
     case 1:
         noret_jmp = &jmp;
         if (setjmp(jmp))
             break;
-        res = FdppThunkCall(regs->ecx,
-                (UBYTE *)so2lin(regs->ss, regs->edx), &len);
+        res = FdppThunkCall(LO_WORD(regs->ecx),
+                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
         switch (len) {
         case 0:
             break;
