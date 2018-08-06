@@ -2,12 +2,13 @@
 # Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
 #
 
+-include config.mak
 srcdir ?= $(CURDIR)
-include $(srcdir)/config.mak
+include $(srcdir)/defs.mak
 XLINK = $(srcdir)/contrib/jwlink
 include $(srcdir)/clang.mak
 
-LIBS=..$(DIRSEP)lib$(DIRSEP)device.lib
+LIBS=$(lib_path)/device.lib
 HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
@@ -33,11 +34,12 @@ ALL = $(FDPPLIB) $(TARGET).sys fdpp.pc
 all: $(ALL)
 
 production:     $(ALL) ../bin/country.sys
+clobber:        clean
 
 # -S to avoid showing expected relocations
 # 0x10 & 0x78 or 0x79 depending on compilation options
-$(TARGET).sys:	kernel.exe ../utils/exeflat.exe
-		..$(DIRSEP)utils$(DIRSEP)exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
+$(TARGET).sys:	kernel.exe $(utils_path)/exeflat.exe
+		$(utils_path)/exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
 
 kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(LIBS) N $@

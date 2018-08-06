@@ -1,5 +1,23 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-if [ ! -f makefile ]; then
+CWD=`pwd -P`
+lib_path="$CWD/lib"
+utils_path="$CWD/utils"
+if [ ! -f configure ]; then
     ln -s "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
+    echo "lib_path = $lib_path" >>config.mak
+    echo "utils_path = $utils_path" >>config.mak
+    mkdir fdpp
+    cd fdpp
+    echo "srcdir = $SCRIPTPATH/fdpp" >config.mak
+    echo "lib_path = $lib_path" >>config.mak
+    echo "utils_path = $utils_path" >>config.mak
+    cd ..
+    mkdir utils
+    cd utils
+    echo "srcdir = $SCRIPTPATH/utils" >config.mak
+    cd ..
+    mkdir drivers
+    cd drivers
+    echo "srcdir = $SCRIPTPATH/drivers" >config.mak
 fi

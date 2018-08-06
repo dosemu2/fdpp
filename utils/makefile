@@ -1,3 +1,4 @@
+-include config.mak
 srcdir ?= $(CURDIR)
 COMPILER ?= gcc
 XCPU ?= 386

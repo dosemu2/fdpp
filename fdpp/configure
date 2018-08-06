@@ -1,0 +1,10 @@
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+TOPDIR=`realpath "$SCRIPTPATH/.."`
+lib_path="$TOPDIR/lib"
+utils_path="$TOPDIR/utils"
+if [ ! -f configure ]; then
+    ln -s "$SCRIPTPATH"/makefile makefile
+    echo "srcdir = $SCRIPTPATH" >config.mak
+    echo "lib_path = $lib_path" >>config.mak
+    echo "utils_path = $utils_path" >>config.mak
+fi

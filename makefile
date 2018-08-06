@@ -83,7 +83,7 @@ XCPU=386
 XFAT=32
 XUPX=
 XNASM=nasm
-MAKE=make
+#MAKE=make
 XLINK=ld
 #ALLCFLAGS=-DDEBUG
 
@@ -94,7 +94,7 @@ ifdef XUPX
 endif
 
 define mdir
-	if [ ! -d $(1) ]; then \
+	if [ ! -f $(1)/makefile ]; then \
 	    mkdir $(1) ; \
 	    ln -s $(srcdir)/$(1)/makefile $(1)/makefile ; \
 	fi
@@ -102,28 +102,28 @@ define mdir
 endef
 
 all:
-	$(call mdir,utils,production)
-	$(call mdir,lib,production)
-	$(call mdir,drivers,production)
+	+$(call mdir,utils,production)
+	+$(call mdir,lib,production)
+	+$(call mdir,drivers,production)
 #	cd boot && $(MAKE) production
 #	cd sys && $(MAKE) production
-	$(call mdir,fdpp,all)
+	+$(call mdir,fdpp,all)
 
 clean:
-	cd utils && $(MAKE) clean
-	cd lib && $(MAKE) clean
-	cd drivers && $(MAKE) clean
-	cd boot && $(MAKE) clean
-	cd sys && $(MAKE) clean
-	cd fdpp && $(MAKE) clean
+	+$(call mdir,utils,clean)
+	+$(call mdir,lib,clean)
+	+$(call mdir,drivers,clean)
+#	cd boot && $(MAKE) clean
+#	cd sys && $(MAKE) clean
+	+$(call mdir,fdpp,clean)
 
 clobber:
-	cd utils && $(MAKE) clobber
-	cd lib && $(MAKE) clobber
-	cd drivers && $(MAKE) clobber
-	cd boot && $(MAKE) clobber
-	cd sys && $(MAKE) clobber
-	cd kernel && $(MAKE) clobber
+	+$(call mdir,utils,clobber)
+	+$(call mdir,lib,clobber)
+	+$(call mdir,drivers,clobber)
+#	cd boot && $(MAKE) clobber
+#	cd sys && $(MAKE) clobber
+	+$(call mdir,fdpp,clobber)
 
 install:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp install

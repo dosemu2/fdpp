@@ -5,6 +5,7 @@
 #
 
 
+-include config.mak
 srcdir ?= $(CURDIR)
 vpath %.asm $(srcdir)
 COMPILER = gcc
