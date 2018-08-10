@@ -5,8 +5,6 @@ utils_path="$CWD/utils"
 if [ ! -f configure ]; then
     ln -s "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
-    echo "lib_path = $lib_path" >>config.mak
-    echo "utils_path = $utils_path" >>config.mak
     mkdir fdpp
     cd fdpp
     echo "srcdir = $SCRIPTPATH/fdpp" >config.mak

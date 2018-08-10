@@ -4,6 +4,8 @@
 
 -include config.mak
 srcdir ?= $(CURDIR)
+lib_path ?= ../lib
+utils_path ?= ../utils
 include $(srcdir)/defs.mak
 XLINK = $(srcdir)/contrib/jwlink
 include $(srcdir)/clang.mak
