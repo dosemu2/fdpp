@@ -206,13 +206,13 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
 
     reloc = 0;
     ptr = (uint8_t *)resolve_segoff(asm_tab_fp);
-    if (ptr >= start_p && ptr < end_p) {
+    if (ptr >= start_p && ptr <= end_p) {
         asm_tab_fp.seg += delta;
         reloc++;
     }
     for (i = 0; i < num_wrps; i++) {
         ptr = (uint8_t *)resolve_segoff(near_wrp[i]);
-        if (ptr >= start_p && ptr < end_p) {
+        if (ptr >= start_p && ptr <= end_p) {
             near_wrp[i].seg += delta;
             reloc++;
         }
@@ -222,7 +222,7 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
     reloc = 0;
     for (i = 0; i < asm_tab_len; i++) {
         ptr = (uint8_t *)so2lin(t[i].seg, t[i].off);
-        if (ptr >= start_p && ptr < end_p) {
+        if (ptr >= start_p && ptr <= end_p) {
             t[i].seg += delta;
             reloc++;
         }
@@ -253,7 +253,7 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
         reloc = 0;
         for (i = 0; i < stab_len; i++) {
             uint8_t *ptr = (uint8_t *)resolve_segoff(thtab[i]);
-            if (ptr >= start_p && ptr < end_p) {
+            if (ptr >= start_p && ptr <= end_p) {
                 thtab[i].seg += delta;
                 reloc++;
             }
@@ -810,7 +810,7 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
     do_relocs(start_p, end_p, delta);
     for (i = 0; i < _countof(asm_thunks.arr); i++) {
         uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);
-        if (ptr >= start_p && ptr < end_p) {
+        if (ptr >= start_p && ptr <= end_p) {
             int rm;
             far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
             if (!f.seg && !f.off)
