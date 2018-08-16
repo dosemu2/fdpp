@@ -207,7 +207,10 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
     for (i = 0; i < num_wrps; i++) {
         ptr = (uint8_t *)resolve_segoff(near_wrp[i]);
         if (ptr >= start_p && ptr <= end_p) {
-            near_wrp[i].seg += delta;
+            if (delta)
+                near_wrp[i].seg += delta;
+            else
+                near_wrp[i].seg = near_wrp[i].off = 0;
             reloc++;
         }
     }
@@ -217,7 +220,10 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
     for (i = 0; i < asm_tab_len; i++) {
         ptr = (uint8_t *)so2lin(t[i].seg, t[i].off);
         if (ptr >= start_p && ptr <= end_p) {
-            t[i].seg += delta;
+            if (delta)
+                t[i].seg += delta;
+            else
+                t[i].seg = t[i].off = 0;
             reloc++;
         }
     }
@@ -383,6 +389,13 @@ void cpu_relax(void)
 #define FLG_FAR 1
 #define FLG_NORET 2
 
+static void _call_wrp(FdppAsmCall_t call, struct vm86_regs *regs, 
+        uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len)
+{
+    _assert(seg || off);
+    call(regs, seg, off, sp, len);
+}
+
 static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
         FdppAsmCall_t call)
 {
@@ -390,7 +403,7 @@ static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
-            call(&s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
+            _call_wrp(call, &s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
             return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
@@ -422,7 +435,7 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
             /* argpack should be aligned */
             _assert(!(len & 1));
             s_regs.ecx = len >> 1;
-            call(&s_regs, asm_tab[i].seg, wrp, sp, len);
+            _call_wrp(call, &s_regs, asm_tab[i].seg, wrp, sp, len);
             return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
         }
     }
@@ -819,6 +832,30 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
         }
     }
     fdlogprintf("processed %i relocs (%i missed)\n", reloc, miss);
+}
+
+void PurgeHook(void *ptr, UDWORD len)
+{
+    unsigned i;
+    int reloc = 0;
+    int miss = 0;
+    uint8_t *start_p = (uint8_t *)ptr;
+    uint8_t *end_p = start_p + len;
+    do_relocs(start_p, end_p, 0);
+    for (i = 0; i < _countof(asm_thunks.arr); i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);
+        if (ptr >= start_p && ptr <= end_p) {
+            int rm;
+            far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
+            if (!f.seg && !f.off)
+                miss++;
+            else
+                _assert(rm);
+            asm_thunks.arr[i]->seg = asm_thunks.arr[i]->off = 0;
+            reloc++;
+        }
+    }
+    fdlogprintf("purged %i relocs (%i missed)\n", reloc, miss);
 }
 
 #define _S(x) __STRING(x)

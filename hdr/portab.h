@@ -213,6 +213,7 @@ void disable(void);
 void enable(void);
 void int3(void);
 void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len);
+void PurgeHook(void *ptr, UDWORD len);
 
 #ifndef __cplusplus
 #define __FAR(t) t FAR *
