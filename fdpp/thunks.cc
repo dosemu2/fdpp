@@ -32,9 +32,8 @@ struct asm_dsc_s {
     UWORD off;
     UWORD seg;
 };
-#define asm_tab ((struct asm_dsc_s *)resolve_segoff(asm_tab_fp))
+struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
-static struct far_s asm_tab_fp;
 static struct farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
@@ -205,11 +204,6 @@ static void do_relocs(uint8_t *start_p, uint8_t *end_p, uint16_t delta)
     uint8_t *ptr;
 
     reloc = 0;
-    ptr = (uint8_t *)resolve_segoff(asm_tab_fp);
-    if (ptr >= start_p && ptr <= end_p) {
-        asm_tab_fp.seg += delta;
-        reloc++;
-    }
     for (i = 0; i < num_wrps; i++) {
         ptr = (uint8_t *)resolve_segoff(near_wrp[i]);
         if (ptr >= start_p && ptr <= end_p) {
@@ -239,7 +233,8 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     num_wrps = symtab->num_wrps;
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
-    asm_tab_fp = symtab->calltab;
+    asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
+    memcpy(asm_tab, resolve_segoff(symtab->calltab), symtab->calltab_len);
     asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
     /* now relocate */
     if (symtab->cur_cs > symtab->orig_cs) {
