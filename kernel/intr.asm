@@ -125,6 +125,14 @@ RES_READ:
         mov ax, -1
 no_read_error:
         ret
+;
+;       void call_intr(nr, rp)
+;       REG int nr
+;       REG struct REGPACK *rp
+;
+		global	CALL_INTR
+CALL_INTR:
+		INTR
 
 segment	INIT_TEXT
 ;

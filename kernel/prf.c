@@ -116,7 +116,7 @@ void put_console(int c)
 #else
   iregs r = {};
   r.a.b.l = c;
-  init_call_intr(0x29, &r);
+  call_intr(0x29, &r);
 #endif
 }
 #endif                          /*  DOSEMU   */

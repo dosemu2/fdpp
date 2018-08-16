@@ -158,7 +158,7 @@ STATIC void fast_put_char(unsigned char chr)
 #else
   iregs r = {};
   r.a.b.l = chr;
-  init_call_intr(0x29, &r);
+  call_intr(0x29, &r);
 #endif
 }
 #endif
