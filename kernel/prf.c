@@ -121,8 +121,6 @@ void put_console(int c)
 }
 #endif                          /*  DOSEMU   */
 
-#if defined(DEBUG_NEED_PRINTF) || defined(FORSYS) || defined(_INIT) || defined(TEST)
-
 #if defined(DEBUG_NEED_PRINTF) && !defined(_INIT) && !defined(FORSYS)
 /* need to use FAR pointers for resident DEBUG printf()s where SS != DS */
 #define SSFAR FAR
@@ -214,7 +212,6 @@ int _vprintf(CONST char *fmt, va_list arg)
   return 0;
 }
 
-#if defined(DEBUG_NEED_PRINTF) && !defined(_INIT) && !defined(FORSYS)
 PRINTF(2)
 STATIC int VA_CDECL _fsprintf(char FAR * buff, CONST char * fmt, ...)
 {
@@ -227,9 +224,6 @@ STATIC int VA_CDECL _fsprintf(char FAR * buff, CONST char * fmt, ...)
   handle_char('\0');
   return 0;
 }
-#else
-#define fsprintf sprintf
-#endif
 
 PRINTF(2)
 int VA_CDECL _sprintf(char * buff, CONST char * fmt, ...)
@@ -443,7 +437,6 @@ STATIC void do_printf_n(size_t size, CONST BYTE * fmt, va_list arg)
   }
 }
 
-#endif
 #if !defined(FORSYS) && !defined(_INIT)
 
 extern void put_string(const char *);
@@ -620,4 +613,3 @@ int main(void)
   return 0;
 }
 #endif
-
