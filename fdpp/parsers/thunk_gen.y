@@ -73,7 +73,7 @@ static void do_start_arg(int anum)
 		strcat(abuf, "_ARG_PTR_FAR_A(");
 		break;
 	    case 2:
-		strcat(abuf, "_CNV_PTR_FAR, 0");
+		strcat(abuf, "_CNV_PTR_FAR, _L_NONE");
 		break;
 	    }
 	} else {
@@ -87,13 +87,13 @@ static void do_start_arg(int anum)
 	    case 2:
 		switch (arg_size) {
 		case 0:
-		    sprintf(abuf + strlen(abuf), "_CNV_PTR_VOID, %i", arg_num + 2);
+		    sprintf(abuf + strlen(abuf), "_CNV_PTR_VOID, _L_REF(%i)", arg_num + 2);
 		    break;
 		case 1:
-		    strcat(abuf, "_CNV_PTR_CHAR, 0");
+		    strcat(abuf, "_CNV_PTR_CHAR, _L_NONE");
 		    break;
 		default:
-		    strcat(abuf, "_CNV_PTR, 0");
+		    strcat(abuf, "_CNV_PTR, _L_NONE");
 		    break;
 		}
 		break;
@@ -108,7 +108,7 @@ static void do_start_arg(int anum)
 	    strcat(abuf, "_ARG_A(");
 	    break;
 	case 2:
-	    strcat(abuf, "_CNV_SIMPLE, 0");
+	    strcat(abuf, "_CNV_SIMPLE, _L_NONE");
 	    break;
 	}
     }

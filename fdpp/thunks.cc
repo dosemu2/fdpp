@@ -524,7 +524,8 @@ void enable(void)
     t d = __MK_NEAR(__##d)
 #define __CNV_SIMPLE(t, d, f, l) t d = (f)
 
-#define _CNV(c, at, nl, n) c(at, _a##n, a##n, a##nl)
+#define _CNV(c, at, l, n) c(at, _a##n, a##n, l)
+#define _L_REF(nl) a##nl
 
 #define _THUNK0_v(n, f, z) \
 void f(void) \
