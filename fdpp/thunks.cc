@@ -386,8 +386,9 @@ void cpu_relax(void)
     fdpp->cpu_relax();
 }
 
-#define FLG_FAR 1
-#define FLG_NORET 2
+#define _TFLG_NONE 0
+#define _TFLG_FAR 1
+#define _TFLG_NORET 2
 
 static void _call_wrp(FdppAsmCall_t call, struct vm86_regs *regs, 
         uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len)
@@ -453,9 +454,9 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
 {
     uint32_t ret;
-    FdppAsmCall_t call = ((flags & FLG_NORET) ?
+    FdppAsmCall_t call = ((flags & _TFLG_NORET) ?
             asm_call_noret : fdpp->asm_call);
-    if (flags & FLG_FAR)
+    if (flags & _TFLG_FAR)
         ret = _do_asm_call_far(num, sp, len, call);
     else
         ret = _do_asm_call(num, sp, len, call);

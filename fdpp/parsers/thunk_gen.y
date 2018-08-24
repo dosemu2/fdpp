@@ -164,16 +164,28 @@ static void fin_arg(int last)
     }
 }
 
-static int get_flags(void)
+static void add_flg(char *buf, const char *flg, int num)
 {
+    if (!num) {
+	strcpy(buf, flg);
+    } else {
+	strcat(buf, " | ");
+	strcat(buf, flg);
+    }
+}
+
+static const char *get_flags(void)
+{
+    static char buf[32];
     int flg = 0;
-#define FLG_FAR 1
-#define FLG_NORET 2
+
     if (is_ffar)
-	flg |= FLG_FAR;
+	add_flg(buf, "_TFLG_FAR", flg++);
     if (is_noret)
-	flg |= FLG_NORET;
-    return flg;
+	add_flg(buf, "_TFLG_NORET", flg++);
+    if (!flg)
+	add_flg(buf, "_TFLG_NONE", flg++);
+    return buf;
 }
 
 %}
@@ -214,7 +226,7 @@ line:		lnum rdecls fname lb args rb SEMIC
 			          $1, $3);
 			    if (arg_num)
 			      printf(", %s", abuf);
-			    printf(", %i)\n", get_flags());
+			    printf(", %s)\n", get_flags());
 			    break;
 			  }
 			}
