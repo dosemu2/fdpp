@@ -1,4 +1,5 @@
 XCPU ?= 386
+srcdir ?= $(CURDIR)
 include $(srcdir)/../../mkfiles/gcc.mak
 
 thunk_gen: lex.yy.c thunk_gen.tab.c
