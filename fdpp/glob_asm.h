@@ -33,7 +33,7 @@ __ASM(BYTE, NetDelay) SEMIC
 __ASM(BYTE, NetRetry) SEMIC
 __ASM(UWORD, first_mcb) SEMIC         /* Start of user memory                 */
 __ASM(UWORD, uppermem_root) SEMIC
-__ASM_FAR(struct dhdr, clock) SEMIC /* CLOCK$ device                        */
+__ASM_FAR(struct dhdr, _clock_) SEMIC /* CLOCK$ device                        */
 __ASM_FAR(struct dhdr, syscon) SEMIC /* console device                      */
 __ASM_FAR(struct buffer, firstbuf) SEMIC /* head of buffers linked list     */
 __ASM_FAR(struct cds, current_ldt) SEMIC

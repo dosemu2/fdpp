@@ -377,8 +377,8 @@ MARK0026H       equ     $
 _DPBp           dd      0               ; 0000 First drive Parameter Block
                 global  _sfthead
 _sfthead        dd      0               ; 0004 System File Table head
-                global  _clock
-_clock          dd      0               ; 0008 CLOCK$ device
+                global  __clock_
+__clock_        dd      0               ; 0008 CLOCK$ device
                 global  _syscon
 _syscon         dw      _con_dev,seg _con_dev   ; 000c console device
                 global  _maxsecsize
