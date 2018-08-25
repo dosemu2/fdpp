@@ -532,9 +532,9 @@ public:
 
 #define __ASMSYM(t) AsmSym<t>
 #define __ASMFSYM(t) AsmFSym<t>
-#define __ASMARSYM(t, v, l) AsmArFSym<t, l> v
-#define __ASMARISYM(t, v) AsmArNSym<t> v
-#define __ASMARIFSYM(t, v) AsmArFSym<t> v
+#define __ASMARSYM(t, l) AsmArFSym<t, l>
+#define __ASMARISYM(t) AsmArNSym<t>
+#define __ASMARIFSYM(t) AsmArFSym<t>
 #define __FAR(t) FarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMNEAR(t, s) AsmNearPtr<t, s>

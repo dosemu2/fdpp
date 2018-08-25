@@ -43,9 +43,9 @@ static jmp_buf *noret_jmp;
 #define __ASM(t, v) __ASMSYM(t) __##v
 #define __ASM_FAR(t, v) __ASMFAR(t) __##v
 #define __ASM_NEAR(t, v) __ASMNEAR(t, data_seg) __##v
-#define __ASM_ARR(t, v, l) __ASMARSYM(t, __##v, l)
-#define __ASM_ARRI(t, v) __ASMARISYM(t, __##v)
-#define __ASM_ARRI_F(t, v) __ASMARIFSYM(t, __##v)
+#define __ASM_ARR(t, v, l) __ASMARSYM(t, l) __##v
+#define __ASM_ARRI(t, v) __ASMARISYM(t) __##v
+#define __ASM_ARRI_F(t, v) __ASMARIFSYM(t) __##v
 #define __ASM_FUNC(v) __ASMFSYM(void) __##v
 #include "glob_asm.h"
 #undef __ASM

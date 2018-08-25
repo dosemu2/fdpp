@@ -198,9 +198,9 @@ struct lowvec {
 #define __ASM(t, v) extern __ASMSYM(t) __##v
 #define __ASM_FAR(t, v) extern __ASMFAR(t) __##v
 #define __ASM_NEAR(t, v) extern __ASMNEAR(t, data_seg) __##v
-#define __ASM_ARR(t, v, l) extern __ASMARSYM(t, __##v, l)
-#define __ASM_ARRI(t, v) extern __ASMARISYM(t, __##v)
-#define __ASM_ARRI_F(t, v) extern __ASMARIFSYM(t, __##v)
+#define __ASM_ARR(t, v, l) extern __ASMARSYM(t, l) __##v
+#define __ASM_ARRI(t, v) extern __ASMARISYM(t) __##v
+#define __ASM_ARRI_F(t, v) extern __ASMARIFSYM(t) __##v
 #define __ASM_FUNC(v) extern __ASMFSYM(void) __##v
 #define SEMIC ;
 #include "glob_asm.h"
