@@ -19,6 +19,7 @@ static int thunk_type;
 static int arg_num;
 static int arg_offs;
 static int arg_size;
+static int al_arg_size;
 static int is_ptr;
 static int is_rptr;
 static int is_far;
@@ -155,18 +156,18 @@ static void fin_arg(int last)
 	else
 	    real_arg_size = 2;
     } else {
-	real_arg_size = arg_size;
+	if (arg_size <= 0) {
+	    if (arg_size == 0 && arg_num)
+		yyerror("parse error, void argument?");
+	    if (arg_num == -1 && !last)
+		yyerror("unknown argument size");
+	    return;
+	}
+	real_arg_size = al_arg_size;
     }
-    if (!last) {
-        assert(real_arg_size != -1);
-        arg_offs += real_arg_size;
-    }
-    if (real_arg_size) {
-	arg_num++;
-    } else if (arg_num) {
-	fprintf(stderr, "parse error, void argument?\n");
-	exit(1);
-    }
+    assert(real_arg_size > 0);
+    arg_offs += real_arg_size;
+    arg_num++;
 }
 
 static void add_flg(char *buf, const char *flg, int num)
@@ -323,6 +324,7 @@ atype:		  VOID		{
 				  arg_size = 0;
 				  cvtype = CVTYPE_VOID;
 				  strcpy(atype, "VOID");
+				  al_arg_size = 0;
 				  is_void = 1;
 				}
 		| CHAR		{
@@ -330,52 +332,63 @@ atype:		  VOID		{
 				  cvtype = CVTYPE_CHAR;
 				  strcpy(atype, "char");
 				  strcpy(atype3, "WORD");
+				  al_arg_size = 2;
 				}
 		| WORD		{
 				  arg_size = 2;
 				  strcpy(atype, "WORD");
+				  al_arg_size = 2;
 				}
 		| UWORD		{
 				  arg_size = 2;
 				  strcpy(atype, "UWORD");
+				  al_arg_size = 2;
 				}
 		| DWORD		{
 				  arg_size = 4;
 				  strcpy(atype, "DWORD");
+				  al_arg_size = 4;
 				}
 		| UDWORD	{
 				  arg_size = 4;
 				  strcpy(atype, "UDWORD");
+				  al_arg_size = 4;
 				}
 		| INT		{
 				  arg_size = 2;
 				  strcpy(atype, "int");
 				  strcpy(atype2, "WORD");
+				  al_arg_size = 2;
 				}
 		| UINT		{
 				  arg_size = 2;
 				  strcpy(atype, "unsigned");
 				  strcpy(atype2, "UWORD");
+				  al_arg_size = 2;
 				}
 		| LONG		{
 				  arg_size = 4;
 				  strcpy(atype, "long");
 				  strcpy(atype2, "DWORD");
+				  al_arg_size = 4;
 				}
 		| ULONG		{
 				  arg_size = 4;
 				  strcpy(atype, "unsigned long");
 				  strcpy(atype2, "UDWORD");
+				  al_arg_size = 4;
 				}
 		| BYTE		{
 				  arg_size = 1;
 				  strcpy(atype, "BYTE");
 				  strcpy(atype3, "WORD");
+				  al_arg_size = 2;
 				}
 		| UBYTE		{
 				  arg_size = 1;
 				  strcpy(atype, "UBYTE");
 				  strcpy(atype3, "UWORD");
+				  al_arg_size = 2;
 				}
 		| STRUCT sname	{
 				  arg_size = -1;
