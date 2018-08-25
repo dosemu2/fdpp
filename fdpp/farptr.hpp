@@ -54,11 +54,21 @@ static inline void do_store_far(far_s fptr)
 #define _RC(T1) typename std::remove_const<T1>::type
 template<typename T> class SymWrp;
 template<typename T> class SymWrp2;
+
+template<typename T>
+class WrpType {
+public:
+    using type = typename std::conditional<std::is_class<T>::value,
+        SymWrp<T>, SymWrp2<T>>::type;
+    using ref_type = typename std::add_lvalue_reference<type>::type;
+};
+
 template<typename T>
 class FarPtrBase {
 protected:
     far_s ptr;
 
+    using wrp_type = typename WrpType<T>::type;
 public:
     FarPtrBase() = default;
     FarPtrBase(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
@@ -75,29 +85,13 @@ public:
         return (T*)resolve_segoff(ptr);
     }
 
-    template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& get_wrp() {
-        SymWrp<T1> *s = (SymWrp<T1> *)get_ptr();
+    wrp_type& get_wrp() {
+        wrp_type *s = (wrp_type *)get_ptr();
         _store_far(s, get_far());
         return *s;
     }
-    template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](int idx) {
-        return FarPtrBase<T1>(*this + idx).get_wrp();
-    }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& get_wrp() {
-        SymWrp2<T1> *s = (SymWrp2<T1> *)get_ptr();
-        _store_far(s, get_far());
-        return *s;
-    }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](int idx) {
-        return FarPtrBase<T1>(*this + idx).get_wrp();
+    wrp_type& operator [](int idx) {
+        return FarPtrBase<T>(*this + idx).get_wrp();
     }
 
     FarPtrBase<T> operator ++(int) {
@@ -300,12 +294,8 @@ class AsmSym {
     FarPtr<T> sym;
 
 public:
-    template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& get_sym() { return sym.get_wrp(); }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& get_sym() { return sym.get_wrp(); }
+    using sym_type = typename WrpType<T>::ref_type;
+    sym_type get_sym() { return sym.get_wrp(); }
     AsmRef<T> operator &() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
@@ -319,7 +309,8 @@ class AsmFSym {
     FarPtr<T> sym;
 
 public:
-    FarPtr<T> get_sym() { return sym; }
+    using sym_type = decltype(sym);
+    sym_type get_sym() { return sym; }
 
     AsmFSym() = default;
     AsmFSym(const AsmFSym<T> &) = delete;
@@ -381,17 +372,9 @@ class ArSymBase {
 protected:
     FarPtrBase<T> sym;
 
+    using wrp_type = typename WrpType<T>::type;
 public:
-    template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](int idx) {
-        _assert(!max_len || idx < max_len);
-        return sym[idx];
-    }
-
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](int idx) {
+    wrp_type& operator [](int idx) {
         _assert(!max_len || idx < max_len);
         return sym[idx];
     }
@@ -426,6 +409,7 @@ template<typename T, int max_len, int (*F)(void)>
 class ArMemb : public MembBase<T, F> {
     T sym[max_len];
 
+    using wrp_type = typename WrpType<T>::type;
 public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
@@ -451,17 +435,7 @@ public:
     FarPtr<T> operator +(int inc) { return this->lookup_sym() + inc; }
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
 
-    template <typename T1 = T,
-        typename std::enable_if<std::is_class<T1>::value>::type* = nullptr>
-    SymWrp<T1>& operator [](int idx) {
-        _assert(!max_len || idx < max_len);
-        FarPtr<T> f = this->lookup_sym();
-        return f[idx];
-    }
-
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_class<T1>::value>::type* = nullptr>
-    SymWrp2<T1>& operator [](int idx) {
+    wrp_type& operator [](int idx) {
         _assert(!max_len || idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
@@ -473,7 +447,8 @@ public:
 template<typename T, int max_len = 0>
 class AsmArNSym : public ArSymBase<T, max_len> {
 public:
-    T* get_sym() { return this->sym.get_ptr(); }
+    using sym_type = T*;
+    sym_type get_sym() { return this->sym.get_ptr(); }
 
     AsmArNSym() = default;
     AsmArNSym(const AsmArNSym<T> &) = delete;
@@ -482,7 +457,8 @@ public:
 template<typename T, int max_len = 0>
 class AsmArFSym : public ArSymBase<T, max_len> {
 public:
-    FarPtr<T> get_sym() { return this->sym; }
+    using sym_type = FarPtr<T>;
+    sym_type get_sym() { return this->sym; }
 
     AsmArFSym() = default;
     AsmArFSym(const AsmArFSym<T> &) = delete;
@@ -506,7 +482,8 @@ class AsmFarPtr {
     FarPtr<FarPtrBase<T>> ptr;
 
 public:
-    FarPtrBase<T>& get_sym() { return *ptr.get_ptr(); }
+    using sym_type = FarPtrBase<T>&;
+    sym_type get_sym() { return *ptr.get_ptr(); }
     FarPtrAsm<T> operator &() { return FarPtrAsm<T>(ptr); }
 
     AsmFarPtr() = default;
@@ -519,7 +496,8 @@ class AsmNearPtr {
     FarPtr<NearPtr<T, SEG>> ptr;
 
 public:
-    NearPtr<T, SEG>& get_sym() { return *ptr.get_ptr(); }
+    using sym_type = NearPtr<T, SEG>&;
+    sym_type get_sym() { return *ptr.get_ptr(); }
 
     AsmNearPtr() = default;
     AsmNearPtr(const AsmNearPtr<T, SEG> &) = delete;
