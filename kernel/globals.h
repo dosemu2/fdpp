@@ -152,9 +152,6 @@ typedef BYTE *UPMAP;
 extern COUNT *error_tos,        /* error stack                          */
   disk_api_tos,                 /* API handler stack - disk fns         */
   char_api_tos;                 /* API handler stack - char fns         */
-extern BYTE FAR _HMATextAvailable,      /* first byte of available CODE area    */
-  FAR _HMATextStart[],          /* first byte of HMAable CODE area      */
-  FAR _HMATextEnd[];            /* and the last byte of it              */
 extern
 BYTE DosLoadedInHMA;            /* if InitHMA has moved DOS up          */
 
