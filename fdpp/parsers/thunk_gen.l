@@ -38,7 +38,7 @@
 "WORD"		{ return WORD; }
 "COUNT"		{ return WORD; }
 "BOOL"		{ return WORD; }
-"char"		{ return BYTE; }
+"char"		{ return CHAR; }
 "short"		{ return WORD; }
 "int"		{ return INT; }
 "unsigned"	{ return UINT; }

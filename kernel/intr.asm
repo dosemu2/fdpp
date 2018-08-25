@@ -94,7 +94,7 @@
 
 segment	HMA_TEXT
 
-;; COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, BYTE * lp)
+;; COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, char * lp)
     global RES_DOSEXEC
 RES_DOSEXEC:
         pop es                  ; ret address

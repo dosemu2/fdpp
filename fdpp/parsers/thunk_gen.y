@@ -35,6 +35,9 @@ static char atype[256];
 static char atype2[256];
 static char atype3[256];
 static char rtbuf[256];
+/* conversion types for flat pointers */
+enum { CVTYPE_OTHER, CVTYPE_VOID, CVTYPE_CHAR };
+static int cvtype;
 
 
 static void beg_arg(void)
@@ -43,6 +46,7 @@ static void beg_arg(void)
     is_ptr = 0;
     is_void = 0;
     is_const = 0;
+    cvtype = CVTYPE_OTHER;
     atype[0] = 0;
     atype2[0] = 0;
     atype3[0] = 0;
@@ -85,14 +89,15 @@ static void do_start_arg(int anum)
 		strcat(abuf, "_ARG_PTR_A(");
 		break;
 	    case 2:
-		switch (arg_size) {
-		case 0:
+		/* flat pointers need conversion to far */
+		switch (cvtype) {
+		case CVTYPE_VOID:
 		    sprintf(abuf + strlen(abuf), "_CNV_PTR_VOID, _L_REF(%i)", arg_num + 2);
 		    break;
-		case 1:
+		case CVTYPE_CHAR:
 		    strcat(abuf, "_CNV_PTR_CHAR, _L_NONE");
 		    break;
-		default:
+		case CVTYPE_OTHER:
 		    strcat(abuf, "_CNV_PTR, _L_NONE");
 		    break;
 		}
@@ -191,7 +196,8 @@ static const char *get_flags(void)
 %}
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
-%token VOID WORD UWORD BYTE UBYTE INT UINT LONG ULONG DWORD UDWORD STRUCT CONST
+%token VOID WORD UWORD CHAR BYTE UBYTE INT UINT LONG ULONG DWORD UDWORD STRUCT
+%token CONST
 %token NORETURN
 
 %define api.value.type union
@@ -305,15 +311,25 @@ rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
 		| BYTE		{ strcpy(rbuf, "\t\t_RSZ = 1;\n\t\t_RET = ");
 				  strcpy(rtbuf, "BYTE");
 				}
+		| CHAR		{ strcpy(rbuf, "\t\t_RSZ = 1;\n\t\t_RET = ");
+				  strcpy(rtbuf, "char");
+				}
 		| UBYTE		{ strcpy(rbuf, "\t\t_RSZ = 1;\n\t\t_RET = ");
 				  strcpy(rtbuf, "UBYTE");
 				}
 ;
 
 atype:		  VOID		{
-				   arg_size = 0;
-				   strcpy(atype, "VOID");
-				   is_void = 1;
+				  arg_size = 0;
+				  cvtype = CVTYPE_VOID;
+				  strcpy(atype, "VOID");
+				  is_void = 1;
+				}
+		| CHAR		{
+				  arg_size = 1;
+				  cvtype = CVTYPE_CHAR;
+				  strcpy(atype, "char");
+				  strcpy(atype3, "WORD");
 				}
 		| WORD		{
 				  arg_size = 2;
