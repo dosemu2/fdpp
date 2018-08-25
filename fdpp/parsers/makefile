@@ -1,3 +1,4 @@
+-include config.mak
 XCPU ?= 386
 srcdir ?= $(CURDIR)
 include $(srcdir)/../../mkfiles/gcc.mak
