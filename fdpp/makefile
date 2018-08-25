@@ -159,7 +159,7 @@ $(PPOBJS): %.obj: %.asm
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(GEN_CC): %.cc: $(SRC)%.c makefile
-	$(srcdir)/parsers/mkfar.sh FAR __FAR $< >$@
+	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) $(LDFLAGS) -o $@ $^
