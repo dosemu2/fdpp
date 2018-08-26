@@ -55,7 +55,7 @@ unsigned char check_handle_break(__DOSFAR(struct dhdr) *pdev)
 {
   unsigned char c = CTL_C;
   if (!ctrl_break_pressed())
-    c = (unsigned char)ndread(__ASMADDR(syscon));
+    c = (unsigned char)ndread(&syscon);
   if (c != CTL_C && *pdev != syscon)
     c = (unsigned char)ndread(pdev);
   if (c == CTL_C)

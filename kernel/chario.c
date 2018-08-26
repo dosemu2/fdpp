@@ -317,7 +317,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
         break;
       }
       if (check_break && *pdev != syscon)
-        check_handle_break(__ASMADDR(syscon));
+        check_handle_break(&syscon);
       /* the idle int is only safe if we're using the character stack */
       if (user_r->AH < 0xd)
         DosIdle_int();

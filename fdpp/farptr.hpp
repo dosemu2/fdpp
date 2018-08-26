@@ -296,7 +296,7 @@ class AsmSym {
 public:
     using sym_type = typename WrpType<T>::ref_type;
     sym_type get_sym() { return sym.get_wrp(); }
-    AsmRef<T> operator &() { return AsmRef<T>(&sym); }
+    AsmRef<T> get_addr() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
     AsmSym() = default;
@@ -484,7 +484,7 @@ class AsmFarPtr {
 public:
     using sym_type = FarPtrBase<T>&;
     sym_type get_sym() { return *ptr.get_ptr(); }
-    FarPtrAsm<T> operator &() { return FarPtrAsm<T>(ptr); }
+    FarPtrAsm<T> get_addr() { return FarPtrAsm<T>(ptr); }
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
@@ -539,7 +539,7 @@ public:
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMNEAR(t, s) AsmNearPtr<t, s>
 #define __ASMREF(f) f.get_ref()
-#define __ASMADDR(v) &__##v
+#define __ASMADDR(v) __##v.get_addr()
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>

@@ -83,8 +83,8 @@ VOID ASMCFUNC FreeDOSmain(void)
   DosDataSeg = (__segment) & DATASTART;
   DosTextSeg = (__segment) & prn_dev;
 #endif
-  setDS(FP_SEG(__ASMADDR(DATASTART)));
-  setES(FP_SEG(__ASMADDR(DATASTART)));
+  setDS(FP_SEG(&DATASTART));
+  setES(FP_SEG(&DATASTART));
 
   /* clear the Init BSS area (what normally the RTL does */
   memset(_ib_start, 0, _ib_end - _ib_start);
