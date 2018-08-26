@@ -111,7 +111,6 @@ CFILES = blockio.c \
     nls.c \
     strings.c \
     sysclk.c \
-    syspack.c \
     systime.c \
     task.c \
     config.c \
