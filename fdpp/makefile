@@ -1,7 +1,3 @@
-#
-# Makefile for kernel.sys  (originally for Borland C/C++ 3.1)
-#
-
 -include config.mak
 srcdir ?= $(CURDIR)
 lib_path ?= ../lib
