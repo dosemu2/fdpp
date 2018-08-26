@@ -39,22 +39,9 @@ static struct far_s *near_wrp;
 static int num_wrps;
 static jmp_buf *noret_jmp;
 
-#define SEMIC ;
-#define __ASM(t, v) __ASMSYM(t) __##v
-#define __ASM_FAR(t, v) __ASMFAR(t) __##v
-#define __ASM_NEAR(t, v) __ASMNEAR(t, data_seg) __##v
-#define __ASM_ARR(t, v, l) __ASMARSYM(t, l) __##v
-#define __ASM_ARRI(t, v) __ASMARISYM(t) __##v
-#define __ASM_ARRI_F(t, v) __ASMARIFSYM(t) __##v
-#define __ASM_FUNC(v) __ASMFSYM(void) __##v
-#include "glob_asm.h"
-#undef __ASM
-#undef __ASM_FAR
-#undef __ASM_NEAR
-#undef __ASM_ARR
-#undef __ASM_ARRI
-#undef __ASM_ARRI_F
-#undef __ASM_FUNC
+#define _E
+#include "glob_tmpl.h"
+#undef _E
 
 static union asm_thunks_u {
   struct _thunks {
@@ -65,6 +52,7 @@ static union asm_thunks_u {
 #define __ASM_ARRI(t, v) struct far_s * __##v
 #define __ASM_ARRI_F(t, v) struct far_s * __##v
 #define __ASM_FUNC(v) struct far_s * __##v
+#define SEMIC ;
 #include "glob_asm.h"
 #undef __ASM
 #undef __ASM_FAR
@@ -73,10 +61,10 @@ static union asm_thunks_u {
 #undef __ASM_ARRI
 #undef __ASM_ARRI_F
 #undef __ASM_FUNC
+#undef SEMIC
   } thunks;
   struct far_s * arr[sizeof(struct _thunks) / sizeof(struct far_s *)];
 } asm_thunks = {{
-#undef SEMIC
 #define SEMIC ,
 #define __ASM(t, v) __ASMREF(__##v)
 #define __ASM_FAR(t, v) __ASMREF(__##v)

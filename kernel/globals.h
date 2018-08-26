@@ -61,6 +61,9 @@ static BYTE *Globals_hRcsId =
 #include "lol.h"
 #include "nls.h"
 #include "dyn.h"
+#ifdef __GNUC__
+#include "glob_inc.h"
+#endif
 
 /* fatfs.c */
 #ifdef WITHFAT32
@@ -195,25 +198,6 @@ struct lowvec {
   unsigned char intno;
   intvec isv;
 };
-
-#define __ASM(t, v) extern __ASMSYM(t) __##v
-#define __ASM_FAR(t, v) extern __ASMFAR(t) __##v
-#define __ASM_NEAR(t, v) extern __ASMNEAR(t, data_seg) __##v
-#define __ASM_ARR(t, v, l) extern __ASMARSYM(t, l) __##v
-#define __ASM_ARRI(t, v) extern __ASMARISYM(t) __##v
-#define __ASM_ARRI_F(t, v) extern __ASMARIFSYM(t) __##v
-#define __ASM_FUNC(v) extern __ASMFSYM(void) __##v
-#define SEMIC ;
-#include "glob_asm.h"
-#undef __ASM
-#undef __ASM_FAR
-#undef __ASM_NEAR
-#undef __ASM_ARR
-#undef __ASM_ARRI
-#undef __ASM_ARRI_F
-#undef __ASM_FUNC
-#undef SEMIC
-#include "glob_asmdefs.h"
 
 enum {LOC_CONV=0, LOC_HMA=1};
 extern __FAR(char) firstAvailableBuf;
