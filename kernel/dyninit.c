@@ -38,13 +38,9 @@ additionally:
 #include "portab.h"
 #include "globals.h"
 #include "init-mod.h"
+#include "dyn.h"
 #include "dyndata.h"
 #include "debug.h"
-
-struct DynS {
-  unsigned Allocated;
-  AR_MEMB(struct DynS, char, Buffer, 0);
-};
 
 #ifndef __TURBOC__
 #include "init-dat.h"

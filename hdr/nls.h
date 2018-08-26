@@ -27,6 +27,8 @@
 /* Cambridge, MA 02139, USA.                                    */
 /****************************************************************/
 
+#ifndef NLS_H
+#define NLS_H
 /*
  *	Description of the organization of NLS information -- 2000/02/13 ska
  *
@@ -604,6 +606,13 @@ struct nlsCSys_loadPackage {
 	struct nlsPackage csys_pkg;
 } PACKED;
 
+struct _nlsCountryInfoHardcoded {
+  char  ThisIsAConstantOne;
+  short TableSize;
+
+  struct CountrySpecificInfo C;
+};
+
 #ifdef DEBUG
         /* Enable debugging of NLS part */
 
@@ -611,4 +620,5 @@ struct nlsCSys_loadPackage {
            _a_lot_ of noise. */
 /*& #define NLS_DEBUG */
 
+#endif
 #endif

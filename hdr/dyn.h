@@ -9,17 +9,12 @@
     moveable and Dyn.Buffer resizable, but not before
 */
 
-#ifndef DYNDATA_H
-#define DYNDATA_H
+#ifndef DYN_H
+#define DYN_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-far_t DynAlloc(const char *what, unsigned num, unsigned size);
-far_t DynLast(void);
-void DynFree(void *ptr);
-#ifdef __cplusplus
-}
-#endif
+struct DynS {
+  unsigned Allocated;
+  AR_MEMB(struct DynS, char, Buffer, 0);
+};
 
 #endif

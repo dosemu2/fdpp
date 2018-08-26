@@ -145,13 +145,6 @@ extern char master_env[128];
 
 extern ASMREF(struct lol) LoL;
 
-struct _nlsCountryInfoHardcoded {
-  char  ThisIsAConstantOne;
-  short TableSize;
-
-  struct CountrySpecificInfo C;
-};
-
 /*
     data shared between DSK.C and INITDISK.C
 */

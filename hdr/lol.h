@@ -26,6 +26,9 @@
 /* Boston, MA  02111-1307  USA.                                 */
 /****************************************************************/
 
+#ifndef LOL_H
+#define LOL_H
+
 //enum {LOC_CONV=0, LOC_HMA=1};
 
 /* note: we start at DOSDS:0, but the "official" list of lists starts a
@@ -89,3 +92,4 @@ struct lol {
 #endif
 } PACKED;
 
+#endif

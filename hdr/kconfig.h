@@ -29,6 +29,10 @@
 		Release: 0 if released version, >0 for svn builds (e.g. svn revision #)
 
 */
+
+#ifndef KCONFIG_H
+#define KCONFIG_H
+
 typedef struct _KernelConfig {
   char CONFIG[6];               /* "CONFIG" */
   unsigned short ConfigSize;
@@ -47,3 +51,5 @@ typedef struct _KernelConfig {
   unsigned short Version_Release;
 
 } KernelConfig;
+
+#endif
