@@ -10,6 +10,7 @@ if [ ! -f configure ]; then
     echo "srcdir = $SCRIPTPATH/fdpp" >config.mak
     echo "lib_path = $lib_path" >>config.mak
     echo "utils_path = $utils_path" >>config.mak
+    mkdir parsers 2>/dev/null
     cd parsers
     echo "srcdir = $SCRIPTPATH/fdpp/parsers" >config.mak
     cd ../..

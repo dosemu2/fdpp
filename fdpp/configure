@@ -7,6 +7,7 @@ if [ ! -f configure ]; then
     echo "srcdir = $SCRIPTPATH" >config.mak
     echo "lib_path = $lib_path" >>config.mak
     echo "utils_path = $utils_path" >>config.mak
+    mkdir parsers 2>/dev/null
     cd parsers
     echo "srcdir = $SCRIPTPATH/parsers" >config.mak
     cd ..

@@ -187,8 +187,7 @@ glob_asmdefs.h: $(srcdir)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< $@
 
 parsers/thunk_gen:
-	if [ ! -d parsers ]; then \
-	    mkdir parsers ; \
+	if [ ! -f parsers/makefile ]; then \
 	    ln -s $(abspath $(srcdir))/parsers/makefile parsers/makefile ; \
 	fi
 	cd parsers && make srcdir=$(abspath $(srcdir))/parsers

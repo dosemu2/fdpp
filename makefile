@@ -95,7 +95,7 @@ endif
 
 define mdir
 	if [ ! -f $(1)/makefile ]; then \
-	    mkdir $(1) ; \
+	    mkdir $(1) 2>/dev/null ; \
 	    ln -s $(srcdir)/$(1)/makefile $(1)/makefile ; \
 	fi
 	cd $(1) && $(MAKE) srcdir=$(srcdir)/$(1) $(2)
