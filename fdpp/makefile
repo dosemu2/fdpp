@@ -88,6 +88,8 @@ _PPHDRS = $(PLPHDRS) dosobj.h farhlp.h thunks_priv.h thunks.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
+# dont change file order as it matches the gen script
+GEN_TMP = plt.inc plt_asmc.inc plt_asmp.inc thunk_calls.tmp thunk_asms.tmp
 GEN_CC = $(CFILES:.c=.cc)
 HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(GEN_HEADERS) $(PPHDRS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
@@ -172,29 +174,14 @@ plt.asm: $(srcdir)/plt.S $(srcdir)/glob_asm.h
 cdata.asm: $(srcdir)/cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
-thunk_calls.tmp: $(SRC)proto.h makefile
-	grep ASMCFUNC $< | sed -e 's/__FAR(\([^)]\+\))/\1 FAR */g' \
-		-e 's/__DOSFAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
-
-plt.inc: thunk_calls.tmp
-	grep ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_f \4,\t\t\1,\t\3/' >$@
-	grep -v ") FAR " $< | sed 's/\([0-9]\+\).\+ \(SEGM(\(.\+\))\).* \([^ (]\+\) *(.*/asmcfunc_n \4,\t\t\1,\t\3/' >>$@
+$(GEN_TMP): $(SRC)proto.h
+	$(srcdir)/parsers/parse_decls.sh $< $(GEN_TMP) $(srcdir)/parsers
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
-	cat $< | parsers/thunk_gen >$@ || (rm -f $@ ; false)
-
-thunk_asms.tmp: $(SRC)proto.h makefile
-	grep 'ASMFUNC\|ASMPASCAL' $< | grep -v "//" | \
-		sed 's/__FAR(\([^)]\+\))/\1 FAR */g' | nl -n ln -v 0 >$@
+	parsers/thunk_gen <$< >$@ || (rm -f $@ ; false)
 
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
-	cat $< | parsers/thunk_gen 1 >$@ || (rm -f $@ ; false)
-
-plt_asmc.inc: thunk_asms.tmp makefile
-	grep ASMFUNC $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmcsym \2,\t\t\1/' >$@
-
-plt_asmp.inc: thunk_asms.tmp makefile
-	grep ASMPASCAL $< | sed 's/\([0-9]\+\).\+ \([^ (]\+\) *(.\+/asmpsym \U\2,\t\t\1/' >$@
+	parsers/thunk_gen 1 <$< >$@ || (rm -f $@ ; false)
 
 glob_asmdefs.h: $(srcdir)/glob_asm.h makefile
 	grep "__ASM(" $< | grep -v '^/' | \

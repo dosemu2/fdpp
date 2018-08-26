@@ -16,6 +16,7 @@ Source0: %{name}-%{version}.tar.gz
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: sed
+BuildRequires: bash
 BuildRequires: clang
 BuildRequires: nasm
 BuildRequires: libstdc++-devel
