@@ -183,21 +183,8 @@ thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
 	parsers/thunk_gen 1 <$< >$@ || (rm -f $@ ; false)
 
-glob_asmdefs.h: $(srcdir)/glob_asm.h makefile
-	grep "__ASM(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >$@
-	grep "__ASM_ARR(" $< | grep -v '^/' | \
-		sed 's/.\+(.\+, \(.\+\), .\+).*/#define \1 __ASYM(__\1)/' >>$@
-	grep "__ASM_ARRI(" $< | grep -v '^/' | \
-		sed 's/.\+(.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
-	grep "__ASM_ARRI_F(" $< | grep -v '^/' | \
-		sed 's/.\+(.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
-	grep "__ASM_FAR(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
-	grep "__ASM_NEAR(" $< | grep -v '^/' | \
-		sed 's/.\+, \(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
-	grep "__ASM_FUNC(" $< | grep -v '^/' | \
-		sed 's/.\+(\(.\+\)).*/#define \1 __ASYM(__\1)/' >>$@
+glob_asmdefs.h: $(srcdir)/glob_asm.h
+	$(srcdir)/parsers/mkasmdefs.sh $< $@
 
 parsers/thunk_gen:
 	if [ ! -d parsers ]; then \
