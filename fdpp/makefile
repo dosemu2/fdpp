@@ -85,7 +85,7 @@ PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
 # dont change file order as it matches the gen script
-GEN_TMP = plt.inc plt_asmc.inc plt_asmp.inc thunk_calls.tmp thunk_asms.tmp
+GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
 GEN_CC = $(CFILES:.c=.cc)
 HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(GEN_HEADERS) $(PPHDRS)
 INITHEADERS=$(HDRS) init-mod.h init-dat.h
@@ -170,8 +170,17 @@ plt.asm: $(srcdir)/plt.S $(srcdir)/glob_asm.h
 cdata.asm: $(srcdir)/cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
 
-$(GEN_TMP): $(SRC)proto.h
-	$(srcdir)/parsers/parse_decls.sh $< $(GEN_TMP) $(srcdir)/parsers
+_pos = $(if $(findstring $1,$2),$(call _pos,$1,\
+       $(wordlist 2,$(words $2),$2),x $3),$3)
+pos = $(words $(call _pos,$1,$2))
+pars =	srcdir=$(srcdir)/parsers \
+	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@
+$(filter %.tmp,$(GEN_TMP)): $(SRC)proto.h
+	$(pars)
+plt.inc: thunk_calls.tmp
+	$(pars)
+plt_asmc.inc plt_asmp.inc: thunk_asms.tmp
+	$(pars)
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
 	parsers/thunk_gen <$< >$@ || (rm -f $@ ; false)
@@ -186,7 +195,7 @@ parsers/thunk_gen:
 	if [ ! -f parsers/makefile ]; then \
 	    ln -s $(abspath $(srcdir))/parsers/makefile parsers/makefile ; \
 	fi
-	cd parsers && make srcdir=$(abspath $(srcdir))/parsers
+	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers
 
 install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
