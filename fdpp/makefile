@@ -189,7 +189,7 @@ thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
 	parsers/thunk_gen 1 <$< >$@ || (rm -f $@ ; false)
 
 glob_asmdefs.h: $(srcdir)/glob_asm.h
-	$(srcdir)/parsers/mkasmdefs.sh $< $@
+	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
 parsers/thunk_gen:
 	if [ ! -f parsers/makefile ]; then \
