@@ -282,7 +282,7 @@ BOOL dir_write_update(REG f_node_ptr fnp, BOOL update)
 }
 
 #ifndef IPL
-COUNT dos_findfirst(UCOUNT attr, BYTE * name)
+COUNT dos_findfirst(UCOUNT attr, const char * name)
 {
   REG f_node_ptr fnp;
   REG dmatch *dmp = &sda_tmp_dm;
@@ -406,7 +406,7 @@ COUNT dos_findnext(void)
 
     so we have to work from the last blank backward
 */
-void ConvertName83ToNameSZ(BYTE FAR * destSZ, BYTE FAR * srcFCBName)
+void ConvertName83ToNameSZ(char FAR * destSZ, const char FAR * srcFCBName)
 {
   int loop;
   int noExtension = FALSE;

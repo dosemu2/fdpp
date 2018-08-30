@@ -28,7 +28,7 @@
 
 #ifdef MAIN
 #ifdef VERSION_STRINGS
-static BYTE *Proto_hRcsId =
+static const char *Proto_hRcsId =
     "$Id: proto.h 1491 2009-07-18 20:48:44Z bartoldeman $";
 #endif
 #endif
@@ -93,24 +93,24 @@ long DosOpen(__FAR(char) fname, unsigned flags, unsigned attrib);
 COUNT CloneHandle(unsigned hndl);
 long DosDup(unsigned Handle);
 COUNT DosForceDup(unsigned OldHandle, unsigned NewHandle);
-long DosOpenSft(__FAR(char) fname, unsigned flags, unsigned attrib);
+long DosOpenSft(__FAR(const char) fname, unsigned flags, unsigned attrib);
 COUNT DosClose(COUNT hndl);
 COUNT DosCloseSft(int sft_idx, BOOL commitonly);
 #define DosCommit(hndl) DosCloseSft(get_sft_idx(hndl), TRUE)
 UWORD DosGetFree(UBYTE drive, UWORD * navc, UWORD * bps, UWORD * nc);
-COUNT DosGetCuDir(UBYTE drive,__FAR(BYTE) s);
-COUNT DosChangeDir(__FAR(BYTE) s);
-COUNT DosFindFirst(UCOUNT attr,__FAR(BYTE) name);
+COUNT DosGetCuDir(UBYTE drive,__FAR(char) s);
+COUNT DosChangeDir(__FAR(const char) s);
+COUNT DosFindFirst(UCOUNT attr,__FAR(const char) name);
 COUNT DosFindNext(void);
 COUNT DosGetFtime(COUNT hndl, date * dp, _time * tp);
 COUNT DosSetFtimeSft(int sft_idx, date dp, _time tp);
 #define DosSetFtime(hndl, dp, tp) DosSetFtimeSft(get_sft_idx(hndl), (dp), (tp))
-COUNT DosGetFattr(__FAR(BYTE) name);
-COUNT DosSetFattr(__FAR(BYTE) name, UWORD attrp);
+COUNT DosGetFattr(__FAR(const char) name);
+COUNT DosSetFattr(__FAR(const char) name, UWORD attrp);
 UBYTE DosSelectDrv(UBYTE drv);
-COUNT DosDelete(__FAR(BYTE) path, int attrib);
-COUNT DosRename(__FAR(BYTE) path1,__FAR(BYTE) path2);
-COUNT DosRenameTrue(BYTE * path1, BYTE * path2, int attrib);
+COUNT DosDelete(__FAR(const char) path, int attrib);
+COUNT DosRename(__FAR(const char) path1,__FAR(const char) path2);
+COUNT DosRenameTrue(const char * path1, const char * path2, int attrib);
 COUNT DosMkRmdir(__FAR(const char) dir, int action);
 __FAR(struct dhdr)IsDevice(__FAR(const char) FileName);
 BOOL IsShareInstalled(BOOL recheck);
@@ -132,8 +132,8 @@ VOID ASMFUNC DosIdle_hlt(void);
 
 /* error.c */
 VOID dump(void);
-VOID panic(const BYTE * s);
-VOID fatal(const BYTE * err_msg);
+VOID panic(const char * s);
+VOID fatal(const char * err_msg);
 
 /* fatdir.c */
 VOID dir_init_fnode(f_node_ptr fnp, CLUSTER dirstart);
@@ -141,9 +141,9 @@ f_node_ptr dir_open(const char *dirname, BOOL split, f_node_ptr fnp);
 COUNT dir_read(REG f_node_ptr fnp);
 BOOL dir_write_update(REG f_node_ptr fnp, BOOL update);
 #define dir_write(fnp) dir_write_update(fnp, FALSE)
-COUNT dos_findfirst(UCOUNT attr, BYTE * name);
+COUNT dos_findfirst(UCOUNT attr, const char * name);
 COUNT dos_findnext(void);
-void ConvertName83ToNameSZ(__FAR(BYTE) destSZ,__FAR(BYTE) srcFCBName);
+void ConvertName83ToNameSZ(__FAR(char) destSZ,__FAR(const char) srcFCBName);
 const char *ConvertNameSZToName83(char *destFCBName, const char *srcSZ);
 
 /* fatfs.c */
@@ -152,14 +152,14 @@ ULONG clus2phys(CLUSTER cl_no,__FAR(struct dpb) dpbp);
 int dos_open(char * path, unsigned flag, unsigned attrib, int fd);
 BOOL fcbmatch(const char *fcbname1, const char *fcbname2);
 BOOL fcmp_wild(const char * s1, const char * s2, unsigned n);
-VOID touc(BYTE * s, COUNT n);
+//VOID touc(BYTE * s, COUNT n);
 COUNT dos_close(COUNT fd);
-COUNT dos_delete(BYTE * path, int attrib);
-COUNT dos_rmdir(BYTE * path);
-COUNT dos_rename(BYTE * path1, BYTE * path2, int attrib);
+COUNT dos_delete(const char * path, int attrib);
+COUNT dos_rmdir(const char * path);
+COUNT dos_rename(const char * path1, const char * path2, int attrib);
 date dos_getdate(void);
 _time dos_gettime(void);
-COUNT dos_mkdir(BYTE * dir);
+COUNT dos_mkdir(const char * dir);
 BOOL last_link(f_node_ptr fnp);
 COUNT map_cluster(REG f_node_ptr fnp, COUNT mode);
 long rwblock(COUNT fd,__FAR(VOID) buffer, UCOUNT count, int mode);
@@ -173,8 +173,8 @@ f_node_ptr split_path(const char *, f_node_ptr fnp);
 
 int dos_cd(char * PathName);
 
-COUNT dos_getfattr(BYTE * name);
-COUNT dos_setfattr(BYTE * name, UWORD attrp);
+COUNT dos_getfattr(const char * name);
+COUNT dos_setfattr(const char * name, UWORD attrp);
 COUNT media_check(__FAR(REG struct dpb) dpbp);
 f_node_ptr xlt_fd(COUNT fd);
 COUNT xlt_fnp(f_node_ptr fnp);
@@ -190,7 +190,7 @@ CLUSTER next_cluster(__FAR(struct dpb) dpbp, REG CLUSTER ClusterNum);
 BOOL is_free_cluster(__FAR(struct dpb) dpbp, REG CLUSTER ClusterNum);
 
 /* fcbfns.c */
-VOID DosOutputString(__FAR(BYTE) s);
+VOID DosOutputString(__FAR(const char) s);
 int DosCharInputEcho(VOID);
 int DosCharInput(VOID);
 VOID DosDirectConsoleIO(__FAR(iregs) r);
@@ -198,11 +198,11 @@ VOID DosCharOutput(COUNT c);
 VOID DosDisplayOutput(COUNT c);
 __FAR(UBYTE)FatGetDrvData(UBYTE drive, UBYTE * spc, UWORD * bps,
                    UWORD * nc);
-UWORD FcbParseFname(UBYTE *wTestMode,__FAR(const BYTE)lpFileName,__FAR(fcb) lpFcb);
-__FAR(const BYTE)ParseSkipWh(__FAR(const BYTE) lpFileName);
-BOOL TestCmnSeps(__FAR(BYTE) lpFileName);
-BOOL TestFieldSeps(__FAR(BYTE) lpFileName);
-__FAR(const BYTE)GetNameField(__FAR(const BYTE) lpFileName,__FAR(BYTE) lpDestField,
+UWORD FcbParseFname(UBYTE *wTestMode,__FAR(const char) lpFileName,__FAR(fcb) lpFcb);
+__FAR(const char)ParseSkipWh(__FAR(const char) lpFileName);
+BOOL TestCmnSeps(__FAR(const char) lpFileName);
+BOOL TestFieldSeps(__FAR(const char) lpFileName);
+__FAR(const char)GetNameField(__FAR(const char) lpFileName,__FAR(char) lpDestField,
                        COUNT nFieldSize, BOOL * pbWildCard);
 UBYTE FcbReadWrite(__FAR(xfcb), UCOUNT, int);
 UBYTE FcbGetFileSize(__FAR(xfcb) lpXfcb);
@@ -352,8 +352,8 @@ __FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);
 
 /* sysclk.c */
 COUNT BcdToByte(COUNT x);
-COUNT BcdToWord(BYTE * x, UWORD * mon, UWORD * day, UWORD * yr);
-LONG WordToBcd(BYTE * x, UWORD * mon, UWORD * day, UWORD * yr);
+//COUNT BcdToWord(BYTE * x, UWORD * mon, UWORD * day, UWORD * yr);
+//LONG WordToBcd(BYTE * x, UWORD * mon, UWORD * day, UWORD * yr);
 
 /* syspack.c */
 #ifdef NONNATIVE
@@ -377,13 +377,13 @@ UWORD DaysFromYearMonthDay(UWORD Year, UWORD Month, UWORD DayOfMonth);
 VOID new_psp(seg para, seg cur_psp);
 VOID child_psp(seg para, seg cur_psp, int psize);
 VOID return_user(void);
-COUNT DosExec(COUNT mode,__FAR(exec_blk) ep,__FAR(BYTE) lp);
+COUNT DosExec(COUNT mode,__FAR(exec_blk) ep,__FAR(const char) lp);
 ULONG SftGetFsize(int sft_idx);
 VOID InitPSP(VOID);
 
 /* newstuff.c */
 int SetJFTSize(UWORD nHandles);
-long DosMkTmp(__FAR(BYTE) pathname, UWORD attr);
+long DosMkTmp(__FAR(char) pathname, UWORD attr);
 COUNT truename(__FAR(const char) src, char * dest, COUNT t);
 
 /* network.c */
@@ -397,8 +397,8 @@ DWORD ASMPASCAL network_redirector_mx(UWORD cmd, __FAR(void)s, UWORD arg);
 #define remote_printredir(dx,ax) (int)network_redirector_mx(REM_PRINTREDIR, MK_FP(0,dx), ax)
 #define QRemote_Fn(d,s) (int)network_redirector_mx(REM_FILENAME, d, GET_FP32(s))
 
-UWORD get_machine_name(__FAR(BYTE) netname);
-VOID set_machine_name(__FAR(BYTE) netname, UWORD name_num);
+UWORD get_machine_name(__FAR(char) netname);
+VOID set_machine_name(__FAR(const char) netname, UWORD name_num);
 
 /* procsupt.asm */
 VOID ASMFUNC NORETURN exec_user(__FAR(iregs) irp, BOOL disable_a20);

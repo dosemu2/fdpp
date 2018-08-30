@@ -67,7 +67,7 @@ int SetJFTSize(UWORD nHandles)
   return SUCCESS;
 }
 
-long DosMkTmp(BYTE FAR * pathname, UWORD attr)
+long DosMkTmp(char FAR * pathname, UWORD attr)
 {
   /* create filename from current date and time */
   char FAR *ptmp;

@@ -443,7 +443,7 @@ bits for flags (bits 11-8 are internal FreeDOS bits only)
                             (not implemented yet))
 */
 
-long DosOpenSft(char FAR * fname, unsigned flags, unsigned attrib)
+long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
 {
   COUNT sft_idx;
   sft FAR *sftp;
@@ -857,7 +857,7 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
 }
 #endif
 
-COUNT DosGetCuDir(UBYTE drive, BYTE FAR * s)
+COUNT DosGetCuDir(UBYTE drive, char FAR * s)
 {
   char path[3];
 
@@ -876,7 +876,7 @@ COUNT DosGetCuDir(UBYTE drive, BYTE FAR * s)
 }
 
 #undef CHDIR_DEBUG
-COUNT DosChangeDir(BYTE FAR * s)
+COUNT DosChangeDir(const char FAR * s)
 {
   COUNT result;
 
@@ -934,7 +934,7 @@ STATIC int pop_dmp(int rc, dmatch FAR * dmp)
   return rc;
 }
 
-COUNT DosFindFirst(UCOUNT attr, BYTE FAR * name)
+COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
 {
   int rc;
   REG dmatch FAR *dmp = (dmatch FAR *)dta;
@@ -1061,7 +1061,7 @@ COUNT DosSetFtimeSft(int sft_idx, date dp, _time tp)
   return SUCCESS;
 }
 
-COUNT DosGetFattr(BYTE FAR * name)
+COUNT DosGetFattr(const char FAR * name)
 {
   COUNT result;
 
@@ -1095,7 +1095,7 @@ COUNT DosGetFattr(BYTE FAR * name)
 /* This function is almost identical to DosGetFattr().
    Maybe it is nice to join both functions.
        -- 2001/09/03 ska*/
-COUNT DosSetFattr(BYTE FAR * name, UWORD attrp)
+COUNT DosSetFattr(const char FAR * name, UWORD attrp)
 {
   COUNT result;
 
@@ -1134,7 +1134,7 @@ UBYTE DosSelectDrv(UBYTE drv)
   return lastdrive;
 }
 
-COUNT DosDelete(BYTE FAR * path, int attrib)
+COUNT DosDelete(const char FAR * path, int attrib)
 {
   COUNT result;
 
@@ -1153,7 +1153,7 @@ COUNT DosDelete(BYTE FAR * path, int attrib)
   return dos_delete(PriPathName, attrib);
 }
 
-COUNT DosRenameTrue(BYTE * path1, BYTE * path2, int attrib)
+COUNT DosRenameTrue(const char * path1, const char * path2, int attrib)
 {
   if (path1[0] != path2[0])
   {
@@ -1165,7 +1165,7 @@ COUNT DosRenameTrue(BYTE * path1, BYTE * path2, int attrib)
   return dos_rename(path1, path2, attrib);
 }
 
-COUNT DosRename(BYTE FAR * path1, BYTE FAR * path2)
+COUNT DosRename(const char FAR * path1, const char FAR * path2)
 {
   COUNT result;
 

@@ -43,7 +43,7 @@ STATIC int find_fname(const char *path, int attr, f_node_ptr fnp);
     /* /// Added - Ron Cemer */
 STATIC int merge_file_changes(f_node_ptr fnp, int collect);
 STATIC BOOL find_free(f_node_ptr);
-STATIC int alloc_find_free(f_node_ptr fnp, char *path);
+STATIC int alloc_find_free(f_node_ptr fnp, const char *path);
 STATIC VOID wipe_out(f_node_ptr);
 STATIC CLUSTER extend(f_node_ptr);
 STATIC COUNT extend_dir(f_node_ptr);
@@ -420,7 +420,7 @@ STATIC COUNT delete_dir_entry(f_node_ptr fnp)
   return SUCCESS;
 }
 
-COUNT dos_delete(BYTE * path, int attrib)
+COUNT dos_delete(const char * path, int attrib)
 {
   REG f_node_ptr fnp = &fnode[0];
 
@@ -443,7 +443,7 @@ COUNT dos_delete(BYTE * path, int attrib)
     return ret;
 }
 
-COUNT dos_rmdir(BYTE * path)
+COUNT dos_rmdir(const char * path)
 {
   REG f_node_ptr fnp;
 
@@ -498,7 +498,7 @@ COUNT dos_rmdir(BYTE * path)
   return delete_dir_entry(fnp);
 }
 
-COUNT dos_rename(BYTE * path1, BYTE * path2, int attrib)
+COUNT dos_rename(const char * path1, const char * path2, int attrib)
 {
   REG f_node_ptr fnp1;
   REG f_node_ptr fnp2;
@@ -634,7 +634,7 @@ STATIC BOOL find_free(f_node_ptr fnp)
 /* alloc_find_free: resets the directory                          */
 /* Then finds a spare directory entry and if not                  */
 /* available, tries to extend the directory.                      */
-STATIC int alloc_find_free(f_node_ptr fnp, char *path)
+STATIC int alloc_find_free(f_node_ptr fnp, const char *path)
 {
   fnp = split_path(path, fnp);
 
@@ -786,7 +786,7 @@ STATIC int clear_dir(f_node_ptr fnp, CLUSTER cluster)
 /* create a directory - returns success or a negative error     */
 /* number                                                       */
 /*                                                              */
-COUNT dos_mkdir(BYTE * dir)
+COUNT dos_mkdir(const char * dir)
 {
   REG f_node_ptr fnp;
   CLUSTER free_fat, parent;
@@ -1517,14 +1517,14 @@ int dos_cd(char * PathName)
 #endif
 
 #ifndef IPL
-COUNT dos_getfattr(BYTE * name)
+COUNT dos_getfattr(const char * name)
 {
   f_node_ptr fnp = &fnode[0];
   int ret = find_fname(name, D_ALL, fnp);
   return ret == SUCCESS ? fnp->f_dir.dir_attrib : ret;
 }
 
-COUNT dos_setfattr(BYTE * name, UWORD attrp)
+COUNT dos_setfattr(const char * name, UWORD attrp)
 {
   f_node_ptr fnp;
   int rc;

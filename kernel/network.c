@@ -38,13 +38,13 @@ static BYTE *RcsId =
 /* see RBIL D-2152 and D-215D06 before attempting
    to change these two functions!
  */
-UWORD get_machine_name(BYTE FAR * netname)
+UWORD get_machine_name(char FAR * netname)
 {
   fmemcpy(netname, &net_name, 16);
   return (NetBios);
 }
 
-VOID set_machine_name(BYTE FAR * netname, UWORD name_num)
+VOID set_machine_name(const char FAR * netname, UWORD name_num)
 {
   NetBios = name_num;
   fmemcpy(&net_name, netname, 15);

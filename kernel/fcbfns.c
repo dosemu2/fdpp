@@ -88,7 +88,7 @@ UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 #define PARSE_RET_BADDRIVE      0xff
 
 #ifndef IPL
-UWORD FcbParseFname(UBYTE *wTestMode, const BYTE FAR * lpFileName, fcb FAR * lpFcb)
+UWORD FcbParseFname(UBYTE *wTestMode, const char FAR * lpFileName, fcb FAR * lpFcb)
 {
   WORD wRetCodeName = FALSE, wRetCodeExt = FALSE;
 
@@ -154,7 +154,7 @@ UWORD FcbParseFname(UBYTE *wTestMode, const BYTE FAR * lpFileName, fcb FAR * lpF
 
   /* Now to format the file name into the string                  */
   lpFileName =
-      GetNameField(lpFileName, (BYTE FAR *) lpFcb->fcb_fname, FNAME_SIZE,
+      GetNameField(lpFileName, lpFcb->fcb_fname, FNAME_SIZE,
                    (BOOL *) & wRetCodeName);
 
   /* Do we have an extension? If do, format it else return        */
@@ -167,7 +167,7 @@ UWORD FcbParseFname(UBYTE *wTestMode, const BYTE FAR * lpFileName, fcb FAR * lpF
   return FP_OFF(lpFileName);
 }
 
-const BYTE FAR * ParseSkipWh(const BYTE FAR * lpFileName)
+const char FAR * ParseSkipWh(const char FAR * lpFileName)
 {
   while (*lpFileName == ' ' || *lpFileName == '\t')
     ++lpFileName;
@@ -175,7 +175,7 @@ const BYTE FAR * ParseSkipWh(const BYTE FAR * lpFileName)
 }
 
 
-const BYTE FAR * GetNameField(const BYTE FAR * lpFileName, BYTE FAR * lpDestField,
+const char FAR * GetNameField(const char FAR * lpFileName, char FAR * lpDestField,
                        COUNT nFieldSize, BOOL * pbWildCard)
 {
   COUNT nIndex = 0;
@@ -540,7 +540,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       BYTE loc_szBuffer[2 + FNAME_SIZE + 1 + FEXT_SIZE + 1];
       fcb LocalFcb;
       BYTE *pToName;
-      const BYTE FAR *pFromPattern = Dmatch.dm_name;
+      const char FAR *pFromPattern = Dmatch.dm_name;
       int i;
       UBYTE mode = 0;
 

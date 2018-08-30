@@ -96,7 +96,7 @@ ULONG SftGetFsize(int sft_idx)
   return s->sft_size;
 }
 
-STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, char FAR * pathname)
+STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pathname)
 {
   BYTE FAR *pSrc;
   BYTE FAR *pDest;
@@ -238,12 +238,12 @@ void child_psp(seg para, seg cur_psp, int psize)
 }
 
 STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, exec_blk FAR * exb,
-                      BYTE FAR * fnam)
+                      const char FAR * fnam)
 {
   psp FAR *_psp;
   mcb FAR *pspmcb;
   int i;
-  BYTE FAR *np;
+  const char FAR *np;
 
   pspmcb = (mcb FAR *)MK_FP(pspseg, 0);
   ++pspseg;
@@ -398,7 +398,7 @@ STATIC int ExecMemAlloc(UWORD size, seg *para, UWORD *asize)
   return rc;
 }
 
-COUNT DosComLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
+STATIC COUNT DosComLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
 {
   UWORD mem;
   UWORD env, asize = 0;
@@ -557,7 +557,7 @@ VOID return_user(void)
   exec_user(q->ps_stack, 0);
 }
 
-COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
+STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
 {
   UWORD mem, env, start_seg, asize = 0;
   UWORD exe_size;
@@ -764,7 +764,7 @@ COUNT DosExeLoader(BYTE FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
 
    leb = local copy of exe block
  */
-COUNT DosExec(COUNT mode, exec_blk FAR * ep, BYTE FAR * lp)
+COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
 {
   COUNT rc;
   COUNT fd;
