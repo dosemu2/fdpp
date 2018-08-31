@@ -508,6 +508,9 @@ void enable(void)
 #define __CNV_PTR_CHAR(t, d, f, l) \
     _MK_FAR_STR(__##d, f); \
     t d = __MK_NEAR(__##d)
+#define __CNV_PTR_ARR(t, d, f, l) \
+    _MK_FAR_SZ(__##d, f, l); \
+    t d = __MK_NEAR(__##d)
 #define __CNV_PTR_VOID(t, d, f, l) \
     _MK_FAR_SZ(__##d, f, l); \
     t d = __MK_NEAR(__##d)
@@ -515,6 +518,7 @@ void enable(void)
 
 #define _CNV(c, at, l, n) c(at, _a##n, a##n, l)
 #define _L_REF(nl) a##nl
+#define _L_IMM(l) l
 
 #define _THUNK0_v(n, f, z) \
 void f(void) \

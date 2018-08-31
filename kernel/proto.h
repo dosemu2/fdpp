@@ -485,7 +485,7 @@ unsigned char ASMPASCAL share_check(void);
 DWORD ASMPASCAL call_nls(UWORD,__FAR(VOID), UWORD, UWORD, UWORD, UWORD);
 
 ULONG ASMPASCAL ReadPCClock(VOID);
-VOID ASMPASCAL WriteATClock(BYTE *, BYTE, BYTE, BYTE);
+VOID ASMPASCAL WriteATClock(BYTE [4], BYTE, BYTE, BYTE);
 VOID ASMPASCAL WritePCClock(ULONG);
 
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);

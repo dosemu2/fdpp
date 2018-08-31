@@ -33,6 +33,8 @@
 "FAR"		{ return FAR; }
 "far"		{ return FAR; }
 "*"		{ return ASTER; }
+"["		{ return LBR; }
+"]"		{ return RBR; }
 "VOID"		{ return VOID; }
 "void"		{ return VOID; }
 "WORD"		{ return WORD; }

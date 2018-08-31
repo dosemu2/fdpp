@@ -20,6 +20,7 @@ static int arg_num;
 static int arg_offs;
 static int arg_size;
 static int al_arg_size;
+static int arr_sz;
 static int is_ptr;
 static int is_rptr;
 static int is_far;
@@ -37,7 +38,7 @@ static char atype2[256];
 static char atype3[256];
 static char rtbuf[256];
 /* conversion types for flat pointers */
-enum { CVTYPE_OTHER, CVTYPE_VOID, CVTYPE_CHAR };
+enum { CVTYPE_OTHER, CVTYPE_VOID, CVTYPE_CHAR, CVTYPE_ARR };
 static int cvtype;
 
 
@@ -48,6 +49,7 @@ static void beg_arg(void)
     is_void = 0;
     is_const = 0;
     cvtype = CVTYPE_OTHER;
+    arr_sz = 0;
     atype[0] = 0;
     atype2[0] = 0;
     atype3[0] = 0;
@@ -97,6 +99,9 @@ static void do_start_arg(int anum)
 		    break;
 		case CVTYPE_CHAR:
 		    strcat(abuf, "_CNV_PTR_CHAR, _L_NONE");
+		    break;
+		case CVTYPE_ARR:
+		    sprintf(abuf + strlen(abuf), "_CNV_PTR_ARR, _L_IMM(%i)", arr_sz);
 		    break;
 		case CVTYPE_OTHER:
 		    strcat(abuf, "_CNV_PTR, _L_NONE");
@@ -198,6 +203,7 @@ static const char *get_flags(void)
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
 %token VOID WORD UWORD CHAR BYTE UBYTE INT UINT LONG ULONG DWORD UDWORD STRUCT
+%token LBR RBR
 %token CONST
 %token NORETURN
 
@@ -261,6 +267,7 @@ rquals:		  FAR ASTER	{ is_rfar = 1; is_rptr = 1; }
 
 quals:		  FAR quals	{ is_far = 1; }
 		| ASTER quals	{ is_ptr = 1; }
+		| LBR num RBR	{ is_ptr = 1; cvtype = CVTYPE_ARR; arr_sz = $2; }
 		|
 ;
 
