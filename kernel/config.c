@@ -34,7 +34,7 @@
 #include "debug.h"
 
 #ifdef VERSION_STRINGS
-static BYTE *RcsId =
+static const char *RcsId =
     "$Id: config.c 1705 2012-02-07 08:10:33Z perditionc $";
 #endif
 
@@ -173,46 +173,46 @@ BYTE  MenuSelected BSS_INIT(0);
 UCOUNT MenuLine BSS_INIT(0);
 UCOUNT Menus BSS_INIT(0);
 
-STATIC VOID CfgMenuColor(BYTE * pLine);
+STATIC VOID CfgMenuColor(char * pLine);
 
-STATIC VOID Config_Buffers(BYTE * pLine);
-STATIC VOID CfgBuffersHigh(BYTE * pLine);
-STATIC VOID sysScreenMode(BYTE * pLine);
-STATIC VOID sysVersion(BYTE * pLine);
-STATIC VOID CfgBreak(BYTE * pLine);
-STATIC VOID Device(BYTE * pLine);
-STATIC VOID DeviceHigh(BYTE * pLine);
-STATIC VOID Files(BYTE * pLine);
-STATIC VOID FilesHigh(BYTE * pLine);
-STATIC VOID Fcbs(BYTE * pLine);
-STATIC VOID CfgKeyBuf(BYTE * pLine);
-STATIC VOID CfgLastdrive(BYTE * pLine);
-STATIC VOID CfgLastdriveHigh(BYTE * pLine);
-STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode);
-STATIC VOID Dosmem(BYTE * pLine);
-STATIC VOID DosData(BYTE * pLine);
-STATIC VOID Country(BYTE * pLine);
-STATIC VOID InitPgm(BYTE * pLine);
-STATIC VOID InitPgmHigh(BYTE * pLine);
-STATIC VOID CmdInstall(BYTE * pLine);
-STATIC VOID CmdInstallHigh(BYTE * pLine);
-STATIC VOID CmdChain(BYTE * pLine);
-STATIC VOID CmdSet(BYTE * pLine);
+STATIC VOID Config_Buffers(char * pLine);
+STATIC VOID CfgBuffersHigh(char * pLine);
+STATIC VOID sysScreenMode(char * pLine);
+STATIC VOID sysVersion(char * pLine);
+STATIC VOID CfgBreak(char * pLine);
+STATIC VOID Device(char * pLine);
+STATIC VOID DeviceHigh(char * pLine);
+STATIC VOID Files(char * pLine);
+STATIC VOID FilesHigh(char * pLine);
+STATIC VOID Fcbs(char * pLine);
+STATIC VOID CfgKeyBuf(char * pLine);
+STATIC VOID CfgLastdrive(char * pLine);
+STATIC VOID CfgLastdriveHigh(char * pLine);
+STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode);
+STATIC VOID Dosmem(char * pLine);
+STATIC VOID DosData(char * pLine);
+STATIC VOID Country(char * pLine);
+STATIC VOID InitPgm(char * pLine);
+STATIC VOID InitPgmHigh(char * pLine);
+STATIC VOID CmdInstall(char * pLine);
+STATIC VOID CmdInstallHigh(char * pLine);
+STATIC VOID CmdChain(char * pLine);
+STATIC VOID CmdSet(char * pLine);
 
 
-STATIC VOID CfgSwitchar(BYTE * pLine);
-STATIC VOID CfgSwitches(BYTE * pLine);
-STATIC VOID CfgFailure(BYTE * pLine);
-STATIC VOID CfgIgnore(BYTE * pLine);
-STATIC VOID CfgMenu(BYTE * pLine);
+STATIC VOID CfgSwitchar(char * pLine);
+STATIC VOID CfgSwitches(char * pLine);
+STATIC VOID CfgFailure(char * pLine);
+STATIC VOID CfgIgnore(char * pLine);
+STATIC VOID CfgMenu(char * pLine);
 
-STATIC VOID CfgMenuEsc(BYTE * pLine);
+STATIC VOID CfgMenuEsc(char * pLine);
 
 STATIC VOID DoMenu(void);
-STATIC VOID CfgMenuDefault(BYTE * pLine);
-STATIC BYTE * skipwh(BYTE * s);
+STATIC VOID CfgMenuDefault(char * pLine);
+STATIC char * skipwh(char * s);
 STATIC int iswh(unsigned char c);
-STATIC BYTE * scan(BYTE * s, BYTE * d);
+STATIC char * scan(char * s, char * d);
 STATIC BOOL isnum(char ch);
 #if 0
 STATIC COUNT tolower(COUNT c);
@@ -224,14 +224,14 @@ STATIC VOID strupr(char *s);
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type);
 STATIC VOID mumcb_init(UCOUNT seg, UWORD size);
 
-STATIC VOID Stacks(BYTE * pLine);
-STATIC VOID StacksHigh(BYTE * pLine);
+STATIC VOID Stacks(char * pLine);
+STATIC VOID StacksHigh(char * pLine);
 
-STATIC VOID SetAnyDos(BYTE * pLine);
-STATIC VOID SetIdleHalt(BYTE * pLine);
-STATIC VOID Numlock(BYTE * pLine);
+STATIC VOID SetAnyDos(char * pLine);
+STATIC VOID SetIdleHalt(char * pLine);
+STATIC VOID Numlock(char * pLine);
 STATIC char *GetNumArg(char * pLine, COUNT * pnArg);
-BYTE *GetStringArg(BYTE * pLine, BYTE * pszString);
+char *GetStringArg(char * pLine, char * pszString);
 STATIC BOOL SkipLine(char *pLine);
 #if 0
 STATIC char * stristr(char *s1, char *s2);
@@ -247,12 +247,12 @@ STATIC VOID FAR * AlignParagraph(VOID FAR * lpPtr);
 
 #define _EOF 0x1a
 
-STATIC struct table * LookUp(struct table *p, BYTE * token);
+STATIC struct table * LookUp(struct table *p, char * token);
 
-typedef void config_sys_func_t(BYTE * pLine);
+typedef void config_sys_func_t(char * pLine);
 
 struct table {
-  const BYTE *entry;
+  const char *entry;
   signed char pass;
   config_sys_func_t *func;
 };
@@ -309,13 +309,13 @@ STATIC struct table commands[] = {
 };
 
 /* RE function for menu. */
-STATIC int findend(BYTE * s)
+STATIC int findend(char * s)
 {
   int nLen = 0;
   /* 'marks' end if at least ten spaces, 0, or newline is found. */
   while (*s && (*s != 0x0d || *s != 0x0a) )
   {
-    BYTE *p= skipwh(s);
+    char *p= skipwh(s);
     /* ah, more than 9 whitespaces ? We're done here (hrmph!) */
     if(p - s >= 10)
       break;
@@ -325,7 +325,7 @@ STATIC int findend(BYTE * s)
   return nLen;
 }
 
-BYTE *pLineStart BSS_INIT(0);
+char *pLineStart BSS_INIT(0);
 
 BYTE HMAState BSS_INIT(0);
 #define HMA_NONE 0              /* do nothing */
@@ -634,7 +634,7 @@ struct memdiskinfo {
 struct memdiskinfo FAR * ASMCFUNC query_memdisk(UBYTE drive);
 
 struct memdiskopt {
-  BYTE * name;
+  char * name;
   UWORD size;
 };
 
@@ -674,7 +674,7 @@ BYTE FAR * ProcessMemdiskLine(BYTE FAR *cLine)
    end of line.  MEMDISK options may appear nearly anywhere on line and are
    ignored - see memdisk_opts for list of recognized options.
 */
-BYTE FAR * GetNextMemdiskLine(BYTE FAR *cLine, BYTE *pLine)
+BYTE FAR * GetNextMemdiskLine(BYTE FAR *cLine, char *pLine)
 {
   STATIC struct memdiskopt memdiskopts[] = {
       {"initrd", 6}, {"BOOT_IMAGE", 10},
@@ -803,7 +803,7 @@ copy_char:
 
 VOID DoConfig(int nPass)
 {
-  BYTE *pLine;
+  char *pLine;
   BOOL bEof = FALSE;
 
 #ifdef MEMDISK_ARGS
@@ -1012,7 +1012,7 @@ VOID DoConfig(int nPass)
   }
 }
 
-STATIC struct table * LookUp(struct table *p, BYTE * token)
+STATIC struct table * LookUp(struct table *p, char * token)
 {
   while (p->entry[0] != '\0' && !strcaseequal(p->entry, token))
     ++p;
@@ -1192,7 +1192,7 @@ STATIC char *GetNumArg(char *p, COUNT *num)
   return p;
 }
 
-BYTE *GetStringArg(BYTE * pLine, BYTE * pszString)
+char *GetStringArg(char * pLine, char * pszString)
 {
   /* look for STRING                               */
   pLine = skipwh(pLine);
@@ -1201,7 +1201,7 @@ BYTE *GetStringArg(BYTE * pLine, BYTE * pszString)
   return scan(pLine, pszString);
 }
 
-STATIC void Config_Buffers(BYTE * pLine)
+STATIC void Config_Buffers(char * pLine)
 {
   COUNT nBuffers;
 
@@ -1210,7 +1210,7 @@ STATIC void Config_Buffers(BYTE * pLine)
     Config.cfgBuffers = nBuffers;
 }
 
-STATIC void CfgBuffersHigh(BYTE * pLine)
+STATIC void CfgBuffersHigh(char * pLine)
 {
   Config_Buffers(pLine);
   _printf("Note: BUFFERS will be in HMA or low RAM, not in UMB\n");
@@ -1219,14 +1219,14 @@ STATIC void CfgBuffersHigh(BYTE * pLine)
 /**
   Set screen mode - rewritten to use init_call_intr() by RE / ICD
 */
-STATIC VOID sysScreenMode(BYTE * pLine)
+STATIC VOID sysScreenMode(char * pLine)
 {
   iregs r;
   COUNT nMode;
   COUNT nFunc = 0x11;
 
   /* Get the argument                                             */
-  if (GetNumArg(pLine, &nMode) == (BYTE *) 0)
+  if (GetNumArg(pLine, &nMode) == (char *) 0)
     return;
 
   if(nMode<0x10)
@@ -1246,7 +1246,7 @@ STATIC VOID sysScreenMode(BYTE * pLine)
   init_call_intr(0x10, &r);
 }
 
-STATIC VOID sysVersion(BYTE * pLine)
+STATIC VOID sysVersion(char * pLine)
 {
   COUNT major, minor;
   char *p = strchr(pLine, '.');
@@ -1257,11 +1257,11 @@ STATIC VOID sysVersion(BYTE * pLine)
   p++;
 
   /* Get major number */
-  if (GetNumArg(pLine, &major) == (BYTE *) 0)
+  if (GetNumArg(pLine, &major) == (char *) 0)
     return;
 
   /* Get minor number */
-  if (GetNumArg(p, &minor) == (BYTE *) 0)
+  if (GetNumArg(p, &minor) == (char *) 0)
     return;
 
   _printf("Changing reported version to %d.%d\n", major, minor);
@@ -1270,12 +1270,12 @@ STATIC VOID sysVersion(BYTE * pLine)
   LoL->_os_setver_minor = minor; /* not the internal os_minor */
 }
 
-STATIC VOID Files(BYTE * pLine)
+STATIC VOID Files(char * pLine)
 {
   COUNT nFiles;
 
   /* Get the argument                                             */
-  if (GetNumArg(pLine, &nFiles) == (BYTE *) 0)
+  if (GetNumArg(pLine, &nFiles) == (char *) 0)
     return;
 
   /* Got the value, assign either default or new value            */
@@ -1283,13 +1283,13 @@ STATIC VOID Files(BYTE * pLine)
   Config.cfgFilesHigh = 0;
 }
 
-STATIC VOID FilesHigh(BYTE * pLine)
+STATIC VOID FilesHigh(char * pLine)
 {
   Files(pLine);
   Config.cfgFilesHigh = 1;
 }
 
-STATIC VOID CfgLastdrive(BYTE * pLine)
+STATIC VOID CfgLastdrive(char * pLine)
 {
   /* Format:   LASTDRIVE = letter         */
   BYTE drv;
@@ -1308,7 +1308,7 @@ STATIC VOID CfgLastdrive(BYTE * pLine)
   Config.cfgLastdriveHigh = 0;
 }
 
-STATIC VOID CfgLastdriveHigh(BYTE * pLine)
+STATIC VOID CfgLastdriveHigh(char * pLine)
 {
   /* Format:   LASTDRIVEHIGH = letter         */
   CfgLastdrive(pLine);
@@ -1319,9 +1319,9 @@ STATIC VOID CfgLastdriveHigh(BYTE * pLine)
     UmbState of confidence, 1 is sure, 2 maybe, 4 unknown and 0 no way.
 */
 
-STATIC VOID Dosmem(BYTE * pLine)
+STATIC VOID Dosmem(char * pLine)
 {
-  BYTE *pTmp;
+  char *pTmp;
   BYTE UMBwanted = FALSE;
 
   pLine = GetStringArg(pLine, szBuf);
@@ -1363,7 +1363,7 @@ STATIC VOID Dosmem(BYTE * pLine)
   }
 }
 
-STATIC VOID DosData(BYTE * pLine)
+STATIC VOID DosData(char * pLine)
 {
   pLine = GetStringArg(pLine, szBuf);
   strupr(szBuf);
@@ -1372,7 +1372,7 @@ STATIC VOID DosData(BYTE * pLine)
     Config.cfgDosDataUmb = TRUE;
 }
 
-STATIC VOID CfgSwitchar(BYTE * pLine)
+STATIC VOID CfgSwitchar(char * pLine)
 {
   /* Format: SWITCHAR = character         */
 
@@ -1380,7 +1380,7 @@ STATIC VOID CfgSwitchar(BYTE * pLine)
   init_switchar(*szBuf);
 }
 
-STATIC VOID CfgSwitches(BYTE * pLine)
+STATIC VOID CfgSwitches(char * pLine)
 {
   pLine = skipwh(pLine);
   if (*pLine == '=')
@@ -1440,7 +1440,7 @@ STATIC VOID CfgSwitches(BYTE * pLine)
   commands[0].pass = 1;
 }
 
-STATIC VOID Fcbs(BYTE * pLine)
+STATIC VOID Fcbs(char * pLine)
 {
   /*  Format:     FCBS = totalFcbs [,protectedFcbs]    */
   COUNT fcbs;
@@ -1470,7 +1470,7 @@ STATIC VOID Fcbs(BYTE * pLine)
    makefile, DOS_PSP in mcb.h, main.c P_0, task.c, kernel.asm)
    (50:e0..ff used as early kernel boot drive / config buffer)
 */
-STATIC VOID CfgKeyBuf(BYTE * pLine)
+STATIC VOID CfgKeyBuf(char * pLine)
 {
   /*  Format:     KEYBUF = startoffset [,endoffset]    */
   UWORD FAR *keyfill = (UWORD FAR *) MK_FP(0x40, 0x1a);
@@ -1646,7 +1646,7 @@ ret:
   return rc;
 }
 
-STATIC VOID Country(BYTE * pLine)
+STATIC VOID Country(char * pLine)
 {
   /* Format: COUNTRY = countryCode, [codePage], filename   */
   COUNT ctryCode;
@@ -1680,7 +1680,7 @@ error:
   CfgFailure(pLine);
 }
 
-STATIC VOID Stacks(BYTE * pLine)
+STATIC VOID Stacks(char * pLine)
 {
   COUNT stacks;
 
@@ -1708,19 +1708,19 @@ STATIC VOID Stacks(BYTE * pLine)
   Config.cfgStacksHigh = 0;
 }
 
-STATIC VOID StacksHigh(BYTE * pLine)
+STATIC VOID StacksHigh(char * pLine)
 {
   Stacks(pLine);
   Config.cfgStacksHigh = 1;
 }
 
-STATIC VOID InitPgmHigh(BYTE * pLine)
+STATIC VOID InitPgmHigh(char * pLine)
 {
   InitPgm(pLine);
   Config.cfgP_0_startmode = 0x80;
 }
 
-STATIC VOID InitPgm(BYTE * pLine)
+STATIC VOID InitPgm(char * pLine)
 {
   static char init[NAMEMAX];
   static char inittail[NAMEMAX];
@@ -1741,14 +1741,14 @@ STATIC VOID InitPgm(BYTE * pLine)
   Config.cfgP_0_startmode = 0;
 }
 
-STATIC VOID CfgBreak(BYTE * pLine)
+STATIC VOID CfgBreak(char * pLine)
 {
   /* Format:      BREAK = (ON | OFF)      */
   GetStringArg(pLine, szBuf);
   break_ena = strcaseequal(szBuf, "OFF") ? 0 : 1;
 }
 
-STATIC VOID Numlock(BYTE * pLine)
+STATIC VOID Numlock(char * pLine)
 {
   /* Format:      NUMLOCK = (ON | OFF)      */
   BYTE FAR *keyflags = (BYTE FAR *) MK_FP(0x40, 0x17);
@@ -1760,7 +1760,7 @@ STATIC VOID Numlock(BYTE * pLine)
   keycheck();
 }
 
-STATIC VOID DeviceHigh(BYTE * pLine)
+STATIC VOID DeviceHigh(char * pLine)
 {
   if (UmbState == 1)
   {
@@ -1777,12 +1777,12 @@ STATIC VOID DeviceHigh(BYTE * pLine)
   }
 }
 
-STATIC void Device(BYTE * pLine)
+STATIC void Device(char * pLine)
 {
   LoadDevice(pLine, lpTop, FALSE);
 }
 
-STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
+STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
 {
   exec_blk eb;
   struct dhdr FAR *dhp;
@@ -1859,9 +1859,9 @@ STATIC BOOL LoadDevice(BYTE * pLine, char FAR *top, COUNT mode)
   return result;
 }
 
-STATIC VOID CfgFailure(BYTE * pLine)
+STATIC VOID CfgFailure(char * pLine)
 {
-  BYTE *pTmp = pLineStart;
+  char *pTmp = pLineStart;
 
   /* suppress multiple printing of same unrecognized lines */
 
@@ -1987,14 +1987,14 @@ STATIC int iswh(unsigned char c)
   return (c == '\r' || c == '\n' || c == '\t' || c == ' ');
 }
 
-STATIC BYTE * skipwh(BYTE * s)
+STATIC char * skipwh(char * s)
 {
   while (iswh(*s))
     ++s;
   return s;
 }
 
-STATIC BYTE * scan(BYTE * s, BYTE * d)
+STATIC char * scan(char * s, char * d)
 {
   askThisSingleCommand = FALSE;
   DontAskThisSingleCommand = FALSE;
@@ -2201,7 +2201,7 @@ STATIC void config_init_buffers(int wantedbuffers)
         will report to MSDOS programs just the version number
         they expect. be careful with it!
 */
-STATIC VOID SetAnyDos(BYTE * pLine)
+STATIC VOID SetAnyDos(char * pLine)
 {
   UNREFERENCED_PARAMETER(pLine);
   ReturnAnyDosVersionExpected = TRUE;
@@ -2212,14 +2212,14 @@ STATIC VOID SetAnyDos(BYTE * pLine)
    -1 max savings, 0 never HLT, 1 safe kernel only HLT,
    2 (3) also hooks int2f.1680 (and sets al=0)
 */
-STATIC VOID SetIdleHalt(BYTE * pLine)
+STATIC VOID SetIdleHalt(char * pLine)
 {
   COUNT haltlevel;
   if (GetNumArg(pLine, &haltlevel))
     HaltCpuWhileIdle = haltlevel; /* 0 for no HLT, 1..n more, -1 max */
 }
 
-STATIC VOID CfgIgnore(BYTE * pLine)
+STATIC VOID CfgIgnore(char * pLine)
 {
   UNREFERENCED_PARAMETER(pLine);
 }
@@ -2230,10 +2230,10 @@ STATIC VOID CfgIgnore(BYTE * pLine)
 */
 
 STATIC void ClearScreen(unsigned char attr);
-STATIC VOID CfgMenu(BYTE * pLine)
+STATIC VOID CfgMenu(char * pLine)
 {
   int nLen;
-  BYTE *pNumber = pLine;
+  char *pNumber = pLine;
 
   _printf("%s\n",pLine);
   if (MenuColor == -1)
@@ -2268,9 +2268,9 @@ STATIC VOID CfgMenu(BYTE * pLine)
   nMenuLine++;
 }
 
-STATIC VOID CfgMenuEsc(BYTE * pLine)
+STATIC VOID CfgMenuEsc(char * pLine)
 {
-  BYTE * check;
+  char * check;
   for (check = pLine; check[0]; check++)
     if (check[0] == '$') check[0] = 27;	/* translate $ to ESC */
   _printf("%s\n",pLine);
@@ -2389,7 +2389,7 @@ RestartInput:
     ClearScreen(0x7);
 }
 
-STATIC VOID CfgMenuDefault(BYTE * pLine)
+STATIC VOID CfgMenuDefault(char * pLine)
 {
   COUNT num = 0;
 
@@ -2440,7 +2440,7 @@ STATIC void ClearScreen(unsigned char attr)
 /**
   MENUCOLOR[=] fg[, bg]
 */
-STATIC void CfgMenuColor(BYTE * pLine)
+STATIC void CfgMenuColor(char * pLine)
 {
   COUNT num = 0;
   unsigned char fg, bg = 0;
@@ -2612,7 +2612,7 @@ struct instCmds {
 #define InstallPrintf(x)
 #endif
 
-STATIC VOID _CmdInstall(BYTE * pLine,int mode)
+STATIC VOID _CmdInstall(char * pLine,int mode)
 {
   struct instCmds *cmd;
 
@@ -2630,15 +2630,15 @@ STATIC VOID _CmdInstall(BYTE * pLine,int mode)
   cmd->mode = mode;
   numInstallCmds++;
 }
-STATIC VOID CmdInstall(BYTE * pLine)
+STATIC VOID CmdInstall(char * pLine)
 {
   _CmdInstall(pLine,0);
 }
-STATIC VOID CmdInstallHigh(BYTE * pLine)
+STATIC VOID CmdInstallHigh(char * pLine)
 {
   _CmdInstall(pLine,0x80);	/* load high, if possible */
 }
-STATIC VOID CmdChain(BYTE * pLine)
+STATIC VOID CmdChain(char * pLine)
 {
   struct CfgFile *cfg;
   int fd;
@@ -2753,7 +2753,7 @@ VOID DoInstall(void)
   return;
 }
 
-STATIC VOID CmdSet(BYTE *pLine)
+STATIC VOID CmdSet(char *pLine)
 {
   pLine = GetStringArg(pLine, szBuf);
   pLine = skipwh(pLine);  /* scan() stops at the equal sign or space */
