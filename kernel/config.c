@@ -309,7 +309,7 @@ STATIC struct table commands[] = {
 };
 
 /* RE function for menu. */
-int  findend(BYTE * s)
+STATIC int findend(BYTE * s)
 {
   int nLen = 0;
   /* 'marks' end if at least ten spaces, 0, or newline is found. */

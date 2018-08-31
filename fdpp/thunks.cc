@@ -346,7 +346,7 @@ void fdvprintf(const char *format, va_list vl)
     fdpp->print(0, format, vl);
 }
 
-void fdlogvprintf(const char *format, va_list vl)
+static void fdlogvprintf(const char *format, va_list vl)
 {
     fdpp->print(1, format, vl);
 }

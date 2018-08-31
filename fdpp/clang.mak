@@ -18,7 +18,7 @@ TARGET=fdppkrnl
 
 EXTRA_DEBUG = 0
 ALLCFLAGS += -iquote $(srcdir)/../hdr $(TARGETOPT) -Wall -fpic \
-    -fno-strict-aliasing -Wno-format-invalid-specifier
+    -fno-strict-aliasing -Wno-format-invalid-specifier -Wmissing-prototypes
 ifeq ($(EXTRA_DEBUG),1)
 ALLCFLAGS += -ggdb3 -fdebug-macro -O0
 else

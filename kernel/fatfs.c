@@ -302,7 +302,7 @@ STATIC int find_fname(const char *path, int attr, f_node_ptr fnp)
  * input: fnp with valid non-LFN directory entry, not equal to '..' or
  *  '.'
  */
-COUNT remove_lfn_entries(f_node_ptr fnp)
+STATIC COUNT remove_lfn_entries(f_node_ptr fnp)
 {
   unsigned original_diroff = fnp->f_dmp->dm_entry;
 

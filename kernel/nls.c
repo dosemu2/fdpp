@@ -335,7 +335,7 @@ STATIC int nlsGetData(struct nlsPackage FAR * nls, int subfct,
   return DE_INVLDFUNC;
 }
 
-VOID nlsCPchange(UWORD cp)
+STATIC VOID nlsCPchange(UWORD cp)
 {
   UNREFERENCED_PARAMETER(cp);
   put_string("\7\nchange codepage not yet done ska\n");

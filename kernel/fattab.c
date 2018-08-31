@@ -51,7 +51,7 @@ int ISFAT32(struct dpb FAR * dpbp)
 }
 #endif
 
-void clusterMessage(const char * msg, CLUSTER clussec)
+STATIC void clusterMessage(const char * msg, CLUSTER clussec)
 {
   put_string("Run chkdsk: Bad FAT ");
   put_string(msg);
@@ -62,7 +62,7 @@ void clusterMessage(const char * msg, CLUSTER clussec)
   put_console('\n');
 }
 
-struct buffer FAR *getFATblock(struct dpb FAR * dpbp, CLUSTER clussec)
+STATIC struct buffer FAR *getFATblock(struct dpb FAR * dpbp, CLUSTER clussec)
 {
   /* *** why dpbp->dpb_unit? only useful to know in context of the dpbp...? *** */
   struct buffer FAR *bp = getblock(clussec, dpbp->dpb_unit);

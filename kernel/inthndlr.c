@@ -175,7 +175,7 @@ VOID ASMCFUNC int21_syscall(iregs FAR * irp)
 
 #ifdef WITHFAT32
       /* DOS 7.0+ FAT32 extended functions */
-int int21_fat32(lregs *r)
+STATIC int int21_fat32(lregs *r)
 {
   COUNT rc;
 

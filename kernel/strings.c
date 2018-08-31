@@ -27,6 +27,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "globals.h"
 
 #ifdef VERSION_STRINGS
 static BYTE *stringsRcsId =

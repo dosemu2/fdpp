@@ -146,7 +146,7 @@ VOID ASMCFUNC FreeDOSmain(void)
     at least one known utility (norton DE) seems to access them directly.
     ok, so we access for all drives, that the stuff gets build
 */
-void InitializeAllBPBs(VOID)
+STATIC void InitializeAllBPBs(VOID)
 {
   static char filename[] = "A:-@JUNK@-.TMP";
   int drive, fileno;

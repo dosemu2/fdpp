@@ -249,7 +249,7 @@ struct PartTableEntry           /* INTERNAL representation of partition table en
 
 BOOL ExtLBAForce = FALSE;
 
-COUNT init_readdasd(UBYTE drive)
+STATIC COUNT init_readdasd(UBYTE drive)
 {
   static iregs regs;
 
@@ -289,7 +289,7 @@ floppy_bpb floppy_bpbs[5] = {
   {FLOPPY_SEC_SIZE, 2, 1, 2, 240, 5760, 0xf0, 9, 36, 2}        /* FD2880 3.5  ED   */
 };
 
-COUNT init_getdriveparm(UBYTE drive, bpb * pbpbarray)
+STATIC COUNT init_getdriveparm(UBYTE drive, bpb * pbpbarray)
 {
   static iregs regs;
   REG UBYTE type;
@@ -341,7 +341,7 @@ COUNT init_getdriveparm(UBYTE drive, bpb * pbpbarray)
     cyclinder and heads are 0 to N-1 based, sector is 1 to N based
 */
 
-void init_LBA_to_CHS(struct CHS *chs, ULONG LBA_address,
+STATIC void init_LBA_to_CHS(struct CHS *chs, ULONG LBA_address,
                      struct DriveParamS *driveparam)
 {
   unsigned hs = driveparam->chs.Sector * driveparam->chs.Head;
@@ -354,7 +354,7 @@ void init_LBA_to_CHS(struct CHS *chs, ULONG LBA_address,
   chs->Sector = hsrem % driveparam->chs.Sector + 1;
 }
 
-void printCHS(const char *title, struct CHS *chs)
+STATIC void printCHS(const char *title, struct CHS *chs)
 {
   /* has no fixed size for head/sect: is often 1/1 in our context */
   _printf("%s%4u-%u-%u", title, chs->Cylinder, chs->Head, chs->Sector);
@@ -383,7 +383,7 @@ void printCHS(const char *title, struct CHS *chs)
 #define NSECTORFAT12 8
 #define NFAT 2
 
-VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
+STATIC VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
 {
   ULONG fatdata;
 
@@ -546,7 +546,7 @@ STATIC void push_ddt(ddt *pddt)
   ddt_buf[nUnits] = fddt;
 }
 
-void DosDefinePartition(struct DriveParamS *driveParam,
+STATIC void DosDefinePartition(struct DriveParamS *driveParam,
                         ULONG StartSector, struct PartTableEntry *pEntry,
                         int extendedPartNo, int PrimaryNum)
 {
@@ -768,7 +768,7 @@ STATIC void ConvCHSToIntern(struct CHS *chs, UBYTE * pDisk)
   chs->Cylinder = pDisk[2] + ((pDisk[1] & 0xc0) << 2);
 }
 
-BOOL ConvPartTableEntryToIntern(struct PartTableEntry * pEntry,
+STATIC BOOL ConvPartTableEntryToIntern(struct PartTableEntry * pEntry,
                                 UBYTE * pDisk)
 {
   int i;
@@ -797,7 +797,7 @@ BOOL ConvPartTableEntryToIntern(struct PartTableEntry * pEntry,
   return TRUE;
 }
 
-BOOL is_suspect(struct CHS *chs, struct CHS *pEntry_chs)
+STATIC BOOL is_suspect(struct CHS *chs, struct CHS *pEntry_chs)
 {
   /* Valid entry:
      entry == chs ||           // partition entry equal to computed values
@@ -813,7 +813,7 @@ BOOL is_suspect(struct CHS *chs, struct CHS *pEntry_chs)
             pEntry_chs->Cylinder == (0x3ff & chs->Cylinder))));
 }
 
-void print_warning_suspect(char *partitionName, UBYTE fs, struct CHS *chs,
+STATIC void print_warning_suspect(char *partitionName, UBYTE fs, struct CHS *chs,
                            struct CHS *pEntry_chs)
 {
   if (!InitKernelConfig.ForceLBA)
@@ -826,7 +826,7 @@ void print_warning_suspect(char *partitionName, UBYTE fs, struct CHS *chs,
   memcpy(pEntry_chs, chs, sizeof(struct CHS));
 }
 
-BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
+STATIC BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
                          struct PartTableEntry * pEntry, ULONG startSector,
                          int partitionsToIgnore, int extendedPartNo)
 {
@@ -952,7 +952,7 @@ BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_type,
 
 void BIOS_drive_reset(unsigned drive);
 
-int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
+STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
                    ULONG LBA_address, void * buffer)
 {
   static struct _bios_LBA_address_packet dap = {
@@ -1030,7 +1030,7 @@ int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 }
 
 /* Load the Partition Tables and get information on all drives */
-int ProcessDisk(int scanType, unsigned drive, int PartitionsToIgnore)
+STATIC int ProcessDisk(int scanType, unsigned drive, int PartitionsToIgnore)
 {
 
   struct PartTableEntry PTable[4];
@@ -1133,7 +1133,7 @@ ReadNextPartitionTable:
   return PartitionsToIgnore;
 }
 
-int BIOS_nrdrives(void)
+STATIC int BIOS_nrdrives(void)
 {
   iregs regs;
 
@@ -1265,7 +1265,7 @@ STATIC void make_ddt (ddt *pddt, int Unit, int driveno, int flags)
   push_ddt(pddt);
 }
 
-void ReadAllPartitionTables(void)
+STATIC void ReadAllPartitionTables(void)
 {
   UBYTE foundPartitions[MAX_HARD_DRIVE];
 
