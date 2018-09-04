@@ -51,4 +51,4 @@ typedef struct _dmatch {
   date dm_date;                 /* file date                    */
   ULONG dm_size;                /* file size                    */
   AR_MEMB(struct _dmatch, BYTE, dm_name, FNAME_SIZE + FEXT_SIZE + 2);     /* file name    */
-} dmatch;
+} PACKED dmatch;
