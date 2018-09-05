@@ -325,6 +325,14 @@ remote_lock_unlock:
 ;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
+                global NETWORK_REDIRECTOR_MX_PD
+NETWORK_REDIRECTOR_MX_PD:
+                global NETWORK_REDIRECTOR_MX_WA4
+NETWORK_REDIRECTOR_MX_WA4:
+                global NETWORK_REDIRECTOR_MX_PS
+NETWORK_REDIRECTOR_MX_PS:
+                global NETWORK_REDIRECTOR_MX_PP
+NETWORK_REDIRECTOR_MX_PP:
                 pop     bx             ; ret address
                 pop     cx             ; stack value (arg); cx in remote_rw
                 pop     dx             ; off s

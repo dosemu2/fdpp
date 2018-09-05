@@ -267,8 +267,11 @@ rquals:		  FAR ASTER	{ is_rfar = 1; is_rptr = 1; }
 
 quals:		  FAR quals	{ is_far = 1; }
 		| ASTER quals	{ is_ptr = 1; }
-		| LBR num RBR	{ is_ptr = 1; cvtype = CVTYPE_ARR; arr_sz = $2; }
+		| arr
 		|
+;
+
+arr:		  LBR num RBR	{ is_ptr = 1; cvtype = CVTYPE_ARR; arr_sz = $2; }
 ;
 
 fatr:		  ASMCFUNC
@@ -420,7 +423,8 @@ args:		  args argsep arg
 		| arg
 ;
 
-arg:		  adecls STRING
+arg:		  adecls STRING arr
+		| adecls STRING
 		| adecls
 ;
 

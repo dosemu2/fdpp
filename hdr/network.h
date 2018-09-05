@@ -78,3 +78,9 @@ struct remote_fileattrib {
   UWORD rfa_time;
   UWORD rfa_date;
 };
+
+struct _SSS
+{
+    unsigned long ofs, len;
+    int unlock;
+};
