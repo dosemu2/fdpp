@@ -18,11 +18,15 @@ endif
 TARGET=fdppkrnl
 
 EXTRA_DEBUG = 0
+DEBUG_MODE = 0
 ALLCFLAGS += -iquote $(srcdir)/../hdr -Wall $(TARGETOPT) -Wmissing-prototypes
 ifeq ($(EXTRA_DEBUG),1)
 ALLCFLAGS += -ggdb3 -fdebug-macro -O0
 else
 ALLCFLAGS += -ggdb3 -O2
+endif
+ifeq ($(DEBUG_MODE),1)
+ALLCFLAGS += -DDEBUG
 endif
 
 CFLAGS=$(ALLCFLAGS)

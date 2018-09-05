@@ -97,8 +97,9 @@ void int3()
 #define HMAInitPrintf(x)
 #endif
 
+#if 0
 #ifdef DEBUG
-VOID hdump(BYTE FAR * p)
+STATIC VOID hdump(BYTE FAR * p)
 {
   int loop;
   HMAInitPrintf(("%P", GET_FP32(p)));
@@ -110,6 +111,7 @@ VOID hdump(BYTE FAR * p)
 }
 #else
 #define hdump(ptr)
+#endif
 #endif
 
 #define KeyboardShiftState() (*(BYTE FAR *)(MK_FP(0x40,0x17)))
