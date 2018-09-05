@@ -1,8 +1,8 @@
 fdpp
 ========
 
-fdpp provides the DOS compatibility layer.
-It is a FreeDOS kernel port to modern C++.
+fdpp is a 64-bit DOS.
+It is based on a FreeDOS kernel ported to modern C++.
 
 Can be compiled with clang (not gcc!) and booted under dosemu2,
 see https://github.com/stsp/dosemu2
