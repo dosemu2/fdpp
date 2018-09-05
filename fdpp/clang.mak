@@ -8,8 +8,9 @@ CP=cp
 CC=clang++ -std=c++11
 CL=clang++
 
-TARGETOPT=-c -fno-unwind-tables -fno-asynchronous-unwind-tables \
-    -fno-exceptions -fno-threadsafe-statics -fno-rtti -Wno-inline-new-delete
+TARGETOPT = -c -fno-unwind-tables -fno-asynchronous-unwind-tables \
+    -fno-exceptions -fno-threadsafe-statics -fno-rtti -fpic \
+    -Wno-format-invalid-specifier
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
 endif
@@ -17,8 +18,7 @@ endif
 TARGET=fdppkrnl
 
 EXTRA_DEBUG = 0
-ALLCFLAGS += -iquote $(srcdir)/../hdr $(TARGETOPT) -Wall -fpic \
-    -fno-strict-aliasing -Wno-format-invalid-specifier -Wmissing-prototypes
+ALLCFLAGS += -iquote $(srcdir)/../hdr -Wall $(TARGETOPT) -Wmissing-prototypes
 ifeq ($(EXTRA_DEBUG),1)
 ALLCFLAGS += -ggdb3 -fdebug-macro -O0
 else
