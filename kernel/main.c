@@ -35,17 +35,17 @@
 #include "debug.h"
 
 #ifdef VERSION_STRINGS
-static BYTE *mainRcsId =
+static const char *mainRcsId =
     "$Id: main.c 1699 2012-01-16 20:45:44Z perditionc $";
 #endif
 
-static char copyright[] =
+static const char *copyright =
     "Written by Stas Sergeev, FDPP project.\n"
     "Based on FreeDOS sources (C) Pasquale J. Villani and The FreeDOS Project.\n\n"
-    "All Rights Reserved. This is free software and comes with ABSOLUTELY NO\n"
-    "WARRANTY; you can redistribute it and/or modify it under the terms of the\n"
-    "GNU General Public License as published by the Free Software Foundation;\n"
-    "either version 2, or (at your option) any later version.\n";
+    "This program is free software: you can redistribute it and/or modify\n"
+    "it under the terms of the GNU General Public License as published by\n"
+    "the Free Software Foundation, either version 3 of the License, or\n"
+    "(at your option) any later version.\n\n";
 
 struct _KernelConfig InitKernelConfig BSS_INIT({0});
 
