@@ -1346,8 +1346,8 @@ STATIC int remote_lock_unlock(sft FAR *sftp,     /* SFT for file */
                                  /* one to unlock; zero to lock */
 {
   struct _SSS param_block;
-  param_block.ofs = ofs;
-  param_block.len = len;
+  param_block.lu.ofs = ofs;
+  param_block.lu.len = len;
   param_block.unlock = unlock;
   return (int)network_redirector_mx_ps(REM_LOCK, sftp, &param_block);
 }

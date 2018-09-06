@@ -59,6 +59,7 @@
 #define REM_PRINTREDIR  0x1125
 #define REM_EXTOC       0x112e
 
+#if 0
 struct rgds {
   UWORD r_spc;
   UWORD r_navc;
@@ -77,10 +78,15 @@ struct remote_fileattrib {
   } rfa_fz_union;
   UWORD rfa_time;
   UWORD rfa_date;
+} PACKED;
+#endif
+
+struct remote_lock_unlock {
+    UDWORD ofs, len;
 };
 
 struct _SSS
 {
-    unsigned long ofs, len;
-    int unlock;
+    struct remote_lock_unlock lu;
+    BYTE unlock;
 };
