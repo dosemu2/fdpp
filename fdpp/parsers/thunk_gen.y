@@ -101,7 +101,8 @@ static void do_start_arg(int anum)
 		    strcat(abuf, "_CNV_PTR_CHAR, _L_NONE");
 		    break;
 		case CVTYPE_ARR:
-		    sprintf(abuf + strlen(abuf), "_CNV_PTR_ARR, _L_IMM(%i)", arr_sz);
+		    sprintf(abuf + strlen(abuf), "_CNV_PTR_ARR, _L_IMM(%i, %i)",
+			    arg_num + 1, arr_sz);
 		    break;
 		case CVTYPE_OTHER:
 		    strcat(abuf, "_CNV_PTR, _L_NONE");

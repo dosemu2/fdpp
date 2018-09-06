@@ -518,7 +518,7 @@ void enable(void)
 
 #define _CNV(c, at, l, n) c(at, _a##n, a##n, l)
 #define _L_REF(nl) a##nl
-#define _L_IMM(l) l
+#define _L_IMM(n, l) (sizeof(_L_REF(n)) * (l))
 
 #define _THUNK0_v(n, f, z) \
 void f(void) \
