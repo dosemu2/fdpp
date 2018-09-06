@@ -83,7 +83,7 @@ typedef struct _sft {
 #else
   __DOSFAR(BYTE)sft_ifsptr;         /* 37 - pointer to IFS driver for file, 0000000h if native DOS */
 #endif
-} sft;
+} PACKED sft;
 
 /* SFT Table header definition                                          */
 typedef struct _sftheader {
@@ -100,7 +100,7 @@ typedef struct sfttbl {
   WORD sftt_count;              /* # of handle definition       */
   /* entries, this table          */
   AR_MEMB(struct sfttbl, sft, sftt_table, SFTMAX);       /* The array of sft for block   */
-} sfttbl;
+} PACKED sfttbl;
 
 /* defines for sft use                                                  */
 #define SFT_MASK        0x0060  /* splits device data           */

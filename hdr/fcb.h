@@ -98,7 +98,7 @@ typedef struct _fcb {
   /* end reserved                                                 */
   UBYTE fcb_curec;              /* Current block number of              */
   ULONG fcb_rndm;               /* Current relative record number       */
-} fcb;
+} PACKED fcb;
 
 /* FAT extended fcb                                                     */
 typedef struct _xfcb {
@@ -106,7 +106,7 @@ typedef struct _xfcb {
   BYTE xfcb_resvrd[5];          /* Reserved                     */
   UBYTE xfcb_attrib;            /* Attribute                    */
   SYM_MEMB(struct _xfcb, fcb, xfcb_fcb);
-} xfcb;
+} PACKED xfcb;
 
 typedef struct _rfcb {
   UBYTE renDriveID;             /* drive no.                    */
