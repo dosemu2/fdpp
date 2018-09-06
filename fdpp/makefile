@@ -12,7 +12,7 @@ SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
 PKG = fdpp-0.1.tar.gz
 
-ALLCFLAGS += -I $(SRC) -I $(srcdir) -I . -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
+ALLCFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
 NASMFLAGS += -i$(SRC)
 
 # *List Macros*

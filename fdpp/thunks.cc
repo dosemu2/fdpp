@@ -270,7 +270,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 #define _SP sp
 
     switch (fn) {
-        #include "thunk_calls.h"
+        #include <thunk_calls.h>
 
         default:
             fdprintf("unknown fn %i\n", fn);
@@ -745,7 +745,7 @@ r f(t1 a1, t2 a2, t3 a3, t4 a4, t5 a5, t6 a6) \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args), z); \
 }
 
-#include "thunk_asms.h"
+#include <thunk_asms.h>
 
 
 UBYTE peekb(UWORD seg, UWORD ofs)
