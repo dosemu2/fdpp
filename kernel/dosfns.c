@@ -502,7 +502,7 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
       cmd = REM_OPEN;
       attrib = (BYTE)flags;
     }
-    status = (int)network_redirector_mx(cmd, sftp, attrib);
+    status = (WORD)network_redirector_mx(cmd, sftp, attrib);
     if (status >= SUCCESS)
     {
       if (sftp->sft_count == 0)
@@ -1349,5 +1349,5 @@ STATIC int remote_lock_unlock(sft FAR *sftp,     /* SFT for file */
   param_block.lu.ofs = ofs;
   param_block.lu.len = len;
   param_block.unlock = unlock;
-  return (int)network_redirector_mx_ps(REM_LOCK, sftp, &param_block);
+  return (WORD)network_redirector_mx_ps(REM_LOCK, sftp, &param_block);
 }

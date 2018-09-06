@@ -53,7 +53,7 @@ VOID set_machine_name(const char FAR * netname, UWORD name_num)
 
 int network_redirector_fp(unsigned cmd, void FAR *s)
 {
-  return (int)network_redirector_mx(cmd, s, 0);
+  return (WORD)network_redirector_mx(cmd, s, 0);
 }
 
 int network_redirector(unsigned cmd)
