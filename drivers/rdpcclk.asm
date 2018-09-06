@@ -30,6 +30,10 @@
 
         %include "../kernel/segs.inc"
 
+segment DATA
+                global  _DaysSinceEpoch
+_DaysSinceEpoch dw      0
+
 segment	HMA_TEXT
 
 ;
@@ -39,8 +43,6 @@ segment	HMA_TEXT
 READPCCLOCK:
                 mov     ah,0
                 int     1ah
-		extern  _DaysSinceEpoch   ;            ; update days if necessary
-
 		; (ah is still 0, al contains midnight flag)
                 add     word [_DaysSinceEpoch  ],ax    ;   *some* BIOSes accumulate several days
                 adc     word [_DaysSinceEpoch+2],byte 0;
