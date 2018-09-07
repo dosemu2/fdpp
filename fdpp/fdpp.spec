@@ -22,8 +22,8 @@ BuildRequires: nasm
 BuildRequires: libstdc++-devel
 
 %description
-fdpp provides the DOS compatibility layer.
-It is a FreeDOS kernel port to modern C++.
+fdpp is a 64-bit DOS.
+It is based on a FreeDOS kernel ported to modern C++.
 
 %prep
 %setup -q
