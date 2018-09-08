@@ -3,7 +3,7 @@
 #
 
 Name: fdpp
-Version: 0.1
+Version: 0.1beta1
 Release: 1%{?dist}
 Summary: DOS compatibility layer
 

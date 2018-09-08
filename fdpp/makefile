@@ -10,7 +10,9 @@ LIBS=$(lib_path)/device.lib
 HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
-PKG = fdpp-0.1.tar.gz
+RELVER = beta1
+PKG = fdpp-0.1$(RELVER)
+TGZ = $(PKG).tar.gz
 
 ALLCFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
 NASMFLAGS += -i$(SRC)
@@ -203,14 +205,14 @@ install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(srcdir)/thunks.h
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
-$(PKG):
-	cd .. && git archive -o fdpp/fdpp-0.1.tar.gz --prefix=fdpp-0.1/ HEAD
-.PHONY: $(PKG)
+$(TGZ):
+	cd .. && git archive -o fdpp/$(TGZ) --prefix=$(PKG)/ HEAD
+.PHONY: $(TGZ)
 
-tar: $(PKG)
+tar: $(TGZ)
 
-rpm: $(PKG)
-	rpmbuild -tb $(PKG)
+rpm: $(TGZ)
+	rpmbuild -tb $(TGZ)
 
 deb:
 	debuild -i -us -uc -b

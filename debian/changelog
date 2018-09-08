@@ -1,3 +1,9 @@
+fdpp (0.1~beta-1) bionic; urgency=low
+
+  * beta-1
+
+ -- Stas Sergeev <stsp@users.sourceforge.net>  Sat, 8 Sep 2018 18:00:00 +0300
+
 fdpp (0.1~alpha-3) artful; urgency=low
 
   * alpha-3
