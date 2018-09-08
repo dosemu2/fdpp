@@ -6,7 +6,7 @@ It is based on a FreeDOS kernel ported to modern C++.<br/>
 In short, FreeDOS plus-plus.
 
 Can be compiled with clang (not gcc!) and booted under
-[dosemu2](https://github.com/stsp/dosemu2)
+[dosemu2](https://github.com/stsp/dosemu2).
 
 ## building and installing
 Just run `make`.<br/>
@@ -16,7 +16,7 @@ After compiling, run `sudo make install` to install.
 
 ## installing from pre-built package
 For the ubuntu package please visit
-[this PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa)
+[this PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
 
 ## running
 The simplest way to get it running is to use
@@ -24,7 +24,8 @@ The simplest way to get it running is to use
 After installing fdpp, you can (re-)build dosemu2.
 It will then find fdpp during build, and enable its support.<br/>
 You can also get the pre-built dosemu2 packages with
-fdpp support enabled from the aforementioned ubuntu PPA.
+fdpp support enabled from the aforementioned
+[ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
 
 ## but what it *actually* is? why dosemu2?
 fdpp is a user-space library that needs a couple of
@@ -37,3 +38,14 @@ use [this code](https://github.com/stsp/dosemu2/blob/devel/src/plugin/fdpp/fdpp.
 as a reference implementation. Sufficiently DOS-oriented
 kernels like [freedos-32](http://freedos-32.sourceforge.net/)
 are good candidates for running fdpp.
+
+## portability
+fdpp is very portable as it uses just a couple of libc
+calls, namely malloc() and a few string functions.
+The initial goal was to avoid the libstdc++ dependency,
+but eventually this was given up because of some
+[unforeseen problems](https://stackoverflow.com/questions/48915888/allocate-shared-with-malloc).
+So fdpp can work with any libc and needs some very basic
+libstdc++. But the requirements to the compiler are
+exceptionally high, so clang++ is the only compiler
+to build fdpp with.
