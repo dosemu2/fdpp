@@ -47,10 +47,16 @@ asm are among its main goals. As the original freedos
 sources are modified very slightly, it may be possible
 to compile it with the real-mode compilers again, after
 some (back-)porting work.
+fdpp code is separated from the freedos kernel, so you can
+[look at it](https://github.com/stsp/fdpp/tree/master/fdpp)
+yourself. You'll find the set of preprocessors, syntax
+analysers, C++ templates and run-time support routines.
+This forms a meta-compiler.
 
 But compiling the freedos unmodified, is just one of the
 fdpp project's goals. Another goal is the development of
-the freedos core itself.
+the freedos core itself. So fdpp aims for a new, freedos-based
+kernel core and a 64bit compiler framework for it.
 
 ## portability
 fdpp is very portable as it uses just a couple of libc
