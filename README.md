@@ -39,6 +39,19 @@ as a reference implementation. Sufficiently DOS-oriented
 kernels like [freedos-32](http://freedos-32.sourceforge.net/)
 are good candidates for running fdpp.
 
+## what fdpp technically is?
+A meta-compiler that allows to compile the freedos
+kernel from its almost unmodified sources.
+Parsing FAR pointers and generating thunks to real-mode
+asm are among its main goals. As the original freedos
+sources are modified very slightly, it may be possible
+to compile it with the real-mode compilers again, after
+some (back-)porting work.
+
+But compiling the freedos unmodified, is just one of the
+fdpp project's goals. Another goal is the development of
+the freedos core itself.
+
 ## portability
 fdpp is very portable as it uses just a couple of libc
 calls, namely malloc() and a few string functions.
