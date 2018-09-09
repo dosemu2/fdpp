@@ -42,9 +42,6 @@
 "BOOL"		{ return WORD; }
 "char"		{ return CHAR; }
 "short"		{ return WORD; }
-"int"		{ return INT; }
-"unsigned"	{ return UINT; }
-"long"		{ return LONG; }
 "UCOUNT"	{ return UWORD; }
 "UWORD"		{ return UWORD; }
 "seg"		{ return UWORD; }
@@ -52,7 +49,6 @@
 "UBYTE"		{ return UBYTE; }
 "unsigned char"	{ return UBYTE; }
 "unsigned short"	{ return UWORD; }
-"unsigned long"	{ return ULONG; }
 "ULONG"		{ return UDWORD; }
 "DWORD"		{ return DWORD; }
 "UDWORD"	{ return UDWORD; }

@@ -203,7 +203,7 @@ static const char *get_flags(void)
 %}
 
 %token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
-%token VOID WORD UWORD CHAR BYTE UBYTE INT UINT LONG ULONG DWORD UDWORD STRUCT
+%token VOID WORD UWORD CHAR BYTE UBYTE DWORD UDWORD STRUCT
 %token LBR RBR
 %token CONST
 %token NORETURN
@@ -296,18 +296,6 @@ rtype:		  VOID		{ strcpy(rbuf, "\t\t_RSZ = 0;\n\t\t");
 				  strcpy(rtbuf, "void");
 				  is_rvoid = 1;
 				}
-		| LONG		{ strcpy(rbuf, "\t\t_RSZ = 4;\n\t\t_RET = ");
-				  strcpy(rtbuf, "long");
-				}
-		| ULONG		{ strcpy(rbuf, "\t\t_RSZ = 4;\n\t\t_RET = ");
-				  strcpy(rtbuf, "unsigned long");
-				}
-		| INT		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
-				  strcpy(rtbuf, "int");
-				}
-		| UINT		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
-				  strcpy(rtbuf, "unsigned");
-				}
 		| WORD		{ strcpy(rbuf, "\t\t_RSZ = 2;\n\t\t_RET = ");
 				  strcpy(rtbuf, "WORD");
 				}
@@ -363,30 +351,6 @@ atype:		  VOID		{
 		| UDWORD	{
 				  arg_size = 4;
 				  strcpy(atype, "UDWORD");
-				  al_arg_size = 4;
-				}
-		| INT		{
-				  arg_size = 2;
-				  strcpy(atype, "int");
-				  strcpy(atype2, "WORD");
-				  al_arg_size = 2;
-				}
-		| UINT		{
-				  arg_size = 2;
-				  strcpy(atype, "unsigned");
-				  strcpy(atype2, "UWORD");
-				  al_arg_size = 2;
-				}
-		| LONG		{
-				  arg_size = 4;
-				  strcpy(atype, "long");
-				  strcpy(atype2, "DWORD");
-				  al_arg_size = 4;
-				}
-		| ULONG		{
-				  arg_size = 4;
-				  strcpy(atype, "unsigned long");
-				  strcpy(atype2, "UDWORD");
 				  al_arg_size = 4;
 				}
 		| BYTE		{
