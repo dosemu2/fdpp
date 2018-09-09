@@ -129,15 +129,15 @@ STATIC COUNT muxLoadPkg(int subfct, UWORD cp, UWORD cntry)
      NLSFUNC ID.  call_nls will set the high word = BX on return.
   */
   ret = muxGo(0, 0, NLS_FREEDOS_NLSFUNC_VERSION, 0, NLS_FREEDOS_NLSFUNC_ID, NULL);
-  if ((int)ret != 0x14ff)
+  if ((WORD)ret != 0x14ff)
     return DE_FILENOTFND;       /* No NLSFUNC --> no load */
-  if ((int)(ret >> 16) != NLS_FREEDOS_NLSFUNC_ID) /* FreeDOS NLSFUNC will return */
+  if ((WORD)(ret >> 16) != NLS_FREEDOS_NLSFUNC_ID) /* FreeDOS NLSFUNC will return */
     return DE_INVLDACC;         /* This magic number */
 
   /* OK, the correct NLSFUNC is available --> load pkg */
   /* If cp == -1 on entry, NLSFUNC updates cp to the codepage loaded
      into memory. The system must then change to this one later */
-  return (int)muxGo(subfct, 0, cp, cntry, 0, NULL);
+  return (WORD)muxGo(subfct, 0, cp, cntry, 0, NULL);
 }
 
 STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
@@ -146,7 +146,7 @@ STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
   log(("NLS: muxBufGo(): subfct=%x, BP=%u, cp=%u, cntry=%u, len=%u, buf=%P\n",
        subfct, bp, cp, cntry, bufsize, GET_FP32(buf)));
 
-  return (int)muxGo(subfct, bp, cp, cntry, bufsize, buf);
+  return (WORD)muxGo(subfct, bp, cp, cntry, bufsize, buf);
 }
 
 #define mux65(s,cp,cc,bs,b)	muxBufGo(2, (s), (cp), (cc), (bs), (b))

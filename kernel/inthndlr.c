@@ -782,7 +782,7 @@ dispatch:
       /* r->DL is NOT changed by MS 6.22 */
       /* INT21/32 is documented to reread the DPB */
       {
-        int drv = (lr.DL == 0 || lr.AH == 0x1f) ? (int)default_drive : lr.DL - 1;
+        int drv = (lr.DL == 0 || lr.AH == 0x1f) ? (WORD)default_drive : lr.DL - 1;
         struct dpb FAR *dpb = get_dpb(drv);
 
         if (dpb == NULL)
@@ -1471,7 +1471,7 @@ dispatch:
 
       /* Get/Set Serial Number */
     case 0x69:
-      rc = (lr.BL == 0 ? (int)default_drive : lr.BL - 1);
+      rc = (lr.BL == 0 ? (WORD)default_drive : lr.BL - 1);
       if (lr.AL < 2)
       {
         if (get_cds(rc) == NULL)
@@ -1569,7 +1569,7 @@ long_check:
     lr.AX = (UWORD)lrc;
     goto exit_dispatch;
   }
-  rc = (int)lrc;
+  rc = (WORD)lrc;
 short_check:
   if (rc < SUCCESS)
     goto error_exit;
@@ -2076,7 +2076,7 @@ long_check:
     r.AX = (UWORD)lrc;
     return;
   }
-  rc = (int)lrc;
+  rc = (WORD)lrc;
 short_check:
   if (rc < SUCCESS)
     goto error_exit;

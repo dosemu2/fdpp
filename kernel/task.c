@@ -693,7 +693,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
     {
       if (exe_size < CHUNK/16)
         toRead = exe_size*16;
-      nBytesRead = (int)DosRWSft(fd, toRead, MK_FP(sp, 0), XFR_READ);
+      nBytesRead = (WORD)DosRWSft(fd, toRead, MK_FP(sp, 0), XFR_READ);
       if (nBytesRead < toRead || exe_size <= CHUNK/16)
         break;
       sp += CHUNK/16;
@@ -782,7 +782,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   }
 
   exe_header *eh = &ExeHeader;
-  rc = (int)DosRWSft(fd, sizeof(exe_header), MK_FAR_PTR_SCP(eh), XFR_READ);
+  rc = (WORD)DosRWSft(fd, sizeof(exe_header), MK_FAR_PTR_SCP(eh), XFR_READ);
 
   if (rc == sizeof(exe_header) &&
       (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))

@@ -79,7 +79,7 @@ long BinaryCharIO(__DOSFAR(struct dhdr) *pdev, size_t n, void FAR * bp,
 
 STATIC int CharIO(__DOSFAR(struct dhdr) *pdev, unsigned char ch, unsigned command)
 {
-  int err = (int)BinaryCharIO(pdev, 1, MK_FAR_SCP(ch), command);
+  int err = (WORD)BinaryCharIO(pdev, 1, MK_FAR_SCP(ch), command);
   if (err == 0)
     return 256;
   if (err < 0)

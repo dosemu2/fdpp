@@ -85,11 +85,11 @@ WORD ASMCFUNC FAR clk_driver(rqptr rp)
         ticks = 5 * ReadPCClock();
         ticks = ((ticks / 59659u) << 16) + ((ticks % 59659u) << 16) / 59659u;
 
-        tmp = (int)(ticks / 6000);
+        tmp = (WORD)(ticks / 6000);
         clk.clkHours = tmp / 60;
         clk.clkMinutes = tmp % 60;
 
-        tmp = (int)(ticks % 6000);
+        tmp = (WORD)(ticks % 6000);
         clk.clkSeconds = tmp / 100;
         clk.clkHundredths = tmp % 100;
 

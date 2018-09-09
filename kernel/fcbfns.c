@@ -61,7 +61,7 @@ UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
   spc = DosGetFree(drive, NULL, bps, nc);
   if (spc != 0xffff)
   {
-    struct dpb FAR *dpbp = get_dpb(drive == 0 ? (int)default_drive : drive - 1);
+    struct dpb FAR *dpbp = get_dpb(drive == 0 ? (WORD)default_drive : drive - 1);
     /* Point to the media desctriptor for this drive               */
     *pspc = (UBYTE)spc;
     if (dpbp == NULL)
@@ -250,7 +250,7 @@ UBYTE FcbReadWrite(xfcb FAR * lpXfcb, UCOUNT recno, int mode)
   /* Do the read                                                  */
   nTransfer = DosRWSft(lpFcb->fcb_sftno, size, dta, mode & ~XFR_FCB_RANDOM);
   if (nTransfer < 0)
-    CritErrCode = -(int)nTransfer;
+    CritErrCode = -(WORD)nTransfer;
 
   /* Now find out how we will return and do it.                   */
   if (mode & XFR_WRITE)
