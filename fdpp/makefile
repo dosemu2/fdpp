@@ -51,7 +51,7 @@ kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 	$(NASM) -o $@ $<
 
 clean:
-	cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
+	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
 		*.lnk *.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
 		plt*.inc kernel.exe $(TARGET).sys kernel.sym *.pc
