@@ -716,7 +716,7 @@ STATIC VOID InitSerialPorts(VOID)
 
 STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 {
-  iregs r;
+  iregs r = {};
   UBYTE buffer[0x13];
   UBYTE FAR *buf;
   buffer[0] = 0x13;
@@ -738,7 +738,7 @@ STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 STATIC void CheckContinueBootFromHarddisk(void)
 {
   const char *bootedFrom = "Floppy/CD";
-  iregs r;
+  iregs r = {};
   int key;
 
   if (InitKernelConfig.BootHarddiskSeconds == 0)

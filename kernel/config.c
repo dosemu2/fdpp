@@ -62,7 +62,7 @@ int MenuColor = -1;
 
 STATIC void WriteMenuLine(struct MenuSelector *menu)
 {
-  iregs r;
+  iregs r = {};
   unsigned char attr = (unsigned char)MenuColor;
   char *pText = menu->Text;
 
@@ -1222,7 +1222,7 @@ STATIC void CfgBuffersHigh(char * pLine)
 */
 STATIC VOID sysScreenMode(char * pLine)
 {
-  iregs r;
+  iregs r = {};
   COUNT nMode;
   COUNT nFunc = 0x11;
 
@@ -2279,7 +2279,7 @@ STATIC VOID CfgMenuEsc(char * pLine)
 
 STATIC VOID DoMenu(void)
 {
-  iregs r;
+  iregs r = {};
   int key = -1;
   if (Menus == 0)
     return;
@@ -2417,7 +2417,7 @@ STATIC VOID CfgMenuDefault(char * pLine)
 STATIC void ClearScreen(unsigned char attr)
 {
   /* scroll down (newlines): */
-  iregs r;
+  iregs r = {};
   unsigned char rows;
 
   /* clear */
@@ -2698,7 +2698,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
 
 STATIC void _free(seg segment)
 {
-  iregs r;
+  iregs r = {};
 
   r.a.b.h = 0x49;				/* free memory	*/
   r.es  = segment;
@@ -2708,7 +2708,7 @@ STATIC void _free(seg segment)
 /* set memory allocation strategy */
 STATIC void set_strategy(unsigned char strat)
 {
-  iregs r;
+  iregs r = {};
 
   r.a.x = 0x5801;
   r.b.b.l = strat;
