@@ -41,7 +41,7 @@ static BYTE *RcsId =
 
 unsigned init_oem(void)
 {
-  iregs r;
+  iregs r = {};
   init_call_intr(0x12, &r);
   return r.a.x;
 }

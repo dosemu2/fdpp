@@ -671,7 +671,7 @@ VOID init_fatal(const BYTE * err_msg)
 
 STATIC VOID InitPrinters(VOID)
 {
-  iregs r;
+  iregs r = {};
   int num_printers, i;
 
   init_call_intr(0x11, &r);     /* get equipment list */
@@ -688,7 +688,7 @@ STATIC VOID InitPrinters(VOID)
 
 STATIC VOID InitSerialPorts(VOID)
 {
-  iregs r;
+  iregs r = {};
   int serial_ports, i;
 
   init_call_intr(0x11, &r);     /* get equipment list */

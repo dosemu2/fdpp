@@ -529,8 +529,9 @@ STATIC seg prev_mcb(seg cur_mcb, seg start)
 
 STATIC void umb_init(void)
 {
-  UWORD umb_seg;
-  UCOUNT umb_size;
+  /* valgrind can't track initializers in asm, so init with 0 */
+  UWORD umb_seg = 0;
+  UCOUNT umb_size = 0;
   seg umb_max;
   void FAR *xms_addr;
 
@@ -1036,7 +1037,7 @@ STATIC struct table * LookUp(struct table *p, char * token)
 
 UWORD GetBiosKey(int timeout)
 {
-  iregs r;
+  iregs r = {};
 
   ULONG startTime = GetBiosTime();
 
@@ -1784,7 +1785,7 @@ STATIC void Device(char * pLine)
 
 STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
 {
-  exec_blk eb;
+  exec_blk eb = {};
   struct dhdr FAR *dhp;
   struct dhdr FAR *next_dhp;
   BOOL result;

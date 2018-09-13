@@ -633,7 +633,7 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
 /* Get the parameters of the hard disk */
 STATIC int LBA_Get_Drive_Parameters(int drive, struct DriveParamS *driveParam)
 {
-  iregs regs;
+  iregs regs = {};
   struct _bios_LBA_disk_parameterS lba_bios_parameters;
   struct _bios_LBA_disk_parameterS FAR *bp;
 
@@ -961,7 +961,7 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
 
   static struct _bios_LBA_address_packet FAR *f_dap;
   struct CHS chs;
-  iregs regs;
+  iregs regs = {};
   int num_retries;
   UBYTE FAR *f_buf;
 
@@ -1135,7 +1135,7 @@ ReadNextPartitionTable:
 
 STATIC int BIOS_nrdrives(void)
 {
-  iregs regs;
+  iregs regs = {};
 
   regs.a.b.h = 0x08;
   regs.d.b.l = 0x80;
