@@ -6,7 +6,7 @@
 #define __ASM_ARRI_F(t, v) _E __ASMARIFSYM(t) __##v
 #define __ASM_FUNC(v) _E __ASMFSYM(void) __##v
 #define SEMIC ;
-#include "glob_asm.h"
+#include <glob_asm.h>
 #undef __ASM
 #undef __ASM_FAR
 #undef __ASM_NEAR

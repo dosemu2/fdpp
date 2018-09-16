@@ -61,9 +61,7 @@ static BYTE *Globals_hRcsId =
 #include "lol.h"
 #include "nls.h"
 #include "dyn.h"
-#ifdef __GNUC__
-#include "glob_inc.h"
-#endif
+#include "glob_fd.h"
 
 /* fatfs.c */
 #ifdef WITHFAT32

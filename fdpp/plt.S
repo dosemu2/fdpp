@@ -127,7 +127,7 @@ __asm_callsymtab_end:
 #define __ASM_FUNC(n) asmsym n
 #define SEMIC
 __asm_symtab_start:
-#include "glob_asm.h"
+#include <glob_asm.h>
 __asm_symtab_end:
 
 segment HMA_TEXT

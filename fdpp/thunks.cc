@@ -53,7 +53,7 @@ static union asm_thunks_u {
 #define __ASM_ARRI_F(t, v) struct far_s * __##v
 #define __ASM_FUNC(v) struct far_s * __##v
 #define SEMIC ;
-#include "glob_asm.h"
+#include <glob_asm.h>
 #undef __ASM
 #undef __ASM_FAR
 #undef __ASM_NEAR
@@ -73,7 +73,7 @@ static union asm_thunks_u {
 #define __ASM_ARRI(t, v) __ASMREF(__##v)
 #define __ASM_ARRI_F(t, v) __ASMREF(__##v)
 #define __ASM_FUNC(v) __ASMREF(__##v)
-#include "glob_asm.h"
+#include <glob_asm.h>
 #undef __ASM
 #undef __ASM_FAR
 #undef __ASM_NEAR

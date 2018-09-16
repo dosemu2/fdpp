@@ -166,8 +166,8 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 
 plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
 
-plt.asm: $(srcdir)/plt.S $(srcdir)/glob_asm.h
-	cpp -P $< >$@
+plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
+	cpp -I $(SRC) -P $< >$@
 
 cdata.asm: $(srcdir)/cdata.S
 	cpp -P $^ | sed 's/" "//g' >$@
@@ -190,7 +190,7 @@ thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
 	parsers/thunk_gen 1 <$< >$@ || (rm -f $@ ; false)
 
-glob_asmdefs.h: $(srcdir)/glob_asm.h
+glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
 parsers/thunk_gen:
