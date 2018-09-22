@@ -27,6 +27,14 @@ You can also get the pre-built dosemu2 packages with
 fdpp support enabled from the aforementioned
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
 
+Note: if you are running dosemu2 for the first time
+and do not have freedos installed locally, you may
+need to run<br/>
+`dosemu -install`<br/>
+and then put some `command.com`
+into `~/.dosemu/drive_c`. This inconvenience will be solved
+in the future.
+
 ## but what it *actually* is? why dosemu2?
 fdpp is a user-space library that needs a couple of
 call-backs to be provided to it by the host program.
