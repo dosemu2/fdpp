@@ -192,6 +192,7 @@ cont:           ; Now set up call frame
                 pop bx
 
                 mov     byte [_BootDrive],bl ; tell where we came from
+                mov     byte [_ShellDrive],bh ; command.com drive
 
 ;!!             int     11h
 ;!!             mov     cl,6
@@ -466,6 +467,9 @@ _version_flags  db      0
                 global  os_release
                 extern  _os_release
 os_release      dw      _os_release
+
+                global  _ShellDrive
+_ShellDrive     db      1
 
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced

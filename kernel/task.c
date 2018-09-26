@@ -28,6 +28,7 @@
 
 #include "portab.h"
 #include "globals.h"
+#include "init-mod.h"
 
 #ifdef VERSION_STRINGS
 static BYTE *RcsId =
@@ -803,8 +804,6 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   return rc;
 }
 
-#include "config.h" /* config structure definition */
-
 /* start process 0 (the shell) */
 VOID ASMCFUNC P_0(struct config FAR *Config)
 {
@@ -842,19 +841,23 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     _printf("Process 0 starting: %s%s\n\n", GET_PTR(Shell), tailp + 2);
 #endif
     res_DosExec(mode, &exb, Shell);
-    put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
-    put_string(Shell);
-    put_string(tailp + 2);
-    if (!retried && default_drive > 2 && fstrlen(Shell) > 3 && Shell[1] != ':')
+    if (!retried && (default_drive > 2 || LoL->_ShellDrive) &&
+        fstrlen(Shell) > 3 && Shell[1] != ':')
     {
       retried++;
       memmove(tailp, tailp + 2, strlen(tailp + 2) + 1);
       fmemmove(Shell + 3, Shell, fstrlen(Shell) + 1);
       memcpy(Shell, "c:\\", 3);
-      strcat(Shell, "\r\n");
+      if (LoL->_ShellDrive & 0x80)
+        Shell[0] += LoL->_ShellDrive & ~0x80;
       endp = Shell + fstrlen(Shell);
+      put_string("Starting shell: ");
+      put_string(Shell);
       continue;
     }
+    put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
+    put_string(Shell);
+    put_string(tailp + 2);
     put_string(" Enter the full shell command line: ");
     rd = res_read(STDIN, Shell, NAMEMAX);
     if (rd <= 0)
