@@ -75,12 +75,7 @@ printer.obj:	$(SRC)printer.asm $(SRC)io.inc
 procsupt.obj:	$(SRC)procsupt.asm $(SRC)segs.inc $(HDR)stacks.inc
 serial.obj:	$(SRC)serial.asm  $(SRC)io.inc
 
-HDRS=\
-    $(HDR)portab.h $(HDR)device.h $(HDR)mcb.h $(HDR)pcb.h \
-    $(HDR)fat.h $(HDR)fcb.h $(HDR)tail.h $(HDR)time.h $(HDR)process.h \
-    $(HDR)dcb.h $(HDR)sft.h $(HDR)cds.h $(HDR)exe.h $(HDR)fnode.h     \
-    $(HDR)dirmatch.h $(HDR)file.h $(HDR)clock.h $(HDR)kbd.h $(HDR)error.h  \
-    $(HDR)version.h $(SRC)dyndata.h
+HDRS = $(wildcard $(HDR)*.h)
 PLPHDRS = farobj.hpp farptr.hpp
 _PPHDRS = $(PLPHDRS) dosobj.h farhlp.h thunks_priv.h thunks.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
