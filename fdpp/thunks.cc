@@ -141,7 +141,7 @@ union dword {
 
 static void *so2lin(uint16_t seg, uint16_t off)
 {
-    return fdpp->mem_base() + (seg << 4) + off;
+    return fdpp->so2lin(seg, off);
 }
 
 void *resolve_segoff(struct far_s fa)
