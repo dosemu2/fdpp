@@ -141,7 +141,7 @@ static dsk_proc * const dispatch[NENTRY] =
 /*  F U N C T I O N S  --------------------------------------------------- */
 /* ----------------------------------------------------------------------- */
 
-COUNT ASMCFUNC FAR blk_driver(rqptr rp)
+COUNT ASMCFUNC FAR blk_driver(_rqptr rp)
 {
   if (rp->r_unit >= blk_dev.dh_name[0] && rp->r_command != C_INIT)
     return failure(E_UNIT);

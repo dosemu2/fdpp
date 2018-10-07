@@ -480,10 +480,11 @@ typedef struct {
 
 /*
  */
-typedef __DOSFAR(request)rqptr;
-typedef __DOSFAR(bpb)bpbptr;
-typedef __DOSFAR(BYTE)byteptr;
-typedef __DOSFAR(struct dhdr)dhdrptr;
+typedef __FAR(request) rqptr;
+typedef __DOSFAR(request) _rqptr;
+typedef __DOSFAR(bpb) bpbptr;
+//typedef __DOSFAR(BYTE) byteptr;
+//typedef __DOSFAR(struct dhdr) dhdrptr;
 
 /* dsk.c */
 COUNT ASMCFUNC FAR blk_driver(rqptr rp);
