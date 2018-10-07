@@ -68,7 +68,7 @@ UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
     {
       mdb = spc >> 8;
       spc &= 0xff;
-      return MK_FAR_ST(mdb);
+      return MK_FAR(mdb);
     }
     else
     {

@@ -179,7 +179,6 @@ public:
 #define _MK_NEAR_ST(n, o) \
     static FarObjSt<decltype(o)::type> __obj_##n; \
     __obj_##n.FarObjSet(o, decltype(o)::len)
-#define MK_FAR_ST(o) ({ _MK_FAR_ST(_ddd, o); __MK_FAR(_ddd); })
 #define MK_NEAR_ST(o) ({ _MK_FAR_ST(_ddd, o); __MK_NEAR(_ddd); })
 #define MK_NEAR_SYM_ST(o) ({ _MK_NEAR_ST(_ddd, o);  __MK_NEAR(_ddd); })
 #define MK_NEAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_NEAR(_ddd); })
