@@ -166,9 +166,16 @@ public:
     static FarObjSt<_R(o)> __obj_##n; \
     __obj_##n.FarObjSet(o, strlen(o) + 1)
 #define MK_FAR(o) \
-        FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o))
+    FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o))
 #define MK_FAR_SZ(o, sz) \
-        FarPtr<_R(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
+    FarPtr<_R(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
+#define MK_FAR_CHLD(o, f) ({ \
+    std::shared_ptr<ObjIf> _sh = std::make_shared<FarObj<decltype(o)>>(o); \
+    bool added = f.set_child(_sh); \
+    _assert(added); \
+    FarPtr<decltype(o)> _dd(_sh); \
+    _dd; \
+})
 #define _MK_NEAR_ST(n, o) \
     static FarObjSt<decltype(o)::type> __obj_##n; \
     __obj_##n.FarObjSet(o, decltype(o)::len)

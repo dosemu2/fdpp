@@ -461,7 +461,7 @@ STATIC WORD bldbpb(rqptr rp, ddt * pddt)
   if ((result = getbpb(pddt)) != 0)
     return result;
 
-  rp->r_bpptr = MK_FAR_ST(pddt->ddt_bpb);
+  rp->r_bpptr = MK_FAR_CHLD(pddt->ddt_bpb, rp);
   return S_DONE;
 }
 

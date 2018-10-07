@@ -22,6 +22,7 @@
 #include <type_traits>
 #include <memory>
 #include <cstring>
+#include <unordered_set>
 //#include "cppstubs.hpp"
 #include "thunks_priv.h"
 #include "farhlp.h"
@@ -131,7 +132,9 @@ public:
 template<typename T>
 class FarPtr : public FarPtrBase<T>
 {
-    std::shared_ptr<ObjIf> obj;
+    typedef std::shared_ptr<ObjIf> sh_obj;
+    sh_obj obj;
+    std::unordered_set<sh_obj> children;
     bool nonnull = false;
 
 public:
@@ -146,7 +149,7 @@ public:
         do_store_far(f.get_far());
     }
     explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
-    explicit FarPtr(const std::shared_ptr<ObjIf>& o) :
+    explicit FarPtr(const sh_obj& o) :
             FarPtrBase<T>(o->get_obj()), obj(o) {}
     FarPtr(const FarPtr<T>& f) = default;
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
@@ -214,6 +217,7 @@ public:
             return NULL;
         return (T*)resolve_segoff(this->ptr);
     }
+    bool set_child(const sh_obj& o) { return children.insert(o).second; }
 };
 
 #define _MK_F(f, s) f(s)
