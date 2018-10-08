@@ -183,7 +183,12 @@ public:
     track_owner_sh(p, _sh); \
     ((FarObj<decltype(o)> *)_sh.get())->get_near(); \
 })
-#define MK_NEAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_NEAR(_ddd); })
+#define MK_NEAR_STR_OBJ(p, o) ({ \
+    std::shared_ptr<ObjRef> _sh = \
+        std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1); \
+    track_owner_sh(p, _sh); \
+    ((FarObj<_R(o)> *)_sh.get())->get_near(); \
+})
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()

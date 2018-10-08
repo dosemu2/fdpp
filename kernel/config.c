@@ -358,8 +358,8 @@ void PreConfig(void)
      KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
 
-  Config.cfgInit = MK_NEAR_STR_ST(_cfgInit);
-  Config.cfgInitTail = MK_NEAR_STR_ST(_cfgInitTail);
+  Config.cfgInit = MK_NEAR_STR_OBJ(&Config, _cfgInit);
+  Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, _cfgInitTail);
   config_init_buffers(Config.cfgBuffers);
 
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
