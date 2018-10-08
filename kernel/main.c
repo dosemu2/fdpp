@@ -580,7 +580,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_command = C_INIT;
   rq.r_length = sizeof(request);
   rq.r_endaddr = *r_top;
-  rq.r_cmdline = MK_FAR_STR_ST(cmdLine ? cmdLine : "\n");
+  rq.r_cmdline = MK_FAR_STR_OBJ(&rq, cmdLine ? cmdLine : "\n");
   rq.r_firstunit = LoL->_nblkdev;
 
   execrh(MK_FAR_SCP(rq), dhp);

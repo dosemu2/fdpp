@@ -164,9 +164,6 @@ public:
 #define _RR(t) typename std::remove_reference<t>::type
 #define _R(o) _RP(_RE(_RR(decltype(o))))
 
-#define _MK_FAR_STR_ST(n, o) \
-    static FarObjSt<_R(o)> __obj_##n; \
-    __obj_##n.FarObjSet(o, strlen(o) + 1)
 #define MK_FAR(o) \
     FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o))
 #define MK_FAR_SZ(o, sz) \
@@ -194,7 +191,12 @@ public:
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define __MK_NEAR2(n, t) t(__obj_##n.get_near().off())
 #define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o) + 1)
-#define MK_FAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_FAR(_ddd); })
+#define MK_FAR_STR_OBJ(p, o) ({ \
+    std::shared_ptr<ObjRef> _sh = \
+        std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1); \
+    track_owner_sh(p, _sh); \
+    FarPtr<decltype(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
+})
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
 #define _MK_FAR_SZ_ST(n, o, sz) \
     static FarObjSt<_R(o)> __obj_##n; \
