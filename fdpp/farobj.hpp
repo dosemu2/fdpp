@@ -128,16 +128,17 @@ public:
 #define _RE(t) typename std::remove_extent<t>::type
 #define _RR(t) typename std::remove_reference<t>::type
 #define _R(o) _RP(_RE(_RR(decltype(o))))
+#define _RC(t) typename std::remove_const<_R(t)>::type
 
 #define MK_FAR(o) \
     FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o))
 #define MK_FAR_SZ(o, sz) \
-    FarPtr<_R(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
+    FarPtr<_RC(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
 #define MK_FAR_CHLD(o, f) ({ \
     std::shared_ptr<ObjIf> _sh = std::make_shared<FarObj<decltype(o)>>(o); \
     bool added = f.set_child(_sh); \
     _assert(added); \
-    FarPtr<decltype(o)> _dd(_sh); \
+    FarPtr<_RC(o)> _dd(_sh); \
     _dd; \
 })
 #define MK_NEAR_OBJ(p, o) ({ \
@@ -151,7 +152,7 @@ public:
     track_owner_sh(p, _sh); \
     ((FarObj<_R(o)> *)_sh.get())->get_near(); \
 })
-#define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
+#define MK_FAR_PTR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(*o).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define __MK_NEAR2(n, t) t(__obj_##n.get_near().off())
@@ -160,17 +161,16 @@ public:
     std::shared_ptr<ObjRef> _sh = \
         std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1); \
     track_owner_sh(p, _sh); \
-    FarPtr<decltype(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
+    FarPtr<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
 #define MK_FAR_SZ_OBJ(p, o, sz) ({ \
     std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<_R(o)>>(o, sz); \
     track_owner_sh(p, _sh); \
-    FarPtr<_R(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
+    FarPtr<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
 #define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o).get_obj())
-#define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())
-#define MK_FAR_STR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(o, strlen(o) + 1).get_obj())
+#define MK_FAR_STR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(o, strlen(o) + 1).get_obj())
 
 #define PTR_MEMB(t) NearPtr_DO<t>
 #define NEAR_PTR_DO(t) NearPtr_DO<t>

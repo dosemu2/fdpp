@@ -834,8 +834,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     /* terminate name and tail */
     *tailp =  *(endp + 2) = '\0';
     /* ctCount: just past '\0' do not count the "\r\n" */
-    size_t sz = sizeof(CommandTail);
-    exb.exec.cmd_line = MK_FAR_SZ_OBJ(&exb, tailp + 1, sz);
+    exb.exec.cmd_line = MK_FAR_STR_OBJ(&exb, tailp + 1);
     exb.exec.cmd_line->ctCount = endp - tailp - 2;
 #ifdef DEBUG
     _printf("Process 0 starting: %s%s\n\n", GET_PTR(Shell), tailp + 2);
