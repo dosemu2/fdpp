@@ -124,41 +124,6 @@ public:
     FarObj& operator =(const FarObj &) = delete;
 };
 
-template <typename T>
-class FarObjSt : public FarObjBase<T> {
-    void MkObj(T* obj, unsigned sz) {
-        if (this->ptr)
-            rm_dosobj_st(this->ptr);
-        this->ptr = obj;
-        this->size = sz;
-        this->fobj = (__DOSFAR(uint8_t))mk_dosobj_st(obj, sz);
-    }
-
-public:
-    using obj_type = typename FarObjBase<T>::obj_type; // inherit type from parent
-
-    FarObjSt() : FarObjBase<T>(NULL, 0) {}
-
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_void<T1>::value &&
-            !std::is_pointer<T1>::value>::type* = nullptr>
-    void FarObjSet(T1& obj) { MkObj(&obj, sizeof(T1)); }
-    void FarObjSet(T* obj, unsigned sz) { MkObj(obj, sz); }
-
-    virtual far_s get_obj() {
-        pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
-        return this->fobj.get_far();
-    }
-    NearPtr_DO<obj_type> get_near() {
-        far_s f = get_obj();
-        return NearPtr_DO<obj_type>(f.off);
-    }
-
-    /* make it non-copyable */
-    FarObjSt(const FarObjSt &) = delete;
-    FarObjSt& operator =(const FarObjSt &) = delete;
-};
-
 #define _RP(t) typename std::remove_pointer<t>::type
 #define _RE(t) typename std::remove_extent<t>::type
 #define _RR(t) typename std::remove_reference<t>::type
