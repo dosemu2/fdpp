@@ -1726,8 +1726,8 @@ STATIC VOID InitPgm(char * pLine)
   static char init[NAMEMAX];
   static char inittail[NAMEMAX];
 
-  Config.cfgInit = MK_NEAR_ST(init);
-  Config.cfgInitTail = MK_NEAR_ST(inittail);
+  Config.cfgInit = MK_NEAR_OBJ(&Config, init);
+  Config.cfgInitTail = MK_NEAR_OBJ(&Config, inittail);
 
   /* Get the string argument that represents the new init pgm     */
   pLine = GetStringArg(pLine, Config.cfgInit);
