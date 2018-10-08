@@ -50,10 +50,12 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
     bool have_obj = false;
     int refcnt = 0;
     std::unordered_set<ObjRef *> owned;
+    std::unordered_set<sh_ref> owned_sh;
 
     void ctor() {
         this->fobj = (__DOSFAR(uint8_t))mk_dosobj(this->ptr, this->size);
         owned = get_owned_list(this->ptr);
+        owned_sh = get_owned_list_sh(this->ptr);
     }
 
     template <typename T1 = T,
@@ -65,6 +67,9 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
 
     void own_cp() {
         std::for_each(owned.begin(), owned.end(), [] (ObjRef *o) {
+            o->cp();
+        });
+        std::for_each(owned_sh.begin(), owned_sh.end(), [&] (sh_ref o) {
             o->cp();
         });
     }
@@ -180,6 +185,11 @@ public:
     static FarObjSt<decltype(o)::type> __obj_##n; \
     __obj_##n.FarObjSet(o, decltype(o)::len)
 #define MK_NEAR_ST(o) ({ _MK_FAR_ST(_ddd, o); __MK_NEAR(_ddd); })
+#define MK_NEAR_OBJ(p, o) ({ \
+    std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<decltype(o)>>(o); \
+    track_owner_sh(p, _sh); \
+    ((FarObj<decltype(o)> *)_sh.get())->get_near(); \
+})
 #define MK_NEAR_SYM_ST(o) ({ _MK_NEAR_ST(_ddd, o);  __MK_NEAR(_ddd); })
 #define MK_NEAR_STR_ST(o) ({ _MK_FAR_STR_ST(_ddd, o); __MK_NEAR(_ddd); })
 #define MK_FAR_PTR_SCP(o) FarPtr<_R(o)>(FarObj<_R(o)>(*o).get_obj())

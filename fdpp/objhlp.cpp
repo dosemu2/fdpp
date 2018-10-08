@@ -39,3 +39,21 @@ std::unordered_set<ObjRef *> get_owned_list(const void *owner)
     }
     return ret;
 }
+
+static std::unordered_map<const void *, std::unordered_set<sh_ref> > shmap;
+
+bool track_owner_sh(const void *owner, sh_ref& obj)
+{
+    std::unordered_set<sh_ref>& ent = shmap[owner];
+    return ent.insert(obj).second;
+}
+
+std::unordered_set<sh_ref> get_owned_list_sh(const void *owner)
+{
+    std::unordered_set<sh_ref> ret;
+    if (shmap.find(owner) != shmap.end()) {
+        ret = shmap[owner];
+        shmap.erase(owner);
+    }
+    return ret;
+}

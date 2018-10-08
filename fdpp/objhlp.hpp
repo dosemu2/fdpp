@@ -19,6 +19,8 @@
 #ifndef OBJHLP_HPP
 #define OBJHLP_HPP
 
+#include <memory>
+
 class ObjRef {
 public:
     virtual void cp() = 0;
@@ -27,5 +29,9 @@ public:
 
 bool track_owner(const void *owner, ObjRef *obj);
 std::unordered_set<ObjRef *> get_owned_list(const void *owner);
+
+typedef std::shared_ptr<ObjRef> sh_ref;
+bool track_owner_sh(const void *owner, sh_ref& obj);
+std::unordered_set<sh_ref> get_owned_list_sh(const void *owner);
 
 #endif
