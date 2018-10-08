@@ -32,7 +32,7 @@
 
 #define FLOPPY_SEC_SIZE 512u  /* common sector size */
 
-UBYTE InitDiskTransferBuffer[MAX_SEC_SIZE] BSS_INIT({0});
+#define InitDiskTransferBuffer DiskTransferBuffer
 COUNT nUnits BSS_INIT(0);
 
 /*
@@ -769,7 +769,7 @@ STATIC void ConvCHSToIntern(struct CHS *chs, UBYTE * pDisk)
 }
 
 STATIC BOOL ConvPartTableEntryToIntern(struct PartTableEntry * pEntry,
-                                UBYTE * pDisk)
+                                UBYTE FAR * pDisk)
 {
   int i;
 
@@ -953,7 +953,7 @@ STATIC BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_t
 void BIOS_drive_reset(unsigned drive);
 
 STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
-                   ULONG LBA_address, void * buffer)
+                   ULONG LBA_address, void FAR * buffer)
 {
   static struct _bios_LBA_address_packet dap = {
     16, 0, 0, 0, _MK_DOS_FP(unsigned char, 0, 0), 0, 0
@@ -963,7 +963,6 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
   struct CHS chs;
   iregs regs = {};
   int num_retries;
-  UBYTE FAR *f_buf;
 
 /* disabled because this should not happen and if it happens the BIOS
    should complain; also there are weird disks around with
@@ -991,7 +990,7 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         (InitKernelConfig.ForceLBA || ExtLBAForce || chs.Cylinder > 1023))
     {
       dap.number_of_blocks = 1;
-      dap.buffer_address = MK_FAR_SZ_OBJ(&dap, buffer, MAX_SEC_SIZE);
+      dap.buffer_address = buffer;
       dap.block_address_high = 0;       /* clear high part */
       dap.block_address = LBA_address;  /* clear high part */
 
@@ -1011,14 +1010,13 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         return 1;
       }
 
-      f_buf = MK_FAR_SZ(buffer, MAX_SEC_SIZE);
       regs.a.x = 0x0201;
-      regs.b.x = FP_OFF_OBJ(&regs, f_buf);
+      regs.b.x = FP_OFF(buffer);
       regs.c.x =
           ((chs.Cylinder & 0xff) << 8) + ((chs.Cylinder & 0x300) >> 2) +
           chs.Sector;
       regs.d.b.h = chs.Head;
-      regs.es = FP_SEG_OBJ(&regs, f_buf);
+      regs.es = FP_SEG(buffer);
     }                           /* end of retries */
     init_call_intr(0x13, &regs);
     if ((regs.flags & FLG_CARRY) == 0)

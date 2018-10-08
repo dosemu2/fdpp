@@ -85,6 +85,12 @@ public:
             return NULL;
         return (T*)resolve_segoff(ptr);
     }
+    template<typename T0>
+    explicit operator T0*() {
+        if (!ptr.seg && !ptr.off)
+            return NULL;
+        return (T0*)resolve_segoff(ptr);
+    }
 
     wrp_type& get_wrp() {
         wrp_type *s = (wrp_type *)get_ptr();
