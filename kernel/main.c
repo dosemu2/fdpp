@@ -88,7 +88,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   /* clear the Init BSS area (what normally the RTL does */
   memset(_ib_start, 0, _ib_end - _ib_start);
-  dosobj_init(640);
+  dosobj_init(300);
 
                         /*  if the kernel has been UPX'ed,
                                 CONFIG info is stored at 50:e2 ..fc
