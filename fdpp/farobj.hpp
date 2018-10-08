@@ -198,10 +198,6 @@ public:
     FarPtr<decltype(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
-#define _MK_FAR_SZ_ST(n, o, sz) \
-    static FarObjSt<_R(o)> __obj_##n; \
-    __obj_##n.FarObjSet(o, sz)
-#define MK_FAR_SZ_ST(o, sz) ({ _MK_FAR_SZ_ST(_ddd, o, sz); __MK_FAR(_ddd); })
 #define MK_FAR_SZ_OBJ(p, o, sz) ({ \
     std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<_R(o)>>(o, sz); \
     track_owner_sh(p, _sh); \

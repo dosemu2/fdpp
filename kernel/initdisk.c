@@ -991,7 +991,7 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
         (InitKernelConfig.ForceLBA || ExtLBAForce || chs.Cylinder > 1023))
     {
       dap.number_of_blocks = 1;
-      dap.buffer_address = MK_FAR_SZ_ST(buffer, MAX_SEC_SIZE);
+      dap.buffer_address = MK_FAR_SZ_OBJ(&dap, buffer, MAX_SEC_SIZE);
       dap.block_address_high = 0;       /* clear high part */
       dap.block_address = LBA_address;  /* clear high part */
 
