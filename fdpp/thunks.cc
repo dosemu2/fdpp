@@ -270,8 +270,16 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 #define _RET ret
 #define _RSZ rsz
 #define _SP sp
-#define _DISPATCH(f, ...) fdpp_dispatch(f, __VA_ARGS__)
-#define _DISPATCH_v(f) fdpp_dispatch(f)
+#define _DISPATCH(r, f, ...) { \
+    fdlogprintf("dispatch " #f "\n"); \
+    r fdpp_dispatch(f, __VA_ARGS__); \
+    fdlogprintf("dispatch " #f " done\n"); \
+}
+#define _DISPATCH_v(r, f) { \
+    fdlogprintf("dispatch " #f "\n"); \
+    r fdpp_dispatch(f); \
+    fdlogprintf("dispatch " #f " done\n"); \
+}
 
     switch (fn) {
         #include <thunk_calls.h>
