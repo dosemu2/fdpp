@@ -487,14 +487,11 @@ typedef __DOSFAR(bpb) bpbptr;
 //typedef __DOSFAR(struct dhdr) dhdrptr;
 
 /* dsk.c */
-COUNT ASMCFUNC FAR blk_driver(rqptr rp);
 ddt * getddt(int dev);
 
 /* error.c */
 COUNT char_error(request * rq, __FAR(struct dhdr) lpDevice);
 COUNT block_error(request * rq, COUNT nDrive, __FAR(struct dhdr) lpDevice, int mode);
-/* sysclk.c */
-WORD ASMCFUNC FAR clk_driver(rqptr rp);
 
 /* execrh.asm */
 #if defined(__WATCOMC__) && _M_IX86 >= 300

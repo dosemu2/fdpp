@@ -22,6 +22,8 @@
 #include "../hdr/portab.h"
 #include "globals.h"
 #include "proto.h"
+
+#include "dispatch.hpp"
 #include "thunks_priv.h"
 #include "thunks.h"
 
@@ -268,6 +270,8 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 #define _RET ret
 #define _RSZ rsz
 #define _SP sp
+#define _DISPATCH(f, ...) fdpp_dispatch(f, __VA_ARGS__)
+#define _DISPATCH_v(f) fdpp_dispatch(f)
 
     switch (fn) {
         #include <thunk_calls.h>

@@ -222,8 +222,12 @@ line:		lnum rdecls fname lb args rb SEMIC
 			{
 			  switch (thunk_type) {
 			  case 0:
-			    printf("\tcase %i:\n%s%s(%s);\n\t\tbreak;\n",
+			    if (abuf[0])
+			      printf("\tcase %i:\n%s_DISPATCH(%s, %s);\n\t\tbreak;\n",
 				$1, rbuf, $3, abuf);
+			    else
+			      printf("\tcase %i:\n%s_DISPATCH_v(%s);\n\t\tbreak;\n",
+				$1, rbuf, $3);
 			    break;
 			  case 1:
 			    if (!is_rvoid)
