@@ -440,7 +440,11 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
     fdpp->asm_call_noret(regs, seg, off, sp, len);
+#if 0
     longjmp(*noret_jmp, 1);
+#else
+    fdpp_ljmp(*noret_jmp);
+#endif
 }
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)

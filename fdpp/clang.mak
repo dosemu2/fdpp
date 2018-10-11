@@ -8,8 +8,7 @@ CP=cp
 CC=clang++ -std=c++11
 CL=clang++
 
-TARGETOPT = -c -fno-unwind-tables -fno-asynchronous-unwind-tables \
-    -fno-exceptions -fno-threadsafe-statics -fno-rtti -fpic \
+TARGETOPT = -c -fno-threadsafe-statics -fno-rtti -fpic \
     -Wno-format-invalid-specifier
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)

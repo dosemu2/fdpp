@@ -16,16 +16,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <csetjmp>
+
+#define LJ_WRAP(c) \
+    try { \
+        c; \
+    } catch (jmp_buf env) { \
+        std::longjmp(env, 1); \
+    }
+
 template<typename T, typename ...args, typename ...Args,
     typename std::enable_if<!std::is_void<T>::value>::type* = nullptr>
 T fdpp_dispatch(T (*func)(args... fa), Args... a)
 {
-    return func(a...);
+    T ret;
+    LJ_WRAP(ret = func(a...));
+    return ret;
 }
 
 template<typename T, typename ...args, typename ...Args,
     typename std::enable_if<std::is_void<T>::value>::type* = nullptr>
 T fdpp_dispatch(T (*func)(args... fa), Args... a)
 {
-    func(a...);
+    LJ_WRAP(func(a...));
+}
+
+static inline void fdpp_ljmp(jmp_buf env)
+{
+    throw(env);
 }

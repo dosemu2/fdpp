@@ -76,7 +76,7 @@ procsupt.obj:	$(SRC)procsupt.asm $(SRC)segs.inc $(HDR)stacks.inc
 serial.obj:	$(SRC)serial.asm  $(SRC)io.inc
 
 HDRS = $(wildcard $(HDR)*.h)
-PLPHDRS = farobj.hpp farptr.hpp
+PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp
 _PPHDRS = $(PLPHDRS) dosobj.h farhlp.h thunks_priv.h thunks.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
