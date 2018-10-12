@@ -67,12 +67,9 @@ the freedos core itself. So fdpp aims for a new, freedos-based
 kernel core and a 64bit compiler framework for it.
 
 ## portability
-fdpp is very portable as it uses just a couple of libc
-calls, namely malloc() and a few string functions.
-The initial goal was to avoid the libstdc++ dependency,
-but eventually this was given up because of some
-[unforeseen problems](https://stackoverflow.com/questions/48915888/allocate-shared-with-malloc).
-So fdpp can work with any libc and needs some very basic
-libstdc++. But the requirements to the compiler are
-exceptionally high, so clang++ is the only compiler
-to build fdpp with.
+fdpp uses just a couple of libc calls, namely malloc() and a few
+string functions. Also currently it uses STL, hence the libstdc++
+dependency. Maybe in the future I'll port it to libsupc++.
+So fdpp can work in any environment with STL/libstdc++ support.
+But the requirements to the compiler are exceptionally high, so
+clang++ is the only compiler to build fdpp with.
