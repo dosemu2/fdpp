@@ -268,9 +268,10 @@ int _vsnprintf(char * buff, size_t size, CONST char * fmt, va_list arg)
 }
 
 enum { RET_CONT, RET_RET };
-STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list arg)
+STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list *_arg)
 {
 #define fmt (*_fmt)
+#define arg (*_arg)
     int base;
     BYTE s[11], * p;
     int size;
@@ -409,32 +410,42 @@ STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list arg)
 
     return RET_CONT;
 #undef fmt
+#undef arg
 }
 
 STATIC void do_printf(CONST BYTE * fmt, va_list arg)
 {
+  /* in order to pass va_list by pointer, we need to create a copy!
+   * https://stackoverflow.com/questions/8047362/is-gcc-mishandling-a-pointer-to-a-va-list-passed-to-a-function
+   * Weird! */
+  va_list arg_copy;
+  va_copy(arg_copy, arg);
   for (;*fmt != '\0'; fmt++)
   {
-    switch (printf_handle_char(&fmt, arg)) {
+    switch (printf_handle_char(&fmt, &arg_copy)) {
     case RET_CONT:
       continue;
     case RET_RET:
-      return;
+      break;
     }
   }
+  va_end(arg_copy);
 }
 
 STATIC void do_printf_n(size_t size, CONST BYTE * fmt, va_list arg)
 {
+  va_list arg_copy;
+  va_copy(arg_copy, arg);
   for (;*fmt != '\0' && size > 0; fmt++, size--)
   {
-    switch (printf_handle_char(&fmt, arg)) {
+    switch (printf_handle_char(&fmt, &arg_copy)) {
     case RET_CONT:
       continue;
     case RET_RET:
-      return;
+      break;
     }
   }
+  va_end(arg_copy);
 }
 
 #if !defined(FORSYS) && !defined(_INIT)
