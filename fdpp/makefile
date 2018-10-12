@@ -14,7 +14,11 @@ RELVER = beta1
 PKG = fdpp-0.1$(RELVER)
 TGZ = $(PKG).tar.gz
 
-ALLCFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) -DKRNL_NAME=$(TARGET).sys
+ALLCFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
+    -DKRNL_NAME=$(TARGET).sys
+ifeq ($(DEBUG_MODE),1)
+ALLCFLAGS += -DCURDIR=$(CURDIR)
+endif
 NASMFLAGS += -i$(SRC)
 
 # *List Macros*

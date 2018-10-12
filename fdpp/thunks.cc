@@ -869,9 +869,19 @@ void PurgeHook(void *ptr, UDWORD len)
 }
 
 #define _S(x) __STRING(x)
-const char *FdppDataDir(void)
+const char *FdppDataDir(int idx)
 {
-    return _S(DATADIR);
+    /* this is to support running w/o 'make install' */
+#ifndef CURDIR
+    idx++;
+#endif
+    switch (idx) {
+    case 0:
+        return _S(CURDIR);
+    case 1:
+        return _S(DATADIR);
+    }
+    return NULL;
 }
 
 const char *FdppKernelName(void)
