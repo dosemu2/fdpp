@@ -37,6 +37,8 @@ static BYTE *RcsId =
 
 #ifndef USE_STDLIB
 #define toupper(c)	((c) >= 'a' && (c) <= 'z' ? (char)((c) + ('A' - 'a')) : (char)(c))
+#else
+#include <ctype.h>
 #endif
 
 #define LOADNGO 0

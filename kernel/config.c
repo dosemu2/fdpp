@@ -219,6 +219,8 @@ STATIC COUNT tolower(COUNT c);
 #endif
 #ifndef USE_STDLIB
 STATIC char toupper(const char c);
+#else
+#include <ctype.h>
 #endif
 STATIC VOID strupr(char *s);
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type);
