@@ -187,7 +187,12 @@ public:
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
-    operator FarPtrBase<T0>() {
+    operator FarPtrBase<T0>() const & {
+        return FarPtrBase<T0>(this->_seg(), this->_off());
+    }
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+    operator FarPtrBase<T0>() && {
         _assert(!obj);
         return FarPtrBase<T0>(this->seg(), this->off());
     }
