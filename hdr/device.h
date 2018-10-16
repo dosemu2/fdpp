@@ -481,7 +481,6 @@ typedef struct {
 /*
  */
 typedef __FAR(request) rqptr;
-typedef __DOSFAR(request) _rqptr;
 typedef __DOSFAR(bpb) bpbptr;
 //typedef __DOSFAR(BYTE) byteptr;
 //typedef __DOSFAR(struct dhdr) dhdrptr;
