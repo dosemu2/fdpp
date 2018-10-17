@@ -19,7 +19,6 @@
 #include <string.h>
 #include <stdarg.h>
 #include "portab.h"
-#include "dyndata.h"
 #include "smalloc.h"
 #include "farhlp.h"
 #include "thunks_priv.h"
@@ -40,9 +39,8 @@ static void err_printf(int prio, const char *fmt, ...)
     va_end(vl);
 }
 
-void dosobj_init(int size)
+void dosobj_init(far_t fa, int size)
 {
-    far_t fa = DynAlloc("dosobj", 1, size);
     void *ptr = resolve_segoff(fa);
 
     sminit(&pool, ptr, size);

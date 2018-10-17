@@ -336,7 +336,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
                                    included by original truename() */
   /* MUX succeeded and really something */
   {
-  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(MK_FAR_STR_SCP(dest), src) == SUCCESS && dest[0] != '\0')
+  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(MK_FAR_SZ_SCP(dest, PATHLEN), src) == SUCCESS && dest[0] != '\0')
   {
     tn_printf(("QRemoteFn() returned: \"%s\"\n", dest));
 #ifdef DEBUG_TRUENAME

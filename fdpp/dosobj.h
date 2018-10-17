@@ -22,7 +22,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void dosobj_init(int size);
+void dosobj_init(far_t fa, int size);
 far_t mk_dosobj(const void *data, UWORD len);
 void pr_dosobj(far_t fa, const void *data, UWORD len);
 void cp_dosobj(void *data, far_t fa, UWORD len);
