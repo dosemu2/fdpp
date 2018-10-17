@@ -406,7 +406,7 @@ COUNT dos_findnext(void)
 
     so we have to work from the last blank backward
 */
-void ConvertName83ToNameSZ(char * destSZ, const char FAR * srcFCBName)
+void ConvertName83ToNameSZ(char * destSZ, const char * srcFCBName)
 {
   int loop;
   int noExtension = FALSE;
