@@ -143,7 +143,7 @@ BOOL dir_write_update(REG f_node_ptr fnp, BOOL update);
 #define dir_write(fnp) dir_write_update(fnp, FALSE)
 COUNT dos_findfirst(UCOUNT attr, const char * name);
 COUNT dos_findnext(void);
-void ConvertName83ToNameSZ(__FAR(char) destSZ,__FAR(const char) srcFCBName);
+void ConvertName83ToNameSZ(char *destSZ,__FAR(const char) srcFCBName);
 const char *ConvertNameSZToName83(char *destFCBName, const char *srcSZ);
 
 /* fatfs.c */

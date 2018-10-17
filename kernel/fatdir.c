@@ -406,7 +406,7 @@ COUNT dos_findnext(void)
 
     so we have to work from the last blank backward
 */
-void ConvertName83ToNameSZ(char FAR * destSZ, const char FAR * srcFCBName)
+void ConvertName83ToNameSZ(char * destSZ, const char FAR * srcFCBName)
 {
   int loop;
   int noExtension = FALSE;
@@ -416,7 +416,7 @@ void ConvertName83ToNameSZ(char FAR * destSZ, const char FAR * srcFCBName)
     noExtension = TRUE;
   }
 
-  fmemcpy(destSZ, srcFCBName, FNAME_SIZE);
+  fmemcpy_n(destSZ, srcFCBName, FNAME_SIZE);
 
   srcFCBName += FNAME_SIZE;
 
@@ -438,7 +438,7 @@ void ConvertName83ToNameSZ(char FAR * destSZ, const char FAR * srcFCBName)
     if (loop >= 0)
     {
       *destSZ++ = '.';
-      fmemcpy(destSZ, srcFCBName, loop + 1);
+      fmemcpy_n(destSZ, srcFCBName, loop + 1);
       destSZ += loop + 1;
     }
   }
