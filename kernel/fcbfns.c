@@ -545,7 +545,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       BYTE loc_szBuffer[2 + FNAME_SIZE + 1 + FEXT_SIZE + 1];
       fcb LocalFcb;
       BYTE *pToName;
-      const char FAR *pFromPattern = Dmatch.dm_name;
+      const char FAR *pFromPattern = Dmatch_p->dm_name;
       int i;
       UBYTE mode = 0;
 
@@ -565,7 +565,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
 
       SecPathName[0] = 'A' + FcbDrive - 1;
       SecPathName[1] = ':';
-      strcpy(&SecPathName[2], Dmatch.dm_name);
+      strcpy(&SecPathName[2], Dmatch_p->dm_name);
       _result = truename(SecPathName, PriPathName, 0);
 
       if (_result < SUCCESS || (_result & IS_DEVICE))
@@ -652,8 +652,8 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
   /* Reconstrct the dirmatch structure from the fcb - doesn't hurt for first */
   Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
 
-  fmemcpy(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
-  DosUpFMem((BYTE FAR *) Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
+  fmemcpy(Dmatch_ff_p->dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
+  DosUpFMem((BYTE FAR *) Dmatch_ff_p->dm_name_pat, FNAME_SIZE + FEXT_SIZE);
 
   Dmatch_ff.dm_attr_srch = wAttr;
   Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
