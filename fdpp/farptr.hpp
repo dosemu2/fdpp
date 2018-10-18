@@ -20,6 +20,7 @@
 #define FARPTR_HPP
 
 #include <type_traits>
+#include <new>
 #include <memory>
 #include <cstring>
 #include <unordered_set>
@@ -93,7 +94,7 @@ public:
     }
 
     wrp_type& get_wrp() {
-        wrp_type *s = (wrp_type *)get_ptr();
+        wrp_type *s = new(get_buf()) wrp_type;
         _store_far(s, get_far());
         return *s;
     }
@@ -125,6 +126,7 @@ public:
     far_s get_far() const { return ptr; }
     far_s& get_ref() { return ptr; }
     T* get_ptr() { return (T*)resolve_segoff(ptr); }
+    void *get_buf() { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
 };
 
@@ -263,7 +265,7 @@ public:
 template<typename T>
 class SymWrp : public T {
 public:
-    SymWrp() = delete;
+    SymWrp() = default;
     SymWrp(const SymWrp&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
@@ -271,10 +273,11 @@ public:
 
 template<typename T>
 class SymWrp2 {
-    T sym;
+    /* remove const or default ctor will be deleted */
+    _RC(T) sym;
 
 public:
-    SymWrp2() = delete;
+    SymWrp2() = default;
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
