@@ -31,7 +31,7 @@ Note: if you are running dosemu2 for the first time
 and do not have freedos installed locally, you may
 need to run<br/>
 `dosemu -install`<br/>
-and then put some `command.com`
+and then put [some `command.com`](https://github.com/stsp/comcom32)
 into `~/.dosemu/drive_c`. This inconvenience will be solved
 in the future.
 
@@ -67,9 +67,8 @@ the freedos core itself. So fdpp aims for a new, freedos-based
 kernel core and a 64bit compiler framework for it.
 
 ## portability
-fdpp uses just a couple of libc calls, namely malloc() and a few
-string functions. Also currently it uses STL, hence the libstdc++
-dependency. Maybe in the future I'll port it to libsupc++.
-So fdpp can work in any environment with STL/libstdc++ support.
+fdpp can work in any environment with STL/C++ runtime support.
+Requirements to the standard libraries are very small, far
+within the ISO standards. No posix or OS-specific APIs are used.
 But the requirements to the compiler are exceptionally high, so
 clang++ is the only compiler to build fdpp with.
