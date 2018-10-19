@@ -1273,7 +1273,9 @@ STATIC void ReadAllPartitionTables(void)
   static iregs regs;
 
   /* quick adjustment of diskette parameter table */
-  fmemcpy(int1e_table, *(char FAR * FAR *)MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);
+//  fmemcpy(int1e_table, *(char FAR * FAR *)MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);
+  /* FDPP: wrong parse of the above */
+  fmemcpy(int1e_table,  *(__FAR(__DOSFAR(char)))MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);
   /* currently only 512 bytes per sector floppies are supported, log2(512/128)=2 */
   int1e_table[3] = 2;
   /* enforce min. 9 sectors per track */

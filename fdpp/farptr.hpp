@@ -82,6 +82,8 @@ public:
         return (T*)resolve_segoff(ptr);
     }
     operator T*() {
+        static_assert(std::is_standard_layout<T>::value ||
+                std::is_void<T>::value, "need std layout");
         if (!ptr.seg && !ptr.off)
             return NULL;
         return (T*)resolve_segoff(ptr);
@@ -230,6 +232,8 @@ public:
     uint16_t _seg() const { return this->ptr.seg; }
     uint16_t _off() const { return this->ptr.off; }
     operator T*() {
+        static_assert(std::is_standard_layout<T>::value ||
+                std::is_void<T>::value, "need std layout");
         if (!nonnull && !this->ptr.seg && !this->ptr.off)
             return NULL;
         return (T*)resolve_segoff(this->ptr);
