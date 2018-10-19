@@ -637,12 +637,12 @@ dispatch:
       /* Get Drive Data                                               */
     case 0x1c:
       {
-        UBYTE FAR *p;
+        static UBYTE FAR *p;    /* FDPP: mark static to avoid crash */
 
         if ((p = FatGetDrvData(lr.DL, &lr.AL, &lr.CX, &lr.DX)) != NULL)
         {
-          lr.DS = FP_SEG(p);
-          lr.BX = FP_OFF(p);
+          lr.DS = FP_SEG_ST(p);
+          lr.BX = FP_OFF_ST(p);
         }
         else
           lr.AL = 0xff;  /* return 0xff on invalid drive */
