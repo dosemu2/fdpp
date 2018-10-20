@@ -146,7 +146,6 @@ class FarPtr : public FarPtrBase<T>
     sh_obj obj;
     std::unordered_set<sh_obj> children;
     bool nonnull = false;
-    int refcnt = 0;
 
 public:
     /* first, tell a few secret phrases to the compiler :) */
@@ -165,7 +164,6 @@ public:
     FarPtr(const FarPtr<T>& f) = default;
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
-    ~FarPtr(void) { if (refcnt) fdlogprintf("non-zero refcount\n"); }
 
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
@@ -217,8 +215,6 @@ public:
 
     uint16_t seg() const { _assert(!obj); return this->ptr.seg; }
     uint16_t off() const { _assert(!obj); return this->ptr.off; }
-    uint16_t seg_st() { refcnt++; return this->ptr.seg; }
-    uint16_t off_st() { refcnt++; return this->ptr.off; }
     uint16_t seg(void *owner) const {
         _assert(obj);
         obj->ref(owner);
@@ -591,8 +587,6 @@ public:
     SymMemb2<t, off_##n> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
-#define FP_SEG_ST(fp) ((fp).seg_st())
-#define FP_OFF_ST(fp) ((fp).off_st())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
 #define FP_OFF_OBJ(o, fp) ((fp).off(o))
 #define MK_FP(seg, ofs) ({ \
