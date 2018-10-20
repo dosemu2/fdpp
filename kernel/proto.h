@@ -149,6 +149,7 @@ const char *ConvertNameSZToName83(char *destFCBName, const char *srcSZ);
 
 /* fatfs.c */
 __FAR(struct dpb)get_dpb(COUNT dsk);
+__FAR(struct dpb)get_dpb_unchecked(COUNT dsk);
 ULONG clus2phys(CLUSTER cl_no,__FAR(struct dpb) dpbp);
 int dos_open(char * path, unsigned flag, unsigned attrib, int fd);
 BOOL fcbmatch(const char *fcbname1, const char *fcbname2);

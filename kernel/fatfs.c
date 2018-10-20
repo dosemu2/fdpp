@@ -92,6 +92,15 @@ struct dpb FAR *get_dpb(COUNT dsk)
   return cdsp->cdsDpb;
 }
 
+struct dpb FAR *get_dpb_unchecked(COUNT dsk)
+{
+  REG struct cds FAR *cdsp = get_cds(dsk);
+
+  if (cdsp == NULL)
+    return NULL;
+  return cdsp->cdsDpb;
+}
+
 /* initialize directory entry (creation/access stamps 0 as per MS-DOS 7.10) */
 STATIC void init_direntry(struct dirent *dentry, unsigned attrib,
                           CLUSTER cluster, const char *name)

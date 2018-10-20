@@ -55,27 +55,18 @@ static dmatch FAR * Dmatch_ff_p;
 
 UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 {
-  static UBYTE mdb;
   UWORD spc;
+  struct dpb FAR *dpbp = get_dpb_unchecked(drive == 0 ? (WORD)default_drive : drive - 1);
 
   /* get the data available from dpb                       */
   spc = DosGetFree(drive, NULL, bps, nc);
   if (spc != 0xffff)
   {
-    struct dpb FAR *dpbp = get_dpb(drive == 0 ? (WORD)default_drive : drive - 1);
     /* Point to the media desctriptor for this drive               */
     *pspc = (UBYTE)spc;
-    if (dpbp == NULL)
-    {
-      mdb = spc >> 8;
-      spc &= 0xff;
-      return MK_FAR(mdb);
-    }
-    else
-    {
-      return (UBYTE FAR *) & (dpbp->dpb_mdb);
-    }
   }
+  if (dpbp != NULL)
+    return (UBYTE FAR *) & (dpbp->dpb_mdb);
   return NULL;
 }
 
