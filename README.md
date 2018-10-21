@@ -72,3 +72,50 @@ Requirements to the standard libraries are very small, far
 within the ISO standards. No posix or OS-specific APIs are used.
 But the requirements to the compiler are exceptionally high, so
 clang++ is the only compiler to build fdpp with.
+
+## related projects
+### FreeDOS
+[FreeDOS kernel](http://www.fdos.org/kernel/) is a
+DOS-compatible kernel that is used as a core of fdpp.
+
+### dosemu2
+[dosemu2](https://github.com/stsp/dosemu2)
+is a virtual machine that allows you to run DOS software under linux.
+It is a primary host platform for fdpp.
+
+### dosbox
+[dosbox](https://www.dosbox.com/) has a good
+[built-in DOS](https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/src/dos/)
+written in C++. It is tightly coupled to dosbox; you can't
+easily port it to your project, whereas fdpp is designed to
+be plugable. Also it uses native APIs and libraries for
+filesystem access, CD-ROM playing and similar things. fdpp
+uses no host APIs or libraries, which may be good or bad,
+depending on your use-case. dosbox is cleanly written in C++
+while fdpp wraps the C-coded freedos kernel into a C++ framework,
+resulting in a nuclear C/C++ mix.
+
+### freedos-32
+[freedos-32](http://freedos-32.sourceforge.net/) is a
+kernel written with DOS compatibility in mind. It has a
+rich user-space part with libc. Very good candidate for
+running fdpp. Unfortunately,
+[the kernel](https://sourceforge.net/p/freedos-32/code/HEAD/tree/trunk/)
+was scrapped, and currently
+[something else](https://github.com/salvois/kernel)
+is being developed.
+
+### freedos-64
+[freedos-64](https://sourceforge.net/projects/dos64/)
+seems to be a project
+[planning](http://freedos.10956.n7.nabble.com/DOS-Development-Idea-td16159.html)
+to implement a 64bit kernel around the real-mode
+freedos kernel.
+
+### NightKernel
+[NightKernel](https://github.com/mercury0x000d/NightKernel)
+is `A 32-bit drop-in replacement for the FreeDOS kernel`, as
+they call themselves. In fact, it is an assembly-written
+ring-0 kernel, currently w/o any DOS compatibility at all.
+Can't be used to run fdpp because it doesn't have a user-space
+part.
