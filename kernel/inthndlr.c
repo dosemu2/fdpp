@@ -1715,10 +1715,11 @@ STATIC VOID StartTrace(VOID)
 /* WARNING: modifications in `r' are used outside of int2F_12_handler()
  * On input r.AX==0x12xx, 0x4A01 or 0x4A02
  */
-VOID ASMCFUNC int2F_12_handler(struct int2f12regs r)
+VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
 {
   COUNT rc;
   long lrc;
+  #define r (*regs)
 
   if (r.AH == 0x4a)
   {
@@ -2089,6 +2090,7 @@ error_exit:
     CritErrCode = r.AX;      /* Maybe set */
 error_carry:
   r.FLAGS |= FLG_CARRY;
+  #undef r
 }
 
 /*

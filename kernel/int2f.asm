@@ -168,9 +168,13 @@ IntDosCal:
   %endif
 %endif
 
+    mov bp,sp
+    push ss
+    push bp
     mov ds,[cs:_DGROUP_]
     extern   _int2F_12_handler
     call _int2F_12_handler
+    add sp,4
 
 %if XCPU >= 386
   %ifdef WATCOM

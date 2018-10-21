@@ -19,7 +19,7 @@
 #ifndef THUNKS_PRIV_H
 #define THUNKS_PRIV_H
 
-#define FDPP_KERNEL_VERSION          2
+#define FDPP_KERNEL_VERSION          3
 
 #define DOS_HELPER_PLUGIN            0x60
 #define DOS_HELPER_PLUGIN_ID_FDPP    0
