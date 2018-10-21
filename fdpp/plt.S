@@ -16,14 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define DOS_HELPER_PLUGIN            0x60
-#define DOS_HELPER_PLUGIN_ID_FDPP    0
-#define DOS_HELPER_PLUGIN_VERSION    1
-#define DOS_SUBHELPER_DL_SET_SYMTAB  0
-#define DOS_SUBHELPER_DL_CCALL       1
-
-#define DOS_HELPER_INT               0xE6
-
+#include "thunks_priv.h"
 %include "segs.inc"
 
 %macro asmcfunc 4
@@ -145,7 +138,7 @@ plt_init:
     push bp
     mov bp, sp
     mov al, DOS_HELPER_PLUGIN
-    mov ah, DOS_HELPER_PLUGIN_VERSION
+    mov ah, FDPP_KERNEL_VERSION
     mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
     push word SEG init_near_wrp

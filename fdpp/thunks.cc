@@ -306,11 +306,16 @@ void FdppCall(struct vm86_regs *regs)
         return;
 
     switch (LO_BYTE(regs->ebx)) {
-    case 0:
+    case DOS_SUBHELPER_DL_SET_SYMTAB:
+        if (HI_BYTE(regs->eax) != FDPP_KERNEL_VERSION) {
+            fdloudprintf("\nfdpp version mismatch: expected %i, got %i\n",
+                    FDPP_KERNEL_VERSION, HI_BYTE(regs->eax));
+            _fail();
+        }
         FdppSetSymTab(regs,
                 (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esp) + 6));
         break;
-    case 1:
+    case DOS_SUBHELPER_DL_CCALL:
         noret_jmp = &jmp;
         if (setjmp(jmp))
             break;
@@ -355,12 +360,12 @@ int FdppInit(struct fdpp_api *api, int ver, int *req_ver)
 
 void fdvprintf(const char *format, va_list vl)
 {
-    fdpp->print(0, format, vl);
+    fdpp->print(FDPP_PRINT_TERMINAL, format, vl);
 }
 
 static void fdlogvprintf(const char *format, va_list vl)
 {
-    fdpp->print(1, format, vl);
+    fdpp->print(FDPP_PRINT_LOG, format, vl);
 }
 
 void fdprintf(const char *format, ...)
@@ -378,6 +383,21 @@ void fdlogprintf(const char *format, ...)
 
     va_start(vl, format);
     fdlogvprintf(format, vl);
+    va_end(vl);
+}
+
+void fdloudprintf(const char *format, ...)
+{
+    va_list vl;
+
+    va_start(vl, format);
+    fdpp->print(FDPP_PRINT_LOG, format, vl);
+    va_end(vl);
+    va_start(vl, format);
+    fdpp->print(FDPP_PRINT_TERMINAL, format, vl);
+    va_end(vl);
+    va_start(vl, format);
+    fdpp->print(FDPP_PRINT_SCREEN, format, vl);
     va_end(vl);
 }
 

@@ -19,6 +19,17 @@
 #ifndef THUNKS_PRIV_H
 #define THUNKS_PRIV_H
 
+#define FDPP_KERNEL_VERSION          2
+
+#define DOS_HELPER_PLUGIN            0x60
+#define DOS_HELPER_PLUGIN_ID_FDPP    0
+#define DOS_SUBHELPER_DL_SET_SYMTAB  0
+#define DOS_SUBHELPER_DL_CCALL       1
+
+#define DOS_HELPER_INT               0xE6
+
+#ifndef __ASSEMBLER__
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,10 +38,13 @@ uint32_t thunk_call_void(struct far_s fa);
 struct far_s lookup_far_st(const void *ptr);
 void fdprintf(const char *format, ...) PRINTF(1);
 void fdlogprintf(const char *format, ...) PRINTF(1);
+void fdloudprintf(const char *format, ...) PRINTF(1);
 void fdvprintf(const char *format, va_list vl);
 void do_abort(const char *file, int line);
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif
