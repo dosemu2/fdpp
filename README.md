@@ -83,6 +83,11 @@ DOS-compatible kernel that is used as a core of fdpp.
 is a virtual machine that allows you to run DOS software under linux.
 It is a primary host platform for fdpp.
 
+### comcom32
+[comcom32](https://github.com/stsp/comcom32)
+is a 32bit command.com that is supposed to be used with fdpp.
+
+## similar projects
 ### dosbox
 [dosbox](https://www.dosbox.com/) has a good
 [built-in DOS](https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/src/dos/)
