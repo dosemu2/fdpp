@@ -22,6 +22,7 @@ DEBUG_MSGS = 0
 ALLCFLAGS += -iquote $(srcdir)/../hdr -Wall $(TARGETOPT) -Wmissing-prototypes
 ifeq ($(DEBUG_MODE),1)
 ALLCFLAGS += -ggdb3
+#ALLCFLAGS += -ggdb3 -fsanitize=undefined -fno-sanitize=alignment
 endif
 ifeq ($(EXTRA_DEBUG),1)
 ALLCFLAGS += -fdebug-macro -O0

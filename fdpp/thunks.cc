@@ -425,7 +425,7 @@ static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
             _call_wrp(call, &s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
-            return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
+            return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
         }
     }
     _assert(0);
@@ -452,12 +452,12 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
             uint16_t wrp = find_wrp(asm_tab[i].seg);
-            s_regs.eax = asm_tab[i].off;
+            LO_WORD(s_regs.eax) = asm_tab[i].off;
             /* argpack should be aligned */
             _assert(!(len & 1));
-            s_regs.ecx = len >> 1;
+            LO_WORD(s_regs.ecx) = len >> 1;
             _call_wrp(call, &s_regs, asm_tab[i].seg, wrp, sp, len);
-            return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
+            return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
         }
     }
     _assert(0);
@@ -489,7 +489,7 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
 
 static uint8_t *clean_stk(size_t len)
 {
-    uint8_t *ret = (uint8_t *)so2lin(s_regs.ss, s_regs.esp);
+    uint8_t *ret = (uint8_t *)so2lin(s_regs.ss, LO_WORD(s_regs.esp));
     s_regs.esp += len;
     return ret;
 }
@@ -497,7 +497,7 @@ static uint8_t *clean_stk(size_t len)
 uint16_t getCS(void)
 {
     /* we pass CS in SI */
-    return s_regs.esi;
+    return LO_WORD(s_regs.esi);
 }
 
 void setDS(uint16_t seg)
@@ -824,7 +824,7 @@ struct far_s lookup_far_st(const void *ptr)
 uint32_t thunk_call_void(struct far_s fa)
 {
     fdpp->asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
-    return (s_regs.edx << 16) | (s_regs.eax & 0xffff);
+    return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
 }
 
 void int3(void)
