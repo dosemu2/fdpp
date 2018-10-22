@@ -85,7 +85,8 @@ It is a primary host platform for fdpp.
 
 ### comcom32
 [comcom32](https://github.com/stsp/comcom32)
-is a 32bit command.com that is supposed to be used with fdpp.
+is a 32bit command.com that is supposed to be used with fdpp
+while we don't have a 64bit one.
 
 ## similar projects
 ### dosbox
@@ -93,11 +94,11 @@ is a 32bit command.com that is supposed to be used with fdpp.
 [built-in DOS](https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/src/dos/)
 written in C++. It is tightly coupled to dosbox; you can't
 easily port it to your project, whereas fdpp is designed to
-be plugable. Also it uses native APIs and libraries for
+be plugable. Also it uses host APIs and libraries for
 filesystem access, CD-ROM playing and similar things. fdpp
 uses no host APIs or libraries, which may be good or bad,
-depending on your use-case. dosbox is cleanly written in C++
-while fdpp wraps the C-coded freedos kernel into a C++ framework,
+depending on your use-case. dosbox is cleanly written in C++,
+whereas fdpp wraps the C-coded freedos kernel into a C++ framework,
 resulting in a nuclear C/C++ mix.
 
 ### freedos-32
