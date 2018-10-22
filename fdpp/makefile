@@ -205,7 +205,7 @@ install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
 $(TGZ):
-	cd .. && git archive -o fdpp/$(TGZ) --prefix=$(PKG)/ HEAD
+	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TGZ) --prefix=$(PKG)/ HEAD
 .PHONY: $(TGZ)
 
 tar: $(TGZ)
