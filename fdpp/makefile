@@ -10,7 +10,7 @@ LIBS=$(lib_path)/device.lib
 HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
-RELVER = beta1
+RELVER = beta2
 PKG = fdpp-0.1$(RELVER)
 TGZ = $(PKG).tar.gz
 
