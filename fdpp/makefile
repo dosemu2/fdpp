@@ -104,7 +104,6 @@ CFILES = blockio.c \
     inthndlr.c \
     ioctl.c \
     memmgr.c \
-    lfnapi.c \
     newstuff.c \
     network.c \
     nls.c \
