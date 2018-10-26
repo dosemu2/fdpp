@@ -3,7 +3,7 @@ fdpplibdir=@LIBDIR@/fdpp
 fdppincdir=${prefix}/include/fdpp
 
 Name: fdpp
-Description: DOS compatibility layer
+Description: 64-bit DOS
 Version: 0.1
 Libs: -Wl,-rpath,${fdpplibdir} -L${fdpplibdir} -lfdpp
 Cflags: -I${fdppincdir}

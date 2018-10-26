@@ -5,7 +5,7 @@
 Name: fdpp
 Version: 0.1beta2
 Release: 1%{?dist}
-Summary: DOS compatibility layer
+Summary: 64-bit DOS
 
 Group: System/Emulator
 

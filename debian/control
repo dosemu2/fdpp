@@ -17,6 +17,6 @@ Homepage: http://www.github.com/stsp/fdpp
 Package: fdpp
 Architecture: i386 amd64
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Description: DOS compatibility layer
+Description: 64-bit DOS
  fdpp is a 64-bit DOS.
  It is based on a FreeDOS kernel ported to modern C++.
