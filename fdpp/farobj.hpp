@@ -39,8 +39,7 @@ protected:
 
 public:
     using obj_type = typename std::conditional<std::is_array<T>::value,
-        typename std::remove_extent<T>::type,
-        typename std::remove_const<T>::type>::type;
+        typename std::remove_extent<T>::type, T>::type;
 
     FarObjBase(T* obj, unsigned sz) : ptr(obj), size(sz) {}
 };
@@ -150,7 +149,7 @@ public:
     std::shared_ptr<ObjRef> _sh = \
         std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1); \
     track_owner_sh(p, _sh); \
-    ((FarObj<_R(o)> *)_sh.get())->get_near(); \
+    ((FarObj<_RC(o)> *)_sh.get())->get_near(); \
 })
 #define MK_FAR_PTR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(*o).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())

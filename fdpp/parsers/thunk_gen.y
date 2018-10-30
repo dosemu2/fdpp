@@ -146,9 +146,13 @@ static void fin_arg(int last)
 	sprintf(abuf + strlen(abuf), "%s)", atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
+	if (is_const)
+	    strcat(abuf, "const ");
 	sprintf(abuf + strlen(abuf), "%s)", atype2[0] ? atype2 : atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
+	if (is_const)
+	    strcat(abuf, "const ");
 	if (is_ptr)
 	    sprintf(abuf + strlen(abuf), "%s)", atype2[0] ? atype2 : atype);
 	else
@@ -335,56 +339,56 @@ rtype:		  VOID		{ strcpy(rbuf, "_RSZ = 0;");
 atype:		  VOID		{
 				  arg_size = 0;
 				  cvtype = CVTYPE_VOID;
-				  strcpy(atype, "VOID");
+				  strcat(atype, "VOID");
 				  al_arg_size = 0;
 				  is_void = 1;
 				}
 		| CHAR		{
 				  arg_size = 1;
 				  cvtype = CVTYPE_CHAR;
-				  strcpy(atype, "char");
-				  strcpy(atype3, "WORD");
+				  strcat(atype, "char");
+				  strcat(atype3, "WORD");
 				  al_arg_size = 2;
 				}
 		| WORD		{
 				  arg_size = 2;
-				  strcpy(atype, "WORD");
+				  strcat(atype, "WORD");
 				  al_arg_size = 2;
 				}
 		| UWORD		{
 				  arg_size = 2;
-				  strcpy(atype, "UWORD");
+				  strcat(atype, "UWORD");
 				  al_arg_size = 2;
 				}
 		| DWORD		{
 				  arg_size = 4;
-				  strcpy(atype, "DWORD");
+				  strcat(atype, "DWORD");
 				  al_arg_size = 4;
 				}
 		| UDWORD	{
 				  arg_size = 4;
-				  strcpy(atype, "UDWORD");
+				  strcat(atype, "UDWORD");
 				  al_arg_size = 4;
 				}
 		| BYTE		{
 				  arg_size = 1;
-				  strcpy(atype, "BYTE");
-				  strcpy(atype3, "WORD");
+				  strcat(atype, "BYTE");
+				  strcat(atype3, "WORD");
 				  al_arg_size = 2;
 				}
 		| UBYTE		{
 				  arg_size = 1;
-				  strcpy(atype, "UBYTE");
-				  strcpy(atype3, "UWORD");
+				  strcat(atype, "UBYTE");
+				  strcat(atype3, "UWORD");
 				  al_arg_size = 2;
 				}
 		| STRUCT sname	{
 				  arg_size = -1;
-				  sprintf(atype, "struct %s", $2);
+				  sprintf(atype + strlen(atype), "struct %s", $2);
 				}
 		| tname		{
 				  arg_size = -1;
-				  sprintf(atype, "%s", $1);
+				  sprintf(atype + strlen(atype), "%s", $1);
 				}
 ;
 
