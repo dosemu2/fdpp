@@ -100,7 +100,10 @@ static void do_start_arg(int anum)
 		    sprintf(abuf + strlen(abuf), "_CNV_PTR_VOID, _L_REF(%i)", arg_num + 2);
 		    break;
 		case CVTYPE_CHAR:
-		    strcat(abuf, "_CNV_PTR_CHAR, _L_NONE");
+		    if (is_const)
+			strcat(abuf, "_CNV_PTR_CCHAR, _L_NONE");
+		    else
+			strcat(abuf, "_CNV_PTR_CHAR, _L_UNIMP");
 		    break;
 		case CVTYPE_ARR:
 		    sprintf(abuf + strlen(abuf), "_CNV_PTR_ARR, _L_IMM(%i, %i)",

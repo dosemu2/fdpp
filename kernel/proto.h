@@ -219,7 +219,7 @@ void FcbCloseAll(void);
 UBYTE FcbFindFirstNext(__FAR(xfcb) lpXfcb, BOOL First);
 
 /* intr.asm */
-COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, char * lp);
+COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, const char * lp);
 UCOUNT ASMPASCAL res_read(UWORD fd, void *buf, UCOUNT count);
 #ifdef __WATCOMC__
 #pragma aux (pascal) res_DosExec modify exact [ax bx dx es]
@@ -460,7 +460,7 @@ UWORD ASMPASCAL floppy_change(UWORD);
            error.  If < 0 is returned, it is the negated error return
            code, so DOS simply negates this value and returns it in
            AX. */
-WORD ASMPASCAL share_open_check(char * filename, unsigned short pspseg, WORD openmode, WORD sharemode);     /* SHARE_COMPAT, etc... */
+WORD ASMPASCAL share_open_check(const char * filename, unsigned short pspseg, WORD openmode, WORD sharemode);     /* SHARE_COMPAT, etc... */
 
         /* DOS calls this to record the fact that it has successfully
            closed a file, or the fact that the open for this file failed. */
@@ -514,7 +514,7 @@ __FAR(void) ASMPASCAL DetectXMSDriver(VOID);
 WORD ASMPASCAL init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
 
 void ASMPASCAL init_PSPSet(seg psp_seg);
-WORD ASMPASCAL init_DosExec(WORD mode, exec_blk * ep, char * lp);
+WORD ASMPASCAL init_DosExec(WORD mode, exec_blk * ep, const char * lp);
 WORD ASMPASCAL init_setdrive(WORD drive);
 WORD ASMPASCAL init_switchar(WORD chr);
 //COUNT ASMPASCAL Umb_Test(void);
