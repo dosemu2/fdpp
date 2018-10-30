@@ -293,15 +293,29 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     return IS_NETWORK;
   }
 
+  dhp = IsDevice(src); /* returns header if -char- device */
   /* Do we have a drive?                                          */
   if (src[1] == ':')
+  {
     result = drLetterToNr(DosUpFChar(src0));
+    cdsEntry = get_cds(result);
+    if (cdsEntry == NULL)
+      return DE_PATHNOTFND;
+  }
   else
+  {
     result = default_drive;
-
-  cdsEntry = get_cds(result);
-  if (cdsEntry == NULL)
-    return DE_PATHNOTFND;
+    cdsEntry = get_cds(result);
+    if (cdsEntry == NULL)
+    {
+      if (dhp)
+      {
+        strcpy(dest, src);
+        return IS_DEVICE;
+      }
+      return DE_PATHNOTFND;
+    }
+  }
 
   fmemcpy(&TempCDS, cdsEntry, sizeof(TempCDS));
   tn_printf(("CDS entry: #%u @%P (%u) '%s'\n", result, GET_FP32(cdsEntry),
@@ -312,7 +326,6 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   if (TempCDS.cdsFlags & CDSNETWDRV)
     result |= IS_NETWORK;
 
-  dhp = IsDevice(src); /* returns header if -char- device */
   if (dhp)
     result |= IS_DEVICE;
 
