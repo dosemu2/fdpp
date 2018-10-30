@@ -310,10 +310,8 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     {
       result = default_drive;
       cdsEntry = get_cds(result);
-      if (cdsEntry == NULL) {
-        strcpy(dest, src);
-        return IS_DEVICE;
-      }
+      if (cdsEntry == NULL)
+        return DE_PATHNOTFND;
     }
     else
       return DE_PATHNOTFND;
