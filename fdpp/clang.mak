@@ -19,10 +19,10 @@ TARGET=fdppkrnl
 DEBUG_MODE = 1
 EXTRA_DEBUG = 0
 DEBUG_MSGS = 0
+USE_UBSAN = 0
 ALLCFLAGS += -iquote $(srcdir)/../hdr -Wall $(TARGETOPT) -Wmissing-prototypes
 ifeq ($(DEBUG_MODE),1)
 ALLCFLAGS += -ggdb3
-#ALLCFLAGS += -ggdb3 -fsanitize=undefined -fno-sanitize=alignment
 endif
 ifeq ($(EXTRA_DEBUG),1)
 ALLCFLAGS += -fdebug-macro -O0
@@ -31,6 +31,9 @@ ALLCFLAGS += -O2
 endif
 ifeq ($(DEBUG_MSGS),1)
 ALLCFLAGS += -DDEBUG
+endif
+ifeq ($(USE_UBSAN),1)
+ALLCFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
 CFLAGS=$(ALLCFLAGS)
