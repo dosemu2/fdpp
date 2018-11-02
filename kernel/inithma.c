@@ -311,8 +311,9 @@ void MoveKernel(UWORD NewKernelSegment)
 {
   UBYTE FAR *HMADest;
   UBYTE FAR *HMASource;
-  unsigned len;
-  unsigned jmpseg = CurrentKernelSegment;
+  UWORD len;
+  UWORD offs = 0;
+  UWORD jmpseg = CurrentKernelSegment;
 
   if (CurrentKernelSegment == 0)
     CurrentKernelSegment = FP_SEG(_HMATextEnd);
@@ -331,6 +332,7 @@ void MoveKernel(UWORD NewKernelSegment)
     HMASource += HMAOFFSET;
     HMADest += HMAOFFSET;
     len -= HMAOFFSET;
+    offs = HMAOFFSET;
   }
 
   HMAInitPrintf(("HMA moving %P up to %P for %04x bytes\n",
@@ -405,7 +407,7 @@ void MoveKernel(UWORD NewKernelSegment)
     }
   }
 
-  RelocHook(CurrentKernelSegment, NewKernelSegment, len);
+  RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
 
   CurrentKernelSegment = NewKernelSegment;
   return;

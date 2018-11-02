@@ -239,6 +239,8 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
         uint8_t *start_p = (uint8_t *)resolve_segoff(symtab->text_start);
         uint8_t *end_p = (uint8_t *)resolve_segoff(symtab->text_end);
         uint16_t delta = symtab->cur_cs - symtab->orig_cs;
+        fdlogprintf("init reloc %hx --> %hx, %tx\n", symtab->orig_cs,
+                symtab->cur_cs, end_p - start_p);
         do_relocs(start_p, end_p, delta);
         /* sym_tab table is patched in non-relocated code, never used later */
         reloc = 0;
@@ -842,14 +844,15 @@ void panic(const BYTE * s)
     fdpp->panic(s);
 }
 
-void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len)
+void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
 {
     unsigned i;
     int reloc = 0;
     int miss = 0;
-    uint8_t *start_p = (uint8_t *)so2lin(old_seg, 0);
-    uint8_t *end_p = (uint8_t *)so2lin(old_seg + (len >> 4), len & 0xf);
+    uint8_t *start_p = (uint8_t *)so2lin(old_seg, offs);
+    uint8_t *end_p = (uint8_t *)so2lin(old_seg + (len >> 4), (len & 0xf) + offs);
     uint16_t delta = new_seg - old_seg;
+    fdlogprintf("relocate %hx --> %hx, %x\n", old_seg, new_seg, len);
     do_relocs(start_p, end_p, delta);
     for (i = 0; i < _countof(asm_thunks.arr); i++) {
         uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);
@@ -876,6 +879,7 @@ void PurgeHook(void *ptr, UDWORD len)
     int miss = 0;
     uint8_t *start_p = (uint8_t *)ptr;
     uint8_t *end_p = start_p + len;
+    fdlogprintf("purge %p %x\n", ptr, len);
     do_relocs(start_p, end_p, 0);
     for (i = 0; i < _countof(asm_thunks.arr); i++) {
         uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);

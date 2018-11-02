@@ -213,7 +213,7 @@ void pokel(UWORD seg, UWORD ofs, UDWORD l);
 void disable(void);
 void enable(void);
 void int3(void);
-void RelocHook(UWORD old_seg, UWORD new_seg, UDWORD len);
+void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len);
 void PurgeHook(void *ptr, UDWORD len);
 
 #ifndef __cplusplus
