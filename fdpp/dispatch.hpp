@@ -18,12 +18,13 @@
 
 #include <csetjmp>
 
-#define LJ_WRAP(c) \
+#define LJ_WRAP(c) do { \
     try { \
         c; \
-    } catch (jmp_buf env) { \
+    } catch (std::jmp_buf env) { \
         std::longjmp(env, 1); \
-    }
+    } \
+} while(0)
 
 template<typename T, typename ...args, typename ...Args,
     typename std::enable_if<!std::is_void<T>::value>::type* = nullptr>
@@ -41,7 +42,7 @@ T fdpp_dispatch(T (*func)(args... fa), Args... a)
     LJ_WRAP(func(a...));
 }
 
-static inline void fdpp_ljmp(jmp_buf env)
+static inline void fdpp_ljmp(std::jmp_buf env)
 {
     throw(env);
 }
