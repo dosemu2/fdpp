@@ -187,6 +187,7 @@ typedef struct far_s far_t;
 void panic(const BYTE * s);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
 void cpu_relax(void);
+void fdexit(int rc);
 
 #ifdef __cplusplus
 #include "farptr.hpp"

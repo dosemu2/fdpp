@@ -832,6 +832,11 @@ void int3(void)
     fdpp->debug("int3");
 }
 
+void fdexit(int rc)
+{
+    fdpp->exit(rc);
+}
+
 void panic(const BYTE * s)
 {
     fdpp->panic(s);

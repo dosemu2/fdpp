@@ -812,6 +812,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   BYTE *tailp, *endp;
   COUNT rd;
   exec_blk exb;
+  WORD err;
   BYTE retried = 0;
   UBYTE mode = Config->cfgP_0_startmode;
 
@@ -841,7 +842,13 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
 #ifdef DEBUG
     _printf("Process 0 starting: %s%s\n\n", GET_PTR(Shell), tailp + 2);
 #endif
-    res_DosExec(mode, &exb, Shell);
+    err = res_DosExec(mode, &exb, Shell);
+    if (!err)
+    {
+      _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
+      read_char_stdin(1);
+      fdexit(0);
+    }
     if (!retried && (default_drive > 2 || LoL->_ShellDrive) &&
         fstrlen(Shell) > 3 && Shell[1] != ':')
     {
