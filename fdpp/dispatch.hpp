@@ -17,6 +17,7 @@
  */
 
 #include <csetjmp>
+#include <type_traits>
 
 #define LJ_WRAP(c) do { \
     try { \
