@@ -37,7 +37,7 @@ ALLCFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
 CFLAGS=$(ALLCFLAGS)
-LDFLAGS=-shared -Wl,-Bsymbolic -Wl,--build-id=sha1 -static-libgcc
+LDFLAGS=-shared -Wl,-Bsymbolic -Wl,--build-id=sha1
 CLC = clang
 
 ALLCFLAGS:=$(ALLCFLAGS) -DI386
