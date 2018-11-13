@@ -502,12 +502,38 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
   return result;
 }
 
+static void FcbExpandAsterisks(char *p)
+{
+  int i, afound;
+
+  // Filename
+  for (i = 0, afound = 0; i < 8; i++) {
+    if (p[i] == '*' || afound) {
+      p[i] = '?';
+      afound = 1;
+    }
+  }
+
+  // Extension
+  for (i = 8, afound = 0; i < 11; i++) {
+    if (p[i] == '*' || afound) {
+      p[i] = '?';
+      afound = 1;
+    }
+  }
+}
+
 UBYTE FcbRename(xfcb FAR * lpXfcb)
 {
   rfcb FAR *lpRenameFcb;
   COUNT FcbDrive;
   UBYTE result = FCB_SUCCESS;
   void FAR *lpOldDta = dta;
+
+  /* DOS 3.0+ allows * wildcards for rename */
+  rfcb FAR *trfcb = (rfcb FAR *)lpXfcb;
+  FcbExpandAsterisks(trfcb->renOldName);
+  FcbExpandAsterisks(trfcb->renNewName);
 
   /* Build a traditional DOS file name                            */
   lpRenameFcb = (rfcb FAR *) CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
