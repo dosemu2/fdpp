@@ -5,10 +5,11 @@
 DIRSEP=/
 RM=rm -f
 CP=cp
-CC=clang++ -std=c++11
+CC=clang++
 CL=clang++
+CLC = clang
 
-TARGETOPT = -c -fno-threadsafe-statics -fno-rtti -fpic \
+TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fno-rtti -fpic \
     -Wno-format-invalid-specifier
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
@@ -20,7 +21,9 @@ DEBUG_MODE = 1
 EXTRA_DEBUG = 0
 DEBUG_MSGS = 0
 USE_UBSAN = 0
-ALLCFLAGS += -iquote $(srcdir)/../hdr -Wall $(TARGETOPT) -Wmissing-prototypes
+CPPFLAGS = -iquote $(srcdir)/../hdr
+WFLAGS = -Wall -Wmissing-prototypes
+ALLCFLAGS += $(TARGETOPT) $(CPPFLAGS) $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)
 ALLCFLAGS += -ggdb3
 endif
@@ -36,9 +39,9 @@ ifeq ($(USE_UBSAN),1)
 ALLCFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
-CFLAGS=$(ALLCFLAGS)
-LDFLAGS=-shared -Wl,-Bsymbolic -Wl,--build-id=sha1
-CLC = clang
+CFLAGS = $(ALLCFLAGS)
+LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
+CLCFLAGS = -c -fpic $(CPPFLAGS) $(WFLAGS)
 
 ALLCFLAGS:=$(ALLCFLAGS) -DI386
 

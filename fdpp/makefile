@@ -135,7 +135,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS)
-	$(CLC) $(CFLAGS) -o $@ $<
+	$(CLC) $(CLCFLAGS) -o $@ $<
 
 $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(GEN_HEADERS)
 	$(CC) $(CFLAGS) -o $@ $<
