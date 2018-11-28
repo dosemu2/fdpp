@@ -222,7 +222,7 @@ STATIC char toupper(const char c);
 #else
 #include <ctype.h>
 #endif
-STATIC VOID strupr(char *s);
+STATIC VOID _strupr(char *s);
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type);
 STATIC VOID mumcb_init(UCOUNT seg, UWORD size);
 
@@ -1329,7 +1329,7 @@ STATIC VOID Dosmem(char * pLine)
 
   pLine = GetStringArg(pLine, szBuf);
 
-  strupr(szBuf);
+  _strupr(szBuf);
 
   /* _printf("DOS called with %s\n", szBuf); */
 
@@ -1369,7 +1369,7 @@ STATIC VOID Dosmem(char * pLine)
 STATIC VOID DosData(char * pLine)
 {
   pLine = GetStringArg(pLine, szBuf);
-  strupr(szBuf);
+  _strupr(szBuf);
 
   if (memcmp(szBuf, "UMB", 3) == 0)
     Config.cfgDosDataUmb = TRUE;
@@ -1827,7 +1827,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
 
   strcpy(szBuf, pLine);
   /* uppercase the device driver command */
-  strupr(szBuf);
+  _strupr(szBuf);
 
   /* TE this fixes the loading of devices drivers with
      multiple devices in it. NUMEGA's SoftIce is such a beast
@@ -2064,7 +2064,7 @@ STATIC char toupper(char c)
 #endif
 
 /* Convert string s to uppercase */
-STATIC VOID strupr(char *s)
+STATIC VOID _strupr(char *s)
 {
   while (*s) {
     *s = toupper(*s);
@@ -2763,7 +2763,7 @@ STATIC VOID CmdSet(char *pLine)
   if (*pLine == '=')      /* equal sign is required */
   {
     int size;
-    strupr(szBuf);        /* all environment variables must be uppercase */
+    _strupr(szBuf);        /* all environment variables must be uppercase */
     strcat(szBuf, "=");
     pLine = skipwh(++pLine);
     strcat(szBuf, pLine); /* append the variable value (may include spaces) */

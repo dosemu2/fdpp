@@ -902,7 +902,8 @@ void PurgeHook(void *ptr, UDWORD len)
     fdlogprintf("purged %i relocs (%i missed)\n", reloc, miss);
 }
 
-#define _S(x) __STRING(x)
+#define __S(x) #x
+#define _S(x) __S(x)
 const char *FdppDataDir(void)
 {
     return _S(DATADIR);
