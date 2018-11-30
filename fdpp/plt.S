@@ -141,22 +141,22 @@ plt_init:
     mov ah, FDPP_KERNEL_VERSION
     mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
-    push word SEG init_near_wrp
+    push word IGROUP
     push word init_near_wrp
-    push word SEG near_wrp
+    push word TGROUP
     push word near_wrp
     push word 2    ; amount of near wrappers
     push word __asm_callsymtab_end - __asm_callsymtab_start
-    push word SEG __asm_callsymtab_start
+    push word IGROUP
     push word __asm_callsymtab_start
     push word __asm_symtab_end - __asm_symtab_start
-    push word SEG __asm_symtab_start
+    push word IGROUP
     push word __asm_symtab_start
     push cs
-    push word SEG plt_init
-    push word SEG __InitTextEnd
+    push word IGROUP
+    push word IGROUP
     push word __InitTextEnd
-    push word SEG __InitTextStart
+    push word IGROUP
     push word __InitTextStart
     int DOS_HELPER_INT
     mov sp, bp
