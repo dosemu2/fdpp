@@ -153,11 +153,11 @@ plt_init:
     push word SEG __asm_symtab_start
     push word __asm_symtab_start
     push cs
-    push word SEG plt_init wrt INIT_TEXT
-    push word SEG __InitTextEnd wrt INIT_TEXT
-    push word __InitTextEnd wrt INIT_TEXT
-    push word SEG __InitTextStart wrt INIT_TEXT
-    push word __InitTextStart wrt INIT_TEXT
+    push word SEG plt_init
+    push word SEG __InitTextEnd
+    push word __InitTextEnd
+    push word SEG __InitTextStart
+    push word __InitTextStart
     int DOS_HELPER_INT
     mov sp, bp
     pop bp
