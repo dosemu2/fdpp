@@ -30,11 +30,11 @@
 
         %include "../kernel/segs.inc"
 
-segment DATA
+segment _DATA
                 global  _DaysSinceEpoch
 _DaysSinceEpoch dw      0
 
-segment	HMA_TEXT
+segment HMA_TEXT
 
 ;
 ;       ULONG ReadPCClock(void)

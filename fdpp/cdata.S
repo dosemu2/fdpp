@@ -19,7 +19,7 @@
 %include "segs.inc"
 #include "../hdr/version.h"
 
-segment _FIXED_DATA
+segment CONST2
 
     global _os_release
 _os_release: db KERNEL_VERSION_STRING
