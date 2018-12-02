@@ -22,11 +22,17 @@ NASMFLAGS += -i$(SRC)
 # Only 8 files per definition; this is limitation of DOS batch
 # files (only 9 directly accessible parameters).
 
-OBJS=kernel.obj entry.obj io.obj console.obj serial.obj printer.obj \
-    execrh.obj nlssupt.obj procsupt.obj dosidle.obj int2f.obj \
-    nls_hc.obj intr.obj irqstack.obj memdisk.obj \
-    cpu.obj
-PPOBJS = plt.obj cdata.obj
+ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
+    execrh.asm nlssupt.asm procsupt.asm dosidle.asm int2f.asm \
+    nls_hc.asm intr.asm irqstack.asm memdisk.asm \
+    cpu.asm
+DASMS = floppy.asm rdpcclk.asm wrpcclk.asm wratclk.asm
+OBJS = $(ASMS:.asm=.obj)
+DOBJS = $(DASMS:.asm=.obj)
+ELFS = $(ASMS:.asm=.elf)
+INCS = $(ASMS:.asm=_seg.inc)
+PPASMS = plt.S cdata.S
+PPOBJS = $(PPASMS:.S=.obj)
 
 #               *Explicit Rules*
 
@@ -42,8 +48,8 @@ clobber:        clean
 $(TARGET).sys:	kernel.exe $(utils_path)/exeflat.exe
 		$(utils_path)/exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
 
-kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
-		$(LINK) debug all op symfile format dos option map,statics,verbose F { $(OBJS) $(PPOBJS) } L $(LIBS) N $@
+kernel.exe:	$(OBJS) $(PPOBJS) $(DOBJS)
+		$(LINK) debug all op symfile format dos option map,statics,verbose F { $^ } N $@
 
 ../bin/country.sys: $(SRC)country.asm
 	if [ ! -d ../bin ]; then \
@@ -53,9 +59,9 @@ kernel.exe:	$(OBJS) $(PPOBJS) $(LIBS)
 
 clean:
 	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
-	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err \
+	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.elf *.inc \
 		*.lnk *.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
-		plt*.inc kernel.exe $(TARGET).sys kernel.sym *.pc
+		kernel.exe $(TARGET).sys kernel.sym *.pc
 
 #               *Individual File Dependencies*
 #apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -146,6 +152,9 @@ $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
 $(OBJS): %.obj: $(SRC)%.asm
 	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
 
+$(DOBJS): %.obj: $(SRC)../drivers/%.asm
+	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
+
 $(PPOBJS): %.obj: %.asm
 	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
 
@@ -159,7 +168,16 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) -o $@ $^ $(LDFLAGS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
+$(ELFS): %.elf: $(SRC)%.asm
+	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
+
+$(INCS): %_seg.inc: %.elf
+	objdump -t $< | $(srcdir)/parsers/gen_segs.sh $(SRC)segs.inc >$@
+
+plt_seg.inc: $(INCS)
+	echo $(patsubst %.inc,\%include \"%.inc\",$(INCS)) | sed 's/.inc" /.inc"\n/g' >$@
+
+plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@
@@ -170,7 +188,7 @@ cdata.asm: $(srcdir)/cdata.S
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)
 pos = $(words $(call _pos,$1,$2))
-pars =	srcdir=$(srcdir)/parsers \
+pars = srcdir=$(srcdir)/parsers \
 	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@
 $(filter %.tmp,$(GEN_TMP)): $(SRC)proto.h
 	$(pars)

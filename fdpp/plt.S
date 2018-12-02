@@ -18,6 +18,9 @@
 
 #include "thunks_priv.h"
 %include "segs.inc"
+%include "plt_seg.inc"
+
+%define _SEG(s) _SEG_%+s
 
 %macro asmcfunc 4
 segment %3
@@ -49,7 +52,7 @@ segment %3
 _%1_num dw %2
 _%1_ptr:
     extern _%1
-    dw _%1, SEG _%1
+    dw _%1, _SEG(_%1)
 %endmacro
 
 %macro asmpsym 2
