@@ -104,7 +104,7 @@ endef
 all:
 	+$(call mdir,utils,production)
 	+$(call mdir,lib,production)
-	+$(call mdir,drivers,production)
+#	+$(call mdir,drivers,production)
 #	cd boot && $(MAKE) production
 #	cd sys && $(MAKE) production
 	+$(call mdir,fdpp,all)
