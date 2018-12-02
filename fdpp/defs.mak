@@ -37,7 +37,7 @@ endif
 # (otherwise will be determined automatically)
 
 # WATCOM Link
-#XLINK=wlink
+XLINK=ld
 
 #*********************************************************************
 # optionally define your MAKE type here, if not then

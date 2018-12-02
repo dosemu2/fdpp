@@ -3,7 +3,6 @@ srcdir ?= $(CURDIR)
 lib_path ?= ../lib
 utils_path ?= ../utils
 include $(srcdir)/defs.mak
-XLINK = $(srcdir)/contrib/jwlink
 include $(srcdir)/clang.mak
 
 LIBS=$(lib_path)/device.lib
@@ -28,13 +27,11 @@ ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
     cpu.asm
 DASMS = floppy.asm rdpcclk.asm wrpcclk.asm wratclk.asm
 AASMS = $(ASMS) $(DASMS)
-OBJS = $(ASMS:.asm=.obj)
-DOBJS = $(DASMS:.asm=.obj)
-ELFS = $(ASMS:.asm=.elf)
+OBJS = $(ASMS:.asm=.o)
+DOBJS = $(DASMS:.asm=.o)
 INCS = $(AASMS:.asm=_seg.inc) cdata_seg.inc
-DELFS = $(DASMS:.asm=.elf)
 PPASMS = plt.S cdata.S
-PPOBJS = $(PPASMS:.S=.obj)
+PPOBJS = $(PPASMS:.S=.o)
 
 #               *Explicit Rules*
 
@@ -45,13 +42,9 @@ all: $(ALL)
 production:     $(ALL) ../bin/country.sys
 clobber:        clean
 
-# -S to avoid showing expected relocations
-# 0x10 & 0x78 or 0x79 depending on compilation options
-$(TARGET).sys:	kernel.exe $(utils_path)/exeflat.exe
-		$(utils_path)/exeflat.exe kernel.exe $(TARGET).sys $(LOADSEG) -S0x10 -S0x78 -S0x79
-
-kernel.exe:	$(OBJS) $(PPOBJS) $(DOBJS)
-		$(LINK) debug all op symfile format dos option map,statics,verbose F { $^ } N $@
+$(TARGET).sys: $(OBJS) $(PPOBJS) $(DOBJS)
+	$(LINK) -T$(srcdir)/kernel.ld -melf_i386 -static -Map kernel.map -o $@ $^
+	chmod -x $@
 
 ../bin/country.sys: $(SRC)country.asm
 	if [ ! -d ../bin ]; then \
@@ -63,7 +56,7 @@ clean:
 	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.elf *.inc \
 		*.lnk *.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
-		kernel.exe $(TARGET).sys kernel.sym *.pc
+		$(TARGET).sys kernel.sym *.pc
 
 #               *Individual File Dependencies*
 #apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -151,14 +144,14 @@ $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(GEN_HEADERS)
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(OBJS): %.obj: $(SRC)%.asm
-	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
+$(OBJS): %.o: $(SRC)%.asm
+	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
-$(DOBJS): %.obj: $(SRC)../drivers/%.asm
-	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
+$(DOBJS): %.o: $(SRC)../drivers/%.asm
+	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
-$(PPOBJS): %.obj: %.asm
-	$(NASM) $(NASMFLAGS) -f obj -o $@ $<
+$(PPOBJS): %.o: %.asm
+	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
 .cpp.o: $(PLPHDRS)
 	$(CC) $(CFLAGS) -o $@ $<
@@ -170,22 +163,13 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) -o $@ $^ $(LDFLAGS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-$(ELFS): %.elf: $(SRC)%.asm
-	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
-
-$(DELFS): %.elf: $(SRC)../drivers/%.asm
-	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
-
-cdata.elf: cdata.asm
-	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
-
-$(INCS): %_seg.inc: %.elf
+$(INCS): %_seg.inc: %.o
 	objdump -t $< | $(srcdir)/parsers/gen_segs.sh $(SRC)segs.inc >$@
 
 plt_seg.inc: $(INCS)
 	echo $(patsubst %.inc,\%include \"%.inc\",$(INCS)) | sed 's/.inc" /.inc"\n/g' >$@
 
-plt.obj: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
+plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@
