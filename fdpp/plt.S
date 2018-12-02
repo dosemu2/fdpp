@@ -59,13 +59,13 @@ _%1_ptr:
 _%1_num dw %2
 _%1_ptr:
     extern %1
-    dw %1, SEG %1
+    dw %1, _SEG(%1)
 %endmacro
 
 %macro asmsym 1
 _%1_ptr:
     extern _%1
-    dw _%1, SEG _%1
+    dw _%1, _SEG(_%1)
 %endmacro
 
 %macro nearwrp 0

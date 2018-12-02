@@ -27,10 +27,12 @@ ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
     nls_hc.asm intr.asm irqstack.asm memdisk.asm \
     cpu.asm
 DASMS = floppy.asm rdpcclk.asm wrpcclk.asm wratclk.asm
+AASMS = $(ASMS) $(DASMS)
 OBJS = $(ASMS:.asm=.obj)
 DOBJS = $(DASMS:.asm=.obj)
 ELFS = $(ASMS:.asm=.elf)
-INCS = $(ASMS:.asm=_seg.inc)
+INCS = $(AASMS:.asm=_seg.inc) cdata_seg.inc
+DELFS = $(DASMS:.asm=.elf)
 PPASMS = plt.S cdata.S
 PPOBJS = $(PPASMS:.S=.obj)
 
@@ -169,6 +171,12 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 $(ELFS): %.elf: $(SRC)%.asm
+	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
+
+$(DELFS): %.elf: $(SRC)../drivers/%.asm
+	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
+
+cdata.elf: cdata.asm
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
 $(INCS): %_seg.inc: %.elf
