@@ -17,3 +17,6 @@ clean:
 
 install:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp install
+
+rpm deb tar:
+	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp $@
