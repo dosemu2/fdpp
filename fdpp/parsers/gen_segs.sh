@@ -1,3 +1,5 @@
+#!/bin/bash
+
 while read -a line_a; do
     line=${line_a[@]}
     [ -z "$line" ] && continue
