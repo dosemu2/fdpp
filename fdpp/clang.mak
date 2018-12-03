@@ -2,12 +2,11 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
-DIRSEP=/
-RM=rm -f
-CP=cp
-CC=clang++
-CL=clang++
+CC = clang++
+CL = clang++
 CLC = clang
+NASM = nasm
+LINK = ld
 
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fno-rtti -fpic \
     -Wno-format-invalid-specifier
@@ -50,8 +49,5 @@ ALLCFLAGS:=$(ALLCFLAGS) -DWITHFAT32
 NASMFLAGS:=$(NASMFLAGS) -DWITHFAT32
 endif
 
-NASM=$(XNASM)
-NASMFLAGS   := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU)
+NASMFLAGS := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU)
 LOADSEG = 0x60
-
-LINK=$(XLINK)
