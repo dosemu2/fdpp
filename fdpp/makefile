@@ -1,11 +1,8 @@
 -include config.mak
 srcdir ?= $(CURDIR)
-lib_path ?= ../lib
-utils_path ?= ../utils
 include $(srcdir)/defs.mak
 include $(srcdir)/clang.mak
 
-LIBS=$(lib_path)/device.lib
 HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so

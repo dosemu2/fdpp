@@ -1,24 +1,12 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 CWD=`pwd -P`
-lib_path="$CWD/lib"
-utils_path="$CWD/utils"
 if [ ! -f configure ]; then
     ln -s "$SCRIPTPATH"/makefile makefile 2>/dev/null
     echo "srcdir = $SCRIPTPATH" >config.mak
     mkdir fdpp 2>/dev/null
     cd fdpp
     echo "srcdir = $SCRIPTPATH/fdpp" >config.mak
-    echo "lib_path = $lib_path" >>config.mak
-    echo "utils_path = $utils_path" >>config.mak
     mkdir parsers 2>/dev/null
     cd parsers
     echo "srcdir = $SCRIPTPATH/fdpp/parsers" >config.mak
-    cd ../..
-    mkdir utils 2>/dev/null
-    cd utils
-    echo "srcdir = $SCRIPTPATH/utils" >config.mak
-    cd ..
-    mkdir drivers 2>/dev/null
-    cd drivers
-    echo "srcdir = $SCRIPTPATH/drivers" >config.mak
 fi
