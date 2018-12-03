@@ -144,7 +144,7 @@ $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
 $(OBJS): %.o: $(SRC)%.asm
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
-$(DOBJS): %.o: $(SRC)../drivers/%.asm
+$(DOBJS): %.o: $(SRC)drivers/%.asm
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
 $(PPOBJS): %.o: %.asm
