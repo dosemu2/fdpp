@@ -1,7 +1,7 @@
 -include config.mak
 XCPU ?= 386
 srcdir ?= $(CURDIR)
-include $(srcdir)/../../mkfiles/gcc.mak
+include $(srcdir)/../clang.mak
 
 thunk_gen: lex.yy.c thunk_gen.tab.c
 	$(CLC) -g -o $@ $^
