@@ -81,7 +81,7 @@ segment	_IO_FIXED_DATA
                 ; DOS-C and kernel
                 ;
                 global  _con_dev
-_con_dev        equ     $
+_con_dev:
                 dw      _prn_dev,LGROUP
                 dw      8013h           ; con device (stdin & stdout)
                 dw      GenStrategy
@@ -155,7 +155,7 @@ _Com4Dev        dw      _clk_dev,LGROUP
                 ; Header for clock device
                 ;
                 global  _clk_dev
-_clk_dev        equ     $
+_clk_dev:
                 dw      _blk_dev,LGROUP
                 dw      8008h           ; clock device
                 dw      GenStrategy
@@ -166,7 +166,7 @@ _clk_dev        equ     $
                 ; Header for device
                 ;
                 global  _blk_dev
-_blk_dev        equ     $
+_blk_dev:
                 dd      -1
                 dw      08c2h           ; block device with ioctl
                 dw      GenStrategy

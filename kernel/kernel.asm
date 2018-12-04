@@ -376,7 +376,7 @@ _first_mcb      dw      0               ;-0002 Start of user memory
                 global  _DPBp
                 global  MARK0026H
 ; A reference seems to indicate that this should start at offset 26h.
-MARK0026H       equ     $
+MARK0026H:
 _DPBp           dd      0               ; 0000 First drive Parameter Block
                 global  _sfthead
 _sfthead        dd      0               ; 0004 System File Table head
@@ -519,7 +519,7 @@ _firstsftt:
                 times (01fbh - ($ - DATASTART)) db 0
 
                 global  MARK01FBH
-MARK01FBH       equ     $
+MARK01FBH:
                 global  _local_buffer   ; local_buffer is 256 bytes long
                                         ; so it overflows into kb_buf!!
         ; only when kb_buf is used, local_buffer is limited to 128 bytes.
