@@ -1,5 +1,10 @@
 -include config.mak
 srcdir ?= $(CURDIR)
+# the below is needed to prevent _our_ srcdir being passed
+# down to rpmbuild/debuild, and, subsequently, to their make!
+unexport srcdir
+MAKEOVERRIDES =
+
 include $(srcdir)/defs.mak
 include $(srcdir)/clang.mak
 
