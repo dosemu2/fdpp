@@ -1,3 +1,17 @@
+## beta-3
+
+A very important milestone as we finally switched to ELF format!
+
+- Switched to GPL tool-chain.
+  The binary-supplied jwlib/jwlink are removed from the repo.
+  Not everything is done an optimal way yet, the build is very
+  complex and slow. We expect the enhancements of nasm in the future.
+- Global clean-up of the repository, all FreeDOS remnants removed.
+  We now have small and clean repository.
+- many fixes (GEOS now works reliably, smaller memory usage)
+
+## beta-2:
+
 We have around 60 commits since previous beta, and @andrewbird joined
 the development. :)
 
