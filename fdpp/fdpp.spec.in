@@ -3,7 +3,7 @@
 #
 
 Name: fdpp
-Version: 0.1beta2
+Version: @VERSION@
 Release: 1%{?dist}
 Summary: 64-bit DOS
 

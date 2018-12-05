@@ -7,8 +7,11 @@ HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
 RELVER = beta2
-PKG = fdpp-0.1$(RELVER)
-TGZ = $(PKG).tar.gz
+VERSION = 0.1$(RELVER)
+PKG = fdpp-$(VERSION)
+TAR = $(PKG).tar
+TGZ = $(TAR).gz
+GEN_EXT = fdpp.pc fdpp.spec
 
 ALLCFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
     -DKRNL_NAME=$(TARGET).sys
@@ -32,7 +35,7 @@ PPOBJS = $(PPASMS:.S=.o)
 
 #               *Explicit Rules*
 
-ALL = $(FDPPLIB) $(TARGET).sys fdpp.pc
+ALL = $(FDPPLIB) $(TARGET).sys $(GEN_EXT)
 
 all: $(ALL)
 
@@ -207,8 +210,10 @@ install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(srcdir)/thunks.h
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
-$(TGZ):
-	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TGZ) --prefix=$(PKG)/ HEAD
+$(TGZ): fdpp.spec
+	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
+	tar rf $(TAR) --add-file=fdpp.spec
+	gzip $(TAR)
 .PHONY: $(TGZ)
 
 tar: $(TGZ)
@@ -219,8 +224,9 @@ rpm: $(TGZ)
 deb:
 	debuild -i -us -uc -b
 
-fdpp.pc: $(srcdir)/fdpp.pc.in makefile
+$(GEN_EXT): %: $(srcdir)/%.in
 	sed \
 		-e 's!@PREFIX[@]!$(PREFIX)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
+		-e 's!@VERSION[@]!$(VERSION)!g' \
 		$< >$@
