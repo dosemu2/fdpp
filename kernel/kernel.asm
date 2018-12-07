@@ -140,9 +140,6 @@ kernel_start:
                 shr     dx,cl
                 sub     ax,dx
                 mov     es,ax
-                mov     dx,INITTEXTSIZE ; para aligned
-                shr     dx,cl
-                add     ax,dx
                 mov     ss,ax           ; set SS to init data segment
                 sti                     ; now enable them
                 mov     ax,cs

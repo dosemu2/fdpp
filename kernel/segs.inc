@@ -60,7 +60,6 @@ group   I_GROUP         ID_B ID ID_E IC IDATA IB_B IB IB_E
 %define nobits
 %define exec
 %define INITSIZE init_end wrt INIT_TEXT
-%define INITTEXTSIZE __INIT_DATA_START wrt INIT_TEXT
 
 %else ; using ELF
 
@@ -75,7 +74,6 @@ extern I_GROUP
 %define class(x)
 %define stack
 extern INITSIZE
-%define INITTEXTSIZE __InitTextEnd
 
 %endif
 
