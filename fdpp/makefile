@@ -12,7 +12,8 @@ HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
 RELVER = beta2
-VERSION = 0.1$(RELVER)
+MAJ = 0.1
+VERSION = $(MAJ)$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
 TGZ = $(TAR).gz
@@ -180,7 +181,7 @@ plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@
 
 cdata.asm: $(srcdir)/cdata.S
-	cpp -P $^ | sed 's/" "//g' >$@
+	cpp -P -DKERNEL_VERSION=$(MAJ)`git describe` $^ | sed 's/" "//g' >$@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)

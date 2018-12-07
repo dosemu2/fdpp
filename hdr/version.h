@@ -45,7 +45,7 @@
 #endif
 
 /* actual version string */
-#define KVS(v,s,o) "FDPP kernel " v "(build 00" #s ") [compiled " __DATE__ "]"
-#define xKVS(v,s,o) KVS(v,s,o)
-#define KERNEL_VERSION_STRING xKVS(KERNEL_VERSION, REVISION_SEQ, OEM_ID)
+#define KVS(v) "FDPP kernel " #v " [compiled " __DATE__ "]"
+#define xKVS(v) KVS(v)
+#define KERNEL_VERSION_STRING xKVS(KERNEL_VERSION)
 
