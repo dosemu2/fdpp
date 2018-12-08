@@ -8,8 +8,9 @@ CLC = clang
 NASM = nasm
 LINK = ld
 
-TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fno-rtti -fpic \
-    -Wno-format-invalid-specifier
+TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fno-rtti -fpic
+# _XTRA should go at the end of cmd line
+TARGETOPT_XTRA = -Wno-format-invalid-specifier
 ifneq ($(XCPU),386)
 $(error unsupported CPU 186)
 endif
@@ -38,7 +39,7 @@ ifeq ($(USE_UBSAN),1)
 DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
-CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS)
+CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
 CLCFLAGS = -c -fpic $(IFLAGS) $(WFLAGS) $(DBGFLAGS)
 LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
 
