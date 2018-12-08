@@ -227,8 +227,10 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     int stab_len = symtab->symtab_len / sizeof(struct far_s);
 
     num_wrps = symtab->num_wrps;
+    free(near_wrp);
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
+    free(asm_tab);
     asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
     memcpy(asm_tab, resolve_segoff(symtab->calltab), symtab->calltab_len);
     asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);

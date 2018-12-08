@@ -52,6 +52,11 @@ void farhlp_init(struct farhlp *ctx)
     _assert(ctx->far_map);
 }
 
+void farhlp_deinit(struct farhlp *ctx)
+{
+    free(ctx->far_map);
+}
+
 static int do_lookup(struct farhlp *ctx, const void *ptr)
 {
     int i;

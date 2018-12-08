@@ -43,8 +43,10 @@ void dosobj_init(far_t fa, int size)
 {
     void *ptr = resolve_segoff(fa);
 
-    if (initialized)
+    if (initialized) {
+        farhlp_deinit(&hlp);
         smdestroy(&pool);
+    }
     sminit(&pool, ptr, size);
     smregister_error_notifier(&pool, err_printf);
     base = fa;

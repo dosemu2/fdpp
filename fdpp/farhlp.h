@@ -34,6 +34,7 @@ extern struct farhlp g_farhlp[FARHLP_MAX];
 extern "C" {
 #endif
 void farhlp_init(struct farhlp *ctx);
+void farhlp_deinit(struct farhlp *ctx);
 void store_far(struct farhlp *ctx, const void *ptr, far_t fptr);
 void store_far_replace(struct farhlp *ctx, const void *ptr, far_t fptr);
 struct far_s lookup_far(struct farhlp *ctx, const void *ptr);
