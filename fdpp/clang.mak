@@ -20,33 +20,33 @@ DEBUG_MODE = 1
 EXTRA_DEBUG = 0
 DEBUG_MSGS = 0
 USE_UBSAN = 0
-CPPFLAGS = -iquote $(srcdir)/../hdr
+IFLAGS = -iquote $(srcdir)/../hdr
+CPPFLAGS = $(IFLAGS)
 WFLAGS = -Wall -Wmissing-prototypes
-ALLCFLAGS += $(TARGETOPT) $(CPPFLAGS) $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)
-ALLCFLAGS += -ggdb3
+DBGFLAGS += -ggdb3
 endif
 ifeq ($(EXTRA_DEBUG),1)
-ALLCFLAGS += -fdebug-macro -O0
+DBGFLAGS += -fdebug-macro -O0
 else
-ALLCFLAGS += -O2
+DBGFLAGS += -O2
 endif
 ifeq ($(DEBUG_MSGS),1)
-ALLCFLAGS += -DDEBUG
+DBGFLAGS += -DDEBUG
 endif
 ifeq ($(USE_UBSAN),1)
-ALLCFLAGS += -fsanitize=undefined -fno-sanitize=alignment
+DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
-CFLAGS = $(ALLCFLAGS)
+CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS)
+CLCFLAGS = -c -fpic $(IFLAGS) $(WFLAGS) $(DBGFLAGS)
 LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
-CLCFLAGS = -c -fpic $(CPPFLAGS) $(WFLAGS)
 
-ALLCFLAGS:=$(ALLCFLAGS) -DI386
+CPPFLAGS += -DI386
 
 ifeq ($(XFAT),32)
-ALLCFLAGS:=$(ALLCFLAGS) -DWITHFAT32
-NASMFLAGS:=$(NASMFLAGS) -DWITHFAT32
+CPPFLAGS += -DWITHFAT32
+NASMFLAGS += -DWITHFAT32
 endif
 
 NASMFLAGS := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU)

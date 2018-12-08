@@ -19,7 +19,7 @@ TAR = $(PKG).tar
 TGZ = $(TAR).gz
 GEN_EXT = fdpp.pc fdpp.spec
 
-ALLCFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
+CPPFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
     -DKRNL_NAME=$(TARGET).sys
 NASMFLAGS += -i$(SRC)
 
