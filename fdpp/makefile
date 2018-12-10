@@ -180,8 +180,8 @@ plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@
 
-cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h
-	cpp -P -DKERNEL_VERSION=$(MAJ)`git describe` $< | sed 's/" "//g' >$@
+cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(srcdir)/makefile
+	cpp -P -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]" $< | sed 's/" "//g' >$@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)
