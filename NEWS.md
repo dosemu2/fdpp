@@ -8,6 +8,8 @@ A very important milestone as we finally switched to ELF format!
   complex and slow. We expect the enhancements of nasm in the future.
 - Global clean-up of the repository, all FreeDOS remnants removed.
   We now have small and clean repository.
+- Long-standing FreeDOS bug fixed that prevented UMB at A0
+- Started supporting reboot (not finished yet)
 - many fixes (GEOS now works reliably, smaller memory usage)
 
 ## beta-2:
