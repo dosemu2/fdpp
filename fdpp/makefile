@@ -230,7 +230,7 @@ rpm: $(TGZ)
 deb:
 	debuild -i -us -uc -b
 
-$(GEN_EXT): %: $(srcdir)/%.in
+$(GEN_EXT): %: $(srcdir)/%.in makefile
 	sed \
 		-e 's!@PREFIX[@]!$(PREFIX)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
