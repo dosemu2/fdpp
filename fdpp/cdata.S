@@ -22,4 +22,4 @@
 segment CONST2
 
     global _os_release
-_os_release: db KERNEL_VERSION_STRING
+_os_release: db KERNEL_VERSION_STRING,0
