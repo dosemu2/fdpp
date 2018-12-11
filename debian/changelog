@@ -1,3 +1,9 @@
+fdpp (0.1~beta3-1) bionic; urgency=low
+
+  * beta-3
+
+ -- Stas Sergeev <stsp@list.ru>  Tue, 11 Dec 2018 20:30:00 +0300
+
 fdpp (0.1~beta2-1) bionic; urgency=low
 
   * beta-2
