@@ -44,6 +44,7 @@ static BYTE *memmgrRcsId =
 	((mcb)->m_type == MCB_NORMAL || (mcb)->m_type == MCB_LAST)
 
 #define para2far(seg) (mcb FAR *)MK_FP((seg) , 0)
+#define MCBDESTRY() (fdprintf("MCB corruption"),_fail(),DE_MCBDESTRY)
 
 /*
  * Join any following unused MCBs to MCB 'p'.
@@ -64,7 +65,7 @@ STATIC COUNT joinMCBs(seg para)
     if (!mcbFree(q))
       break;
     if (!mcbValid(q))
-      return DE_MCBDESTRY;
+      return MCBDESTRY();
     /* join both MCBs */
     p->m_type = q->m_type;      /* possibly the next MCB is the last one */
     p->m_size += q->m_size + 1; /* one for q's MCB itself */
@@ -138,12 +139,12 @@ searchAgain:
   {
     /* check for corruption                         */
     if (!mcbValid(p))
-      return DE_MCBDESTRY;
+      return MCBDESTRY();
 
     if (mcbFree(p))
     {                           /* unused block, check if it applies to the rule */
       if (joinMCBs(FP_SEG(p)) != SUCCESS)       /* join following unused blocks */
-        return DE_MCBDESTRY;    /* error */
+        return MCBDESTRY();    /* error */
 
       if (!biggestSeg || biggestSeg->m_size < p->m_size)
         biggestSeg = p;
@@ -324,7 +325,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
 
   /* check for corruption                                         */
   if (!mcbValid(p))
-    return DE_MCBDESTRY;
+    return MCBDESTRY();
 
   /* check if to grow the block                                   */
   if (size > p->m_size)
@@ -332,7 +333,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     /* first try to make the MCB larger by joining with any following
        unused blocks */
     if (joinMCBs(FP_SEG(p)) != SUCCESS)
-      return DE_MCBDESTRY;
+      return MCBDESTRY();
 
     if (size > p->m_size)
     {                           /* block is still too small */
@@ -363,7 +364,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
 
     /* try to join q with the free MCBs following it if possible */
     if (joinMCBs(FP_SEG(q)) != SUCCESS)
-      return DE_MCBDESTRY;
+      return MCBDESTRY();
   }
 
   /* MS network client NET.EXE: DosMemChange sets the PSP              *
@@ -395,7 +396,7 @@ COUNT DosMemCheck(void)
       put_unsigned(first_mcb, 16, 4);
       hexd("\nprev ", pprev, 16);
       hexd("notMZ", p, 16);
-      return DE_MCBDESTRY;
+      return MCBDESTRY();
     }
 
     /* not corrupted - but not end, bump the pointer */
@@ -418,7 +419,7 @@ COUNT FreeProcessMem(UWORD ps)
   {
 
     if (!mcbValid(p))           /* check for corruption */
-      return DE_MCBDESTRY;
+      return MCBDESTRY();
 
     if (p->m_psp == ps)
       DosMemFree(FP_SEG(p));
