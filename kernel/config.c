@@ -520,6 +520,8 @@ STATIC seg prev_mcb(seg cur_mcb, seg start)
 {
   /* determine prev mcb */
   seg mcb_prev, mcb_next;
+
+  _assert(cur_mcb > start);
   mcb_prev = mcb_next = start;
   while (mcb_next < cur_mcb && para2far(mcb_next)->m_type == MCB_NORMAL)
   {
@@ -580,6 +582,8 @@ STATIC void umb_init(void)
 
       if (umb_seg < umb_max)
       {
+        /* make sure prev mcb is link */
+        _assert(para2far(umb_prev)->m_psp == 8);
         if (umb_next - umb_seg - umb_size == 0)
         {
           /* should the UMB driver return
@@ -598,10 +602,15 @@ STATIC void umb_init(void)
         umb_prev = umb_next;
       }
 
-      if (umb_seg - umb_prev - 1 == 0)
+      if (umb_seg - umb_prev - 1 == 0 && umb_prev > ram_top * 64)
+      {
         /* should the UMB driver return
            adjacent memory in several pieces */
-        para2far(prev_mcb(umb_prev, LoL->_uppermem_root))->m_size += umb_size;
+        umb_prev = prev_mcb(umb_prev, LoL->_uppermem_root);
+        /* make sure we are still in UMB and adjusting non-link */
+        _assert(umb_prev >= ram_top * 64 && para2far(umb_prev)->m_psp != 8);
+        para2far(umb_prev)->m_size += umb_size;
+      }
       else
       {
         /* create link mcb (below) */
