@@ -128,10 +128,6 @@ kernel_start:
                 popf
                 pop bx
 
-                mov     ax,I_GROUP
-                cli
-                mov     ss,ax
-                mov     sp,init_tos
                 int     12h             ; move init text+data to higher memory
                 mov     cl,6
                 shl     ax,cl           ; convert kb to para
@@ -140,8 +136,12 @@ kernel_start:
                 shr     dx,cl
                 sub     ax,dx
                 mov     es,ax
+                add     ax,I_GROUP
+                sub     ax,IGROUP
+                cli
                 mov     ss,ax           ; set SS to init data segment
-                sti                     ; now enable them
+                mov     sp,init_tos
+                sti                     ; now enable interrupts
                 mov     ax,cs
                 mov     dx,__HMATextEnd ; para aligned
                 shr     dx,cl
