@@ -66,7 +66,7 @@ SECTIONS
 		*(ID_B)
 		*(ID_E)
 	}
-    .ibss SIZEOF(.idata) (NOLOAD) : AT (ALIGN(LOADADDR(.idata) + SIZEOF(.idata), 16)) {
+    .ibss SIZEOF(.idata) (NOLOAD) : AT (LOADADDR(.idata) + SIZEOF(.idata)) {
 		*(IB_B)
 		*(IB_E)
 	}
