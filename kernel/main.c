@@ -47,7 +47,7 @@ static const char *copyright =
     "the Free Software Foundation, either version 3 of the License, or\n"
     "(at your option) any later version.\n\n";
 
-struct _KernelConfig InitKernelConfig BSS_INIT({0});
+BSSZ(struct _KernelConfig, InitKernelConfig);
 
 STATIC VOID InitIO(void);
 
@@ -92,6 +92,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 #define DOSOBJ_POOL 512
   far_t fa = DynAlloc("dosobj", 1, DOSOBJ_POOL);
   dosobj_init(fa, DOSOBJ_POOL);
+  run_ctors();
 #endif
 
                         /*  if the kernel has been UPX'ed,

@@ -55,9 +55,9 @@ struct MenuSelector
 };
 
 /** Structure below holds the menu-strings */
-STATIC struct MenuSelector MenuStruct[MENULINESMAX] BSS_INIT({0});
+STATIC BSSA(struct MenuSelector, MenuStruct, MENULINESMAX);
 
-int nMenuLine BSS_INIT(0);
+BSS(int, nMenuLine, 0);
 int MenuColor = -1;
 
 STATIC void WriteMenuLine(struct MenuSelector *menu)
@@ -116,13 +116,14 @@ STATIC void SelectLine(int MenuSelected)
   WriteMenuLine(menu);
 }
 
-UWORD umb_start BSS_INIT(0), UMB_top BSS_INIT(0);
-UWORD ram_top BSS_INIT(0); /* How much ram in Kbytes               */
-size_t ebda_size BSS_INIT(0);
+BSS(UWORD, umb_start, 0);
+BSS(UWORD, UMB_top, 0);
+BSS(UWORD, ram_top, 0); /* How much ram in Kbytes               */
+BSS(size_t, ebda_size, 0);
 
-static UBYTE ErrorAlreadyPrinted[128] BSS_INIT({0});
+STATIC BSSA(UBYTE, ErrorAlreadyPrinted, 128);
 
-char master_env[128] BSS_INIT({0});
+BSSA(char, master_env, 128);
 static char *envp = master_env;
 
 static const char *_cfgInit = "command.com";
@@ -147,31 +148,32 @@ struct config Config = {
       , 0                       /* default value for switches=/E:nnnn */
 };
 
-STATIC seg base_seg BSS_INIT(0);
-STATIC seg umb_base_seg BSS_INIT(0);
-BYTE FAR *lpTop BSS_INIT(0);
-STATIC unsigned nCfgLine BSS_INIT(0);
-COUNT UmbState BSS_INIT(0);
-STATIC BYTE szLine[256] BSS_INIT({0});
-STATIC BYTE szBuf[256] BSS_INIT({0});
+STATIC BSS(seg, base_seg, 0);
+STATIC BSS(seg, umb_base_seg, 0);
+BYTE FAR *lpTop;
+STATIC BSS(unsigned, nCfgLine, 0);
+BSS(COUNT, UmbState, 0);
+STATIC BSSA(BYTE, szLine, 256);
+STATIC BSSA(BYTE, szBuf, 256);
 
 #define MAX_CHAINS 5
 struct CfgFile {
   COUNT nFileDesc;
   COUNT nCfgLine;
-} cfgFile[MAX_CHAINS] BSS_INIT({0});
-COUNT nCurChain BSS_INIT(0);
-COUNT nFileDesc BSS_INIT(0);
+};
+BSSA(struct CfgFile, cfgFile, MAX_CHAINS);
+BSS(COUNT, nCurChain, 0);
+BSS(COUNT, nFileDesc, 0);
 
-BYTE singleStep BSS_INIT(FALSE);        /* F8 processing */
-BYTE SkipAllConfig BSS_INIT(FALSE);     /* F5 processing */
-BYTE askThisSingleCommand BSS_INIT(FALSE);      /* ?device=  device?= */
-BYTE DontAskThisSingleCommand BSS_INIT(FALSE);  /* !files=            */
+BSS(BYTE, singleStep, FALSE);        /* F8 processing */
+BSS(BYTE, SkipAllConfig, FALSE);     /* F5 processing */
+BSS(BYTE, askThisSingleCommand, FALSE);      /* ?device=  device?= */
+BSS(BYTE, DontAskThisSingleCommand, FALSE);  /* !files=            */
 
 COUNT MenuTimeout = -1;
-BYTE  MenuSelected BSS_INIT(0);
-UCOUNT MenuLine BSS_INIT(0);
-UCOUNT Menus BSS_INIT(0);
+BSS(BYTE,  MenuSelected, 0);
+BSS(UCOUNT, MenuLine, 0);
+BSS(UCOUNT, Menus, 0);
 
 STATIC VOID CfgMenuColor(char * pLine);
 
@@ -327,9 +329,9 @@ STATIC int findend(char * s)
   return nLen;
 }
 
-char *pLineStart BSS_INIT(0);
+BSS(char *, pLineStart, NULL);
 
-BYTE HMAState BSS_INIT(0);
+BSS(BYTE, HMAState, 0);
 #define HMA_NONE 0              /* do nothing */
 #define HMA_REQ 1               /* DOS = HIGH detected */
 #define HMA_DONE 2              /* Moved kernel to HMA */
@@ -2092,7 +2094,7 @@ STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
 
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)
 {
-  static mcb near_mcb BSS_INIT({0});
+  STATIC BSS(mcb, near_mcb, {0});
   near_mcb.m_type = type;
   mcb_init_copy(seg, size, &near_mcb);
 }
@@ -2612,11 +2614,12 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode)
 ** implementation of INSTALL=NANSI.COM /P /X /BLA
 */
 
-unsigned int  numInstallCmds BSS_INIT(0);
+BSS(unsigned int, numInstallCmds, 0);
 struct instCmds {
   char buffer[128];
   int mode;
-} InstallCommands[10] BSS_INIT({0});
+};
+BSSA(struct instCmds, InstallCommands, 10);
 
 #ifdef DEBUG
 #define InstallPrintf(x) _printf x

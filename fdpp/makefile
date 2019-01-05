@@ -131,7 +131,7 @@ FDPP_CFILES = \
 FDPP_CCFILES = \
     thunks.cc
 
-CPPFILES = objhlp.cpp
+CPPFILES = objhlp.cpp ctors.cpp
 
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)

@@ -72,9 +72,9 @@ static BYTE *RcsId =
     "$Id: inithma.c 956 2004-05-24 17:07:04Z bartoldeman $";
 #endif
 
-BYTE DosLoadedInHMA BSS_INIT(FALSE);  /* set to TRUE if loaded HIGH          */
-BYTE HMAclaimed BSS_INIT(0);          /* set to TRUE if claimed from HIMEM   */
-UWORD HMAFree BSS_INIT(0);            /* first byte in HMA not yet used      */
+BSS(BYTE, DosLoadedInHMA, FALSE);  /* set to TRUE if loaded HIGH          */
+BSS(BYTE, HMAclaimed, 0);          /* set to TRUE if claimed from HIMEM   */
+BSS(UWORD, HMAFree, 0);            /* first byte in HMA not yet used      */
 
 STATIC void InstallVDISK(void);
 
@@ -305,7 +305,7 @@ VOID FAR * HMAalloc(UCOUNT bytesToAllocate)
   return HMAptr;
 }
 
-UWORD CurrentKernelSegment = 0;
+DATA(UWORD, CurrentKernelSegment, 0);
 
 void MoveKernel(UWORD NewKernelSegment)
 {
@@ -396,7 +396,6 @@ void MoveKernel(UWORD NewKernelSegment)
       }
       else
         rp->jmpSegment = NewKernelSegment;
-
     }
 
     if (NewKernelSegment == 0xffff)

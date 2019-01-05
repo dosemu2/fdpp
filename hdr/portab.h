@@ -192,6 +192,7 @@ void fdexit(int rc);
 #ifdef __cplusplus
 #include "farptr.hpp"
 #include "farobj.hpp"
+#include "ctors.hpp"
 #endif
 
 #define VA_CDECL
@@ -217,6 +218,9 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len);
 void PurgeHook(void *ptr, UDWORD len);
 
 #ifndef __cplusplus
+#define CTOR(t, n, i) t n = i
+#define CTORA(t, n, l) t n[l] = {0}
+#define CTORZ(t, n) t n = {0}
 #define __FAR(t) t FAR *
 #define __ASMFAR(t) t FAR **
 #define __ASMFARREF(f) &f
@@ -241,6 +245,10 @@ void PurgeHook(void *ptr, UDWORD len);
 #define __ASMCALL(t, f) t (* f)(void)
 #endif
 #define FP_FROM_D(t, l) (__FAR(t))MK_FP((UWORD)((l) >> 16), (UWORD)((l) & 0xffff))
+#define BSS(t, n, i) CTOR(t, n, i)
+#define BSSA(t, n, l) CTORA(t, n, l)
+#define BSSZ(t, n) CTORZ(t, n)
+#define DATA(t, n, i) CTOR(t, n, i)
 
 #define FAR                     /* linear architecture  */
 #define REG

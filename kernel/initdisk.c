@@ -33,7 +33,7 @@
 #define FLOPPY_SEC_SIZE 512u  /* common sector size */
 
 #define InitDiskTransferBuffer DiskTransferBuffer
-COUNT nUnits BSS_INIT(0);
+BSS(COUNT, nUnits, 0);
 
 /*
  *    Rev 1.0   13 May 2001  tom ehlert
