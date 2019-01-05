@@ -407,6 +407,10 @@ dispatch:
     dump_regs = TRUE;
     dump();
   }
+  else
+  {
+    fdlogprintf("System call (21h): %02x\n", user_r->AX);
+  }
 #endif
 
   if ((lr.AH >= 0x38 && lr.AH <= 0x4F) || (lr.AH >= 0x56 && lr.AH <= 0x5c) ||
