@@ -16,21 +16,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <forward_list>
+#include <unordered_set>
 #include <algorithm>
+#include <cassert>
 #include "ctors.hpp"
 
-static std::forward_list<ctor_base*>& ctor_list()
+static std::unordered_set<ctor_base*>& ctor_list()
 {
     /* https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use */
-    static std::forward_list<ctor_base*> *lst = new
-	    std::forward_list<ctor_base*>();
+    static std::unordered_set<ctor_base*> *lst = new
+	    std::unordered_set<ctor_base*>();
     return *lst;
 }
 
 void add_ctor(ctor_base *ptr)
 {
-    ctor_list().push_front(ptr);
+    ctor_list().insert(ptr);
+}
+
+void rm_ctor(ctor_base *ptr)
+{
+    int erased = ctor_list().erase(ptr);
+    assert(erased);
 }
 
 void run_ctors()

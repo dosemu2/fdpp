@@ -21,21 +21,25 @@
 
 #include <cstring>
 
+class ctor_base;
+
+void add_ctor(ctor_base *ptr);
+void rm_ctor(ctor_base *ptr);
+void run_ctors();
+
 class ctor_base {
 public:
     virtual void init() = 0;
-    virtual ~ctor_base() = default;
+    ctor_base() { add_ctor(this); }
+    virtual ~ctor_base() { rm_ctor(this); }
 };
-
-void add_ctor(ctor_base *ptr);
-void run_ctors();
 
 template <typename T>
 class ctor : public ctor_base {
     T *ptr;
     const T holder;
 public:
-    ctor(T *p, const T i) : ptr(p), holder(i) { add_ctor(this); }
+    ctor(T *p, const T i) : ptr(p), holder(i) {}
     virtual void init() { *ptr = holder; }
 };
 
@@ -43,7 +47,7 @@ template <typename T, int L>
 class ctor_a : public ctor_base {
     T *ptr;
 public:
-    ctor_a(T *p) : ptr(p) { add_ctor(this); }
+    ctor_a(T *p) : ptr(p) {}
     virtual void init() { std::memset(ptr, 0, sizeof(T) * L); }
 };
 
@@ -51,7 +55,7 @@ template <typename T>
 class ctor_z : public ctor_base {
     T *ptr;
 public:
-    ctor_z(T *p) : ptr(p) { add_ctor(this); }
+    ctor_z(T *p) : ptr(p) {}
     virtual void init() { std::memset(ptr, 0, sizeof(T)); }
 };
 

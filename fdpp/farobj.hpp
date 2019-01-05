@@ -24,6 +24,7 @@
 //#include "cppstubs.hpp"
 #include "dosobj.h"
 #include "objhlp.hpp"
+#include "ctors.hpp"
 
 template<typename T>
 class NearPtr_DO : public NearPtr<T, dosobj_seg> {
@@ -47,11 +48,12 @@ public:
 template <typename T>
 class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
     bool have_obj = false;
+    ctor<bool> ct;
     int refcnt = 0;
     std::unordered_set<ObjRef *> owned;
     std::unordered_set<sh_ref> owned_sh;
 
-    void ctor() {
+    void _ctor() {
         this->fobj = (__DOSFAR(uint8_t))mk_dosobj(this->ptr, this->size);
         owned = get_owned_list(this->ptr);
         owned_sh = get_owned_list_sh(this->ptr);
@@ -92,11 +94,11 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
-    FarObj(T1& obj) : FarObjBase<T>(&obj, sizeof(T1)) {
-        ctor();
+    FarObj(T1& obj) : FarObjBase<T>(&obj, sizeof(T1)), ct(&have_obj, false) {
+        _ctor();
     }
-    FarObj(T* obj, unsigned sz) : FarObjBase<T>(obj, sz) {
-        ctor();
+    FarObj(T* obj, unsigned sz) : FarObjBase<T>(obj, sz), ct(&have_obj, false) {
+        _ctor();
     }
     virtual far_s get_obj() {
         _assert(!have_obj);

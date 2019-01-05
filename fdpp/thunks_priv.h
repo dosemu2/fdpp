@@ -40,7 +40,6 @@ void fdprintf(const char *format, ...) PRINTF(1);
 void fdlogprintf(const char *format, ...) PRINTF(1);
 void fdloudprintf(const char *format, ...) PRINTF(1);
 void fdvprintf(const char *format, va_list vl);
-void do_abort(const char *file, int line);
 #ifdef __cplusplus
 }
 #endif
