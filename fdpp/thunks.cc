@@ -40,6 +40,7 @@ static struct farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
 static jmp_buf *noret_jmp;
+static int recur_cnt;
 
 #define _E
 #include "glob_tmpl.h"
@@ -267,27 +268,29 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FP_FROM_D(t, __d); \
 })
 
-static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
-{
-    UDWORD ret = 0;
-    UBYTE rsz = 0;
-#define _RET ret
-#define _RSZ rsz
-#define _SP sp
 #ifdef DEBUG
 #define _logprintf(...) fdlogprintf(__VA_ARGS__)
 #else
 #define _logprintf(...)
 #endif
+
+static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
+{
+    UDWORD ret = 0;
+    UBYTE rsz = 0;
+
+#define _RET ret
+#define _RSZ rsz
+#define _SP sp
 #define _DISPATCH(r, f, ...) { \
     _logprintf("dispatch " #f "\n"); \
     r fdpp_dispatch(f, __VA_ARGS__); \
-    _logprintf("dispatch " #f " done\n"); \
+    _logprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 #define _DISPATCH_v(r, f) { \
     _logprintf("dispatch " #f "\n"); \
     r fdpp_dispatch(f); \
-    _logprintf("dispatch " #f " done\n"); \
+    _logprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 
     switch (fn) {
@@ -296,7 +299,6 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
         default:
             fdprintf("unknown fn %i\n", fn);
             _fail();
-            return 0;
     }
 
     if (r_len)
@@ -304,7 +306,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     return ret;
 }
 
-void FdppCall(struct vm86_regs *regs)
+static void _FdppCall(struct vm86_regs *regs)
 {
     jmp_buf jmp, *prev_jmp = noret_jmp;
     s_regs = *regs;
@@ -326,8 +328,10 @@ void FdppCall(struct vm86_regs *regs)
         break;
     case DOS_SUBHELPER_DL_CCALL:
         noret_jmp = &jmp;
-        if (setjmp(jmp))
+        if (setjmp(jmp)) {
+            _logprintf("noret jump, %i\n", recur_cnt); \
             break;
+        }
         res = FdppThunkCall(LO_WORD(regs->ecx),
                 (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
         switch (len) {
@@ -351,6 +355,13 @@ void FdppCall(struct vm86_regs *regs)
     }
 
     noret_jmp = prev_jmp;
+}
+
+void FdppCall(struct vm86_regs *regs)
+{
+    recur_cnt++;
+    _FdppCall(regs);
+    recur_cnt--;
 }
 
 void do_abort(const char *file, int line)
