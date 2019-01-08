@@ -19,6 +19,8 @@
 #include <unordered_set>
 #include <algorithm>
 #include <cassert>
+#include "portab.h"
+#include "thunks_priv.h"
 #include "ctors.hpp"
 
 static std::unordered_set<ctor_base*>& ctor_list()

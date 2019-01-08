@@ -59,6 +59,13 @@ public:
     virtual void init() { std::memset(ptr, 0, sizeof(T)); }
 };
 
+class ctor_log : public ctor_base {
+    const char *msg;
+public:
+    ctor_log(const char *m) : msg(m) {}
+    virtual void init() { fdloudprintf("%s\n", msg); }
+};
+
 #define CTOR(t, n, i) t n; static ctor<t> _ctor_##n(&n, i)
 #define CTORA(t, n, l) t n[l]; static ctor_a<t,l> _ctor_##n(n)
 #define CTORZ(t, n) t n; static ctor_z<t> _ctor_##n(&n)

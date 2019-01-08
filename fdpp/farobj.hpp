@@ -48,7 +48,7 @@ public:
 template <typename T>
 class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
     bool have_obj = false;
-    ctor<bool> ct;
+    ctor_log ct;
     int refcnt = 0;
     std::unordered_set<ObjRef *> owned;
     std::unordered_set<sh_ref> owned_sh;
@@ -94,10 +94,10 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
-    FarObj(T1& obj) : FarObjBase<T>(&obj, sizeof(T1)), ct(&have_obj, false) {
+    FarObj(T1& obj, const char *nm) : FarObjBase<T>(&obj, sizeof(T1)), ct(nm) {
         _ctor();
     }
-    FarObj(T* obj, unsigned sz) : FarObjBase<T>(obj, sz), ct(&have_obj, false) {
+    FarObj(T* obj, unsigned sz, const char *nm) : FarObjBase<T>(obj, sz), ct(nm) {
         _ctor();
     }
     virtual far_s get_obj() {
@@ -131,48 +131,52 @@ public:
 #define _R(o) _RP(_RE(_RR(decltype(o))))
 #define _RC(t) typename std::remove_const<_R(t)>::type
 
+#define __Sx(x) #x
+#define _Sx(x) __Sx(x)
+#define NM __FILE__ ":" _Sx(__LINE__)
+
 #define MK_FAR(o) \
-    FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o))
+    FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o, NM))
 #define MK_FAR_SZ(o, sz) \
     FarPtr<_RC(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
 #define MK_FAR_CHLD(o, f) ({ \
-    std::shared_ptr<ObjIf> _sh = std::make_shared<FarObj<decltype(o)>>(o); \
+    std::shared_ptr<ObjIf> _sh = std::make_shared<FarObj<decltype(o)>>(o, NM); \
     bool added = f.set_child(_sh); \
     _assert(added); \
     FarPtr<_RC(o)> _dd(_sh); \
     _dd; \
 })
 #define MK_NEAR_OBJ(p, o) ({ \
-    std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<decltype(o)>>(o); \
+    std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<decltype(o)>>(o, NM); \
     track_owner_sh(p, _sh); \
     ((FarObj<decltype(o)> *)_sh.get())->get_near(); \
 })
 #define MK_NEAR_STR_OBJ(p, o) ({ \
     std::shared_ptr<ObjRef> _sh = \
-        std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1); \
+        std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1, NM); \
     track_owner_sh(p, _sh); \
     ((FarObj<_RC(o)> *)_sh.get())->get_near(); \
 })
-#define MK_FAR_PTR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(*o).get_obj())
+#define MK_FAR_PTR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(*o, NM).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define __MK_NEAR2(n, t) t(__obj_##n.get_near().off())
-#define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o) + 1)
+#define _MK_FAR_STR(n, o) FarObj<_R(o)> __obj_##n(o, strlen(o) + 1, NM)
 #define MK_FAR_STR_OBJ(p, o) ({ \
     std::shared_ptr<ObjRef> _sh = \
-        std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1); \
+        std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1, NM); \
     track_owner_sh(p, _sh); \
     FarPtr<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
-#define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz)
+#define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz, NM)
 #define MK_FAR_SZ_OBJ(p, o, sz) ({ \
-    std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<_R(o)>>(o, sz); \
+    std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<_R(o)>>(o, sz, NM); \
     track_owner_sh(p, _sh); \
     FarPtr<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
-#define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o).get_obj())
-#define MK_FAR_STR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(o, strlen(o) + 1).get_obj())
-#define MK_FAR_SZ_SCP(o, sz) FarPtr<_RC(o)>(FarObj<_R(o)>(o, sz).get_obj())
+#define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o, NM).get_obj())
+#define MK_FAR_STR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(o, strlen(o) + 1, NM).get_obj())
+#define MK_FAR_SZ_SCP(o, sz) FarPtr<_RC(o)>(FarObj<_R(o)>(o, sz, NM).get_obj())
 
 #define PTR_MEMB(t) NearPtr_DO<t>
 #define NEAR_PTR_DO(t) NearPtr_DO<t>
