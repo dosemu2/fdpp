@@ -42,6 +42,9 @@ static int num_wrps;
 static jmp_buf *noret_jmp;
 static int recur_cnt;
 
+typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
+        uint16_t off, uint8_t *sp, uint8_t len);
+
 #define _E
 #include "glob_tmpl.h"
 #undef _E
@@ -484,6 +487,17 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
     return -1;
 }
 
+static void asm_call(struct vm86_regs *regs, uint16_t seg,
+        uint16_t off, uint8_t *sp, uint8_t len)
+{
+    jmp_buf *prev = NULL;
+    jmp_buf buf;
+
+    if (setjmp(buf))
+        fdpp_ljmp(*prev);
+    fdpp->asm_call(regs, seg, off, sp, len, &buf, &prev);
+}
+
 static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
@@ -498,8 +512,7 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
 {
     uint32_t ret;
-    FdppAsmCall_t call = ((flags & _TFLG_NORET) ?
-            asm_call_noret : fdpp->asm_call);
+    FdppAsmCall_t call = ((flags & _TFLG_NORET) ? asm_call_noret : asm_call);
     if (flags & _TFLG_FAR)
         ret = _do_asm_call_far(num, sp, len, call);
     else
@@ -843,7 +856,7 @@ struct far_s lookup_far_st(const void *ptr)
 
 uint32_t thunk_call_void(struct far_s fa)
 {
-    fdpp->asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
+    asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
     return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
 }
 

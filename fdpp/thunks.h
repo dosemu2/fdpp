@@ -21,8 +21,9 @@
 
 #include <stdint.h>
 #include <stdarg.h>
+#include <setjmp.h>
 
-#define FDPP_API_VER 11
+#define FDPP_API_VER 12
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,9 +31,6 @@ extern "C" {
 
 struct vm86_regs;
 void FdppCall(struct vm86_regs *regs);
-
-typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
-        uint16_t off, uint8_t *sp, uint8_t len);
 
 enum { FDPP_PRINT_LOG, FDPP_PRINT_TERMINAL, FDPP_PRINT_SCREEN };
 
@@ -44,8 +42,11 @@ struct fdpp_api {
     void (*debug)(const char *msg);
     void (*panic)(const char *msg);
     void (*cpu_relax)(void);
-    FdppAsmCall_t asm_call;
-    FdppAsmCall_t asm_call_noret;
+    void (*asm_call)(struct vm86_regs *regs, uint16_t seg,
+        uint16_t off, uint8_t *sp, uint8_t len,
+        jmp_buf *canc, jmp_buf **prev);
+    void (*asm_call_noret)(struct vm86_regs *regs, uint16_t seg,
+        uint16_t off, uint8_t *sp, uint8_t len);
 };
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 
