@@ -490,12 +490,12 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
 static void asm_call(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
-    jmp_buf *prev = NULL;
+    jmp_buf *volatile prev = NULL;
     jmp_buf buf;
 
     if (setjmp(buf))
         fdpp_ljmp(*prev);
-    fdpp->asm_call(regs, seg, off, sp, len, &buf, &prev);
+    fdpp->asm_call(regs, seg, off, sp, len, &buf, const_cast<jmp_buf**>(&prev));
 }
 
 static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
