@@ -311,7 +311,8 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 
 static void _FdppCall(struct vm86_regs *regs)
 {
-    jmp_buf jmp, *prev_jmp = noret_jmp;
+    jmp_buf jmp;
+    jmp_buf *volatile prev_jmp = noret_jmp;
     s_regs = *regs;
     UBYTE len;
     UDWORD res;
