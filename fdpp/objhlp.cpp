@@ -57,3 +57,8 @@ std::unordered_set<sh_ref> get_owned_list_sh(const void *owner)
     }
     return ret;
 }
+
+void objhlp_reset()
+{
+    shmap.clear();
+}
