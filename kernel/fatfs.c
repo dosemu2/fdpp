@@ -1663,7 +1663,7 @@ ckok:;
 
 STATIC int rqblockio(unsigned char command, struct dpb FAR * dpbp)
 {
- retry:
+// retry:
   MediaReqHdr.r_length = sizeof(request);
   MediaReqHdr.r_unit = dpbp->dpb_subunit;
   MediaReqHdr.r_command = command;
@@ -1675,6 +1675,7 @@ STATIC int rqblockio(unsigned char command, struct dpb FAR * dpbp)
   execrh((request FAR *) & MediaReqHdr, dpbp->dpb_device);
   if ((MediaReqHdr.r_status & S_ERROR) || !(MediaReqHdr.r_status & S_DONE))
   {
+#if 0
     FOREVER
     {
       switch (block_error(&MediaReqHdr, dpbp->dpb_unit, dpbp->dpb_device, 0))
@@ -1690,6 +1691,10 @@ STATIC int rqblockio(unsigned char command, struct dpb FAR * dpbp)
         return SUCCESS;
       }
     }
+#else
+    /* https://github.com/stsp/dosemu2/issues/750 */
+    return DE_INVLDDRV;
+#endif
   }
   return SUCCESS;
 }
