@@ -278,7 +278,7 @@ typedef struct {
   UWORD bpb_nfsect;             /* FAT size in sectors          */
   UWORD bpb_nsecs;              /* Sectors per track            */
   UWORD bpb_nheads;             /* Number of heads              */
-} floppy_bpb;
+} PACKED floppy_bpb;
 
 floppy_bpb floppy_bpbs[5] = {
 /* copied from Brian Reifsnyder's FORMAT, bpb.h */

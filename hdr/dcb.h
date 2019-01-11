@@ -83,7 +83,7 @@ struct dpb {
   ULONG dpb_xcluster;           /* cluster # of first free      */
   /* -1 if not known              */
 #endif
-};
+} PACKED;
 
 #define UNKNCLUSTER      0x0000 /* see RBIL INT 21/AH=52 entry */
 #define XUNKNCLSTFREE    0xffffffffl    /* unknown for DOS */
