@@ -43,7 +43,7 @@ std::unordered_set<ObjRef *> get_owned_list(const void *owner)
 
 static std::unordered_map<const void *, std::unordered_set<sh_ref> > shmap;
 
-bool track_owner_sh(const void *owner, sh_ref& obj)
+bool track_owner_sh(const void *owner, sh_ref obj)
 {
     std::unordered_set<sh_ref>& ent = shmap[owner];
     return ent.insert(obj).second;
