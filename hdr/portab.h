@@ -250,6 +250,7 @@ void PurgeHook(void *ptr, UDWORD len);
 #define BSSA(t, n, l) CTORA(t, n, l)
 #define BSSZ(t, n) CTORZ(t, n)
 #define DATA(t, n, i) CTOR(t, n, i)
+#define DATAAIS(t, n, ...) CTORAI(static, t, n, __VA_ARGS__)
 
 #define FAR                     /* linear architecture  */
 #define REG

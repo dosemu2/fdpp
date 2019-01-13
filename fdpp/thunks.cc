@@ -157,7 +157,6 @@ void *resolve_segoff(struct far_s fa)
 
 static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 {
-#define _countof(a) (sizeof(a)/sizeof(*(a)))
     int i;
     int exp = _countof(asm_thunks.arr);
 

@@ -261,7 +261,7 @@ struct table {
   config_sys_func_t *func;
 };
 
-STATIC struct table commands[] = {
+DATAAIS(struct table, commands, {
   /* first = switches! this one is special; some options will
      always be ran, others depends on F5/F8 and ? processing */
   {"SWITCHES", 0, CfgSwitches},
@@ -310,7 +310,7 @@ STATIC struct table commands[] = {
 
   /* default action                                               */
   {"", -1, CfgFailure}
-};
+});
 
 /* RE function for menu. */
 STATIC int findend(char * s)
