@@ -525,9 +525,11 @@ STATIC seg prev_mcb(seg cur_mcb, seg start)
 
   _assert(cur_mcb > start);
   mcb_prev = mcb_next = start;
-  while (mcb_next < cur_mcb && para2far(mcb_next)->m_type == MCB_NORMAL)
+  while (mcb_next < cur_mcb)
   {
     mcb_prev = mcb_next;
+    if (para2far(mcb_next)->m_type == MCB_LAST)
+      break;
     mcb_next += para2far(mcb_prev)->m_size + 1;
   }
   return mcb_prev;
@@ -559,7 +561,7 @@ STATIC void umb_init(void)
     mumcb_init(LoL->_uppermem_root, umb_seg - LoL->_uppermem_root - 1);
 
     /* setup the real mcb for the devicehigh block */
-    mcb_init(umb_seg, umb_size - 2, MCB_NORMAL);
+    mcb_init(umb_seg, umb_size - 1, MCB_LAST);
 
     umb_base_seg = umb_max = umb_start = umb_seg;
     UMB_top = umb_size;
@@ -576,7 +578,7 @@ STATIC void umb_init(void)
       seg umb_prev, umb_next;
 
       /* setup the real mcb for the devicehigh block */
-      mcb_init(umb_seg, umb_size - 2, MCB_NORMAL);
+      mcb_init(umb_seg, umb_size - 1, MCB_LAST);
 
       /* determine prev and next umbs */
       umb_prev = prev_mcb(umb_seg, LoL->_uppermem_root);
@@ -586,6 +588,8 @@ STATIC void umb_init(void)
       {
         /* make sure prev mcb is link */
         _assert(para2far(umb_prev)->m_psp == 8);
+        para2far(umb_seg)->m_type = MCB_NORMAL;
+        para2far(umb_seg)->m_size--;
         if (umb_next - umb_seg - umb_size == 0)
         {
           /* should the UMB driver return
@@ -601,7 +605,11 @@ STATIC void umb_init(void)
       }
       else /* umb_seg >= umb_max */
       {
-        umb_prev = umb_next;
+        /* make sure to adjust not link */
+        _assert(para2far(umb_prev)->m_psp != 8);
+        para2far(umb_prev)->m_type = MCB_NORMAL;
+        para2far(umb_prev)->m_size--;
+        umb_prev = umb_next - 1;
       }
 
       if (umb_seg - umb_prev - 1 == 0 && umb_prev > ram_top * 64)
@@ -622,8 +630,6 @@ STATIC void umb_init(void)
       if (umb_seg > umb_max)
         umb_max = umb_seg;
     }
-    para2far(umb_max)->m_size++;
-    para2far(umb_max)->m_type = MCB_LAST;
     DebugPrintf(("UMB Allocation completed: start at 0x%x\n", umb_base_seg));
   }
 }

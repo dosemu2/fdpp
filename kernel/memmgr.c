@@ -44,7 +44,7 @@ static BYTE *memmgrRcsId =
 	((mcb)->m_type == MCB_NORMAL || (mcb)->m_type == MCB_LAST)
 
 #define para2far(seg) (mcb FAR *)MK_FP((seg) , 0)
-#define MCBDESTRY() (fdprintf("MCB corruption"),_fail(),DE_MCBDESTRY)
+#define MCBDESTRY() (fdprintf("MCB corruption\n"),_fail(),DE_MCBDESTRY)
 
 /*
  * Join any following unused MCBs to MCB 'p'.
