@@ -127,6 +127,7 @@ public:
     uint32_t get_fp32() const { return ((ptr.seg << 16) | ptr.off); }
     far_s get_far() const { return ptr; }
     far_s& get_ref() { return ptr; }
+    const far_s *get_addr() { return &ptr; }
     T* get_ptr() { return (T*)resolve_segoff(ptr); }
     void *get_buf() { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
@@ -144,7 +145,6 @@ class FarPtr : public FarPtrBase<T>
 {
     typedef std::shared_ptr<ObjIf> sh_obj;
     sh_obj obj;
-    std::unordered_set<sh_obj> children;
     bool nonnull = false;
 
 public:
@@ -234,7 +234,6 @@ public:
             return NULL;
         return (T*)resolve_segoff(this->ptr);
     }
-    bool set_child(const sh_obj& o) { return children.insert(o).second; }
 };
 
 #define _MK_F(f, s) f(s)
