@@ -62,7 +62,7 @@ struct FS_info {
 };
 
 /*TE - array access functions */
-ddt *getddt(int dev)
+ddt FAR *getddt(int dev)
 {
   _assert(dev < 26);
   return ddt_buf[dev];
@@ -84,7 +84,7 @@ STATIC BOOL tdelay(ddt *pddt, ULONG ticks)
 #define PARTOFF 0x1be
 
 #ifdef PROTO
-typedef WORD dsk_proc(rqptr rq, ddt * pddt);
+typedef WORD dsk_proc(rqptr rq, ddt FAR * pddt);
 #else
 typedef WORD dsk_proc();
 #endif
@@ -223,7 +223,7 @@ STATIC WORD diskchange(ddt * pddt)
   return tdelay(pddt, 37ul) ? M_DONT_KNOW : M_NOT_CHANGED;
 }
 
-STATIC WORD mediachk(rqptr rp, ddt * pddt)
+STATIC WORD mediachk(rqptr rp, ddt FAR * pddt)
 {
   /* check floppy status */
   if (pddt->ddt_descflags & DF_REFORMAT)
@@ -269,7 +269,7 @@ STATIC WORD RWzero(ddt * pddt, UWORD mode)
    0 if not set, 1 = a, 2 = b, etc, assume set.
    page 424 MS Programmer's Ref.
  */
-STATIC WORD Getlogdev(rqptr rp, ddt * pddt)
+STATIC WORD Getlogdev(rqptr rp, ddt FAR * pddt)
 {
   int i;
   ddt *pddt2;
@@ -292,7 +292,7 @@ STATIC WORD Getlogdev(rqptr rp, ddt * pddt)
   return S_DONE;
 }
 
-STATIC WORD Setlogdev(rqptr rp, ddt * pddt)
+STATIC WORD Setlogdev(rqptr rp, ddt FAR * pddt)
 {
   unsigned char unit = rp->r_unit;
   Getlogdev(rp, pddt);
@@ -304,7 +304,7 @@ STATIC WORD Setlogdev(rqptr rp, ddt * pddt)
   return S_DONE;
 }
 
-STATIC WORD blk_Open(rqptr rp, ddt * pddt)
+STATIC WORD blk_Open(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(rp);
 
@@ -312,7 +312,7 @@ STATIC WORD blk_Open(rqptr rp, ddt * pddt)
   return S_DONE;
 }
 
-STATIC WORD blk_Close(rqptr rp, ddt * pddt)
+STATIC WORD blk_Close(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(rp);
 
@@ -320,7 +320,7 @@ STATIC WORD blk_Close(rqptr rp, ddt * pddt)
   return S_DONE;
 }
 
-STATIC WORD blk_nondr(rqptr rp, ddt * pddt)
+STATIC WORD blk_nondr(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(rp);
   UNREFERENCED_PARAMETER(pddt);
@@ -328,7 +328,7 @@ STATIC WORD blk_nondr(rqptr rp, ddt * pddt)
   return S_BUSY | S_DONE;
 }
 
-STATIC WORD blk_Media(rqptr rp, ddt * pddt)
+STATIC WORD blk_Media(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(rp);
 
@@ -454,18 +454,18 @@ STATIC WORD getbpb(ddt * pddt)
   return 0;
 }
 
-STATIC WORD bldbpb(rqptr rp, ddt * pddt)
+STATIC WORD bldbpb(rqptr rp, ddt FAR * pddt)
 {
   WORD result;
 
   if ((result = getbpb(pddt)) != 0)
     return result;
 
-  rp->r_bpptr = MK_FAR_CHLD(pddt->ddt_bpb, rp->r_bpptr);
+  rp->r_bpptr = &pddt->ddt_bpb;
   return S_DONE;
 }
 
-STATIC WORD IoctlQueblk(rqptr rp, ddt * pddt)
+STATIC WORD IoctlQueblk(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(pddt);
 
@@ -514,7 +514,7 @@ STATIC COUNT GenblockioAbs(ddt * pddt, UWORD mode, WORD head, WORD track,
                       sector, count, &transferred);
 }
 
-STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
+STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
 {
   int ret;
   unsigned descflags = pddt->ddt_descflags;
@@ -768,7 +768,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt * pddt)
   return S_DONE;
 }
 
-STATIC WORD blockio(rqptr rp, ddt * pddt)
+STATIC WORD blockio(rqptr rp, ddt FAR * pddt)
 {
   ULONG start, size;
   WORD ret;
@@ -818,7 +818,7 @@ STATIC WORD blockio(rqptr rp, ddt * pddt)
   return S_DONE;
 }
 
-STATIC WORD blk_error(rqptr rp, ddt * pddt)
+STATIC WORD blk_error(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(pddt);
 
@@ -826,7 +826,7 @@ STATIC WORD blk_error(rqptr rp, ddt * pddt)
   return failure(E_FAILURE);    /* general failure */
 }
 
-STATIC WORD blk_noerr(rqptr rp, ddt * pddt)
+STATIC WORD blk_noerr(rqptr rp, ddt FAR * pddt)
 {
   UNREFERENCED_PARAMETER(rp);
   UNREFERENCED_PARAMETER(pddt);

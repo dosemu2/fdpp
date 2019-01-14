@@ -280,6 +280,43 @@ typedef struct {
   UWORD bpb_nheads;             /* Number of heads              */
 } PACKED floppy_bpb;
 
+typedef struct {
+  __DOSFAR(struct ddtstruct)ddt_next;
+  /* pointer to next table (offset FFFFh if last table) */
+  UBYTE ddt_driveno;            /* physical unit number (for INT 13)     */
+  UBYTE ddt_logdriveno;         /* logical drive number (0=A:)        */
+  bpb ddt_bpb;                  /* BIOS Parameter Block */
+  UBYTE ddt_flags;
+  /* bit 6: 16-bit FAT instead of 12-bit
+     bit 7: unsupportable disk (all accesses will return Not Ready) */
+  UWORD ddt_FileOC;             /* Count of Open files on Drv */
+  UBYTE ddt_type;               /* device type       */
+  UWORD ddt_descflags;          /* bit flags describing drive */
+  UWORD ddt_ncyl;               /* number of cylinders
+                                   (for partition only, if hard disk) */
+//  SYM_MEMB(struct ddtstruct, bpb, ddt_defbpb);               /* BPB for default (highest) capacity supported */
+  bpb ddt_defbpb;               /* BPB for default (highest) capacity supported */
+  UBYTE ddt_reserved[6];        /* (part of BPB above) */
+  UBYTE ddt_ltrack;             /* last track accessed */
+  union {
+    ULONG ddt_lasttime;         /* removable media: time of last access
+                                   in clock ticks (FFFFFFFFh if never) */
+    struct {
+      UWORD ddt_part;           /* partition (FFFFh = primary, 0001h = extended)
+                                   always 0001h for DOS 5+ */
+      UWORD ddt_abscyl;         /* absolute cylinder number of partition's
+                                   start on physical drive
+                                   (FFFFh if primary partition in DOS 4.x) */
+    } ddt_hd;
+  } ddt_fh;
+  UBYTE ddt_volume[12];         /* ASCIIZ volume label or "NO NAME    " if none
+                                   (apparently taken from extended boot record
+                                   rather than root directory) */
+  ULONG ddt_serialno;           /* serial number */
+  UBYTE ddt_fstype[9];          /* ASCIIZ filesystem type ("FAT12   " or "FAT16   ") */
+  ULONG ddt_offset;             /* relative partition offset */
+} PACKED _nddt;
+
 floppy_bpb floppy_bpbs[5] = {
 /* copied from Brian Reifsnyder's FORMAT, bpb.h */
   {FLOPPY_SEC_SIZE, 2, 1, 2, 112, 720, 0xfd, 2, 9, 2}, /* FD360  5.25 DS   */
@@ -383,7 +420,7 @@ STATIC void printCHS(const char *title, struct CHS *chs)
 #define NSECTORFAT12 8
 #define NFAT 2
 
-STATIC VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
+STATIC VOID CalculateFATData(_nddt * pddt, ULONG NumSectors, UBYTE FileSystem)
 {
   ULONG fatdata;
 
@@ -534,7 +571,7 @@ STATIC VOID CalculateFATData(ddt * pddt, ULONG NumSectors, UBYTE FileSystem)
   pddt->ddt_fstype[8] = '\0';
 }
 
-STATIC void push_ddt(ddt *pddt)
+STATIC void push_ddt(_nddt *pddt)
 {
   ddt FAR *fddt = (ddt FAR *)DynAlloc("ddt", 1, sizeof(ddt));
   fmemcpy(fddt, MK_FAR_PTR_SCP(pddt), sizeof(ddt));
@@ -550,8 +587,8 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
                         ULONG StartSector, struct PartTableEntry *pEntry,
                         int extendedPartNo, int PrimaryNum)
 {
-  ddt nddt;
-  ddt *pddt = &nddt;
+  _nddt nddt;
+  _nddt *pddt = &nddt;
   struct CHS chs;
 
   if (nUnits >= NDEV)
@@ -1248,7 +1285,7 @@ I don't know, if I did it right, but I tried to do it that way. TE
 
 ***********************************************************************/
 
-STATIC void make_ddt (ddt *pddt, int Unit, int driveno, int flags)
+STATIC void make_ddt (_nddt *pddt, int Unit, int driveno, int flags)
 {
   pddt->ddt_next = _MK_DOS_FP(struct ddtstruct, 0, 0xffff);
   pddt->ddt_logdriveno = Unit;
@@ -1269,7 +1306,7 @@ STATIC void ReadAllPartitionTables(void)
 
   unsigned int HardDrive;
   unsigned int nHardDisk;
-  ddt nddt;
+  _nddt nddt;
   static iregs regs;
 
   /* quick adjustment of diskette parameter table */

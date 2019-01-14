@@ -207,8 +207,7 @@ typedef struct ddtstruct {
   /* pointer to next table (offset FFFFh if last table) */
   UBYTE ddt_driveno;            /* physical unit number (for INT 13)     */
   UBYTE ddt_logdriveno;         /* logical drive number (0=A:)        */
-//  SYM_MEMB(struct ddtstruct, bpb, ddt_bpb);                  /* BIOS Parameter Block */
-  bpb ddt_bpb;                  /* BIOS Parameter Block */
+  SYM_MEMB(struct ddtstruct, bpb, ddt_bpb); /* BIOS Parameter Block */
   UBYTE ddt_flags;
   /* bit 6: 16-bit FAT instead of 12-bit
      bit 7: unsupportable disk (all accesses will return Not Ready) */
@@ -486,7 +485,7 @@ typedef __DOSFAR(bpb) bpbptr;
 //typedef __DOSFAR(struct dhdr) dhdrptr;
 
 /* dsk.c */
-ddt * getddt(int dev);
+__FAR(ddt) getddt(int dev);
 
 /* error.c */
 COUNT char_error(request * rq, __FAR(struct dhdr) lpDevice);

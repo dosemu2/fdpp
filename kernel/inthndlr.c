@@ -1325,6 +1325,14 @@ dispatch:
       }
       else
       {
+#ifdef NO_REDIRECTOR
+        if (lr.AL == 3)
+        {
+          SET_CARRY_FLAG();
+          r->AX = 0xff;
+          goto real_exit;
+        }
+#endif
         rc = (WORD)network_redirector_mx(REM_DOREDIRECT, MK_FAR_SCP(lr), Int21AX);
         /* the remote function manipulates *r directly !,
            so we should not copy lr to r here            */

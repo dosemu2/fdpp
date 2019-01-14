@@ -413,10 +413,13 @@ protected:
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off) {
             f = lookup_far(&g_farhlp[FARHLP2], ptr);
+// XXX the below crashes with IDA installer
+#if 0
             if (f.seg || f.off) {
                 /* purge for faster look-ups - very risky! */
                 purge_far(&g_farhlp[FARHLP2]);
             }
+#endif
         }
         _assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + F();
