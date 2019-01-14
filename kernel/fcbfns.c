@@ -46,6 +46,9 @@ STATIC fcb FAR *CommonFcbInit(xfcb FAR * lpExtFcb, BYTE * pszBuffer,
 STATIC void FcbNameInit(fcb FAR * lpFcb, BYTE * pszBuffer, COUNT * pCurDrive);
 STATIC void FcbNextRecord(fcb FAR * lpFcb);
 STATIC void FcbCalcRec(xfcb FAR * lpXfcb);
+STATIC const char FAR *GetNameField(__FAR(const char) lpFileName,
+                       char *lpDestField,
+                       COUNT nFieldSize, BOOL * pbWildCard);
 
 #define TestCmnSeps(lpFileName) (*lpFileName && strchr(":;,=+ \t", *lpFileName) != NULL)
 #define TestFieldSeps(lpFileName) ((unsigned char)*lpFileName <= ' ' || strchr("/\\\"[]<>|.:;,=+\t", *lpFileName) != NULL)
@@ -167,7 +170,7 @@ const char FAR * ParseSkipWh(const char FAR * lpFileName)
 }
 
 
-const char FAR * GetNameField(const char FAR * lpFileName, char FAR * lpDestField,
+const char FAR * GetNameField(const char FAR * lpFileName, char * lpDestField,
                        COUNT nFieldSize, BOOL * pbWildCard)
 {
   COUNT nIndex = 0;
@@ -504,6 +507,8 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
 
 UBYTE FcbRename(xfcb FAR * lpXfcb)
 {
+  BYTE buf[FNAME_SIZE + FEXT_SIZE];
+  BOOL wc;
   rfcb FAR *lpRenameFcb;
   COUNT FcbDrive;
   UBYTE result = FCB_SUCCESS;
@@ -511,6 +516,9 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
 
   /* Build a traditional DOS file name                            */
   lpRenameFcb = (rfcb FAR *) CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
+  /* expand wildcards in dest                                     */
+  GetNameField(lpRenameFcb->renNewName, buf, FNAME_SIZE, &wc);
+  GetNameField(lpRenameFcb->renNewExtent, buf + FNAME_SIZE, FEXT_SIZE, &wc);
 
   /* check for a device                                           */
   if (IsDevice(SecPathName))
@@ -537,6 +545,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       fcb LocalFcb;
       BYTE *pToName;
       const char FAR *pFromPattern = Dmatch_p->dm_name;
+      const char *pToPattern = buf;
       int i;
       UBYTE mode = 0;
 
@@ -545,13 +554,12 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       /* I'm cheating because this assumes that the   */
       /* struct alignments are on byte boundaries     */
       pToName = LocalFcb.fcb_fname;
-      pFromPattern = lpRenameFcb->renNewName;
       for (i = 0; i < FNAME_SIZE + FEXT_SIZE; i++)
       {
-        if (*pFromPattern != '?')
-          *pToName = *pFromPattern;
+        if (*pToPattern != '?')
+          *pToName = *pToPattern;
         pToName++;
-        pFromPattern++;
+        pToPattern++;
       }
 
       SecPathName[0] = 'A' + FcbDrive - 1;

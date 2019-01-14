@@ -114,7 +114,7 @@ typedef struct _rfcb {
   BYTE renOldExtent[3];         /* Old File Extension           */
   BYTE renReserved1[5];
   AR_MEMB(struct _rfcb, BYTE, renNewName, 8);           /* New Filename                 */
-  BYTE renNewExtent[3];         /* New FileExtension            */
+  AR_MEMB(struct _rfcb, BYTE, renNewExtent, 3);         /* New FileExtension            */
   BYTE renReserved2[9];
 } rfcb;
 

@@ -204,8 +204,6 @@ UWORD FcbParseFname(UBYTE *wTestMode,__FAR(const char) lpFileName,__FAR(fcb) lpF
 __FAR(const char)ParseSkipWh(__FAR(const char) lpFileName);
 BOOL TestCmnSeps(__FAR(const char) lpFileName);
 BOOL TestFieldSeps(__FAR(const char) lpFileName);
-__FAR(const char)GetNameField(__FAR(const char) lpFileName,__FAR(char) lpDestField,
-                       COUNT nFieldSize, BOOL * pbWildCard);
 UBYTE FcbReadWrite(__FAR(xfcb), UCOUNT, int);
 UBYTE FcbGetFileSize(__FAR(xfcb) lpXfcb);
 void FcbSetRandom(__FAR(xfcb) lpXfcb);
