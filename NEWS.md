@@ -1,8 +1,20 @@
+## beta-4
+
+All of the bug fixes, including regression fixes and freedos fixes.
+
+- UMB handling in freedos got many fixes. As the result, we can
+  now set a record of 332K of UMB space (with UMB at A0, among others).
+  This is impossible on the original freedos, at the time of writing this.
+- Crash with some versions of ld linker was fixed
+- Added reboot support. This was the most difficult and intrusive
+  change of this beta, even if sounds simple. :)
+- Many fixes to both freedos and fdpp.
+
 ## beta-3
 
 A very important milestone as we finally switched to ELF format!
 
-- Switched to GPL tool-chain.
+- Switched to ELF tool-chain.
   The binary-supplied jwlib/jwlink are removed from the repo.
   Not everything is done an optimal way yet, the build is very
   complex and slow. We expect the enhancements of nasm in the future.
