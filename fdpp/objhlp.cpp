@@ -20,7 +20,6 @@
 
 #include <unordered_set>
 #include <unordered_map>
-#include "portab.h"
 #include "objhlp.hpp"
 
 static std::unordered_map<const void *, std::unordered_set<ObjRef *> > omap;
@@ -59,21 +58,7 @@ std::unordered_set<sh_ref> get_owned_list_sh(const void *owner)
     return ret;
 }
 
-static std::unordered_map<const far_s *, sh_base> cmap;
-
-bool track_child(const far_s *owner, sh_base obj)
-{
-    bool ret = false;
-    if (cmap.find(owner) != cmap.end()) {
-        cmap.erase(owner);
-        ret = true;
-    }
-    cmap[owner] = obj;
-    return ret;
-}
-
 void objhlp_reset()
 {
     shmap.clear();
-    cmap.clear();
 }

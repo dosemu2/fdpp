@@ -32,7 +32,7 @@ class NearPtr_DO : public NearPtr<T, dosobj_seg> {
 };
 
 template <typename T>
-class FarObjBase : public ObjBase {
+class FarObjBase {
 protected:
     T *ptr;
     int size;
@@ -140,11 +140,6 @@ public:
     FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o, NM))
 #define MK_FAR_SZ(o, sz) \
     FarPtr<_RC(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
-#define MK_FAR_CHLD(o, f) ({ \
-    std::shared_ptr<FarObj<decltype(o)>> _sh = std::make_shared<FarObj<decltype(o)>>(o, NM); \
-    track_child(f.get_addr(), _sh); \
-    FarPtrBase<decltype(o)>(_sh->get_obj()); \
-})
 #define MK_NEAR_OBJ(p, o) ({ \
     std::shared_ptr<FarObj<decltype(o)>> _sh = std::make_shared<FarObj<decltype(o)>>(o, NM); \
     track_owner_sh(p, _sh); \
