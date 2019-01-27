@@ -85,7 +85,7 @@ serial.obj:	$(SRC)serial.asm  $(SRC)io.inc
 
 HDRS = $(wildcard $(HDR)*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
-_PPHDRS = $(PLPHDRS) dosobj.h farhlp.h thunks_priv.h thunks.h smalloc.h
+_PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h thunks.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
@@ -124,14 +124,9 @@ CFILES = blockio.c \
     initclk.c \
     prf.c
 
-FDPP_CFILES = \
-    smalloc.c \
-    dosobj.c \
-    farhlp.c
-FDPP_CCFILES = \
-    thunks.cc
-
-CPPFILES = objhlp.cpp ctors.cpp
+FDPP_CFILES = smalloc.c
+FDPP_CCFILES = thunks.cc dosobj.cc
+CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp
 
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)

@@ -16,33 +16,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FARHLP_H
-#define FARHLP_H
+#ifndef FARHLP_HPP
+#define FARHLP_HPP
 
-struct f_m;
+#include <unordered_map>
 
+struct f_m {
+    const void *p;
+    far_t f;
+    int refcnt;
+};
 struct farhlp {
-    struct f_m *far_map;
-    int f_m_size;
-    int f_m_len;
+    std::unordered_map<const void *, struct f_m> map;
 };
 
 enum { FARHLP1, FARHLP2, FARHLP_MAX };
-extern struct farhlp g_farhlp[FARHLP_MAX];
+extern farhlp g_farhlp[FARHLP_MAX];
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-void farhlp_init(struct farhlp *ctx);
-void farhlp_deinit(struct farhlp *ctx);
-void store_far(struct farhlp *ctx, const void *ptr, far_t fptr);
-void store_far_replace(struct farhlp *ctx, const void *ptr, far_t fptr);
-struct far_s lookup_far(struct farhlp *ctx, const void *ptr);
-struct far_s lookup_far_ref(struct farhlp *ctx, const void *ptr);
-struct far_s lookup_far_unref(struct farhlp *ctx, const void *ptr, int *rm);
-int purge_far(struct farhlp *ctx);
-#ifdef __cplusplus
-}
-#endif
+void farhlp_init(farhlp *ctx);
+void farhlp_deinit(farhlp *ctx);
+void store_far(farhlp *ctx, const void *ptr, far_t fptr);
+void store_far_replace(farhlp *ctx, const void *ptr, far_t fptr);
+struct far_s lookup_far(farhlp *ctx, const void *ptr);
+struct far_s lookup_far_ref(farhlp *ctx, const void *ptr);
+struct far_s lookup_far_unref(farhlp *ctx, const void *ptr, int *rm);
+int purge_far(farhlp *ctx);
 
 #endif

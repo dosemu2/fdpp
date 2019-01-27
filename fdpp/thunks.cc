@@ -36,7 +36,7 @@ struct asm_dsc_s {
 };
 struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
-static struct farhlp sym_tab;
+static farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
 static jmp_buf *noret_jmp;

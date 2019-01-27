@@ -26,7 +26,7 @@
 #include <unordered_set>
 //#include "cppstubs.hpp"
 #include "thunks_priv.h"
-#include "farhlp.h"
+#include "farhlp.hpp"
 
 static inline far_s _lookup_far(const void *ptr)
 {

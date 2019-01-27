@@ -20,13 +20,13 @@
 #include <stdarg.h>
 #include "portab.h"
 #include "smalloc.h"
-#include "farhlp.h"
+#include "farhlp.hpp"
 #include "thunks_priv.h"
 #include "dosobj.h"
 
 static smpool pool;
 static far_t base;
-static struct farhlp hlp;
+static farhlp hlp;
 static int initialized;
 
 static void err_printf(int prio, const char *fmt, ...) PRINTF(2);
