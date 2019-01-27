@@ -607,8 +607,11 @@ STATIC void umb_init(void)
       {
         /* make sure to adjust not link */
         _assert(para2far(umb_prev)->m_psp != 8);
-        para2far(umb_prev)->m_type = MCB_NORMAL;
-        para2far(umb_prev)->m_size--;
+        if (umb_seg > umb_next) {
+            /* will create link, so adjust non-link type */
+            para2far(umb_prev)->m_type = MCB_NORMAL;
+            para2far(umb_prev)->m_size--;
+        }
         umb_prev = umb_next - 1;
       }
 
