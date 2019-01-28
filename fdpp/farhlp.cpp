@@ -37,35 +37,30 @@ void farhlp_deinit(farhlp *ctx)
     ctx->map.clear();
 }
 
-static void _store_far(farhlp *ctx, const void *ptr, far_t fptr,
-    int rplc)
+void store_far(farhlp *ctx, const void *ptr, far_t fptr)
 {
     struct f_m *fm;
-    decltype(ctx->map)::iterator it;
-
-    it = ctx->map.find(ptr);
-    if (it != ctx->map.end()) {
-        if (!rplc) {
-            far_t *f = &it->second.f;
-            _assert(f->seg == fptr.seg && f->off == fptr.off);
-            /* already exists, do nothing */
-            return;
-        }
+    const std::pair<decltype(ctx->map)::iterator, bool> &p =
+            ctx->map.insert(std::make_pair(ptr,
+            decltype(ctx->map)::mapped_type()));
+    if (p.second) {
+        far_t *f = &p.first->second.f;
+        _assert(f->seg == fptr.seg && f->off == fptr.off);
+        /* already exists, do nothing */
+        return;
     }
-    fm = &ctx->map[ptr];
+    fm = &p.first->second;
     fm->p = ptr;
     fm->f = fptr;
     fm->refcnt = 1;
 }
 
-void store_far(farhlp *ctx, const void *ptr, far_t fptr)
-{
-    _store_far(ctx, ptr, fptr, 0);
-}
-
 void store_far_replace(farhlp *ctx, const void *ptr, far_t fptr)
 {
-    _store_far(ctx, ptr, fptr, 1);
+    struct f_m *fm = &ctx->map[ptr];
+    fm->p = ptr;
+    fm->f = fptr;
+    fm->refcnt = 1;
 }
 
 far_t lookup_far(farhlp *ctx, const void *ptr)
