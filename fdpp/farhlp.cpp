@@ -26,7 +26,8 @@
  * Need this to work around some C++ deficiencies, see comments
  * in farptr.hpp */
 
-farhlp g_farhlp[FARHLP_MAX];
+fh1 g_farhlp1;
+farhlp g_farhlp2;
 
 void farhlp_init(farhlp *ctx)
 {

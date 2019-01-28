@@ -30,22 +30,21 @@
 
 static inline far_s _lookup_far(const void *ptr)
 {
-    far_s f = lookup_far(&g_farhlp[FARHLP1], ptr);
+    _assert(ptr == g_farhlp1.ptr);
+    far_s f = g_farhlp1.f;
     _assert(f.seg || f.off);
-    /* purge for faster look-ups - very risky! */
-    purge_far(&g_farhlp[FARHLP1]);
     return f;
 }
 
 static inline void _store_far(const void *ptr, far_s fptr)
 {
-    /* because of things like adjust_far() we can have clashes */
-    store_far_replace(&g_farhlp[FARHLP1], ptr, fptr);
+    g_farhlp1.ptr = ptr;
+    g_farhlp1.f = fptr;
 }
 
 static inline void do_store_far(far_s fptr)
 {
-    store_far_replace(&g_farhlp[FARHLP2], resolve_segoff(fptr), fptr);
+    store_far_replace(&g_farhlp2, resolve_segoff(fptr), fptr);
 }
 
 #define _MK_S(s, o) (far_s){o, s}
@@ -408,7 +407,7 @@ protected:
         const uint8_t *ptr = (const uint8_t *)this - F();
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off)
-            f = lookup_far(&g_farhlp[FARHLP2], ptr);
+            f = lookup_far(&g_farhlp2, ptr);
         _assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + F();
         return fp;

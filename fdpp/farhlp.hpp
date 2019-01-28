@@ -29,8 +29,12 @@ struct farhlp {
     std::unordered_map<const void *, struct f_m> map;
 };
 
-enum { FARHLP1, FARHLP2, FARHLP_MAX };
-extern farhlp g_farhlp[FARHLP_MAX];
+struct fh1 {
+    const void *ptr;
+    far_t f;
+};
+extern fh1 g_farhlp1;
+extern farhlp g_farhlp2;
 
 void farhlp_init(farhlp *ctx);
 void farhlp_deinit(farhlp *ctx);
