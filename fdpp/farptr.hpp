@@ -153,11 +153,7 @@ public:
     using FarPtrBase<T>::FarPtrBase;
     FarPtr() = default;
 
-    FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {
-        /* XXX for things like "p = sym->ptr; a = p->arr[i];"
-         * All sym pointer members should be marked with __DOSFAR(). */
-        do_store_far(f.get_far());
-    }
+    FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {}
     explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
     explicit FarPtr(const sh_obj& o) :
             FarPtrBase<T>(o->get_obj()), obj(o) {}
@@ -411,20 +407,10 @@ protected:
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - F();
         far_s f = lookup_far_st(ptr);
-        if (!f.seg && !f.off) {
+        if (!f.seg && !f.off)
             f = lookup_far(&g_farhlp[FARHLP2], ptr);
-// XXX the below crashes with IDA installer
-#if 0
-            if (f.seg || f.off) {
-                /* purge for faster look-ups - very risky! */
-                purge_far(&g_farhlp[FARHLP2]);
-            }
-#endif
-        }
         _assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + F();
-        /* for arrays of struct that contain arrays */
-        do_store_far(fp.get_far());
         return fp;
     }
 };
@@ -594,7 +580,6 @@ public:
 #define MK_FP(seg, ofs) ({ \
     uint16_t _s = seg; \
     uint16_t _o = ofs; \
-    do_store_far(_MK_S(_s, _o)); \
     __FAR(void)(_s, _o); \
 })
 #define MK_FP_N(seg, ofs) (__FAR(void)(seg, ofs, true))
@@ -603,7 +588,6 @@ public:
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()
-#define _DOS_FP(p) ({ do_store_far(p.get_far()); p; })
 
 #undef NULL
 #define NULL           nullptr
