@@ -326,6 +326,7 @@ static void _FdppCall(struct vm86_regs *regs)
                     FDPP_KERNEL_VERSION, HI_BYTE(regs->eax));
             _fail();
         }
+        farhlp_init(&g_farhlp2);
         FdppSetSymTab(regs,
                 (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esp) + 6));
         break;

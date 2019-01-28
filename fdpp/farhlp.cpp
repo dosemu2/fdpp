@@ -31,10 +31,6 @@ farhlp g_farhlp2;
 
 void farhlp_init(farhlp *ctx)
 {
-}
-
-void farhlp_deinit(farhlp *ctx)
-{
     ctx->map.clear();
 }
 
@@ -103,11 +99,4 @@ far_t lookup_far_unref(farhlp *ctx, const void *ptr, int *rm)
     if (rm)
         *rm = r;
     return ret;
-}
-
-int purge_far(farhlp *ctx)
-{
-    int old = ctx->map.size();
-    ctx->map.clear();
-    return old;
 }

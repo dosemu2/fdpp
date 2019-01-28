@@ -37,12 +37,10 @@ extern fh1 g_farhlp1;
 extern farhlp g_farhlp2;
 
 void farhlp_init(farhlp *ctx);
-void farhlp_deinit(farhlp *ctx);
 void store_far(farhlp *ctx, const void *ptr, far_t fptr);
 void store_far_replace(farhlp *ctx, const void *ptr, far_t fptr);
 struct far_s lookup_far(farhlp *ctx, const void *ptr);
 struct far_s lookup_far_ref(farhlp *ctx, const void *ptr);
 struct far_s lookup_far_unref(farhlp *ctx, const void *ptr, int *rm);
-int purge_far(farhlp *ctx);
 
 #endif
