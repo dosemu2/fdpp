@@ -50,7 +50,6 @@ void store_far(farhlp *ctx, const void *ptr, far_t fptr)
         return;
     }
     fm = &p.first->second;
-    fm->p = ptr;
     fm->f = fptr;
     fm->refcnt = 1;
 }
@@ -58,7 +57,6 @@ void store_far(farhlp *ctx, const void *ptr, far_t fptr)
 void store_far_replace(farhlp *ctx, const void *ptr, far_t fptr)
 {
     struct f_m *fm = &ctx->map[ptr];
-    fm->p = ptr;
     fm->f = fptr;
     fm->refcnt = 1;
 }

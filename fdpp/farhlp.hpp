@@ -22,7 +22,6 @@
 #include <unordered_map>
 
 struct f_m {
-    const void *p;
     far_t f;
     int refcnt;
 };
