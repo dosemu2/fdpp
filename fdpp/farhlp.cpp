@@ -43,7 +43,7 @@ void store_far(farhlp *ctx, const void *ptr, far_t fptr)
     const std::pair<decltype(ctx->map)::iterator, bool> &p =
             ctx->map.insert(std::make_pair(ptr,
             decltype(ctx->map)::mapped_type()));
-    if (p.second) {
+    if (!p.second) {
         far_t *f = &p.first->second.f;
         _assert(f->seg == fptr.seg && f->off == fptr.off);
         /* already exists, do nothing */
