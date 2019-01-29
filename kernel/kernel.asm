@@ -120,6 +120,7 @@ segment INIT_TEXT
                 ;
 kernel_start:
 
+                push ax
                 push bx
                 pushf
                 mov ax, 0e32h           ; '2' Tracecode - kernel entered
@@ -127,7 +128,9 @@ kernel_start:
                 int 010h
                 popf
                 pop bx
+                pop ax
 
+                mov     si,ax
                 mov     ax,I_GROUP
                 cli
                 mov     ss,ax
@@ -145,6 +148,7 @@ kernel_start:
                 add     ax,dx
                 mov     ss,ax           ; set SS to init data segment
                 sti                     ; now enable them
+                push    si              ; save ax (in si)
                 mov     ax,cs
                 mov     dx,__HMATextEnd ; para aligned
                 shr     dx,cl
@@ -177,6 +181,7 @@ kernel_start:
                 add     ax,dx
                 mov     es,ax           ; otherwise CS -> init_text
 %endif
+                pop     si              ; ax value in si
                 push    es
                 mov     ax,cont
                 push    ax
@@ -185,6 +190,7 @@ cont:           ; Now set up call frame
                 mov     ds,[cs:_INIT_DGROUP]
                 mov     bp,sp           ; and set up stack frame for c
 
+                push si
                 push bx
                 pushf
                 mov ax, 0e33h           ; '3' Tracecode - kernel entered
@@ -192,9 +198,11 @@ cont:           ; Now set up call frame
                 int 010h
                 popf
                 pop bx
+                pop ax
 
                 mov     byte [_BootDrive],bl ; tell where we came from
                 mov     byte [_ShellDrive],bh ; command.com drive
+                mov     byte [_DeviceDrive],al ; DEVICE= drive
 
 ;!!             int     11h
 ;!!             mov     cl,6
@@ -471,7 +479,9 @@ _version_flags  db      0
 os_release      dw      _os_release
 
                 global  _ShellDrive
-_ShellDrive     db      1
+_ShellDrive     db      0
+                global  _DeviceDrive
+_DeviceDrive    db      0
 
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced

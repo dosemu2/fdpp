@@ -1811,6 +1811,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
   struct dhdr FAR *dhp;
   struct dhdr FAR *next_dhp;
   BOOL result;
+  UBYTE off = 0;
   seg base, start;
 
   if (mode)
@@ -1828,8 +1829,15 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
     base++;
   base++;
 
+  if (pLine[1] != ':')
+  {
+    strcpy(szBuf, "C:\\");
+    if (LoL->_DeviceDrive & 0x80)
+        szBuf[0] += LoL->_DeviceDrive & ~0x80;
+    off = 3;
+  }
   /* Get the device driver name                                   */
-  GetStringArg(pLine, szBuf);
+  GetStringArg(pLine, szBuf + off);
 
   /* The driver is loaded at the top of allocated memory.         */
   /* The device driver is paragraph aligned.                      */
@@ -1845,7 +1853,6 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
     return result;
   }
 
-  strcpy(szBuf, pLine);
   /* uppercase the device driver command */
   _strupr(szBuf);
 
