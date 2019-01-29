@@ -152,7 +152,7 @@ kernel_start:
                 add     ax,dx
 %endif
                 mov     ds,ax
-                mov     si,-2 + INITSIZE; word aligned
+                mov     si,-2 + INITSIZE - (init_tos - __ib_end) ; exclude stk
                 lea     cx,[si+2]
                 mov     di,si
                 shr     cx,1
