@@ -59,8 +59,8 @@ VOID FAR int21_entry(iregs UserRegs)
 struct HugeSectorBlock {
   ULONG blkno;
   WORD nblks;
-  BYTE FAR *buf;
-};
+  __DOSFAR(BYTE) buf;
+} PACKED;
 
 /* Normal entry.  This minimizes user stack usage by avoiding local     */
 /* variables needed for the rest of the handler.                        */
