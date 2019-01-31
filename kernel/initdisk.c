@@ -1297,6 +1297,7 @@ STATIC void make_ddt (_nddt *pddt, int Unit, int driveno, int flags)
   pddt->ddt_offset = 0;
   pddt->ddt_serialno = 0x12345678l;
   memcpy(&pddt->ddt_bpb, &pddt->ddt_defbpb, sizeof(bpb));
+  pddt->ddt_fh.ddt_lasttime = 0xFFFFFFFF;
   push_ddt(pddt);
 }
 
@@ -1307,7 +1308,7 @@ STATIC void ReadAllPartitionTables(void)
   unsigned int HardDrive;
   unsigned int nHardDisk;
   _nddt nddt;
-  static iregs regs;
+  iregs regs = {};
 
   /* quick adjustment of diskette parameter table */
 //  fmemcpy(int1e_table, *(char FAR * FAR *)MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);

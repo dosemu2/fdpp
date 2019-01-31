@@ -75,6 +75,8 @@ STATIC VOID tmark(ddt *pddt)
 
 STATIC BOOL tdelay(ddt *pddt, ULONG ticks)
 {
+  if (pddt->ddt_fh.ddt_lasttime == 0xFFFFFFFF)
+    return FALSE;
   return ReadPCClock() - pddt->ddt_fh.ddt_lasttime >= ticks;
 }
 
