@@ -1663,8 +1663,9 @@ VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r)
 
 #ifdef WITHFAT32
   {
-    struct dpb FAR *dpbp = get_dpb(drv);
-    if (dpbp != NULL && ISFAT32(dpbp))
+    ddt *pddt = getddt(drv);
+    bpb *pbpb = pddt ? &pddt->ddt_defbpb : NULL;
+    if (pbpb != NULL && pbpb->bpb_nsize > 32 * 1024 * 1024 / pbpb->bpb_nbyte)
     {
       r->ax = 0x207;
       SET_CARRY_FLAG();
