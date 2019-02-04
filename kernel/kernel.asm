@@ -953,20 +953,39 @@ _empty_handler:
         do_reloc %1,_
 %endmacro
 
-reloc_i  _int2f_handler
-reloc_i  _int20_handler
-reloc_i  _int21_handler
-reloc_i  _low_int25_handler
-reloc_i  _low_int26_handler
-reloc_i  _int27_handler
-reloc_i  _int0_handler
-reloc_i  _int6_handler
-reloc_i  _int19_handler
-reloc_i  _cpm_entry
-reloc_i2 blk_driver
-reloc_i2 clk_driver
-reloc_i  _CharMapSrvc ; in _DATA (see AARD)
-reloc_i _call_p_0
+%macro reloc_ivec 1
+        global  %1
+        extern  reloc_call%1
+%1:
+        jmp hdlr%1
+%1_addr:
+        dw reloc_call%1
+%1_seg:
+        dw 0
+        dw 0x424B
+        db 0
+        jmp rst%1
+        times 7 db 0
+rst%1:
+        retf
+hdlr%1:
+        jmp far [cs:%1_addr]
+%endmacro
+
+reloc_ivec  _int2f_handler
+reloc_ivec  _int20_handler
+reloc_ivec  _int21_handler
+reloc_ivec  _low_int25_handler
+reloc_ivec  _low_int26_handler
+reloc_ivec  _int27_handler
+reloc_ivec  _int0_handler
+reloc_ivec  _int6_handler
+reloc_ivec  _int19_handler
+reloc_i     _cpm_entry
+reloc_i2    blk_driver
+reloc_i2    clk_driver
+reloc_i     _CharMapSrvc ; in _DATA (see AARD)
+reloc_i     _call_p_0
 
 %macro relo 1
         dw %1_seg
