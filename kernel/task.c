@@ -333,7 +333,7 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
 
     if (InDOS)
       --InDOS;
-    exec_user(irp, 1);
+    exec_user(irp);
 
     /* We should never be here
        fatal("KERNEL RETURNED!!!");                    */
@@ -557,7 +557,7 @@ VOID return_user(void)
 
   if (InDOS)
     --InDOS;
-  exec_user(q->ps_stack, 0);
+  exec_user(q->ps_stack);
 }
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)

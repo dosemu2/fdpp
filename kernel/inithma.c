@@ -358,16 +358,14 @@ void MoveKernel(UWORD NewKernelSegment)
      */
 
     struct RelocationTable FAR *rp;
-    struct RelocationTable rtemp;
 
     /* verify, that all entries are valid */
 
     for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
     {
       if (rp->jmpFar != 0xea || /* jmp FaR */
-          rp->jmpSegment != jmpseg ||     /* will only relocate HMA_TEXT */
-          rp->callNear != 0xe8 ||       /* call NEAR */
-          0)
+          rp->jmpSegment != jmpseg      /* will only relocate HMA_TEXT */
+         )
       {
         _printf("illegal relocation entry # %zd\n",
                (FP_OFF(rp) -
@@ -382,20 +380,7 @@ void MoveKernel(UWORD NewKernelSegment)
 
     for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
     {
-      if (NewKernelSegment == 0xffff)
-      {
-        struct RelocatedEntry FAR *rel = (struct RelocatedEntry FAR *)rp;
-
-        fmemcpy_n(&rtemp, rp, sizeof(rtemp));
-
-        rel->jmpFar = rtemp.jmpFar;
-        rel->jmpSegment = NewKernelSegment;
-        rel->jmpOffset = rtemp.jmpOffset;
-        rel->callNear = rtemp.callNear;
-        rel->callOffset = rtemp.callOffset + 5; /* near calls are relative */
-      }
-      else
-        rp->jmpSegment = NewKernelSegment;
+      rp->jmpSegment = NewKernelSegment;
     }
 
     if (NewKernelSegment == 0xffff)

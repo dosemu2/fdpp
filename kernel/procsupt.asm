@@ -45,7 +45,7 @@ segment HMA_TEXT
 ;
 ;       Special call for switching processes
 ;
-;       void exec_user(iregs far *irp, int disable_a20)
+;       void exec_user(iregs far *irp)
 ;
                 global  _exec_user
 _exec_user:
@@ -60,19 +60,6 @@ _exec_user:
 
                 pop     bp		      ; irp (user ss:sp)
                 pop	si
-		pop	cx		      ; disable A20?
-		or	cx,cx
-		jz	do_iret
-
-                cli
-                mov     ss,si
-                mov     sp,bp                   ; set-up user stack
-                sti
-;
-                POP$ALL
-                extern _ExecUserDisableA20
-                jmp DGROUP:_ExecUserDisableA20
-do_iret:
                 extern _int21_iret
                 jmp _int21_iret
 

@@ -155,16 +155,6 @@ struct RelocationTable {
   UBYTE jmpFar;
   UWORD jmpOffset;
   UWORD jmpSegment;
-  UBYTE callNear;
-  UWORD callOffset;
-} PACKED;
-
-struct RelocatedEntry {
-  UBYTE callNear;
-  UWORD callOffset;
-  UBYTE jmpFar;
-  UWORD jmpOffset;
-  UWORD jmpSegment;
 } PACKED;
 
 #if defined(WATCOM) && 0

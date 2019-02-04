@@ -405,7 +405,7 @@ UWORD get_machine_name(__FAR(char) netname);
 VOID set_machine_name(__FAR(const char) netname, UWORD name_num);
 
 /* procsupt.asm */
-VOID ASMFUNC NORETURN exec_user(__FAR(iregs) irp, BOOL disable_a20);
+VOID ASMFUNC NORETURN exec_user(__FAR(iregs) irp);
 
 /* new by TE */
 

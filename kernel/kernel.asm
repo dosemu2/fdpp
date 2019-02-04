@@ -938,86 +938,67 @@ _empty_handler:
                 iret
 
 
-global _initforceEnableA20
-initforceEnableA20:
-                call near forceEnableA20
-                retf
-
     global __HMARelocationTableStart
 __HMARelocationTableStart:
 
                 global  _int2f_handler
                 extern  reloc_call_int2f_handler
 _int2f_handler: jmp 0:reloc_call_int2f_handler
-                call near forceEnableA20
 
                 global  _int20_handler
                 extern  reloc_call_int20_handler
 _int20_handler: jmp 0:reloc_call_int20_handler
-                call near forceEnableA20
 
                 global  _int21_handler
                 extern  reloc_call_int21_handler
 _int21_handler: jmp 0:reloc_call_int21_handler
-                call near forceEnableA20
 
 
                 global  _low_int25_handler
                 extern  reloc_call_low_int25_handler
 _low_int25_handler: jmp 0:reloc_call_low_int25_handler
-                call near forceEnableA20
 
                 global  _low_int26_handler
                 extern  reloc_call_low_int26_handler
 _low_int26_handler: jmp 0:reloc_call_low_int26_handler
-                call near forceEnableA20
 
                 global  _int27_handler
                 extern  reloc_call_int27_handler
 _int27_handler: jmp 0:reloc_call_int27_handler
-                call near forceEnableA20
 
                 global  _int0_handler
                 extern  reloc_call_int0_handler
 _int0_handler:  jmp 0:reloc_call_int0_handler
-                call near forceEnableA20
 
                 global  _int6_handler
                 extern  reloc_call_int6_handler
 _int6_handler:  jmp 0:reloc_call_int6_handler
-                call near forceEnableA20
 
                 global  _int19_handler
                 extern  reloc_call_int19_handler
 _int19_handler: jmp 0:reloc_call_int19_handler
-                call near forceEnableA20
 
                 global  _cpm_entry
                 extern  reloc_call_cpm_entry
 _cpm_entry:     jmp 0:reloc_call_cpm_entry
-                call near forceEnableA20
 
                 global  _reloc_call_blk_driver
                 extern  _blk_driver
 _reloc_call_blk_driver:
                 jmp 0:_blk_driver
-                call near forceEnableA20
 
                 global  _reloc_call_clk_driver
                 extern  _clk_driver
 _reloc_call_clk_driver:
                 jmp 0:_clk_driver
-                call near forceEnableA20
 
                 global  _CharMapSrvc ; in _DATA (see AARD)
                 extern  _reloc_call_CharMapSrvc
 _CharMapSrvc:   jmp 0:_reloc_call_CharMapSrvc
-                call near forceEnableA20
 
                 global _init_call_p_0
                 extern reloc_call_p_0
 _init_call_p_0: jmp  0:reloc_call_p_0
-                call near forceEnableA20
 
 
    global __HMARelocationTableEnd
@@ -1051,75 +1032,6 @@ UsingXMSdriver:
 _DISABLEA20:
     mov ah,6
     jmp short UsingXMSdriver
-
-dslowmem  dw 0
-eshighmem dw 0ffffh
-
-    global forceEnableA20
-forceEnableA20:
-
-    push ds
-    push es
-    push ax
-
-forceEnableA20retry:
-    mov  ds, [cs:dslowmem]
-    mov  es, [cs:eshighmem]
-
-    mov ax, [ds:00000h]
-    cmp ax, [es:00010h]
-    jne forceEnableA20success
-
-    mov ax, [ds:00002h]
-    cmp ax, [es:00012h]
-    jne forceEnableA20success
-
-    mov ax, [ds:00004h]
-    cmp ax, [es:00014h]
-    jne forceEnableA20success
-
-    mov ax, [ds:00006h]
-    cmp ax, [es:00016h]
-    jne forceEnableA20success
-
-;
-;   ok, we have to enable A20 )at least seems so
-;
-
-    call DGROUP:_ENABLEA20
-
-    jmp short forceEnableA20retry
-
-
-
-forceEnableA20success:
-    pop ax
-    pop es
-    pop ds
-    ret
-
-;
-; global f*cking compatibility issues:
-;
-; very old brain dead software (PKLITE, copyright 1990)
-; forces us to execute with A20 disabled
-;
-
-global _ExecUserDisableA20
-
-_ExecUserDisableA20:
-
-    cmp word [cs:_XMSDriverAddress], byte 0
-    jne NeedToDisable
-    cmp word [cs:_XMSDriverAddress+2], byte 0
-    je noNeedToDisable
-NeedToDisable:
-    push ax
-    call DGROUP:_DISABLEA20
-    pop ax
-noNeedToDisable:
-    iret
-
 
 ;
 ; Default Int 24h handler -- always returns fail
