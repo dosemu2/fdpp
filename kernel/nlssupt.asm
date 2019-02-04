@@ -32,7 +32,7 @@
 		%include "stacks.inc"
 
 segment	HMA_TEXT
-                global  _reloc_call_CharMapSrvc
+                global  reloc_call_CharMapSrvc
                 extern  _DosUpChar
                 extern  _DGROUP_
 ;
@@ -40,7 +40,7 @@ segment	HMA_TEXT
 ;       User callable character mapping service.
 ;       Part of Function 38h
 ;
-_reloc_call_CharMapSrvc:
+reloc_call_CharMapSrvc:
 
                 Protect386Registers
                 push    ds

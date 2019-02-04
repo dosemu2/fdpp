@@ -271,8 +271,8 @@ _spawn_int23:
 
 ; prepare to call process 0 (the shell) from P_0() in C
 
-    global reloc_call_p_0
-reloc_call_p_0:
+    global reloc_call_call_p_0
+reloc_call_call_p_0:
         pop ax          ; return address (32-bit, unused)
         pop ax
         pop ax          ; fetch parameter 0 (32-bit) from the old stack

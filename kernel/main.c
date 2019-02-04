@@ -510,7 +510,7 @@ STATIC void kernel()
       Config.cfgInitTail = MK_NEAR_OBJ(&Config, Cmd.ctBuffer);
     }
   }
-  init_call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
+  call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
 }
 
 /* check for a block device and update  device control block    */

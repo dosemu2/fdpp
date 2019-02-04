@@ -313,7 +313,7 @@ void MoveKernel(UWORD NewKernelSegment)
   UBYTE FAR *HMASource;
   UWORD len;
   UWORD offs = 0;
-  UWORD jmpseg = CurrentKernelSegment;
+  struct RelocationTable FAR *rp;
 
   if (CurrentKernelSegment == 0)
     CurrentKernelSegment = FP_SEG(_HMATextEnd);
@@ -346,57 +346,20 @@ void MoveKernel(UWORD NewKernelSegment)
   HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0xfff0;
   /* first free byte after HMA_TEXT on 16 byte boundary */
 
+  for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
   {
-    /* D) but it only makes sense, if we can relocate
-       all our entries to make use of HMA
-     */
+    *rp->jmpSegment = NewKernelSegment;
+  }
 
-    /* this is for a
-       call near enableA20
-       jmp FAR kernelentry
-       style table
-     */
-
-    struct RelocationTable FAR *rp;
-
-    /* verify, that all entries are valid */
-
-    for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
-    {
-      if (rp->jmpFar != 0xea || /* jmp FaR */
-          rp->jmpSegment != jmpseg      /* will only relocate HMA_TEXT */
-         )
-      {
-        _printf("illegal relocation entry # %zd\n",
-               (FP_OFF(rp) -
-                FP_OFF((BYTE FAR *)_HMARelocationTableStart)) /
-               sizeof(struct RelocationTable));
-        int3();
-        goto errorReturn;
-      }
-    }
-
-    /* OK, all valid, go to relocate */
-
-    for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
-    {
-      rp->jmpSegment = NewKernelSegment;
-    }
-
-    if (NewKernelSegment == 0xffff)
-    {
-      /* jmp FAR cpm_entry (copy from 0:c0) */
-      pokeb(0xffff, 0x30 * 4 + 0x10, 0xea);
-      pokel(0xffff, 0x30 * 4 + 0x11, (ULONG)cpm_entry);
-    }
+  if (NewKernelSegment == 0xffff)
+  {
+    /* jmp FAR cpm_entry (copy from 0:c0) */
+    pokeb(0xffff, 0x30 * 4 + 0x10, 0xea);
+    pokel(0xffff, 0x30 * 4 + 0x11, (ULONG)cpm_entry);
   }
 
   RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
 
   CurrentKernelSegment = NewKernelSegment;
-  return;
-
-errorReturn:
-  panic("HMA init failure");
 }
 

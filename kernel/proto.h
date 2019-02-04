@@ -520,4 +520,4 @@ COUNT ASMPASCAL UMB_get_largest(__FAR(void) driverAddress, UWORD * __seg, UCOUNT
 VOID ASMFUNC init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
 void ASMFUNC NORETURN spawn_int23(void);        /* procsupt.asm */
 /* kernel.asm */
-VOID ASMFUNC FAR NORETURN init_call_p_0(__FAR(struct config)Config); /* P_0, actually */
+VOID ASMFUNC FAR NORETURN call_p_0(__FAR(struct config)Config); /* P_0, actually */

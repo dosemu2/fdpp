@@ -937,71 +937,59 @@ _int2a_handler:
 _empty_handler:
                 iret
 
+%macro do_reloc 2
+        global  %1
+        extern  %2%1
+%1: jmp far [cs:%1_addr]
+%1_addr:
+        dw %2%1
+%1_seg:
+        dw 0
+%endmacro
+%macro reloc_i 1
+        do_reloc %1,reloc_call
+%endmacro
+%macro reloc_i2 1
+        do_reloc %1,_
+%endmacro
+
+reloc_i  _int2f_handler
+reloc_i  _int20_handler
+reloc_i  _int21_handler
+reloc_i  _low_int25_handler
+reloc_i  _low_int26_handler
+reloc_i  _int27_handler
+reloc_i  _int0_handler
+reloc_i  _int6_handler
+reloc_i  _int19_handler
+reloc_i  _cpm_entry
+reloc_i2 blk_driver
+reloc_i2 clk_driver
+reloc_i  _CharMapSrvc ; in _DATA (see AARD)
+reloc_i _call_p_0
+
+%macro relo 1
+        dw %1_seg
+        dw DGROUP
+%endmacro
 
     global __HMARelocationTableStart
 __HMARelocationTableStart:
-
-                global  _int2f_handler
-                extern  reloc_call_int2f_handler
-_int2f_handler: jmp 0:reloc_call_int2f_handler
-
-                global  _int20_handler
-                extern  reloc_call_int20_handler
-_int20_handler: jmp 0:reloc_call_int20_handler
-
-                global  _int21_handler
-                extern  reloc_call_int21_handler
-_int21_handler: jmp 0:reloc_call_int21_handler
-
-
-                global  _low_int25_handler
-                extern  reloc_call_low_int25_handler
-_low_int25_handler: jmp 0:reloc_call_low_int25_handler
-
-                global  _low_int26_handler
-                extern  reloc_call_low_int26_handler
-_low_int26_handler: jmp 0:reloc_call_low_int26_handler
-
-                global  _int27_handler
-                extern  reloc_call_int27_handler
-_int27_handler: jmp 0:reloc_call_int27_handler
-
-                global  _int0_handler
-                extern  reloc_call_int0_handler
-_int0_handler:  jmp 0:reloc_call_int0_handler
-
-                global  _int6_handler
-                extern  reloc_call_int6_handler
-_int6_handler:  jmp 0:reloc_call_int6_handler
-
-                global  _int19_handler
-                extern  reloc_call_int19_handler
-_int19_handler: jmp 0:reloc_call_int19_handler
-
-                global  _cpm_entry
-                extern  reloc_call_cpm_entry
-_cpm_entry:     jmp 0:reloc_call_cpm_entry
-
-                global  _reloc_call_blk_driver
-                extern  _blk_driver
-_reloc_call_blk_driver:
-                jmp 0:_blk_driver
-
-                global  _reloc_call_clk_driver
-                extern  _clk_driver
-_reloc_call_clk_driver:
-                jmp 0:_clk_driver
-
-                global  _CharMapSrvc ; in _DATA (see AARD)
-                extern  _reloc_call_CharMapSrvc
-_CharMapSrvc:   jmp 0:_reloc_call_CharMapSrvc
-
-                global _init_call_p_0
-                extern reloc_call_p_0
-_init_call_p_0: jmp  0:reloc_call_p_0
-
-
-   global __HMARelocationTableEnd
+        relo _int2f_handler
+        relo _int20_handler
+        relo _int21_handler
+        relo _low_int25_handler
+        relo _low_int26_handler
+        relo _int27_handler
+        relo _int0_handler
+        relo _int6_handler
+        relo _int19_handler
+        relo _cpm_entry
+        relo blk_driver
+        relo clk_driver
+        relo _CharMapSrvc
+        relo _call_p_0
+    global __HMARelocationTableEnd
 __HMARelocationTableEnd:
 
 ;

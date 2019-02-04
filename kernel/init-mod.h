@@ -152,9 +152,7 @@ extern ASMREF(struct lol) LoL;
 extern UWORD DOSFAR LBA_WRITE_VERIFY;
 
 struct RelocationTable {
-  UBYTE jmpFar;
-  UWORD jmpOffset;
-  UWORD jmpSegment;
+  __DOSFAR(UWORD) jmpSegment;
 } PACKED;
 
 #if defined(WATCOM) && 0

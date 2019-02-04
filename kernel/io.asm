@@ -39,8 +39,8 @@
 ;!!                extern   _NumFloppies
                 extern   blk_stk_top
                 extern   clk_stk_top
-                extern   _reloc_call_blk_driver
-                extern   _reloc_call_clk_driver
+                extern   blk_driver
+                extern   clk_driver
 
                 extern   _TEXT_DGROUP
 
@@ -500,12 +500,12 @@ GetUnitNum:
 
 blk_driver_params:
                    dw  blk_stk_top
-                   dw  _reloc_call_blk_driver
+                   dw  blk_driver
                    dw  DGROUP
 
 clk_driver_params:
                    dw  clk_stk_top
-                   dw  _reloc_call_clk_driver
+                   dw  clk_driver
                    dw  DGROUP
 
                 ; clock device interrupt
