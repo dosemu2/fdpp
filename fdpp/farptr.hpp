@@ -518,7 +518,7 @@ class SymMemb : public T, public MembBase<T, F> {
 public:
     SymMemb() = default;
     SymMemb(const SymMemb&) = delete;
-    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *(SymWrp<T> *)this; }
+    T& operator =(const T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
 };
 
@@ -529,7 +529,7 @@ class SymMemb2 : public MembBase<T, F> {
 public:
     SymMemb2() = default;
     SymMemb2(const SymMemb2&) = delete;
-    SymWrp2<T>& operator =(const T& f) { sym = f; return *(SymWrp2<T> *)this; }
+    T& operator =(const T& f) { sym = f; return sym; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
     operator T &() { return sym; }
 };
