@@ -866,13 +866,23 @@ VOID DoConfig(int nPass)
   /* Check to see if we have a config.sys file.  If not, just     */
   /* exit since we don't force the user to have one (but 1st      */
   /* also process MEMDISK passed config options if present).      */
-  if ((nFileDesc = open("fdconfig.sys", 0)) >= 0)
+  if ((nFileDesc = open("fdppconf.sys", 0)) >= 0)
   {
-    DebugPrintf(("Reading FDCONFIG.SYS...\n"));
+    DebugPrintf(("Reading FDPPCONF.SYS...\n"));
   }
   else
   {
-    DebugPrintf(("FDCONFIG.SYS not found\n"));
+    DebugPrintf(("FDPPCONF.SYS not found\n"));
+  }
+  if (nFileDesc < 0) {
+    if ((nFileDesc = open("fdconfig.sys", 0)) >= 0)
+    {
+      DebugPrintf(("Reading FDCONFIG.SYS...\n"));
+    }
+    else
+    {
+      DebugPrintf(("FDCONFIG.SYS not found\n"));
+    }
   }
   if (nFileDesc < 0) {
     if ((nFileDesc = open("config.sys", 0)) >= 0)
