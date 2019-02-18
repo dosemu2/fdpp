@@ -203,6 +203,7 @@ cont:           ; Now set up call frame
                 mov     byte [_BootDrive],bl ; tell where we came from
                 mov     byte [_ShellDrive],bh ; command.com drive
                 mov     byte [_DeviceDrive],al ; DEVICE= drive
+                mov     word [_InitEnvSeg],gs ; env seg
 
 ;!!             int     11h
 ;!!             mov     cl,6
@@ -482,6 +483,8 @@ os_release      dw      _os_release
 _ShellDrive     db      0
                 global  _DeviceDrive
 _DeviceDrive    db      0
+                global  _InitEnvSeg
+_InitEnvSeg     dw      0
 
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced

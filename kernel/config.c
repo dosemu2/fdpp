@@ -125,6 +125,7 @@ STATIC BSSA(UBYTE, ErrorAlreadyPrinted, 128);
 
 BSSA(char, master_env, 128);
 static DATA(char *, envp, master_env);
+STATIC char *AddEnv(char *env);
 
 static const char *_cfgInit = "command.com";
 static const char *_cfgInitTail = " /P /E:256\r\n";
@@ -860,6 +861,13 @@ VOID DoConfig(int nPass)
       DebugPrintf(("MEMDISK not detected!\n"));
     }
 #endif
+
+    if (LoL->_InitEnvSeg)
+    {
+      char *p = MK_FP(LoL->_InitEnvSeg, 0);
+      while (p && *p)
+        p = AddEnv(p);
+    }
   }
 
 
@@ -2794,25 +2802,33 @@ VOID DoInstall(void)
   return;
 }
 
+STATIC char *AddEnv(char *env)
+{
+  int size = strlen(env);
+  if (size < master_env + sizeof(master_env) - envp - 1)
+  {                     /* must end with two consequtive zeros */
+    strcpy(envp, env);
+    envp += size + 1;   /* add next variables starting at the second zero */
+  }
+  else
+  {
+    _printf("Master environment is full - can't add \"%s\"\n", szBuf);
+    return NULL;
+  }
+  return env + size + 1;
+}
+
 STATIC VOID CmdSet(char *pLine)
 {
   pLine = GetStringArg(pLine, szBuf);
   pLine = skipwh(pLine);  /* scan() stops at the equal sign or space */
   if (*pLine == '=')      /* equal sign is required */
   {
-    int size;
     _strupr(szBuf);        /* all environment variables must be uppercase */
     strcat(szBuf, "=");
     pLine = skipwh(++pLine);
     strcat(szBuf, pLine); /* append the variable value (may include spaces) */
-    size = strlen(szBuf);
-    if (size < master_env + sizeof(master_env) - envp - 1)
-    {                     /* must end with two consequtive zeros */
-      strcpy(envp, szBuf);
-      envp += size + 1;   /* add next variables starting at the second zero */
-    }
-    else
-      _printf("Master environment is full - can't add \"%s\"\n", szBuf);
+    AddEnv(szBuf);
   }
   else if (*pLine == '\0')
   {
