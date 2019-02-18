@@ -124,7 +124,7 @@ BSS(size_t, ebda_size, 0);
 STATIC BSSA(UBYTE, ErrorAlreadyPrinted, 128);
 
 BSSA(char, master_env, 128);
-static char *envp = master_env;
+static DATA(char *, envp, master_env);
 
 static const char *_cfgInit = "command.com";
 static const char *_cfgInitTail = " /P /E:256\r\n";
@@ -2813,6 +2813,15 @@ STATIC VOID CmdSet(char *pLine)
     }
     else
       _printf("Master environment is full - can't add \"%s\"\n", szBuf);
+  }
+  else if (*pLine == '\0')
+  {
+    char *p = master_env;
+    while (p < envp)
+    {
+      _printf("%s\n", p);
+      p += strlen(p) + 1;
+    }
   }
   else
     _printf("Invalid SET command: \"%s\"\n", szBuf);
