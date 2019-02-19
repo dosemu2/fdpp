@@ -29,7 +29,6 @@
 ;
 
                 %include "segs.inc"
-                %include "ludivmul.inc"
 
 
 segment PSP
