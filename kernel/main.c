@@ -259,13 +259,13 @@ STATIC void setup_int_vectors(void)
       { 0x19, FP_OFF(int19_handler) },
       { 0x20, FP_OFF(int20_handler) },
       { 0x21, FP_OFF(int21_handler) },
-      { 0x22, FP_OFF(int22_handler) },
+//      { 0x22, FP_OFF(int22_handler) },
       { 0x24, FP_OFF(int24_handler) },
       { 0x25, FP_OFF(low_int25_handler) },
       { 0x26, FP_OFF(low_int26_handler) },
       { 0x27, FP_OFF(int27_handler) },
-      { 0x28, FP_OFF(int28_handler) },
-      { 0x2a, FP_OFF(int2a_handler) },
+//      { 0x28, FP_OFF(int28_handler) },
+//      { 0x2a, FP_OFF(int2a_handler) },
       { 0x2f, FP_OFF(int2f_handler) }
     };
   struct vec *pvec;
