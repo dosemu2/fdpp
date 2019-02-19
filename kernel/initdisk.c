@@ -575,10 +575,10 @@ STATIC void push_ddt(_nddt *pddt)
 {
   ddt FAR *fddt = (ddt FAR *)DynAlloc("ddt", 1, sizeof(ddt));
   fmemcpy(fddt, MK_FAR_PTR_SCP(pddt), sizeof(ddt));
-  if (pddt->ddt_logdriveno != 0) {
-    (fddt - 1)->ddt_next = fddt;
+  if (nUnits != 0) {
+    ddt_buf[nUnits - 1]->ddt_next = fddt;
     if (pddt->ddt_driveno == 0 && pddt->ddt_logdriveno == 1)
-      (fddt - 1)->ddt_descflags |= DF_CURLOG | DF_MULTLOG;
+      ddt_buf[nUnits - 1]->ddt_descflags |= DF_CURLOG | DF_MULTLOG;
   }
   ddt_buf[nUnits] = fddt;
 }

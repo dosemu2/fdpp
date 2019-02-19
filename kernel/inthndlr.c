@@ -2106,6 +2106,15 @@ error_carry:
   #undef r
 }
 
+VOID ASMCFUNC int2F_08_handler(iregs FAR * regs)
+{
+  if (regs->AL == 3)
+  {
+    regs->DS = FP_SEG(ddt_buf[0]);
+    regs->DI = FP_OFF(ddt_buf[0]);
+  }
+}
+
 /*
  * 2000/09/04  Brian Reifsnyder
  * Modified interrupts 0x25 & 0x26 to return more accurate error codes.

@@ -96,7 +96,7 @@ Check4Share:
                 cmp     ah,08h
                 je      DriverSysCal            ; DRIVER.SYS calls
                 cmp     ah,14h                  ; NLSFUNC.EXE interrupt?
-                jne     Int2f?iret              ; yes, do installation check
+                jne     Int2f?iret              ; no, go out
 Int2f?14:      ;; MUX-14 -- NLSFUNC API
                ;; all functions are passed to syscall_MUX14
                push bp                 ; Preserve BP later on
@@ -126,13 +126,20 @@ Int2f?iret:
 
 ; DRIVER.SYS calls - now only 0803.
 DriverSysCal:
-                extern  _Dyn
-                cmp     al, 3
-                jne     Int2f?iret
-                mov     ds, [cs:_DGROUP_]
-                mov     di, _Dyn+2
-                jmp     short Int2f?iret
-
+               push bp                 ; Preserve BP later on
+               Protect386Registers
+               PUSH$ALL
+               mov bp, sp              ; Save pointer to iregs struct
+               push ss
+               push bp                 ; Pass pointer to iregs struct to C
+               mov ds, [cs:_DGROUP_]
+               extern   _int2F_08_handler
+               call _int2F_08_handler
+               add sp, 4               ; Remove SS,SP
+               POP$ALL
+               Restore386Registers
+               pop bp
+               iret
 
 ;**********************************************************************
 ; internal dos calls INT2F/12xx and INT2F/4A01,4A02 - handled through C
