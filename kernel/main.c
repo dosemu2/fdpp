@@ -274,8 +274,11 @@ STATIC void setup_int_vectors(void)
 
   for (plvec = intvec_table; plvec < intvec_table + 5; plvec++)
     plvec->isv = getvec(plvec->intno);
-  for (i = 0x23; i <= 0x3f; i++)
-    setvec(i, empty_handler);
+  for (i = 0x23; i <= 0x3f; i++) {
+    void FAR * old_vec = getvec(i);
+    if (old_vec == NULL)
+      setvec(i, empty_handler);
+  }
   HaltCpuWhileIdle = 0;
   for (pvec = vectors; pvec < vectors + (sizeof vectors/sizeof *pvec); pvec++)
     setvec(pvec->intno, (intvec)MK_FP(FP_SEG((intvec)empty_handler), pvec->handleroff));
