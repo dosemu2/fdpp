@@ -105,7 +105,7 @@ COUNT DosDevIOctl(lregs * r)
 
       /* Test that the handle is valid and                    */
       /* get the SFT block that contains the SFT              */
-      if ((s = get_sft(r->BX)) == (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1))
+      if ((s = get_sft(r->BX)) == (sft FAR *) - 1)
         return DE_INVLDHNDL;
 
       flags = s->sft_flags;
@@ -242,12 +242,12 @@ COUNT DosDevIOctl(lregs * r)
     CharReqHdr.r_fun = r->CL;            /* function (minor) code */
     CharReqHdr.r_si = r->SI;             /* contents of SI and DI */
     CharReqHdr.r_di = r->DI;
-    CharReqHdr.r_io = _MK_DOS_FP(struct gblkio, r->DS, r->DX);    /* parameter block */
+    CharReqHdr.r_io = MK_FP(r->DS, r->DX);    /* parameter block */
   }
   else
   {
     CharReqHdr.r_count = r->CX;
-    CharReqHdr.r_trans = _MK_DOS_FP(BYTE, r->DS, r->DX);
+    CharReqHdr.r_trans = MK_FP(r->DS, r->DX);
   }
   CharReqHdr.r_length = sizeof(request);
   CharReqHdr.r_status = 0;
