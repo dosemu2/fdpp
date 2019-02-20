@@ -111,12 +111,12 @@ int idx_to_sft_(int SftIndex)
   /*called from below and int2f/ax=1216*/
   sfttbl FAR *sp;
 
-  lpCurSft = (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  lpCurSft = (sft FAR *) - 1;
   if (SftIndex < 0)
     return -1;
 
   /* Get the SFT block that contains the SFT      */
-  for (sp = sfthead; sp != (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1); sp = sp->sftt_next)
+  for (sp = sfthead; sp != (sfttbl FAR *) - 1; sp = sp->sftt_next)
   {
     if (SftIndex < sp->sftt_count)
     {
@@ -137,13 +137,13 @@ sft FAR * idx_to_sft(int SftIndex)
   SftIndex = idx_to_sft_(SftIndex);
   /* if not opened, the SFT is useless            */
   if (SftIndex == -1 || lpCurSft->sft_count == 0)
-    return (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+    return (sft FAR *) - 1;
   return lpCurSft;
 }
 
 int get_sft_idx(UCOUNT hndl)
 {
-  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *p = MK_FP(cu_psp, 0);
   int idx;
 
   if (hndl >= p->ps_maxfiles)
@@ -208,7 +208,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
       if (mode == XFR_WRITE && rc > 0 && (s->sft_flags & SFT_FCONOUT))
       {
         size_t cnt = (size_t)rc;
-        const char FAR *p = (const char FAR *)bp;
+        const char FAR *p = bp;
         while (cnt--)
           update_scr_pos(*p++, 1);
       }
@@ -226,10 +226,10 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
         return 0;
 
       if (s->sft_flags & SFT_FCONIN)
-        rc = read_line_handle(sft_idx, n, (char FAR *)bp);
+        rc = read_line_handle(sft_idx, n, bp);
       else
-        rc = cooked_read(&dev, n, (char FAR *)bp);
-      if (*(char FAR *)bp == CTL_Z)
+        rc = cooked_read(&dev, n, bp);
+      if (*(char *)bp == CTL_Z)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
     }
@@ -242,7 +242,7 @@ long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
       if (s->sft_flags & SFT_FNUL)
         return n;
       else
-        return cooked_write(&dev, n, (char FAR *)bp);
+        return cooked_write(&dev, n, bp);
     }
   }
 
@@ -316,9 +316,9 @@ ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc)
 
 STATIC long get_free_hndl(void)
 {
-  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *p = MK_FP(cu_psp, 0);
   UBYTE FAR *q = p->ps_filetab;
-  UBYTE FAR *r = (UBYTE FAR *)fmemchr(q, 0xff, p->ps_maxfiles);
+  UBYTE FAR *r = fmemchr(q, 0xff, p->ps_maxfiles);
   if (FP_SEG(r) == 0) return DE_TOOMANY;
   return (unsigned)(r - q);
 }
@@ -330,7 +330,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
 
   *sft_idx = 0;
   /* Get the SFT block that contains the SFT      */
-  for (sp = sfthead; sp != (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1); sp = sp->sftt_next)
+  for (sp = sfthead; sp != (sfttbl FAR *) - 1; sp = sp->sftt_next)
   {
     REG COUNT i = sp->sftt_count;
     sft FAR *sfti = sp->sftt_table;
@@ -351,7 +351,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
     }
   }
   /* If not found, return an error                */
-  return (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  return (sft FAR *) - 1;
 }
 
 const char FAR *get_root(const char FAR * fname)
@@ -464,7 +464,7 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
   set_fcbname();
 
   /* now get a free system file table entry       */
-  if ((sftp = get_free_sft(&sft_idx)) == (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1))
+  if ((sftp = get_free_sft(&sft_idx)) == (sft FAR *) - 1)
     return DE_TOOMANY;
 
   fmemset(sftp, 0, sizeof(sft));
@@ -586,7 +586,7 @@ COUNT CloneHandle(unsigned hndl)
   /* now get the system file table entry                          */
   sft FAR *sftp = get_sft(hndl);
 
-  if (sftp == (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1) || (sftp->sft_mode & O_NOINHERIT))
+  if (sftp == (sft FAR *) -1 || (sftp->sft_mode & O_NOINHERIT))
     return DE_INVLDHNDL;
 
   /* now that we have the system file table entry, get the fnode  */
@@ -611,11 +611,11 @@ long DosDup(unsigned Handle)
 
 COUNT DosForceDup(unsigned OldHandle, unsigned NewHandle)
 {
-  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *p = MK_FP(cu_psp, 0);
   sft FAR *Sftp;
 
   /* Get the SFT block that contains the SFT                      */
-  if ((Sftp = get_sft(OldHandle)) == (sft FAR *)MK_FP((UWORD)-1, (UWORD)-1))
+  if ((Sftp = get_sft(OldHandle)) == (sft FAR *) - 1)
     return DE_INVLDHNDL;
 
   /* now close the new handle if it's open                        */
