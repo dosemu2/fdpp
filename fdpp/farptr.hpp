@@ -64,6 +64,15 @@ public:
     using ref_type = typename std::add_lvalue_reference<type>::type;
 };
 
+#define ALLOW_CNV(T0, T1) (( \
+        std::is_void<T0>::value || \
+        std::is_void<T1>::value || \
+        std::is_same<_RC(T0), char>::value || \
+        std::is_same<_RC(T1), char>::value || \
+        std::is_same<_RC(T0), unsigned char>::value || \
+        std::is_same<_RC(T1), unsigned char>::value) && \
+        (_C(T1) || !_C(T0)))
+
 template<typename T>
 class FarPtrBase {
 protected:
@@ -75,6 +84,10 @@ public:
     FarPtrBase(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
     FarPtrBase(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
     explicit FarPtrBase(const far_s& f) : ptr(f) {}
+
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
+    FarPtrBase(const FarPtrBase<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
     T* operator ->() {
         do_store_far(get_far());
@@ -161,14 +174,6 @@ public:
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
 
-#define ALLOW_CNV(T0, T1) (( \
-        std::is_void<T0>::value || \
-        std::is_void<T1>::value || \
-        std::is_same<_RC(T0), char>::value || \
-        std::is_same<_RC(T1), char>::value || \
-        std::is_same<_RC(T0), unsigned char>::value || \
-        std::is_same<_RC(T1), unsigned char>::value) && \
-        (_C(T1) || !_C(T0)))
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
