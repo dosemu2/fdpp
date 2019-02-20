@@ -95,7 +95,7 @@ WORD ASMCFUNC FAR clk_driver(rqptr rp)
 
         clk.clkDays = DaysSinceEpoch;
 
-        fmemcpy(rp->r_trans, MK_FAR_SCP(clk), sizeof(struct ClockRecord));
+        fmemcpy(rp->r_trans, &clk, sizeof(struct ClockRecord));
       }
       return S_DONE;
 
@@ -109,7 +109,7 @@ WORD ASMCFUNC FAR clk_driver(rqptr rp)
         if (sizeof(struct ClockRecord) != rp->r_count)
           return failure(E_LENGTH);
 
-        fmemcpy(MK_FAR_SCP(clk), rp->r_trans, sizeof(struct ClockRecord));
+        fmemcpy(&clk, rp->r_trans, sizeof(struct ClockRecord));
 
         /* Set PC Clock first                                   */
         DaysSinceEpoch = clk.clkDays;

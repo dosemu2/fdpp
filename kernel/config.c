@@ -1663,19 +1663,19 @@ err:
         {
           /* if DBCS table (in country.sys) is empty, clear internal table */
           *(DWORD *)(subf_data.buffer) = 0L;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR_SCP(subf_data.buffer), 4);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 4);
         }
         else
         {
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR_SCP(subf_data.buffer), subf_data.length);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer, subf_data.length);
           /* write length */
           *(UWORD *)(subf_data.buffer) = subf_data.length;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), MK_FAR_SCP(subf_data.buffer), 2);
+          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 2);
         }
         continue;
       }
 
-      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, MK_FAR_SCP(subf_data.buffer),
+      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer,
                                 /* skip length ^*/  subf_data.length);
     }
     rc = TRUE;
