@@ -597,7 +597,7 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
     return;                     /* we are done */
   }
 
-  pddt->ddt_next = _MK_DOS_FP(struct ddtstruct, 0, 0xffff);
+  pddt->ddt_next = MK_FP(0, 0xffff);
   pddt->ddt_driveno = driveParam->driveno;
   pddt->ddt_logdriveno = nUnits;
   pddt->ddt_descflags = driveParam->descflags;
@@ -993,7 +993,7 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
                    ULONG LBA_address, void FAR * buffer)
 {
   static struct _bios_LBA_address_packet dap = {
-    16, 0, 0, 0, _MK_DOS_FP(unsigned char, 0, 0), 0, 0
+    16, 0, 0, 0, NULL, 0, 0
   };
 
   static struct _bios_LBA_address_packet FAR *f_dap;
@@ -1287,7 +1287,7 @@ I don't know, if I did it right, but I tried to do it that way. TE
 
 STATIC void make_ddt (_nddt *pddt, int Unit, int driveno, int flags)
 {
-  pddt->ddt_next = _MK_DOS_FP(struct ddtstruct, 0, 0xffff);
+  pddt->ddt_next = MK_FP(0, 0xffff);
   pddt->ddt_logdriveno = Unit;
   pddt->ddt_driveno = driveno;
   pddt->ddt_type = init_getdriveparm(driveno, &pddt->ddt_defbpb);
