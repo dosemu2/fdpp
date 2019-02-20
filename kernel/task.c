@@ -712,7 +712,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
     SftSeek(fd, ExeHeader.exRelocTable, 0);
     for (i = 0; i < ExeHeader.exRelocItems; i++)
     {
-      if (DosRWSft(fd, sizeof(reloc), MK_FAR_SCP(reloc), XFR_READ) != sizeof(reloc))
+      if (DosRWSft(fd, sizeof(reloc), reloc, XFR_READ) != sizeof(reloc))
       {
         if (mode != OVERLAY)
         {

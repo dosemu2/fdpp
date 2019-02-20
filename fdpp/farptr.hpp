@@ -190,7 +190,7 @@ public:
         !std::is_convertible<T1, FarPtr<const void>>::value &&
         !std::is_convertible<T1, FarPtrBase<const void>>::value &&
         !std::is_convertible<T1, far_s>::value &&
-        std::is_class<T1>::value
+        (std::is_class<T1>::value || std::is_array<T1>::value)
         >::type* = nullptr>
     FarPtr(T1 &p) : FarPtr(_MK_FAR(p)) {}
 

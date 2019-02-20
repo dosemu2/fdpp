@@ -327,7 +327,7 @@ STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list *_arg)
         {
           UDWORD w0 = va_arg(arg, unsigned);
           char SSFAR *tmp = charp;
-          _fsprintf(MK_FAR_SCP(s), "%04x:%04x", w0 >> 16, w0 & 0xffff);
+          _fsprintf(s, "%04x:%04x", w0 >> 16, w0 & 0xffff);
           p = s;
           charp = tmp;
           break;

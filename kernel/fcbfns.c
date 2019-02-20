@@ -575,7 +575,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       /* now to build a dos name again                */
       LocalFcb.fcb_drive = FcbDrive;
       FcbNameInit(LocalFcb, loc_szBuffer, &FcbDrive);
-      _result = truename(MK_FAR_SCP(loc_szBuffer), SecPathName, 0);
+      _result = truename(loc_szBuffer, SecPathName, 0);
       if (_result < SUCCESS || (_result & (IS_NETWORK|IS_DEVICE)) == IS_DEVICE
         || DosRenameTrue(PriPathName, SecPathName, wAttr) != SUCCESS)
       {
