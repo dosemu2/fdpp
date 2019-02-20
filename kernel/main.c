@@ -166,7 +166,7 @@ STATIC void InitializeAllBPBs(VOID)
 
 STATIC void PSPInit(void)
 {
-  psp FAR *p = (psp FAR *)MK_FP(DOS_PSP, 0);
+  psp FAR *p = MK_FP(DOS_PSP, 0);
 
   /* Clear out new psp first                              */
   fmemset(p, 0, sizeof(psp));
@@ -175,9 +175,9 @@ STATIC void PSPInit(void)
   /* CP/M-like exit point                                 */
   p->ps_exit = 0x20cd;
 
-  /* CP/M-like entry point - call FAR to special entry    */
+  /* CP/M-like entry point - call far to special entry    */
   p->ps_farcall = 0x9a;
-  p->ps_reentry = _MK_DOS_FP(VOID, 0, 0x30 * 4);
+  p->ps_reentry = MK_FP(0, 0x30 * 4);
   /* unix style call - 0xcd 0x21 0xcb (int 21, retf)      */
   p->ps_unix[0] = 0xcd;
   p->ps_unix[1] = 0x21;
@@ -187,7 +187,7 @@ STATIC void PSPInit(void)
   /* parent psp segment                                   */
   p->ps_parent = FP_SEG(p);
   /* previous psp pointer                                 */
-  p->ps_prevpsp = _MK_DOS_FP(psp, 0xffff,0xffff);
+  p->ps_prevpsp = MK_FP(0xffff,0xffff);
 
   /* Environment and memory useage parameters             */
   /* memory size in paragraphs                            */
@@ -210,7 +210,7 @@ STATIC void PSPInit(void)
   fmemset(p->ps_files, 0xff, 20);
 
   /* open file table pointer                              */
-  p->ps_filetab = (UBYTE FAR *)p->ps_files;
+  p->ps_filetab = p->ps_files;
 
   /* first command line argument                          */
   /* p->ps_fcb1.fcb_drive = 0; already set                */
@@ -281,13 +281,13 @@ STATIC void setup_int_vectors(void)
   }
   HaltCpuWhileIdle = 0;
   for (pvec = vectors; pvec < vectors + (sizeof vectors/sizeof *pvec); pvec++)
-    setvec(pvec->intno, (intvec)MK_FP(FP_SEG((intvec)empty_handler), pvec->handleroff));
+    setvec(pvec->intno, (intvec)MK_FP(FP_SEG(empty_handler), pvec->handleroff));
   pokeb(0, 0x30 * 4, 0xea);
   pokel(0, 0x30 * 4 + 1, (ULONG)cpm_entry);
 
   /* these two are in the device driver area LOWTEXT (0x70) */
   setvec(0x1b, got_cbreak);
-  setvec(0x29, int29_handler);  /* required for _printf! */
+  setvec(0x29, int29_handler);  /* required for printf! */
 }
 
 STATIC void init_kernel(void)
@@ -308,7 +308,7 @@ STATIC void init_kernel(void)
 #endif
 
   MoveKernel(FP_SEG(lpTop));
-  lpTop = (BYTE FAR *)MK_FP((UWORD)(FP_SEG(lpTop) - 0xfff), 0xfff0);
+  lpTop = MK_FP((UWORD)(FP_SEG(lpTop) - 0xfff), 0xfff0);
 
   /* Initialize IO subsystem                                      */
   InitIO();
@@ -386,7 +386,7 @@ STATIC VOID FsConfig(VOID)
 
     pcds_table->cdsCurrentPath[0] += i;
 
-    if (i < LoL->_nblkdev && dpb != _MK_DOS_FP(struct dpb, (UWORD)-1, (UWORD)-1))
+    if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
     {
       pcds_table->cdsDpb = dpb;
       pcds_table->cdsFlags = CDSPHYSDRV;
@@ -513,7 +513,7 @@ STATIC void kernel()
       Config.cfgInitTail = MK_NEAR_OBJ(&Config, Cmd.ctBuffer);
     }
   }
-  call_p_0(Config); /* go execute process 0 (the shell) */
+  call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
 }
 
 /* check for a block device and update  device control block    */
@@ -527,10 +527,10 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; _dpb->dpb_next != _MK_DOS_FP(struct dpb, (UWORD)-1, (UWORD)-1);
+    for (_dpb = LoL->_DPBp; (ULONG) _dpb->dpb_next != 0xffffffffl;
          _dpb = _dpb->dpb_next)
       ;
-    _dpb = (struct dpb FAR *)
+    _dpb =
       KernelAlloc(nunits * sizeof(struct dpb), 'E', Config.cfgDosDataUmb);
     _dpb->dpb_next = _dpb;
   }
@@ -542,7 +542,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     _dpb->dpb_subunit = Index;
     _dpb->dpb_device = dhp;
     _dpb->dpb_flags = M_CHANGED;
-    if ((LoL->_CDSp != 0) && (LoL->_nblkdev < LoL->_lastdrive))
+    if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
     {
       LoL->_CDSp[LoL->_nblkdev].cdsDpb = _dpb;
       LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
@@ -550,7 +550,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     ++_dpb;
     ++LoL->_nblkdev;
   }
-  (_dpb - 1)->dpb_next = _MK_DOS_FP(struct dpb, (UWORD)-1, (UWORD)-1);
+  (_dpb - 1)->dpb_next = (void FAR *)0xFFFFFFFFl;
 }
 
 /* If cmdLine is NULL, this is an internal driver */
@@ -592,7 +592,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_cmdline = MK_FAR_STR_OBJ(&rq, cmdLine ? cmdLine : "\n");
   rq.r_firstunit = LoL->_nblkdev;
 
-  execrh(rq, dhp);
+  execrh(MK_FAR_SCP(rq), dhp);
 
 /*
  *  Added needed Error handle
