@@ -146,7 +146,6 @@ public:
     track_owner_sh(p, _sh); \
     ((FarObj<_RC(o)> *)_sh.get())->get_near(); \
 })
-#define MK_FAR_PTR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(*o, NM).get_obj())
 #define __MK_FAR(n) FarPtr<decltype(__obj_##n)::obj_type>(__obj_##n.get_obj())
 #define __MK_NEAR(n) __obj_##n.get_near()
 #define __MK_NEAR2(n, t) t(__obj_##n.get_near().off())

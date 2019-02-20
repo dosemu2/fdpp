@@ -785,7 +785,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   }
 
   exe_header *eh = &ExeHeader;
-  rc = (WORD)DosRWSft(fd, sizeof(exe_header), MK_FAR_PTR_SCP(eh), XFR_READ);
+  rc = (WORD)DosRWSft(fd, sizeof(exe_header), eh, XFR_READ);
 
   if (rc == sizeof(exe_header) &&
       (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))

@@ -182,13 +182,16 @@ public:
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
 
     FarPtr(T *&p) : FarPtr(_MK_FAR(*p)) {}
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
+    FarPtr(T0 *&p) : FarPtr(_MK_FAR(*p)) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
+    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg_(), f._off_()),
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
@@ -196,13 +199,13 @@ public:
     explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg(), f._off()),
+    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg_(), f._off_()),
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
     operator FarPtrBase<T0>() const & {
-        return FarPtrBase<T0>(this->_seg(), this->_off());
+        return FarPtrBase<T0>(this->_seg_(), this->_off_());
     }
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
@@ -235,8 +238,8 @@ public:
         obj->ref(owner);
         return this->ptr.off;
     }
-    uint16_t _seg() const { return this->ptr.seg; }
-    uint16_t _off() const { return this->ptr.off; }
+    uint16_t _seg_() const { return this->ptr.seg; }
+    uint16_t _off_() const { return this->ptr.off; }
     operator T*() {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
@@ -589,6 +592,8 @@ public:
     SymMemb2<t, off_##n> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
+#define _FP_SEG(fp) ((fp)._seg_())
+#define _FP_OFF(fp) ((fp)._off_())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
 #define FP_OFF_OBJ(o, fp) ((fp).off(o))
 #define MK_FP(seg, ofs) ({ \
