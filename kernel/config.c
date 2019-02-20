@@ -412,16 +412,15 @@ void PreConfig2(void)
   mcb_init(base_seg, ram_top * 64 - LoL->_first_mcb - 1, MCB_LAST);
 
   sp = LoL->_sfthead;
-  sp = sp->sftt_next = (sfttbl FAR *)KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
+  sp = sp->sftt_next = KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = 3;
 
   if (ebda_size)  /* move the Extended BIOS Data Area from top of RAM here */
     movebda(ebda_size, FP_SEG(KernelAlloc(ebda_size, 'I', 0)));
 
-/*  if (UmbState == 2)
-      umb_init();
-*/
+//  if (UmbState == 2)
+//    umb_init();
 }
 
 /* Do third pass initialization.                                        */
@@ -467,7 +466,7 @@ void PostConfig(void)
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = Config.cfgFiles - 8;
 
-  LoL->_CDSp = (struct cds FAR *)KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
+  LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
 /*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
@@ -501,7 +500,7 @@ VOID configDone(VOID)
     unsigned short hma_paras = (HMAFree+0xf)/16;
 
     kernel_seg = allocmem(hma_paras);
-    p = para2far((UWORD)(kernel_seg - 1));
+    p = para2far(kernel_seg - 1);
 
     p->m_name[0] = 'S';
     p->m_name[1] = 'C';
@@ -1579,8 +1578,9 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     UBYTE buffer[256];
   } subf_data;
   struct subf_tbl {
+    /* FDPP: was 8, set to 9 to avoid errors "char array too long" */
     char sig[9];        /* signature for each subfunction data XXX was 8 */
-    __FAR(void) p;        /* pointer to data in nls_hc.asm to be copied to */
+    void FAR *p;        /* pointer to data in nls_hc.asm to be copied to */
   };
   static struct subf_tbl table[8] = {
     {"\377       ", NULL},                  /* 0, unused */
@@ -1613,8 +1613,7 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
   }
   if (memcmp(header.name, "\377COUNTRY", sizeof(header.name)))
   {
-err:
-    _printf("%s has invalid format\n", filename);
+err:printf("%s has invalid format\n", filename);
     goto ret;
   }
   if (lseek(fd, header.offset) == 0xffffffffL
@@ -1655,7 +1654,7 @@ err:
         nlsPackageHardcoded.cntry = entry.country;
         nlsPackageHardcoded.cp = entry.codepage;
         subf_data.length =      /* MS-DOS "CTYINFO" is up to 38 bytes */
-                min((unsigned)subf_data.length, sizeof(struct CountrySpecificInfo));
+                min(subf_data.length, sizeof(struct CountrySpecificInfo));
       }
       if (hdr[i].id == 7)
       {
@@ -1805,7 +1804,7 @@ STATIC VOID DeviceHigh(char * pLine)
 {
   if (UmbState == 1)
   {
-    if (LoadDevice(pLine, (char FAR *)MK_FP((UWORD)(umb_start + UMB_top), 0), TRUE) == DE_NOMEM)
+    if (LoadDevice(pLine, MK_FP(umb_start + UMB_top, 0), TRUE) == DE_NOMEM)
     {
       _printf("Not enough free memory in UMBs: loading low\n");
       LoadDevice(pLine, lpTop, FALSE);
@@ -1881,7 +1880,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
   /* add \r\n to the command line */
   strcat(szBuf, " \r\n");
 
-  dhp = (struct dhdr FAR *)MK_FP(base, 0);
+  dhp = MK_FP(base, 0);
 
   /* NOTE - Modification for multisegmented device drivers:          */
   /*   In order to emulate the functionallity experienced with other */
@@ -1894,8 +1893,8 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
        (result = init_device(dhp, szBuf, mode, &top)) == SUCCESS;
        dhp = next_dhp)
   {
-    next_dhp = (struct dhdr FAR *)MK_FP(FP_SEG(dhp), FP_OFF(dhp->dh_next));
-    /* Link in device driver and save LoL->_nul_dev pointer to next */
+    next_dhp = MK_FP(FP_SEG(dhp), FP_OFF(dhp->dh_next));
+    /* Link in device driver and save LoL->nul_dev pointer to next */
     dhp->dh_next = LoL->_nul_dev.dh_next;
     LoL->_nul_dev.dh_next = dhp;
   }
@@ -1983,7 +1982,7 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
     umb_base_seg = base;
   else
     base_seg = base;
-  return MK_FP((UWORD)(FP_SEG(p)+1), 0);
+  return MK_FP(FP_SEG(p)+1, 0);
 }
 
 void FAR * KernelAlloc(size_t nBytes, char type, int mode)
@@ -1994,7 +1993,7 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
   if (LoL->_first_mcb == 0)
   {
     /* prealloc */
-    lpTop = (BYTE FAR *)MK_FP((UWORD)(FP_SEG(lpTop) - nPara), FP_OFF(lpTop));
+    lpTop = MK_FP(FP_SEG(lpTop) - nPara, FP_OFF(lpTop));
     p = AlignParagraph(lpTop);
   }
   else
@@ -2193,19 +2192,19 @@ STATIC void config_init_buffers(int wantedbuffers)
   LoL->inforecptr = &LoL->_firstbuf;
   {
     size_t bytes = sizeof(struct buffer) * buffers;
-    pbuffer = (struct buffer FAR *)HMAalloc(bytes);
+    pbuffer = HMAalloc(bytes);
 
     if (pbuffer == NULL)
     {
-      pbuffer = (struct buffer FAR *)KernelAlloc(bytes, 'B', 0);
+      pbuffer = KernelAlloc(bytes, 'B', 0);
       if (HMAState == HMA_DONE)
-        firstAvailableBuf = (char FAR *)MK_FP(0xffff, HMAFree);
+        firstAvailableBuf = MK_FP(0xffff, HMAFree);
     }
     else
     {
       LoL->_bufloc = LOC_HMA;
       /* space in HMA beyond requested buffers available as user space */
-      firstAvailableBuf = (char FAR *)(pbuffer + wantedbuffers);
+      firstAvailableBuf = pbuffer + wantedbuffers;
     }
   }
   LoL->_deblock_buf = DiskTransferBuffer;
@@ -2215,18 +2214,18 @@ STATIC void config_init_buffers(int wantedbuffers)
   DebugPrintf((" (%P)", GET_FP32(LoL->_firstbuf)));
 
   buffers--;
-  pbuffer->b_prev = FP_OFF((struct buffer FAR *)(pbuffer + buffers));
+  pbuffer->b_prev = FP_OFF(pbuffer + buffers);
   {
     int i = buffers;
     do
     {
-      pbuffer->b_next = FP_OFF((struct buffer FAR *)(pbuffer + 1));
+      pbuffer->b_next = FP_OFF(pbuffer + 1);
       pbuffer++;
-      pbuffer->b_prev = FP_OFF((struct buffer FAR *)(pbuffer - 1));
+      pbuffer->b_prev = FP_OFF(pbuffer - 1);
     }
     while (--i);
   }
-  pbuffer->b_next = FP_OFF((struct buffer FAR *)(pbuffer - buffers));
+  pbuffer->b_next = FP_OFF(pbuffer - buffers);
 
     /* now, we can have quite some buffers in HMA
        -- up to 50 for KE38616.
@@ -2731,9 +2730,8 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   args[*args+2] = 0;
 
   exb.exec.env_seg  = 0;
-  size_t sz = sizeof(CommandTail);
-  exb.exec.cmd_line = MK_FAR_SZ_OBJ(&exb, args, sz);
-  exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, (UWORD)-1, (UWORD)-1);
+  exb.exec.cmd_line = MK_FAR_SZ_OBJ(&exb, args, sizeof(CommandTail));
+  exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *) 0xfffffffful;
 
 
   InstallPrintf(("cmd[%s] args [%u,%s]\n",filename,*args,args+1));
