@@ -649,8 +649,9 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
                afentry.sector <= pddt->ddt_bpb.bpb_nsecs; afentry.sector++)
             memcpy(addrfield++, &afentry, sizeof(afentry));
 
-          ret = Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0,
-                           pddt->ddt_bpb.bpb_nsecs, DiskTransferBuffer);
+          ret =
+              Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0,
+                         pddt->ddt_bpb.bpb_nsecs, DiskTransferBuffer);
           if (ret != 0)
             return dskerr(ret);
         }
@@ -949,7 +950,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
                  UWORD * transferred)
 {
   static struct _bios_LBA_address_packet dap = {
-    16, 0, 0, 0, (UBYTE FAR *)NULL, 0, 0
+    16, 0, 0, 0, NULL, 0, 0
   };
 
   unsigned count;
@@ -1017,7 +1018,7 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
       {
         dap.number_of_blocks = count;
 
-        dap.buffer_address = (UBYTE FAR *)transfer_address;
+        dap.buffer_address = transfer_address;
 
         dap.block_address_high = 0;     /* clear high part */
         dap.block_address = LBA_address;        /* clear high part */
@@ -1062,12 +1063,12 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
                                                           chs.Cylinder,
                                                           chs.Sector,
                                                           count,
-                                                          (UBYTE FAR *)transfer_address);
+                                                          transfer_address);
 
         if (error_code == 0 && mode == LBA_WRITE_VERIFY)
         {
           error_code = fl_verify(driveno, chs.Head, chs.Cylinder,
-                                 chs.Sector, count, (UBYTE FAR *)transfer_address);
+                                 chs.Sector, count, transfer_address);
         }
       }
       if (error_code == 0)
