@@ -117,6 +117,7 @@ public:
         return *this;
     }
     FarPtrBase<T> operator +=(int inc) { ptr.off += inc * sizeof(T); return *this; }
+    FarPtrBase<T> operator -=(int dec) { ptr.off -= dec * sizeof(T); return *this; }
     FarPtrBase<T> operator +(int inc) { return FarPtrBase<T>(ptr.seg, ptr.off + inc * sizeof(T)); }
     FarPtrBase<T> operator -(int dec) { return FarPtrBase<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
     bool operator == (std::nullptr_t) { return (!ptr.seg && !ptr.off); }

@@ -339,7 +339,7 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
        fatal("KERNEL RETURNED!!!");                    */
   }
   /* mode == LOAD */
-  exp->exec.stack = _MK_DOS_FP(BYTE, FP_SEG(exp->exec.stack), (UWORD)(FP_OFF(exp->exec.stack) - 2));
+  exp->exec.stack -= 2;
   *(UWORD FAR *)exp->exec.stack = fcbcode;
   return SUCCESS;
 }
