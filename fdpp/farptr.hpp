@@ -159,6 +159,7 @@ template <typename T> class FarObj;
 #define NM __FILE__ ":" _Sx(__LINE__)
 #define _RR(t) typename std::remove_reference<t>::type
 #define _MK_FAR(o) std::make_shared<FarObj<_RR(decltype(o))>>(o, NM)
+#define _MK_FAR_S(o) std::make_shared<FarObj<char>>(o, strlen(o) + 1, NM)
 
 template<typename T>
 class FarPtr : public FarPtrBase<T>
@@ -181,10 +182,11 @@ public:
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
 
-    FarPtr(T *&p) : FarPtr(_MK_FAR(*p)) {}
-    template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(T0 *&p) : FarPtr(_MK_FAR(*p)) {}
+    template<typename T1 = T,
+        typename std::enable_if<
+        !std::is_same<T1, char>::value>::type* = nullptr>
+    FarPtr(T1 *&p) : FarPtr(_MK_FAR(*p)) {}
+    FarPtr(char *&s) : FarPtr(_MK_FAR_S(s)) {}
     template<typename T1 = T,
         typename std::enable_if<!std::is_pointer<T1>::value &&
         !std::is_convertible<T1, FarPtr<const void>>::value &&

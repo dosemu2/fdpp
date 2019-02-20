@@ -104,7 +104,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   drv = LoL->_BootDrive + 1;
   p = (unsigned char FAR *)MK_FP(0, 0x5e0);
-  if (fmemcmp(p+2,MK_FAR_STR_SCP("CONFIG"),6) == 0)      /* UPX */
+  if (fmemcmp(p+2,"CONFIG",6) == 0)      /* UPX */
   {
     fmemcpy_n(&InitKernelConfig, p+2, sizeof(InitKernelConfig));
 

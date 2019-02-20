@@ -565,7 +565,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   }
 
   *p = '\0';				/* add the string terminator */
-  DosUpFString(MK_FAR_STR_SCP(rootPos));	        /* upcase the file/path name */
+  DosUpFString(rootPos);	        /* upcase the file/path name */
 
 /** Note:
     Only the portions passed in by the user are upcased, because it is

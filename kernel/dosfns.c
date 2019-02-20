@@ -376,7 +376,7 @@ const char FAR *get_root(const char FAR * fname)
 
 STATIC void ConvertPathNameToFCBName(char *FCBName, const char *PathName)
 {
-  ConvertNameSZToName83(FCBName, get_root(MK_FAR_STR_SCP(PathName)));
+  ConvertNameSZToName83(FCBName, get_root(PathName));
   FCBName[FNAME_SIZE + FEXT_SIZE] = '\0';
 }
 
