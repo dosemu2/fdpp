@@ -369,8 +369,9 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
     {
       if (froot == src + 5)
       {
-        fmemcpy_n(dest + 3, src, 5);
-        DosUpMem(MK_FAR_STR_SCP(dest) + 3, 5);
+        char *dest3 = dest + 3;
+        fmemcpy_n(dest3, src, 5);
+        DosUpMem(dest3, 5);
         if (dest[3] == '/') dest[3] = '\\';
         if (dest[7] == '/') dest[7] = '\\';
       }

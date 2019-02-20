@@ -163,7 +163,6 @@ public:
     FarPtrBase<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
 #define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o, NM).get_obj())
-#define MK_FAR_STR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(o, strlen(o) + 1, NM).get_obj())
 #define MK_FAR_SZ_SCP(o, sz) FarPtr<_RC(o)>(FarObj<_R(o)>(o, sz, NM).get_obj())
 
 #define PTR_MEMB(t) NearPtr_DO<t>
