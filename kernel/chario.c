@@ -71,7 +71,7 @@ long BinaryCharIO(__DOSFAR(struct dhdr) *pdev, size_t n, void FAR * bp,
   do
   {
     CharReqHdr.r_count = n;
-    CharReqHdr.r_trans = (BYTE FAR *)bp;
+    CharReqHdr.r_trans = bp;
     err = CharRequest(pdev, command);
   } while (err == 1);
   return err == SUCCESS ? (long)CharReqHdr.r_count : err;
@@ -415,10 +415,10 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
           }
           else
           {
-            char FAR *sp = (char FAR *)fmemchr(&kp->_kb_buf[stored_pos],
+            char FAR *sp = fmemchr(&kp->_kb_buf[stored_pos],
                                    c2, stored_size - stored_pos);
             if (sp != NULL)
-                new_pos = (FP_OFF(sp) - FP_OFF((char FAR *)&kp->_kb_buf[stored_pos])) + 1;
+                new_pos = (FP_OFF(sp) - FP_OFF(&kp->_kb_buf[stored_pos])) + 1;
           }
         }
         /* fall through */
