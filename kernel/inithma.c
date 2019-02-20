@@ -178,7 +178,7 @@ int MoveKernelToHMA()
     return TRUE;
   }
 
-  if ((xms_addr = DetectXMSDriver()) == (void *)NULL)
+  if ((xms_addr = DetectXMSDriver()) == NULL)
     return FALSE;
 
   XMSDriverAddress = xms_addr;
@@ -321,11 +321,11 @@ void MoveKernel(UWORD NewKernelSegment)
   if (CurrentKernelSegment == 0xffff)
     return;
 
-  HMASource = (UBYTE FAR *)
-      MK_FP(CurrentKernelSegment, (UWORD)(FP_OFF(_HMATextStart) & 0xfff0));
-  HMADest = (UBYTE FAR *)MK_FP(NewKernelSegment, 0x0000);
+  HMASource =
+      MK_FP(CurrentKernelSegment, (FP_OFF(_HMATextStart) & 0xfff0));
+  HMADest = MK_FP(NewKernelSegment, 0x0000);
 
-  len = (FP_OFF((BYTE FAR *)_HMATextEnd) | 0x000f) - (FP_OFF((BYTE FAR *)_HMATextStart) & 0xfff0);
+  len = (FP_OFF(_HMATextEnd) | 0x000f) - (FP_OFF(_HMATextStart) & 0xfff0);
 
   if (NewKernelSegment == 0xffff)
   {
