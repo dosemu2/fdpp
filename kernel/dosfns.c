@@ -619,7 +619,7 @@ COUNT DosForceDup(unsigned OldHandle, unsigned NewHandle)
     return DE_INVLDHNDL;
 
   /* now close the new handle if it's open                        */
-  if (p->ps_filetab[NewHandle] != 0xff)
+  if ((UBYTE) p->ps_filetab[NewHandle] != 0xff)
   {
     COUNT ret;
 
