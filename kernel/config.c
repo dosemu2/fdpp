@@ -2123,7 +2123,7 @@ STATIC VOID _strupr(char *s)
 STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
-  fmemcpy(MK_FP(seg, 0), MK_FAR_PTR_SCP(near_mcb), sizeof(mcb));
+  fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
 }
 
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)

@@ -153,6 +153,13 @@ public:
     virtual ~ObjIf() = default;
 };
 
+template <typename T> class FarObj;
+#define __Sx(x) #x
+#define _Sx(x) __Sx(x)
+#define NM __FILE__ ":" _Sx(__LINE__)
+#define _RR(t) typename std::remove_reference<t>::type
+#define _MK_FAR(o) std::make_shared<FarObj<_RR(decltype(o))>>(o, NM)
+
 template<typename T>
 class FarPtr : public FarPtrBase<T>
 {
@@ -173,6 +180,8 @@ public:
     FarPtr(const FarPtr<T>& f) = default;
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
+
+    FarPtr(T *&p) : FarPtr(_MK_FAR(*p)) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>

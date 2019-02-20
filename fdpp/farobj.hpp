@@ -128,16 +128,11 @@ public:
 
 #define _RP(t) typename std::remove_pointer<t>::type
 #define _RE(t) typename std::remove_extent<t>::type
-#define _RR(t) typename std::remove_reference<t>::type
+//#define _RR(t) typename std::remove_reference<t>::type
 #define _R(o) _RP(_RE(_RR(decltype(o))))
 #define _RC(t) typename std::remove_const<_R(t)>::type
 
-#define __Sx(x) #x
-#define _Sx(x) __Sx(x)
-#define NM __FILE__ ":" _Sx(__LINE__)
-
-#define MK_FAR(o) \
-    FarPtr<decltype(o)>(std::make_shared<FarObj<decltype(o)>>(o, NM))
+#define MK_FAR(o) FarPtr<decltype(o)>(_MK_FAR(o))
 #define MK_FAR_SZ(o, sz) \
     FarPtr<_RC(o)>(std::make_shared<FarObj<_R(o)>>(o, sz))
 #define MK_NEAR_OBJ(p, o) ({ \
@@ -160,13 +155,13 @@ public:
     std::shared_ptr<ObjRef> _sh = \
         std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1, NM); \
     track_owner_sh(p, _sh); \
-    FarPtr<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
+    FarPtrBase<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
 #define _MK_FAR_SZ(n, o, sz) FarObj<_R(o)> __obj_##n(o, sz, NM)
 #define MK_FAR_SZ_OBJ(p, o, sz) ({ \
     std::shared_ptr<ObjRef> _sh = std::make_shared<FarObj<_R(o)>>(o, sz, NM); \
     track_owner_sh(p, _sh); \
-    FarPtr<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
+    FarPtrBase<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 })
 #define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o, NM).get_obj())
 #define MK_FAR_STR_SCP(o) FarPtr<_RC(o)>(FarObj<_R(o)>(o, strlen(o) + 1, NM).get_obj())
