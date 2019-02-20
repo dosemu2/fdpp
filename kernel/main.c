@@ -469,7 +469,7 @@ STATIC void kernel()
 
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
-  fmemcpy(MK_FP(DOS_PSP + 8, 0), MK_FAR_SCP(master_env), sizeof(master_env));
+  fmemcpy(MK_FP(DOS_PSP + 8, 0), master_env, sizeof(master_env));
 
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */

@@ -1301,7 +1301,7 @@ dispatch:
           break;
 
         default:
-          rc = (WORD)network_redirector_mx(REM_PRINTSET, MK_FAR_SCP(lr), Int21AX);
+          rc = (WORD)network_redirector_mx(REM_PRINTSET, lr, Int21AX);
           goto short_check;
       }
       break;
@@ -1333,7 +1333,7 @@ dispatch:
           goto real_exit;
         }
 #endif
-        rc = (WORD)network_redirector_mx(REM_DOREDIRECT, MK_FAR_SCP(lr), Int21AX);
+        rc = (WORD)network_redirector_mx(REM_DOREDIRECT, lr, Int21AX);
         /* the remote function manipulates *r directly !,
            so we should not copy lr to r here            */
         if (rc != SUCCESS)
@@ -1826,7 +1826,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
         rq.r_status = 0;
         rq.r_command = C_OPEN;
         rq.r_length = sizeof(request);
-        execrh(MK_FAR_SCP(rq), lpCurSft->sft_dev);
+        execrh(rq, lpCurSft->sft_dev);
       }
 
       /* just do it always, not just for FCBs */
