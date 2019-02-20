@@ -549,7 +549,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       int i;
       UBYTE mode = 0;
 
-      FcbParseFname(&mode, pFromPattern, MK_FAR_SCP(LocalFcb));
+      FcbParseFname(&mode, pFromPattern, LocalFcb);
       /* Overlay the pattern, skipping '?'            */
       /* I'm cheating because this assumes that the   */
       /* struct alignments are on byte boundaries     */
@@ -574,7 +574,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       }
       /* now to build a dos name again                */
       LocalFcb.fcb_drive = FcbDrive;
-      FcbNameInit(MK_FAR_SCP(LocalFcb), loc_szBuffer, &FcbDrive);
+      FcbNameInit(LocalFcb, loc_szBuffer, &FcbDrive);
       _result = truename(MK_FAR_SCP(loc_szBuffer), SecPathName, 0);
       if (_result < SUCCESS || (_result & (IS_NETWORK|IS_DEVICE)) == IS_DEVICE
         || DosRenameTrue(PriPathName, SecPathName, wAttr) != SUCCESS)

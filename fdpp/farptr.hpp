@@ -185,6 +185,14 @@ public:
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(T0 *&p) : FarPtr(_MK_FAR(*p)) {}
+    template<typename T1 = T,
+        typename std::enable_if<!std::is_pointer<T1>::value &&
+        !std::is_convertible<T1, FarPtr<const void>>::value &&
+        !std::is_convertible<T1, FarPtrBase<const void>>::value &&
+        !std::is_convertible<T1, far_s>::value &&
+        std::is_class<T1>::value
+        >::type* = nullptr>
+    FarPtr(T1 &p) : FarPtr(_MK_FAR(p)) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>

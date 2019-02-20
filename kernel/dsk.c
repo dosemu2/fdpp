@@ -1031,11 +1031,13 @@ STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
         else
         {
           /* verify requested, but not supported */
-          error_code = fl_lba_ReadWrite(driveno, LBA_WRITE, MK_FAR_SCP(dap));
+          error_code =
+              fl_lba_ReadWrite(driveno, LBA_WRITE, MK_FAR_SCP(dap));
 
           if (error_code == 0)
           {
-            error_code = fl_lba_ReadWrite(driveno, LBA_VERIFY, MK_FAR_SCP(dap));
+            error_code =
+                fl_lba_ReadWrite(driveno, LBA_VERIFY, MK_FAR_SCP(dap));
           }
         }
       }

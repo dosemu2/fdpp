@@ -513,7 +513,7 @@ STATIC void kernel()
       Config.cfgInitTail = MK_NEAR_OBJ(&Config, Cmd.ctBuffer);
     }
   }
-  call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
+  call_p_0(Config); /* go execute process 0 (the shell) */
 }
 
 /* check for a block device and update  device control block    */
@@ -592,7 +592,7 @@ BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
   rq.r_cmdline = MK_FAR_STR_OBJ(&rq, cmdLine ? cmdLine : "\n");
   rq.r_firstunit = LoL->_nblkdev;
 
-  execrh(MK_FAR_SCP(rq), dhp);
+  execrh(rq, dhp);
 
 /*
  *  Added needed Error handle
