@@ -40,7 +40,7 @@ static BYTE *mainRcsId =
 int SetJFTSize(UWORD nHandles)
 {
   UWORD block, maxBlock, i;
-  psp FAR *ppsp = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *ppsp = MK_FP(cu_psp, 0);
   UBYTE FAR *newtab;
 
   if (nHandles <= ppsp->ps_maxfiles)
@@ -54,7 +54,7 @@ int SetJFTSize(UWORD nHandles)
     return DE_NOMEM;
 
   ++block;
-  newtab = (UBYTE FAR *)MK_FP(block, 0);
+  newtab = MK_FP(block, 0);
 
   i = ppsp->ps_maxfiles;
   /* copy existing part and fill up new part by "no open file" */
@@ -268,7 +268,7 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   tn_printf(("truename(%s)\n", GET_PTR(src)));
 
   /* First, adjust the source pointer */
-  src = (const char FAR *)adjust_far(src);
+  src = adjust_far(src);
 
   /* In opposite of the TRUENAME shell command, an empty string is
      rejected by MS DOS 6 */
@@ -587,7 +587,8 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
       size_t j = strlen(cdsp->cdsCurrentPath);
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
-      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0') && memcmp(dest, cdsp->cdsCurrentPath, j) == 0)
+      if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0')
+         && fmemcmp(dest, cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';
@@ -629,103 +630,3 @@ COUNT truename(const char FAR * src, char * dest, COUNT mode)
   tn_printf(("Physical path: \"%s\"\n", dest));
   return result;
 }
-
-#if 0
-/**********************************************
-	Result of INTRSPY
-
-	Calling RBIL's INT.COM in MS DOS v6.22
-
-=== Script: MUX.SCR
-
-intercept 2fh
-    function 11h    ; network redirector
-    	subfunction 23h		; Qualify path and filename
-			on_entry
-				output "1123: IN: " (ds:SI->byte,asciiz,64)
-			on_exit
-				if (cflag == 1)
-					sameline " [FAIL " ax "]"
-				output "1123: OUT: " (es:dI->byte,asciiz,64)
-				output "1123: orig buffer: " (ds:sI->byte,asciiz,64)
-	function 12h
-		subfunction 21h
-			on_entry
-				output "1221: IN: " (ds:SI->byte,asciiz,64)
-			on_exit
-				if (cflag == 1)
-					sameline " [FAIL " ax "]"
-				output "1221: OUT: " (es:dI->byte,asciiz,64)
-
-=== Batch file: SPY_INT.BAT
-@echo off
-if exist report.out del report.out
-cmdspy stop
-cmdspy flush
-cmdspy restart
-int ax=0x6000 -buf ds:si="abcöflkgsxkf\0" -buf es:di="%256s" -int 0x21 -d es:di:128 >spy_int.out
-cmdspy stop
-cmdspy report report.out
-more report.out
-=== Intspy report file: REPORT.OUT
-1123: IN:  C:\INTRSPY\SPY_INT.BAT [FAIL 0001]
-1123: OUT:  
-1123: orig buffer:  C:\INTRSPY\SPY_INT.BAT
-1123: IN:  int.??? [FAIL 0001]
-1123: OUT:  C:\INTRSPY
-1123: orig buffer:  int.???
-1123: IN:  C:\TOOL\int.??? [FAIL 0001]
-1123: OUT:  C:\INTRSPY
-1123: orig buffer:  C:\TOOL\int.???
-1123: IN:  spy_int.out [FAIL 0001]
-1123: OUT:  C:\TOOL\INT.???
-1123: orig buffer:  spy_int.out
-1123: IN:  C:\TOOL\INT.COM [FAIL 0001]
-1123: OUT:  C:\INTRSPY\SPY_INT.OUT
-1123: orig buffer:  C:\TOOL\INT.COM
-1123: IN:  abcöflkgsxkf [FAIL 0001]
-1123: OUT:  C:\TOOL\INT.COM
-1123: orig buffer:  abcöflkgsxkf
-1123: IN:  C:\INTRSPY\SPY_INT.BAT [FAIL 0001]
-1123: OUT:  C:\INTRSPY\ABCÖFLKG
-1123: orig buffer:  C:\INTRSPY\SPY_INT.BAT
-1123: IN:  cmdspy.??? [FAIL 0001]
-1123: OUT:  C:\INTRSPY
-1123: orig buffer:  cmdspy.???
-1123: IN:  C:\INTRSPY\CMDSPY.EXE [FAIL 0001]
-1123: OUT:  C:\INTRSPY
-1123: orig buffer:  C:\INTRSPY\CMDSPY.EXE
-=== INT.COM output: SPY_INT.OUT
-              000   CX=0000   DX=0000
-SI=4A5E   DI=4A76   BP=FF70   SP=FF64
-CS=0000   DS=279D   ES=279D   SS=0000   CPU Flags: 0n00oditsz0a0p1c
-
-INT: 0x21
-
-AX=0059   BX=0000   CX=0000   DX=0000
-SI=4A5E   DI=4A76   BP=FF70   SP=FF64
-CS=0000   DS=279D   ES=279D   SS=0000   CPU Flags: 0N11odItSz0A0P1c
-DOSERR: 0000 (0)
-
-*<es:di:128> {
-43(C) 3A(:) 5C(\) 49(I) 4E(N) 54(T) 52(R) 53(S) 50(P) 59(Y) 5C(\) 41(A)
-42(B) 43(C) 99(Ö) 46(F) 4C(L) 4B(K) 47(G) 00(.) 3D(=) 30(0) 30(0) 30(0)
-30(0) 20( ) 20( ) 20( ) 43(C) 58(X) 3D(=) 30(0) 30(0) 30(0) 30(0) 28(()
-30(0) 29()) 20( ) 32(2) 38(8) 28(() 28(() 29()) 20( ) 33(3) 30(0) 28(()
-30(0) 29()) 20( ) 32(2) 39(9) 28(() 29()) 29()) 20( ) 32(2) 30(0) 28(()
-20( ) 29()) 20( ) 33(3) 32(2) 28(() 32(2) 29()) 20( ) 33(3) 38(8) 28(()
-38(8) 29()) 20( ) 32(2) 38(8) 28(() 28(() 29()) 20( ) 32(2) 38(8) 28(()
-28(() 29()) 20( ) 32(2) 39(9) 28(() 29()) 29()) 20( ) 32(2) 30(0) 28(()
-20( ) 29()) 20( ) 33(3) 33(3) 28(() 33(3) 29()) 20( ) 33(3) 30(0) 28(()
-30(0) 29()) 20( ) 32(2) 38(8) 28(() 28(() 29()) 20( ) 33(3) 30(0) 28(()
-30(0) 29()) 20( ) 32(2) 39(9) 28(() 29()) 29()) }
-===
-
-The actual interesting lines are the 6th "IN:" of the report file.
-The DOS interface passed _exactly_ the same string to MUX-11-23 as
-written on command line, the same applied to "con\0", a device driver.
-
-***************************************/
-
-#endif
-
