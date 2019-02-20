@@ -688,7 +688,7 @@ COUNT DosCloseSft(int sft_idx, BOOL commitonly)
 
 COUNT DosClose(COUNT hndl)
 {
-  psp FAR *p = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *p = MK_FP(cu_psp, 0);
   int sft_idx = get_sft_idx(hndl);
 
   if (FP_OFF(idx_to_sft(sft_idx)) == (UWORD) - 1)
@@ -944,7 +944,7 @@ STATIC int pop_dmp(int rc, dmatch FAR * dmp)
 COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
 {
   int rc;
-  REG dmatch FAR *dmp = (dmatch FAR *)dta;
+  REG dmatch FAR *dmp = dta;
 
   rc = truename(name, PriPathName,
                 CDS_MODE_CHECK_DEV_PATH | CDS_MODE_ALLOW_WILDCARDS);
@@ -999,7 +999,7 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
 COUNT DosFindNext(void)
 {
   COUNT rc;
-  REG dmatch FAR *dmp = (dmatch FAR *)dta;
+  REG dmatch FAR *dmp = dta;
 
 /*
  *  The new version of SHSUCDX 1.0 looks at the dm_drive byte to
@@ -1284,7 +1284,7 @@ struct dhdr FAR *IsDevice(const char FAR * fname)
   }
 
   /* cycle through all device headers checking for match */
-  for (dhp = (struct dhdr FAR *)&nul_dev; dhp != (struct dhdr FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  for (dhp = (struct dhdr FAR *)&nul_dev; dhp != (struct dhdr FAR *)-1;
        dhp = dhp->dh_next)
   {
     if (!(dhp->dh_attr & ATTR_CHAR))  /* if this is block device, skip */
