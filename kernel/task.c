@@ -106,13 +106,13 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
   UWORD nEnvSize;
   COUNT RetCode;
 /*  UWORD MaxEnvSize;                                                                                                                                           not used -- 1999/04/21 ska */
-  psp FAR *ppsp = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *ppsp = MK_FP(cu_psp, 0);
 
   /* create a new environment for the process             */
   /* copy parent's environment if exec.env_seg == 0       */
 
   pSrc = exp->exec.env_seg ?
-      (BYTE FAR *)MK_FP(exp->exec.env_seg, 0) : (BYTE FAR *)MK_FP(ppsp->ps_environ, 0);
+      MK_FP(exp->exec.env_seg, 0) : MK_FP(ppsp->ps_environ, 0);
 
 #if 0
   /* Every process requires an environment because of argv[0]
@@ -147,7 +147,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
                              mem_access_mode, pChildEnvSeg,
                              NULL /*(UWORD FAR *) MaxEnvSize ska */ )) < 0)
     return RetCode;
-  pDest = (BYTE FAR *)MK_FP((UWORD)(*pChildEnvSeg + 1), 0);
+  pDest = MK_FP((UWORD)(*pChildEnvSeg + 1), 0);
 
   /* fill the new env and inform the process of its       */
   /* location throught the psp                            */
@@ -183,7 +183,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
 /* The following code is 8086 dependant                         */
 void new_psp(seg para, seg cur_psp)
 {
-  psp FAR *p = (psp FAR *)MK_FP(para, 0);
+  psp FAR *p = MK_FP(para, 0);
 
   fmemcpy(p, MK_FP(cur_psp, 0), sizeof(psp));
 
@@ -199,8 +199,8 @@ void new_psp(seg para, seg cur_psp)
 
 void child_psp(seg para, seg cur_psp, int psize)
 {
-  psp FAR *p = (psp FAR *)MK_FP(para, 0);
-  psp FAR *q = (psp FAR *)MK_FP(cur_psp, 0);
+  psp FAR *p = MK_FP(para, 0);
+  psp FAR *q = MK_FP(cur_psp, 0);
   int i;
 
   new_psp(para, cur_psp);
@@ -221,7 +221,7 @@ void child_psp(seg para, seg cur_psp, int psize)
   fmemset(p->ps_files, 0xff, 20);
 
   /* open file table pointer                              */
-  p->ps_filetab = (UBYTE FAR *)p->ps_files;
+  p->ps_filetab = p->ps_files;
 
   /* clone the file table -- 0xff is unused               */
   for (i = 0; i < 20; i++)
@@ -248,9 +248,9 @@ STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, exec_blk FAR * exb,
   int i;
   const char FAR *np;
 
-  pspmcb = (mcb FAR *)MK_FP(pspseg, 0);
+  pspmcb = MK_FP(pspseg, 0);
   ++pspseg;
-  _psp = (psp FAR *)MK_FP(pspseg, 0);
+  _psp = MK_FP(pspseg, 0);
 
   /* complete the psp by adding the command line and FCBs     */
   fmemcpy(&_psp->ps_cmd, exb->exec.cmd_line, sizeof(CommandTail));
@@ -299,8 +299,8 @@ set_name:
 
 STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
 {
-  psp FAR *p = (psp FAR *)MK_FP(ds, 0);
-  psp FAR *q = (psp FAR *)MK_FP(cu_psp, 0);
+  psp FAR *p = MK_FP(ds, 0);
+  psp FAR *q = MK_FP(cu_psp, 0);
 
   /* Transfer control to the executable                   */
   p->ps_parent = cu_psp;
@@ -340,7 +340,7 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
   }
   /* mode == LOAD */
   exp->exec.stack -= 2;
-  *(UWORD FAR *)exp->exec.stack = fcbcode;
+  *((UWORD FAR *)(exp->exec.stack)) = fcbcode;
   return SUCCESS;
 }
 
@@ -466,9 +466,9 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
     BYTE FAR *sp;
 
     if (mode == OVERLAY)  /* memory already allocated */
-      sp = (BYTE FAR *)MK_FP(mem, 0);
+      sp = MK_FP(mem, 0);
     else                  /* test the filesize against the allocated memory */
-      sp = (BYTE FAR *)MK_FP(mem, sizeof(psp));
+      sp = MK_FP(mem, sizeof(psp));
 
     /* MS DOS always only loads the very first 64KB - sizeof(psp) bytes.
        -- 1999/04/21 ska */
@@ -500,14 +500,14 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
       return DE_NOMEM;
     asize -= 0x11;
     /* CP/M compatibility--size of first segment for .COM files
-       while preserving the FAR call to 0:00c0 +
+       while preserving the far call to 0:00c0 +
        copy in HMA at ffff:00d0 */
-    p = (psp FAR *)MK_FP(mem, 0);
-    p->ps_reentry = _MK_DOS_FP(VOID, (UWORD)(0xc - asize), (UWORD)(asize << 4));
+    p = MK_FP(mem, 0);
+    p->ps_reentry = MK_FP(0xc - asize, asize << 4);
     asize <<= 4;
     asize += 0x10e;
-    exp->exec.stack = _MK_DOS_FP(BYTE, mem, asize);
-    exp->exec.start_addr = _MK_DOS_FP(BYTE, mem, 0x100);
+    exp->exec.stack = MK_FP(mem, asize);
+    exp->exec.start_addr = MK_FP(mem, 0x100);
     *((UWORD FAR *) MK_FP(mem, asize)) = (UWORD) 0;
     load_transfer(mem, exp, fcbcode, mode);
   }
@@ -523,7 +523,7 @@ VOID return_user(void)
 /*  long j;*/
 
   /* restore parent                                       */
-  p = (psp FAR *)MK_FP(cu_psp, 0);
+  p = MK_FP(cu_psp, 0);
 
   /* When process returns - restore the isv               */
   setvec(0x22, p->ps_isv22);
@@ -547,9 +547,9 @@ VOID return_user(void)
   }
 
   cu_psp = p->ps_parent;
-  q = (psp FAR *)MK_FP(cu_psp, 0);
+  q = MK_FP(cu_psp, 0);
 
-  irp = q->ps_stack;
+  irp = (iregs FAR *) q->ps_stack;
 
   irp->CS = FP_SEG(p->ps_isv22);
   irp->IP = FP_OFF(p->ps_isv22);
@@ -557,7 +557,7 @@ VOID return_user(void)
 
   if (InDOS)
     --InDOS;
-  exec_user(q->ps_stack);
+  exec_user((iregs FAR *) q->ps_stack);
 }
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
@@ -679,7 +679,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
       start_seg += sizeof(psp) / 16;
       if (exe_size > 0 && (ExeHeader.exMinAlloc | ExeHeader.exMaxAlloc) == 0)
       {
-        mcb FAR *mp = (mcb FAR *)MK_FP((UWORD)(mem - 1), 0);
+        mcb FAR *mp = MK_FP((UWORD)(mem - 1), 0);
 
         /* then the image should be placed as high as possible */
         start_seg += mp->m_size - image_size;
@@ -712,7 +712,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
     SftSeek(fd, ExeHeader.exRelocTable, 0);
     for (i = 0; i < ExeHeader.exRelocItems; i++)
     {
-      if (DosRWSft(fd, sizeof(reloc), reloc, XFR_READ) != sizeof(reloc))
+      if (DosRWSft(fd, sizeof(reloc), MK_FAR_SCP(reloc), XFR_READ) != sizeof(reloc))
       {
         if (mode != OVERLAY)
         {
@@ -723,13 +723,13 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
       }
       if (mode == OVERLAY)
       {
-        spot = (seg FAR *)MK_FP((UWORD)(reloc[1] + mem), reloc[0]);
+        spot = MK_FP((UWORD)(reloc[1] + mem), reloc[0]);
         *spot += exp->load.reloc;
       }
       else
       {
         /*      spot = MK_FP(reloc[1] + mem + 0x10, reloc[0]); */
-        spot = (seg FAR *)MK_FP((UWORD)(reloc[1] + start_seg), reloc[0]);
+        spot = MK_FP((UWORD)(reloc[1] + start_seg), reloc[0]);
         *spot += start_seg;
       }
     }
@@ -750,10 +750,10 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
     child_psp(mem, cu_psp, mem + asize);
 
     fcbcode = patchPSP(mem - 1, env, exp, namep);
-    exp->exec.stack = _MK_DOS_FP(BYTE,
-      (UWORD)(ExeHeader.exInitSS + start_seg), ExeHeader.exInitSP);
-    exp->exec.start_addr = _MK_DOS_FP(BYTE,
-      (UWORD)(ExeHeader.exInitCS + start_seg), ExeHeader.exInitIP);
+    exp->exec.stack =
+      MK_FP(ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
+    exp->exec.start_addr =
+      MK_FP(ExeHeader.exInitCS + start_seg, ExeHeader.exInitIP);
 
     /* Transfer control to the executable                   */
     load_transfer(mem, exp, fcbcode, mode);
@@ -799,9 +799,9 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
 
   DosCloseSft(fd, FALSE);
 
-  exec_blk *eb = &TempExeBlock;
+
   if (mode == LOAD && rc == SUCCESS)
-    fmemcpy(ep, eb, sizeof(exec_blk));
+    fmemcpy(ep, &TempExeBlock, sizeof(exec_blk));
 
   return rc;
 }
@@ -817,7 +817,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   UBYTE mode = Config->cfgP_0_startmode;
 
   /* build exec block and save all parameters here as init part will vanish! */
-  exb.exec.fcb_1 = exb.exec.fcb_2 = _MK_DOS_FP(fcb, (UWORD)-1, (UWORD)-1);
+  exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
   exb.exec.env_seg = DOS_PSP + 8;
   fstrcpy(Shell, _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInit));
   /* join name and tail */
@@ -828,8 +828,8 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   {
     BYTE *p;
     /* if there are no parameters, point to end without "\r\n" */
-    if((tailp = strchr((char *)Shell,'\t')) == NULL &&
-       (tailp = strchr((char *)Shell, ' ')) == NULL)
+    if((tailp = strchr(Shell,'\t')) == NULL &&
+       (tailp = strchr(Shell, ' ')) == NULL)
         tailp = endp - 2;
     /* shift tail to right by 2 to make room for '\0', ctCount */
     for (p = endp - 1; p >= tailp; p--)
