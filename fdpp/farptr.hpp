@@ -191,9 +191,9 @@ public:
     FarPtr(T1 *&p) : FarPtr(_MK_FAR(*p)) {}
     FarPtr(char *&s) : FarPtr(_MK_FAR_S(s)) {}
     FarPtr(const char *&s) : FarPtr(_MK_FAR_CS(s)) {}
-    template<typename T1 = T,
-        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
-    FarPtr(T1 &p) : FarPtr(_MK_FAR(p)) {}
+    template<typename T1 = T, int N,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+    FarPtr(T1 (&p)[N]) : FarPtr(_MK_FAR(p)) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
