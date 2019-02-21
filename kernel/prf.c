@@ -455,7 +455,7 @@ extern void put_unsigned(unsigned, int, int);
 
 void hexd(const char *title, VOID FAR * v_p, COUNT numBytes)
 {
-  UBYTE FAR * p = (UBYTE FAR *)v_p;
+  UBYTE FAR * p = v_p;
   int loop, start = 0;
   put_string(title);
   if (numBytes > 16)
@@ -473,7 +473,7 @@ void hexd(const char *title, VOID FAR * v_p, COUNT numBytes)
       put_console(' ');
     }
     for (loop = start; loop < numBytes && loop < start+16;loop++)
-      put_console(p[loop] < 0x20 ? '.' : (char)p[loop]);
+      put_console(p[loop] < 0x20 ? '.' : p[loop]);
     put_console('\n');
   }
 }
