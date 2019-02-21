@@ -1,7 +1,7 @@
 # fdpp
 
 ## what is fdpp?
-fdpp is a 64-bit DOS.<br/>
+fdpp is a 64-bit DOS core.<br/>
 It is based on a FreeDOS kernel ported to modern C++.<br/>
 In short, FreeDOS plus-plus.
 

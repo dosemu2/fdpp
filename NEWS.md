@@ -1,3 +1,21 @@
+## beta-5
+
+- Last bits of UMB saga [fdkernel]
+- A lot of work on object tracking [fdpp run-time]
+- Extensions to allow passing env vars and boot drives to config.sys [boot]
+- Fix problems with drive formatting [fdkernel]
+- Add shared headers to most int vectors [fdkernel]
+- New config.sys name: fdppconf.sys (fdconfig.sys supported for compatibility)
+- Ported int2f/08 handling to fdpp framework
+- Started work to pass int vectors back to the prev handler [fdkernel]
+- Extend compiler front-end to allow compiling the original freedos
+  sources with much fewer manual instrumentation [compile-time templates]
+- Reviewed all diffs in fdkernel, compared with the original and reverted
+  all changes that are no longer needed. Now our freedos code is much
+  closer to the original than it ever was, and our front-end can parse
+  it all properly.
+- Lots of fixes
+
 ## beta-4
 
 All of the bug fixes, including regression fixes and freedos fixes.
