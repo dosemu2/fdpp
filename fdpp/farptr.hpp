@@ -160,6 +160,7 @@ template <typename T> class FarObj;
 #define _RR(t) typename std::remove_reference<t>::type
 #define _MK_FAR(o) std::make_shared<FarObj<_RR(decltype(o))>>(o, NM)
 #define _MK_FAR_S(o) std::make_shared<FarObj<char>>(o, strlen(o) + 1, NM)
+#define _MK_FAR_CS(o) std::make_shared<FarObj<const char>>(o, strlen(o) + 1, NM)
 
 template<typename T>
 class FarPtr : public FarPtrBase<T>
@@ -184,16 +185,14 @@ public:
 
     template<typename T1 = T,
         typename std::enable_if<
-        !std::is_same<T1, char>::value>::type* = nullptr>
+          !std::is_same<T1, char>::value &&
+          !std::is_same<T1, const char>::value
+        >::type* = nullptr>
     FarPtr(T1 *&p) : FarPtr(_MK_FAR(*p)) {}
     FarPtr(char *&s) : FarPtr(_MK_FAR_S(s)) {}
+    FarPtr(const char *&s) : FarPtr(_MK_FAR_CS(s)) {}
     template<typename T1 = T,
-        typename std::enable_if<!std::is_pointer<T1>::value &&
-        !std::is_convertible<T1, FarPtr<const void>>::value &&
-        !std::is_convertible<T1, FarPtrBase<const void>>::value &&
-        !std::is_convertible<T1, far_s>::value &&
-        (std::is_class<T1>::value || std::is_array<T1>::value)
-        >::type* = nullptr>
+        typename std::enable_if<std::is_array<T1>::value>::type* = nullptr>
     FarPtr(T1 &p) : FarPtr(_MK_FAR(p)) {}
 
     template<typename T0, typename T1 = T,
