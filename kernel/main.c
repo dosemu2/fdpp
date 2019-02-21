@@ -230,7 +230,7 @@ intvec getvec(unsigned char intno)
 {
   intvec iv;
   disable();
-  iv = *(intvec FAR *)MK_FP_N(0, (UWORD)(4 * (intno)));
+  iv = *(intvec FAR *)MK_FP_N(0,4 * (intno));
   enable();
   return iv;
 }
@@ -238,7 +238,7 @@ intvec getvec(unsigned char intno)
 void setvec(unsigned char intno, intvec vector)
 {
   disable();
-  *(intvec FAR *)MK_FP_N(0, (UWORD)(4 * intno)) = vector;
+  *(intvec FAR *)MK_FP_N(0,4 * intno) = vector;
   enable();
 }
 #endif
@@ -304,11 +304,11 @@ STATIC void init_kernel(void)
 #ifdef __WATCOMC__
   lpTop = MK_FP(_CS, 0);
 #else
-  lpTop = MK_FP((UWORD)(_CS - (FP_OFF(_HMATextEnd) + 15) / 16), 0);
+  lpTop = MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
 #endif
 
   MoveKernel(FP_SEG(lpTop));
-  lpTop = MK_FP((UWORD)(FP_SEG(lpTop) - 0xfff), 0xfff0);
+  lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
 
   /* Initialize IO subsystem                                      */
   InitIO();

@@ -34,7 +34,7 @@ static BYTE *memmgrRcsId =
     "$Id: memmgr.c 1338 2007-07-20 20:52:33Z mceric $";
 #endif
 
-#define nxtMCBsize(m,size) MK_FP((UWORD)(FP_SEG(m) + (size) + 1), FP_OFF(m))
+#define nxtMCBsize(mcb,size) MK_FP(FP_SEG(mcb) + (size) + 1, FP_OFF(mcb))
 #define nxtMCB(mcb) nxtMCBsize((mcb), (mcb)->m_size)
 
 #define mcbFree(mcb) ((mcb)->m_psp == FREE_PSP)
@@ -95,7 +95,7 @@ void FAR * adjust_far(const void FAR * fp)
     return (void FAR *)fp;
 #endif
 
-  return MK_FP((UWORD)(_FP_SEG(fp) + (_FP_OFF(fp) >> 4)), (UWORD)(_FP_OFF(fp) & 0xf));
+  return MK_FP(_FP_SEG(fp) + (_FP_OFF(fp) >> 4), _FP_OFF(fp) & 0xf);
 }
 
 #undef REG
@@ -321,7 +321,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
   REG mcb FAR *q;
 
   /* Initialize                                                   */
-  p = para2far((UWORD)(para - 1));       /* pointer to MCB */
+  p = para2far(para - 1);       /* pointer to MCB */
 
   /* check for corruption                                         */
   if (!mcbValid(p))

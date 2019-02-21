@@ -147,7 +147,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
                              mem_access_mode, pChildEnvSeg,
                              NULL /*(UWORD FAR *) MaxEnvSize ska */ )) < 0)
     return RetCode;
-  pDest = MK_FP((UWORD)(*pChildEnvSeg + 1), 0);
+  pDest = MK_FP(*pChildEnvSeg + 1, 0);
 
   /* fill the new env and inform the process of its       */
   /* location throught the psp                            */
@@ -679,7 +679,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
       start_seg += sizeof(psp) / 16;
       if (exe_size > 0 && (ExeHeader.exMinAlloc | ExeHeader.exMaxAlloc) == 0)
       {
-        mcb FAR *mp = MK_FP((UWORD)(mem - 1), 0);
+        mcb FAR *mp = MK_FP(mem - 1, 0);
 
         /* then the image should be placed as high as possible */
         start_seg += mp->m_size - image_size;
@@ -723,13 +723,13 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
       }
       if (mode == OVERLAY)
       {
-        spot = MK_FP((UWORD)(reloc[1] + mem), reloc[0]);
+        spot = MK_FP(reloc[1] + mem, reloc[0]);
         *spot += exp->load.reloc;
       }
       else
       {
         /*      spot = MK_FP(reloc[1] + mem + 0x10, reloc[0]); */
-        spot = MK_FP((UWORD)(reloc[1] + start_seg), reloc[0]);
+        spot = MK_FP(reloc[1] + start_seg, reloc[0]);
         *spot += start_seg;
       }
     }
