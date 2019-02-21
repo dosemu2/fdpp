@@ -574,7 +574,7 @@ COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
     /* matching NLS package found */
     if (nls->flags & NLS_FLAG_DIRECT_GETDATA)
       /* Direct access to the data */
-      return nlsGetData(nls, subfct, (UBYTE FAR *)buf, bufsize);
+      return nlsGetData(nls, subfct, buf, bufsize);
     cp = nls->cp;
     cntry = nls->cntry;
   }
@@ -677,12 +677,12 @@ UWORD ASMCFUNC syscall_MUX14(iregs FAR * regs)
       regs->BX = NLS_FREEDOS_NLSFUNC_ID;
       return SUCCESS;           /* kernel just simulates default functions */
     case NLSFUNC_DOS38:
-      return nlsGetData(nls, NLS_DOS_38, (UBYTE FAR *)MK_FP(regs->ES, regs->DI), 34);
+      return nlsGetData(nls, NLS_DOS_38, MK_FP(regs->ES, regs->DI), 34);
     case NLSFUNC_GETDATA:
-      return nlsGetData(nls, regs->BP, (UBYTE FAR *)MK_FP(regs->ES, regs->DI), regs->CX);
+      return nlsGetData(nls, regs->BP, MK_FP(regs->ES, regs->DI), regs->CX);
     case NLSFUNC_DRDOS_GETDATA:
       /* Does not pass buffer length */
-      return nlsGetData(nls, regs->CL, (UBYTE FAR *)MK_FP(regs->ES, regs->DI), 512);
+      return nlsGetData(nls, regs->CL, MK_FP(regs->ES, regs->DI), 512);
     case NLSFUNC_LOAD_PKG:
       return nlsLoadPackage(nls);
     case NLSFUNC_LOAD_PKG2:
