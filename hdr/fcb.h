@@ -79,8 +79,8 @@ static BYTE *fcb_hRcsId =
 /* File Control Block (FCB)                                             */
 typedef struct _fcb {
   UBYTE fcb_drive;              /* Drive number 0=default, 1=A, etc     */
-  AR_MEMB(struct _fcb, BYTE, fcb_fname, FNAME_SIZE);   /* File name                    */
-  AR_MEMB(struct _fcb, BYTE, fcb_fext, FEXT_SIZE);     /* File name Extension          */
+  AR_MEMB(_fcb, BYTE, fcb_fname, FNAME_SIZE);   /* File name                    */
+  AR_MEMB(_fcb, BYTE, fcb_fext, FEXT_SIZE);     /* File name Extension          */
   UWORD fcb_cublock;            /* Current block number of              */
   /* 128 records/block, for seq. r/w      */
   UWORD fcb_recsiz;             /* Logical record size in bytes,        */
@@ -105,7 +105,7 @@ typedef struct _xfcb {
   UBYTE xfcb_flag;              /* 0xff indicates Extended FCB  */
   BYTE xfcb_resvrd[5];          /* Reserved                     */
   UBYTE xfcb_attrib;            /* Attribute                    */
-  SYM_MEMB(struct _xfcb, fcb, xfcb_fcb);
+  SYM_MEMB(_xfcb, fcb, xfcb_fcb);
 } PACKED xfcb;
 
 typedef struct _rfcb {
@@ -113,8 +113,8 @@ typedef struct _rfcb {
   BYTE renOldName[8];           /* Old Filename                 */
   BYTE renOldExtent[3];         /* Old File Extension           */
   BYTE renReserved1[5];
-  AR_MEMB(struct _rfcb, BYTE, renNewName, 8);           /* New Filename                 */
-  AR_MEMB(struct _rfcb, BYTE, renNewExtent, 3);         /* New FileExtension            */
+  AR_MEMB(_rfcb, BYTE, renNewName, 8);           /* New Filename                 */
+  AR_MEMB(_rfcb, BYTE, renNewExtent, 3);         /* New FileExtension            */
   BYTE renReserved2[9];
 } rfcb;
 

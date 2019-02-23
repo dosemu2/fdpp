@@ -39,7 +39,7 @@ static BYTE *tail_hRcsId =
 
 typedef struct _cct {
   UBYTE ctCount;                /* number of bytes returned             */
-//  AR_MEMB(struct _cct, char, ctBuffer, CTBUFFERSIZE);  /* the buffer itself            */
+//  AR_MEMB(_cct, char, ctBuffer, CTBUFFERSIZE);  /* the buffer itself            */
   char ctBuffer[CTBUFFERSIZE];  /* the buffer itself            */
 } CommandTail;
 

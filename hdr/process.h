@@ -73,7 +73,7 @@ typedef struct _psp {
          ps_isv23,              /* 0e ctrl-break address           */
          ps_isv24;              /* 12 critical error address       */
   UWORD ps_parent;              /* 16 parent psp segment           */
-  AR_MEMB(struct _psp, UBYTE, ps_files, 20);           /* 18 file table - 0xff is unused  */
+  AR_MEMB(_psp, UBYTE, ps_files, 20);           /* 18 file table - 0xff is unused  */
   UWORD ps_environ;             /* 2c environment paragraph        */
   __DOSFAR(BYTE)ps_stack;           /* 2e user stack pointer - int 21  */
   UWORD ps_maxfiles;            /* 32 maximum open files           */
@@ -89,17 +89,21 @@ typedef struct _psp {
   UBYTE ps_fill2c[7];           /* 49 unused, 7 bytes              */
   UBYTE ps_unix[3];             /* 50 unix style call - 0xcd 0x21 0xcb */
   BYTE ps_fill3[9];             /* 53 */
+  DUMMY_MARK(_u);
   union {
-    struct __u1 {
-      SYM_MEMB2(struct _psp, _u, struct __u1, fcb, _ps_fcb1);             /* 5c first command line argument */
+    struct {
+//      SYM_MEMB2(_psp, _u, 0, fcb, _ps_fcb1);             /* 5c first command line argument */
+      fcb _ps_fcb1;             /* 5c first command line argument */
     } _u1;
-    struct __u2 {
+    struct {
       BYTE fill4[16];
-      SYM_MEMB2(struct _psp, _u, struct __u2, fcb, _ps_fcb2);             /* second command line argument */
+//      SYM_MEMB2(_psp, _u, sizeof(fill4), fcb, _ps_fcb2);             /* second command line argument */
+      fcb _ps_fcb2;             /* second command line argument */
     } _u2;
-    struct __u3 {
+    struct {
       BYTE fill5[36];
-      SYM_MEMB2(struct _psp, _u, struct __u3, CommandTail, _ps_cmd);
+      SYM_MEMB2(_psp, _u, sizeof(fill5), CommandTail, _ps_cmd);
+//      CommandTail _ps_cmd;
     } _u3;
   } _u;
 } psp;
@@ -107,4 +111,3 @@ typedef struct _psp {
 #define ps_fcb1 _u._u1._ps_fcb1
 #define ps_fcb2 _u._u2._ps_fcb2
 #define ps_cmd  _u._u3._ps_cmd
-

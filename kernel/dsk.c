@@ -57,8 +57,8 @@ ddt FAR *ddt_buf[26];
 
 struct FS_info {
   ULONG serialno;
-  AR_MEMB(struct FS_info, BYTE, volume, 11);
-  AR_MEMB(struct FS_info, BYTE, fstype, 8);
+  AR_MEMB(FS_info, BYTE, volume, 11);
+  AR_MEMB(FS_info, BYTE, fstype, 8);
 };
 
 /*TE - array access functions */

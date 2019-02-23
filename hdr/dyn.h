@@ -14,7 +14,7 @@
 
 struct DynS {
   unsigned Allocated;
-  AR_MEMB(struct DynS, char, Buffer, 0);
+  AR_MEMB(DynS, char, Buffer, 0);
 };
 
 #endif

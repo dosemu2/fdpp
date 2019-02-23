@@ -68,7 +68,7 @@ typedef struct _sft {
   UWORD sft_relclust;           /* 19 - File relative cluster (low part)     */
   ULONG sft_dirsector;          /* 1b - Sector containing cluster            */
   UBYTE sft_diridx;             /* 1f - directory index                      */
-  AR_MEMB(struct _sft, BYTE, sft_name, 11);            /* 20 - dir style file name                  */
+  AR_MEMB(_sft, BYTE, sft_name, 11);            /* 20 - dir style file name                  */
 #ifdef WITHFAT32
   CLUSTER sft_stclust;          /* 2b - Starting cluster                     */
 #else
@@ -99,7 +99,7 @@ typedef struct sfttbl {
     sftt_next;
   WORD sftt_count;              /* # of handle definition       */
   /* entries, this table          */
-  AR_MEMB(struct sfttbl, sft, sftt_table, SFTMAX);       /* The array of sft for block   */
+  AR_MEMB(sfttbl, sft, sftt_table, SFTMAX);       /* The array of sft for block   */
 } PACKED sfttbl;
 
 /* defines for sft use                                                  */

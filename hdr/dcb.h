@@ -50,7 +50,7 @@ struct dpb {
   UWORD dpb_fatsize;            /* # of sectors / FAT           */
   UWORD dpb_dirstrt;            /* start sec. of root dir       */
   __DOSFAR(struct dhdr)dpb_device;  /* pointer to device header     */
-  SYM_MEMB_T(struct dpb, UBYTE, dpb_mdb);                /* media descr. byte            */
+  SYM_MEMB_T(dpb, UBYTE, dpb_mdb);                /* media descr. byte            */
   BYTE dpb_flags;               /* -1 = force MEDIA CHK         */
   __DOSFAR(struct dpb)dpb_next; /* next dpb in chain            */
                                 /* -1 = end                     */

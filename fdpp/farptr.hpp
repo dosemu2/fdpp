@@ -425,24 +425,31 @@ public:
     far_s* get_ref() { return &sym.get_ref(); }
 };
 
-template<typename T, int (*F)(void)>
+template <typename T, char (T::*M)[0]>
+struct offset_of {
+    constexpr operator size_t() const {
+        return (std::uintptr_t)&(((T*)nullptr)->*M);
+    }
+};
+template<typename T, typename P, char (P::*M)[0], int O = 0>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
         FarPtr<T> fp;
+        int off = offset_of<P, M>() + O;
         /* find parent first */
-        const uint8_t *ptr = (const uint8_t *)this - F();
+        const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off)
             f = lookup_far(&g_farhlp2, ptr);
         _assert(f.seg || f.off);
-        fp = _MK_F(FarPtr<uint8_t>, f) + F();
+        fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
     }
 };
 
-template<typename T, int max_len, int (*F)(void)>
-class ArMemb : public MembBase<T, F> {
+template<typename T, int max_len, typename P, char (P::*M)[0]>
+class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
 
     using wrp_type = typename WrpType<T>::type;
@@ -540,8 +547,8 @@ public:
     far_s* get_ref() { return &ptr.get_ref(); }
 };
 
-template<typename T, int (*F)(void)>
-class SymMemb : public T, public MembBase<T, F> {
+template<typename T, typename P, char (P::*M)[0], int O = 0>
+class SymMemb : public T, public MembBase<T, P, M, O> {
 public:
     SymMemb() = default;
     SymMemb(const SymMemb&) = delete;
@@ -549,8 +556,8 @@ public:
     FarPtr<T> operator &() const { return this->lookup_sym(); }
 };
 
-template<typename T, int (*F)(void)>
-class SymMemb2 : public MembBase<T, F> {
+template<typename T, typename P, char (P::*M)[0], int O = 0>
+class SymMemb2 : public MembBase<T, P, M, O> {
     T sym;
 
 public:
@@ -579,26 +586,18 @@ public:
 #define __ASMCALL(t, f) AsmCSym<t> f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
+#define DUMMY_MARK(n) char off_##n[0]
 #define AR_MEMB(p, t, n, l) \
-    static int off_##n() { \
-        return offsetof(p, n); \
-    } \
-    ArMemb<t, l, off_##n> n
+    DUMMY_MARK(n); \
+    ArMemb<t, l, p, &p::off_##n> n
 #define SYM_MEMB(p, t, n) \
-    static int off_##n() { \
-        return offsetof(p, n); \
-    } \
-    SymMemb<t, off_##n> n
-#define SYM_MEMB2(c, m, p, t, n) \
-    static int off_##n() { \
-        return offsetof(c, m) + offsetof(p, n); \
-    } \
-    SymMemb<t, off_##n> n
+    DUMMY_MARK(n); \
+    SymMemb<t, p, &p::off_##n> n
+#define SYM_MEMB2(p, m, o, t, n) \
+    SymMemb<t, p, &p::off_##m, o> n
 #define SYM_MEMB_T(p, t, n) \
-    static int off_##n() { \
-        return offsetof(p, n); \
-    } \
-    SymMemb2<t, off_##n> n
+    DUMMY_MARK(n); \
+    SymMemb2<t, p, &p::off_##n> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define _FP_SEG(fp) ((fp)._seg_())
