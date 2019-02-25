@@ -40,6 +40,17 @@ segment	HMA_TEXT
 
                 global  reloc_call_int2f_handler
 reloc_call_int2f_handler:
+                jmp hdlr2f
+                global  _prev_int2f_handler
+_prev_int2f_handler:
+                dd 0
+                dw 0x424B
+                db 0
+                jmp rst2f
+                times 7 db 0
+rst2f:
+                retf
+hdlr2f:
                 sti                             ; Enable interrupts
                 cmp     ah,11h                  ; Network interrupt?
                 jne     Int2f3                  ; No, continue
@@ -119,10 +130,12 @@ Int2f?14:      ;; MUX-14 -- NLSFUNC API
                and BYTE [bp-6], 0feh   ; clear carry as no error condition
                pop bp
                iret
-Int2f?14?1:        or BYTE [bp-6], 1
+Int2f?14?1:
+               or BYTE [bp-6], 1
                pop bp
-Int2f?iret:
                iret
+Int2f?iret:
+               jmp far [cs:_prev_int2f_handler]
 
 ; DRIVER.SYS calls - now only 0803.
 DriverSysCal:
