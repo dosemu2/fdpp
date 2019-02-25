@@ -855,10 +855,9 @@ struct far_s lookup_far_st(const void *ptr)
     return lookup_far(&sym_tab, ptr);
 }
 
-uint32_t thunk_call_void(struct far_s fa)
+void thunk_call_void(struct far_s fa)
 {
-    asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
-    return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
+    asm_call_noret(&s_regs, fa.seg, fa.off, NULL, 0);
 }
 
 void int3(void)

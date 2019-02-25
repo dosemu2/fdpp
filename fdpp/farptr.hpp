@@ -360,27 +360,20 @@ public:
     far_s* get_ref() { return &sym.get_ref(); }
 };
 
-template<typename T>
 class CallSym {
-    FarPtr<T> ptr;
+    FarPtr<void> ptr;
 
 public:
-    CallSym(const FarPtr<T>& f) { ptr = f; }
-    template <typename T1 = T,
-        typename std::enable_if<std::is_void<T1>::value>::type* = nullptr>
-    T1 operator()() { thunk_call_void(ptr.get_far()); }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
-    T1 operator()() { return thunk_call_void(ptr.get_far()); }
+    CallSym(const FarPtr<void>& f) { ptr = f; }
+    void operator()() { thunk_call_void(ptr.get_far()); }
 };
 
-template<typename T>
 class AsmCSym {
-    CallSym<T> sym;
+    CallSym sym;
 
 public:
-    AsmCSym(const FarPtr<T>& f) : sym(f) {}
-    CallSym<T>& operator *() { return sym; }
+    AsmCSym(const FarPtr<void>& f) : sym(f) {}
+    CallSym& operator *() { return sym; }
 };
 
 template<typename T, uint16_t (*SEG)(void)>
@@ -583,7 +576,7 @@ public:
 #define __ASMNEAR(t, s) AsmNearPtr<t, s>
 #define __ASMREF(f) f.get_ref()
 #define __ASMADDR(v) __##v.get_addr()
-#define __ASMCALL(t, f) AsmCSym<t> f
+#define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
 #define DUMMY_MARK(n) char off_##n[0]
