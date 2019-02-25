@@ -121,9 +121,6 @@ VOID ASMCFUNC FreeDOSmain(void)
     drv = (LoL->_BootDrive & ~0x80) + 3; /* HDD */
   LoL->_BootDrive = drv;
 
-  /* install DOS API and other interrupt service routines, basic kernel functionality works */
-  setup_int_vectors();
-
   CheckContinueBootFromHarddisk();
 
   /* display copyright info and kernel emulation status */
@@ -310,6 +307,8 @@ STATIC void init_kernel(void)
   MoveKernel(FP_SEG(lpTop));
   lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
 
+  /* install DOS API and other interrupt service routines, basic kernel functionality works */
+  setup_int_vectors();
   /* Initialize IO subsystem                                      */
   InitIO();
   InitPrinters();
