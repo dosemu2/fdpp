@@ -873,13 +873,18 @@ VOID DoConfig(int nPass)
   /* Check to see if we have a config.sys file.  If not, just     */
   /* exit since we don't force the user to have one (but 1st      */
   /* also process MEMDISK passed config options if present).      */
-  if ((nFileDesc = open("fdppconf.sys", 0)) >= 0)
+  if (LoL->_CfgDrive & 0x80)
   {
-    DebugPrintf(("Reading FDPPCONF.SYS...\n"));
-  }
-  else
-  {
-    DebugPrintf(("FDPPCONF.SYS not found\n"));
+    char buf[] = "c:\\fdppconf.sys";
+    buf[0] += LoL->_CfgDrive & ~0x80;
+    if ((nFileDesc = open(buf, 0)) >= 0)
+    {
+      DebugPrintf(("Reading FDPPCONF.SYS...\n"));
+    }
+    else
+    {
+      DebugPrintf(("FDPPCONF.SYS not found\n"));
+    }
   }
   if (nFileDesc < 0) {
     if ((nFileDesc = open("fdconfig.sys", 0)) >= 0)

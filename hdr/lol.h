@@ -87,7 +87,8 @@ struct lol {
   PTR_MEMB(char) _os_release;  /* 70 near pointer to os_release string    */
   unsigned char _ShellDrive;   /* 72 drive num to start shell from        */
   unsigned char _DeviceDrive;  /* 73 drive num to load DEVICE= from       */
-  unsigned short _InitEnvSeg;  /* 74 initial env seg                      */
+  unsigned char _CfgDrive;     /* 74 drive num to load fdppconf.sys from  */
+  unsigned short _InitEnvSeg;  /* 75 initial env seg                      */
 #ifdef WIN31SUPPORT
   unsigned short winInstanced; /* WinInit called                          */
   unsigned long  winStartupInfo[4];
