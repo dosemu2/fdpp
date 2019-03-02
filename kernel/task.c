@@ -813,13 +813,19 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   COUNT rd;
   exec_blk exb;
   WORD err;
-  BYTE retried = 0;
+  BYTE off = 0;
   UBYTE mode = Config->cfgP_0_startmode;
 
   /* build exec block and save all parameters here as init part will vanish! */
   exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
   exb.exec.env_seg = DOS_PSP + 8;
-  fstrcpy(Shell, _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInit));
+  if ((LoL->_ShellDrive & 0x80) && Config->cfgInit[1] != ':')
+  {
+    memcpy(Shell, "C:\\", 3);
+    Shell[0] += LoL->_ShellDrive & ~0x80;
+    off = 3;
+  }
+  fstrcpy(Shell + off, _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInit));
   /* join name and tail */
   fstrcpy(Shell + strlen(Shell), _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInitTail));
   endp =  Shell + strlen(Shell);
@@ -839,29 +845,13 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     /* ctCount: just past '\0' do not count the "\r\n" */
     exb.exec.cmd_line = MK_FAR_STR_OBJ(&exb, tailp + 1);
     exb.exec.cmd_line->ctCount = endp - tailp - 2;
-#ifdef DEBUG
-    _printf("Process 0 starting: %s%s\n\n", GET_PTR(Shell), tailp + 2);
-#endif
+    _printf("Process 0 starting: %s%s", GET_PTR(Shell), tailp + 2);
     err = res_DosExec(mode, &exb, Shell);
     if (!err)
     {
       _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
       read_char_stdin(1);
       fdexit(0);
-    }
-    if (!retried && (default_drive > 2 || LoL->_ShellDrive) &&
-        fstrlen(Shell) > 3 && Shell[1] != ':')
-    {
-      retried++;
-      memmove(tailp, tailp + 2, strlen(tailp + 2) + 1);
-      fmemmove(Shell + 3, Shell, fstrlen(Shell) + 1);
-      memcpy(Shell, "c:\\", 3);
-      if (LoL->_ShellDrive & 0x80)
-        Shell[0] += LoL->_ShellDrive & ~0x80;
-      endp = Shell + fstrlen(Shell);
-      put_string("Starting shell: ");
-      put_string(Shell);
-      continue;
     }
     put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
     put_string(Shell);
