@@ -252,7 +252,7 @@ STATIC VOID FAR * AlignParagraph(VOID FAR * lpPtr);
 
 #define _EOF 0x1a
 
-STATIC struct table * LookUp(struct table *p, char * token);
+STATIC struct table * LookUp(struct table *p, const char * token);
 
 typedef void config_sys_func_t(char * pLine);
 
@@ -301,12 +301,12 @@ DATAAIS(struct table, commands, {
   {"VERSION", 1, sysVersion},     /* JPP */
   {"ANYDOS", 1, SetAnyDos},       /* tom */
   {"IDLEHALT", 1, SetIdleHalt},   /* ea  */
+  {"CHAIN", 1, CmdChain},
 
   {"DEVICE", 2, Device},
   {"DEVICEHIGH", 2, DeviceHigh},
   {"INSTALL", 2, CmdInstall},
   {"INSTALLHIGH", 2, CmdInstallHigh},
-  {"CHAIN", 2, CmdChain},
   {"SET", 2, CmdSet},
 
   /* default action                                               */
@@ -1001,6 +1001,11 @@ VOID DoConfig(int nPass)
       bEof = FALSE;
       nFileDesc = cfg->nFileDesc;
       nCfgLine = cfg->nCfgLine;
+      if (!nCurChain)
+      {
+        pEntry = LookUp(commands, "CHAIN");
+        pEntry->pass++;  /* schedule for next pass */
+      }
       continue;
     }
 
@@ -1070,7 +1075,7 @@ VOID DoConfig(int nPass)
   }
 }
 
-STATIC struct table * LookUp(struct table *p, char * token)
+STATIC struct table * LookUp(struct table *p, const char * token)
 {
   while (p->entry[0] != '\0' && !strcaseequal(p->entry, token))
     ++p;
