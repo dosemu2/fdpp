@@ -823,7 +823,6 @@ copy_char:
 
 #endif
 
-
 VOID DoConfig(int nPass)
 {
   char *pLine;
@@ -1045,6 +1044,20 @@ VOID DoConfig(int nPass)
     }
     if ('=' == *pLine || pEntry->func == CfgMenu || pEntry->func == CfgMenuEsc)
       pLine = skipwh(pLine+1);
+    if ('@' == *pLine)
+    {
+      char sfn[13];
+      pLine++;
+      GetStringArg(pLine, szBuf);
+      if (!*szBuf || strlen(szBuf) > 12)
+      {
+        CfgFailure(pLine);
+        continue;
+      }
+      strcpy(sfn, szBuf);
+      if (!exists(sfn))
+        continue;
+    }
 
     /* YES. DO IT */
     pEntry->func(pLine);

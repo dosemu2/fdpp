@@ -193,6 +193,26 @@ KEYCHECK:
         int 16h
         ret
 
+;; int exists(const char *pathname);
+    global INIT_EXISTS
+INIT_EXISTS:
+        pop bx         ; ret address
+        pop si         ; pathname
+        push bx        ; ret address
+        mov ax, 6c00h
+        mov bx, 0
+        mov cx, 0
+        mov dx, 0
+        int 21h
+        cmp ax, 50h
+        je file_exists
+        xor ax, ax
+exists_ret:
+        ret
+file_exists:
+        mov ax, 1
+        jmp exists_ret
+
 ;; int open(const char *pathname, int flags);
     global INIT_DOSOPEN
 INIT_DOSOPEN:

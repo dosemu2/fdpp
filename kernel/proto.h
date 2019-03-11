@@ -500,6 +500,7 @@ UWORD ASMPASCAL init_call_intr(WORD nr, iregs * rp);
 UWORD ASMPASCAL call_intr(WORD nr, iregs * rp);
 UWORD ASMPASCAL read(WORD fd, void *buf, UWORD count);
 WORD ASMPASCAL init_DosOpen(const char *pathname, WORD flags);
+WORD ASMPASCAL init_exists(const char *pathname);
 WORD ASMPASCAL close(WORD fd);
 WORD ASMPASCAL dup2(WORD oldfd, WORD newfd);
 ULONG ASMPASCAL lseek(WORD fd, DWORD position);
