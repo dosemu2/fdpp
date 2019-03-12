@@ -72,6 +72,7 @@ __segment DosTextSeg = 0;
 #endif
 
 ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
+struct _bprm *bprm;
 
 VOID ASMCFUNC FreeDOSmain(void)
 {
@@ -120,6 +121,10 @@ VOID ASMCFUNC FreeDOSmain(void)
   if (drv >= 0x80)
     drv = (LoL->_BootDrive & ~0x80) + 3; /* HDD */
   LoL->_BootDrive = drv;
+
+  if (LoL->_BootParamVer != BPRM_VER)
+    fpanic("Wrong boot param version %i, need %i", LoL->_BootParamVer, BPRM_VER);
+  bprm = MK_FP(LoL->_BootParamSeg, 0);
 
   CheckContinueBootFromHarddisk();
 

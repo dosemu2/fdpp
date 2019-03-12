@@ -860,9 +860,9 @@ VOID DoConfig(int nPass)
     }
 #endif
 
-    if (LoL->_InitEnvSeg)
+    if (bprm->InitEnvSeg)
     {
-      char *p = MK_FP(LoL->_InitEnvSeg, 0);
+      char *p = MK_FP(bprm->InitEnvSeg, 0);
       while (p && *p)
         p = AddEnv(p);
     }
@@ -872,10 +872,10 @@ VOID DoConfig(int nPass)
   /* Check to see if we have a config.sys file.  If not, just     */
   /* exit since we don't force the user to have one (but 1st      */
   /* also process MEMDISK passed config options if present).      */
-  if (LoL->_CfgDrive & 0x80)
+  if (bprm->CfgDrive & 0x80)
   {
     char buf[] = "c:\\fdppconf.sys";
-    buf[0] += LoL->_CfgDrive & ~0x80;
+    buf[0] += bprm->CfgDrive & ~0x80;
     if ((nFileDesc = open(buf, 0)) >= 0)
     {
       DebugPrintf(("Reading FDPPCONF.SYS...\n"));
@@ -1872,8 +1872,8 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
   if (pLine[1] != ':')
   {
     strcpy(szBuf, "C:\\");
-    if (LoL->_DeviceDrive & 0x80)
-        szBuf[0] += LoL->_DeviceDrive & ~0x80;
+    if (bprm->DeviceDrive & 0x80)
+        szBuf[0] += bprm->DeviceDrive & ~0x80;
     off = 3;
   }
   /* Get the device driver name                                   */

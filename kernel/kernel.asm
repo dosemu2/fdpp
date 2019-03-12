@@ -200,10 +200,8 @@ cont:           ; Now set up call frame
                 pop ax
 
                 mov     byte [_BootDrive],bl ; tell where we came from
-                mov     byte [_ShellDrive],bh ; command.com drive
-                mov     byte [_DeviceDrive],al ; DEVICE= drive
-                mov     byte [_CfgDrive],ah ; fdppconf.sys drive
-                mov     word [_InitEnvSeg],gs ; env seg
+                mov     word [_BootParamSeg],ax ; bprm seg
+                mov     byte [_BootParamVer],bh ; bprm version
 
 ;!!             int     11h
 ;!!             mov     cl,6
@@ -479,14 +477,10 @@ _version_flags  db      0
                 extern  _os_release
 os_release      dw      _os_release
 
-                global  _ShellDrive
-_ShellDrive     db      0
-                global  _DeviceDrive
-_DeviceDrive    db      0
-                global  _CfgDrive
-_CfgDrive       db      0
-                global  _InitEnvSeg
-_InitEnvSeg     dw      0
+                global  _BootParamSeg
+_BootParamSeg   dw      0
+                global  _BootParamVer
+_BootParamVer   db      0
 
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced

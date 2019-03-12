@@ -187,6 +187,7 @@ void do_abort(const char *file, int line);
 #define _assert(c) if (!(c)) _fail()
 void panic(const BYTE * s);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
+void fpanic(const BYTE * s, ...) PRINTF(1);
 void cpu_relax(void);
 void fdexit(int rc);
 

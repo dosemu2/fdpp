@@ -59,6 +59,7 @@ static BYTE *Globals_hRcsId =
 #include "xstructs.h"
 #include "kconfig.h"
 #include "lol.h"
+#include "bprm.h"
 #include "nls.h"
 #include "dyn.h"
 #include "glob_fd.h"

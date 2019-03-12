@@ -85,10 +85,8 @@ struct lol {
   unsigned char rev_number;    /* 6e DOS revision#, only 3 bits           */
   unsigned char _version_flags;/* 6f DOS version flags                    */
   PTR_MEMB(char) _os_release;  /* 70 near pointer to os_release string    */
-  unsigned char _ShellDrive;   /* 72 drive num to start shell from        */
-  unsigned char _DeviceDrive;  /* 73 drive num to load DEVICE= from       */
-  unsigned char _CfgDrive;     /* 74 drive num to load fdppconf.sys from  */
-  unsigned short _InitEnvSeg;  /* 75 initial env seg                      */
+  unsigned short _BootParamSeg;/* 72 initial env seg                      */
+  unsigned char _BootParamVer; /* 74 bprm version                         */
 #ifdef WIN31SUPPORT
   unsigned short winInstanced; /* WinInit called                          */
   unsigned long  winStartupInfo[4];
