@@ -1462,6 +1462,9 @@ STATIC VOID CfgSwitches(char * pLine)
       case 'N':
         InitKernelConfig.SkipConfigSeconds = -1;
         break;
+      case 'Y':
+        singleStep = 1;
+        break;
       case 'F':
         InitKernelConfig.SkipConfigSeconds = 0;
         break;
