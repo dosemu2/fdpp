@@ -209,6 +209,7 @@ install: $(FDPPLIB) fdpp.pc
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
 	install -D -t $(DESTDIR)$(PKGCONFIGDIR) -m 0644 fdpp.pc
 	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(srcdir)/thunks.h
+	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(HDR)bprm.h
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
 $(TGZ): fdpp.spec

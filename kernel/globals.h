@@ -300,3 +300,5 @@ extern BYTE ReturnAnyDosVersionExpected;
  * 3) merge_file_changes (for SHARE)
  */
 GLOBAL struct f_node fnode[2];
+
+extern struct _bprm *bprm;
