@@ -50,10 +50,10 @@ _prev_int2f_handler:
                 times 7 db 0
 rst2f:
                 retf
-hdlr2f:
-                sti                             ; Enable interrupts
-                cmp     ah,11h                  ; Network interrupt?
-                jne     Int2f3                  ; No, continue
+;hdlr2f:
+;                sti                             ; Enable interrupts
+;                cmp     ah,11h                  ; Network interrupt?
+;                jne     Int2f3                  ; No, continue
 Int2f1:
                 or      al,al                   ; Installation check?
                 jz      FarTabRetn              ; yes, just return
@@ -84,10 +84,11 @@ WinIdle:					; only HLT if at haltlevel 2+
 		mov	al,0			; even admit we HLTed ;-)
 		jmp	short FarTabRetn
 
+hdlr2f:
 Int2f3:         cmp     ax,1680h                ; Win "release time slice"
                 je      WinIdle
-                cmp     ah,16h
-                je      FarTabRetn              ; other Win Hook return fast
+;                cmp     ah,16h
+;                je      FarTabRetn              ; other Win Hook return fast
                 cmp     ah,12h
                 je      IntDosCal               ; Dos Internal calls
 
