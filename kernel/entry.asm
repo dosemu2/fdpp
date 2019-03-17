@@ -236,6 +236,17 @@ reloc_call_int20_handler:
 ;       int21_handler(iregs UserRegs)
 ;
 reloc_call_int21_handler:
+                jmp hdlr21
+                global  _prev_int21_handler
+_prev_int21_handler:
+                dd 0
+                dw 0x424B
+                db 0
+                jmp rst21
+                times 7 db 0
+rst21:
+                retf
+hdlr21:
                 ;
                 ; Create the stack frame for C call.  This is done to
                 ; preserve machine state and provide a C structure for

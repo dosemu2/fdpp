@@ -719,6 +719,19 @@ r f(t1 a1, t2 a2) \
     return do_asm_call(n, (UBYTE *)&_args, sizeof(_args), z); \
 }
 
+#define _THUNK_P_2_v(n, f, t1, at1, aat1, c1, l1, t2, at2, aat2, c2, l2, z) \
+void f(t1 a1, t2 a2) \
+{ \
+    _CNV(c1, at1, l1, 1); \
+    _CNV(c2, at2, l2, 2); \
+    struct { \
+	aat2 a2; \
+	aat1 a1; \
+    } PACKED _args = { _a2, _a1 }; \
+    _assert(n < asm_tab_len); \
+    do_asm_call(n, (UBYTE *)&_args, sizeof(_args), z); \
+}
+
 #define _THUNK_P_3(n, r, f, t1, at1, aat1, c1, l1, t2, at2, aat2, \
     c2, l2, t3, at3, aat3, c3, l3, z) \
 r f(t1 a1, t2 a2, t3 a3) \
@@ -856,6 +869,11 @@ struct far_s lookup_far_st(const void *ptr)
 }
 
 void thunk_call_void(struct far_s fa)
+{
+    asm_call(&s_regs, fa.seg, fa.off, NULL, 0);
+}
+
+void thunk_call_void_noret(struct far_s fa)
 {
     asm_call_noret(&s_regs, fa.seg, fa.off, NULL, 0);
 }

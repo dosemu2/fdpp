@@ -606,10 +606,21 @@ dispatch:
       break;
 
     default:
+    {
+      UWORD flg = r->flags;
 #ifdef DEBUG
       _printf("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL);
 #endif
-      /* Fall through. */
+      r->flags |= FLG_CARRY;
+      call_intr_func(prev_int21_handler, r);
+      if (r->flags & FLG_CARRY)
+      {
+        /* carry still set - unhandled */
+        r->flags = flg;
+        lr.AL = 0;
+      }
+      break;
+    }
 
       /* CP/M compatibility functions                                 */
     case 0x18:
@@ -1522,11 +1533,6 @@ dispatch:
       /* case 0x6d and above not implemented : see default; return AL=0 */
 
 #ifdef WITHFAT32
-      /* LFN functions - fail with "function not supported" error code */
-    case 0x71:
-      lr.AL = 00;
-      goto error_carry;
-
       /* DOS 7.0+ FAT32 extended functions */
     case 0x73:
       CLEAR_CARRY_FLAG();

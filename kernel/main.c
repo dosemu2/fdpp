@@ -278,6 +278,11 @@ STATIC void setup_int_vectors(void)
   for (plvec = intvec_table; plvec < intvec_table + 5; plvec++)
     plvec->isv = getvec(plvec->intno);
 
+  old_vec = getvec(0x21);
+  if (old_vec)
+    prev_int21_handler = old_vec;
+  else
+    prev_int21_handler = empty_handler;
   old_vec = getvec(0x2f);
   if (old_vec)
     prev_int2f_handler = old_vec;

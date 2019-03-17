@@ -134,6 +134,57 @@ no_read_error:
 CALL_INTR:
 		INTR
 
+;
+;       void call_func(ptr, rp)
+;       void FAR *ptr
+;       REG struct REGPACK *rp
+;
+		global	CALL_INTR_FUNC
+CALL_INTR_FUNC:
+                push    bp                      ; Standard C entry
+                mov     bp,sp
+
+                push	ds
+
+		mov	bx, [bp+4]		; regpack structure
+		mov	ax, [bx]
+		mov	cx, [bx+4]
+		mov	dx, [bx+6]
+		mov	si, [bx+8]
+		mov	di, [bx+10]
+;		mov	bp, [bx+12]
+		push	word [bx+14]		; ds
+		mov	es, [bx+16]
+		push	word [bx+22]		; flags
+		popf
+		mov	bx, [bx+2]
+		pop	ds
+		pushf
+		call	far [ss:bp+6]
+
+		pushf
+		push	ds
+		push	bx
+		mov	bx, sp
+		mov	ds, [ss:bx+6]		; peek saved ds
+		mov	bx, [ss:bp+4]		; address of REGPACK
+		mov	[bx], ax
+		pop	word [bx+2]		; bx
+		mov	[bx+4], cx
+		mov	[bx+6], dx
+		mov	[bx+8], si
+		mov	[bx+10], di
+		mov	[bx+12], bp
+		pop	word [bx+14]		; ds
+		mov	[bx+16], es
+		pop	word [bx+22]		; flags
+
+		pop	ds
+
+		pop	bp
+		ret     6
+
+
 segment	INIT_TEXT
 ;
 ;       void init_call_intr(nr, rp)

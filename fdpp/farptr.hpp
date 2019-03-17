@@ -361,19 +361,20 @@ public:
 };
 
 class CallSym {
-    FarPtr<void> ptr;
+    FarPtrBase<void> ptr;
 
 public:
-    CallSym(const FarPtr<void>& f) { ptr = f; }
-    void operator()() { thunk_call_void(ptr.get_far()); }
+    CallSym(const FarPtrBase<void>& f) { ptr = f; }
+    void operator()() { thunk_call_void_noret(ptr.get_far()); }
 };
 
 class AsmCSym {
-    CallSym sym;
+    FarPtrBase<void> ptr;
 
 public:
-    AsmCSym(const FarPtr<void>& f) : sym(f) {}
-    CallSym& operator *() { return sym; }
+    AsmCSym(const FarPtrBase<void>& f) : ptr(f) {}
+    CallSym operator *() { return CallSym(ptr); }
+    void operator()() { thunk_call_void(ptr.get_far()); }
 };
 
 template<typename T, uint16_t (*SEG)(void)>
