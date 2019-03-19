@@ -43,7 +43,7 @@ public:
     virtual void init() { *ptr = holder; }
 };
 
-template <typename T, int L>
+template <typename T, int L = 1>
 class ctor_a : public ctor_base {
     T *ptr;
 public:
@@ -60,14 +60,6 @@ public:
     virtual void init() { std::memcpy(ptr, holder, sizeof(T) * L); }
 };
 
-template <typename T>
-class ctor_z : public ctor_base {
-    T *ptr;
-public:
-    ctor_z(T *p) : ptr(p) {}
-    virtual void init() { std::memset(ptr, 0, sizeof(T)); }
-};
-
 class ctor_log : public ctor_base {
     const char *msg;
 public:
@@ -82,6 +74,6 @@ public:
     static const t _##n[] = __VA_ARGS__; \
     s t n[_countof(_##n)]; \
     static ctor_ai<t,_countof(_##n)> _ctor_##n(n, _##n)
-#define CTORZ(t, n) t n; static ctor_z<t> _ctor_##n(&n)
+#define CTORZ(t, n) t n; static ctor_a<t> _ctor_##n(&n)
 
 #endif
