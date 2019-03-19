@@ -451,7 +451,6 @@ public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
 
-    ArMemb(const T s[]) { strncpy(sym, s, max_len); }
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
     operator FarPtr<void> () { return this->lookup_sym(); }
