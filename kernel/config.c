@@ -154,8 +154,9 @@ STATIC BSS(seg, umb_base_seg, 0);
 BYTE FAR *lpTop;
 STATIC BSS(unsigned, nCfgLine, 0);
 BSS(COUNT, UmbState, 0);
-STATIC BSSA(BYTE, szLine, 256);
-STATIC BSSA(BYTE, szBuf, 256);
+STATIC BSSA(char, szLine, 256);
+STATIC BSSA(char, szBuf, 256);
+STATIC BSSAP(char, cfgStrings, 10);
 
 #define MAX_CHAINS 5
 struct CfgFile {
@@ -863,8 +864,17 @@ VOID DoConfig(int nPass)
     if (bprm->InitEnvSeg)
     {
       char *p = MK_FP(bprm->InitEnvSeg, 0);
-      while (p && *p)
-        p = AddEnv(p);
+      while (p && *p) {
+        if (p[0] == '#' && isnum(p[1]) && p[2] == ' ')
+        {
+          cfgStrings[p[1] - '0'] = strdup(p + 3);
+          p += strlen(p) + 1;
+        }
+        else
+        {
+          p = AddEnv(p);
+        }
+      }
     }
   }
 
@@ -1024,6 +1034,47 @@ VOID DoConfig(int nPass)
 	/* should config command be executed on this pass? */
     if (pEntry->pass >= 0 && pEntry->pass != nPass)
       continue;
+
+    if ('#' == pLine[1])
+    {
+      char *p;
+      pLine++;
+      if (!isnum(pLine[1]) || isnum(pLine[2]))
+      {
+        CfgFailure(pLine);
+        continue;
+      }
+      p = cfgStrings[pLine[1] - '0'];
+      if (!p)
+        continue;
+      if (!*p)
+      {
+        CfgFailure(pLine);
+        continue;
+      }
+      if (*p == ':')
+      {
+        char *p1;
+        int ok;
+        p++;
+        p1 = p + strlen(szBuf);
+        if (*p1 != '=')
+        {
+          CfgFailure(pLine);
+          continue;
+        }
+        *p1 = '\0';
+        ok = strcaseequal(p, szBuf);
+        *p1 = '=';
+        if (!ok)
+        {
+          CfgFailure(pLine);
+          continue;
+        }
+        p = p1;
+      }
+      pLine = p;
+    }
 
 	/* pass 0 always executed (rem Menu prompt switches) */
     if (nPass == 0)
@@ -1947,8 +1998,13 @@ STATIC VOID CfgFailure(char * pLine)
   }
   _printf("CONFIG.SYS error in line %d\n", nCfgLine);
   _printf(">>>%s\n   ", pTmp);
-  while (++pTmp != pLine)
+  while (*pTmp)
+  {
+    if (strcmp(pTmp, pLine) == 0)
+      break;
     _printf(" ");
+    pTmp++;
+  }
   _printf("^\n");
 }
 

@@ -249,6 +249,7 @@ void PurgeHook(void *ptr, UDWORD len);
 #define FP_FROM_D(t, l) (__FAR(t))MK_FP((UWORD)((l) >> 16), (UWORD)((l) & 0xffff))
 #define BSS(t, n, i) CTOR(t, n, i)
 #define BSSA(t, n, l) CTORA(t, n, l)
+#define BSSAP(t, n, l) CTORAP(t*, n, l)
 #define BSSZ(t, n) CTORZ(t, n)
 #define DATA(t, n, i) CTOR(t, n, i)
 #define DATAAIS(t, n, ...) CTORAI(static, t, n, __VA_ARGS__)

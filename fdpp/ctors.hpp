@@ -51,6 +51,19 @@ public:
     virtual void init() { std::memset(ptr, 0, sizeof(T) * L); }
 };
 
+template <typename T, int L = 1>
+class ctor_ap : public ctor_base {
+    T *ptr;
+public:
+    ctor_ap(T *p) : ptr(p) {}
+    virtual void init() {
+        for (int i = 0; i < L; i++) {
+            std::free(ptr[i]);
+            ptr[i] = NULL;
+        }
+    }
+};
+
 template <typename T, int L>
 class ctor_ai : public ctor_base {
     T *ptr;
@@ -69,6 +82,7 @@ public:
 
 #define CTOR(t, n, i) t n; static ctor<t> _ctor_##n(&n, i)
 #define CTORA(t, n, l) t n[l]; static ctor_a<t,l> _ctor_##n(n)
+#define CTORAP(t, n, l) t n[l]; static ctor_ap<t,l> _ctor_##n(n)
 #define _countof(array) (sizeof(array) / sizeof(array[0]))
 #define CTORAI(s, t, n, ...) \
     static const t _##n[] = __VA_ARGS__; \
