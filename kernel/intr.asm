@@ -135,9 +135,9 @@ CALL_INTR:
 		INTR
 
 ;
-;       void call_func(ptr, rp)
+;       void ASMPASCAL call_intr_func(ptr, rp)
 ;       void FAR *ptr
-;       REG struct REGPACK *rp
+;       struct REGPACK *rp
 ;
 		global	CALL_INTR_FUNC
 CALL_INTR_FUNC:
@@ -160,7 +160,7 @@ CALL_INTR_FUNC:
 		mov	bx, [bx+2]
 		pop	ds
 		pushf
-		call	far [ss:bp+6]
+		call	far [bp+6]
 
 		pushf
 		push	ds
