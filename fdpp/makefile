@@ -175,7 +175,10 @@ plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@
 
-cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(srcdir)/makefile
+GIT_REV := $(shell $(srcdir)/git-rev.sh)
+.LOW_RESOLUTION_TIME: $(GIT_REV)
+
+cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
 	cpp -P -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]" $< | sed 's/" "//g' >$@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
