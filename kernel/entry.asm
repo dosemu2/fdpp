@@ -284,7 +284,17 @@ int21_reentry:
                 cmp     ah,51h
                 je      int21_user
                 cmp     ah,62h
-                jne     int21_1
+                je      int21_user
+                cmp     byte [_InDOS],0
+                je      int21_1
+
+int21_reent:
+                push    ss
+                push    bp
+                call    _int21_service
+                pop     cx
+                pop     cx
+                jmp     short int21_ret
 
 int21_user:
                 call    dos_crit_sect
