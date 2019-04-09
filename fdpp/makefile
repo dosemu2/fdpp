@@ -19,8 +19,12 @@ TAR = $(PKG).tar
 TGZ = $(TAR).gz
 GEN_EXT = fdpp.pc fdpp.spec
 
+GIT_REV := $(shell $(srcdir)/git-rev.sh)
+.LOW_RESOLUTION_TIME: $(GIT_REV)
+
 CPPFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
-    -DKRNL_NAME=$(TARGET).sys
+    -DKRNL_NAME=$(TARGET).sys \
+    -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]"
 NASMFLAGS += -i$(SRC)
 
 # *List Macros*
@@ -139,7 +143,8 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS)
 	$(CLC) $(CLCFLAGS) -o $@ $<
 
-$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(GEN_HEADERS)
+$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(GEN_HEADERS) $(GIT_REV) \
+    $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
@@ -175,11 +180,8 @@ plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@
 
-GIT_REV := $(shell $(srcdir)/git-rev.sh)
-.LOW_RESOLUTION_TIME: $(GIT_REV)
-
 cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
-	cpp -P -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]" $< | sed 's/" "//g' >$@
+	cpp -P $(CPPFLAGS) $< | sed 's/" "/","/g' >$@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)

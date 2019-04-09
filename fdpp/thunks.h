@@ -23,7 +23,7 @@
 #include <stdarg.h>
 #include <setjmp.h>
 
-#define FDPP_API_VER 12
+#define FDPP_API_VER 13
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,6 +52,7 @@ int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 
 const char *FdppDataDir(void);
 const char *FdppKernelName(void);
+const char *FdppVersionString(void);
 
 #ifdef __cplusplus
 }

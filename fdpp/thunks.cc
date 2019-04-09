@@ -967,3 +967,8 @@ const char *FdppKernelName(void)
 {
     return _S(KRNL_NAME);
 }
+
+const char *FdppVersionString(void)
+{
+    return KERNEL_VERSION_STRING;
+}
