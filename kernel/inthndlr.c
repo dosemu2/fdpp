@@ -613,12 +613,11 @@ dispatch:
 #endif
       r->flags |= FLG_CARRY;
       call_intr_func(prev_int21_handler, r);
-      if (r->flags & FLG_CARRY)
-      {
-        /* carry still set - unhandled */
-        r->flags = flg;
-        lr.AL = 0;
-      }
+      if (!(r->flags & FLG_CARRY))
+        goto real_exit;
+      /* carry still set - unhandled */
+      r->flags = flg;
+      lr.AL = 0;
       break;
     }
 
