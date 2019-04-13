@@ -270,12 +270,6 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FP_FROM_D(t, __d); \
 })
 
-#ifdef DEBUG
-#define _logprintf(...) fdlogprintf(__VA_ARGS__)
-#else
-#define _logprintf(...)
-#endif
-
 static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
     UDWORD ret = 0;
@@ -285,14 +279,14 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 #define _RSZ rsz
 #define _SP sp
 #define _DISPATCH(r, f, ...) { \
-    _logprintf("dispatch " #f "\n"); \
+    fdlogprintf("dispatch " #f "\n"); \
     r fdpp_dispatch(f, __VA_ARGS__); \
-    _logprintf("dispatch " #f " done, %i\n", recur_cnt); \
+    fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 #define _DISPATCH_v(r, f) { \
-    _logprintf("dispatch " #f "\n"); \
+    fdlogprintf("dispatch " #f "\n"); \
     r fdpp_dispatch(f); \
-    _logprintf("dispatch " #f " done, %i\n", recur_cnt); \
+    fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 
     switch (fn) {
@@ -333,7 +327,7 @@ static void _FdppCall(struct vm86_regs *regs)
     case DOS_SUBHELPER_DL_CCALL:
         noret_jmp = &jmp;
         if (setjmp(jmp)) {
-            _logprintf("noret jump, %i\n", recur_cnt); \
+            fdlogprintf("noret jump, %i\n", recur_cnt); \
             break;
         }
         res = FdppThunkCall(LO_WORD(regs->ecx),
