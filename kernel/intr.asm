@@ -166,15 +166,15 @@ CALL_INTR_FUNC:
 		push	ds
 		push	bx
 		mov	bx, sp
-		mov	ds, [ss:bx+6]		; peek saved ds
-		mov	bx, [ss:bp+4]		; address of REGPACK
+		mov	ds, [bp-2]		; peek saved ds
+		mov	bx, [bp+4]		; address of REGPACK
 		mov	[bx], ax
 		pop	word [bx+2]		; bx
 		mov	[bx+4], cx
 		mov	[bx+6], dx
 		mov	[bx+8], si
 		mov	[bx+10], di
-		mov	[bx+12], bp
+;		mov	[bx+12], bp
 		pop	word [bx+14]		; ds
 		mov	[bx+16], es
 		pop	word [bx+22]		; flags
