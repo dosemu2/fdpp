@@ -24,6 +24,7 @@
 #include "proto.h"
 
 #include "dispatch.hpp"
+#include "objtrace.hpp"
 #include "thunks_priv.h"
 #include "thunks.h"
 
@@ -280,12 +281,16 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 #define _SP sp
 #define _DISPATCH(r, f, ...) { \
     fdlogprintf("dispatch " #f "\n"); \
+    objtrace_enter(); \
     r fdpp_dispatch(f, __VA_ARGS__); \
+    objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 #define _DISPATCH_v(r, f) { \
     fdlogprintf("dispatch " #f "\n"); \
+    objtrace_enter(); \
     r fdpp_dispatch(f); \
+    objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 
@@ -327,7 +332,7 @@ static void _FdppCall(struct vm86_regs *regs)
     case DOS_SUBHELPER_DL_CCALL:
         noret_jmp = &jmp;
         if (setjmp(jmp)) {
-            fdlogprintf("noret jump, %i\n", recur_cnt); \
+            fdlogprintf("noret jump, %i\n", recur_cnt);
             break;
         }
         res = FdppThunkCall(LO_WORD(regs->ecx),
@@ -482,6 +487,11 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
     return -1;
 }
 
+static void leave_h()
+{
+    objtrace_leave();
+}
+
 static void asm_call(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
@@ -489,7 +499,7 @@ static void asm_call(struct vm86_regs *regs, uint16_t seg,
     jmp_buf buf;
 
     if (setjmp(buf))
-        fdpp_ljmp(*prev);
+        fdpp_ljmp(*prev, leave_h);
     fdpp->asm_call(regs, seg, off, sp, len, &buf, const_cast<jmp_buf**>(&prev));
 }
 
@@ -497,11 +507,8 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
     fdpp->asm_call_noret(regs, seg, off, sp, len);
-#if 0
-    longjmp(*noret_jmp, 1);
-#else
-    fdpp_ljmp(*noret_jmp);
-#endif
+    objtrace_mark();
+    fdpp_ljmp(*noret_jmp, leave_h);
 }
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)

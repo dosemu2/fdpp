@@ -19,9 +19,8 @@
 #include <cstring>
 #include <unordered_set>
 #include <algorithm>
-//#include "malloca.hpp"
 #include "farptr.hpp"
-//#include "cppstubs.hpp"
+#include "objtrace.hpp"
 #include "dosobj.h"
 #include "objhlp.hpp"
 #include "ctors.hpp"
@@ -86,7 +85,7 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
             return;
         do_cp();
         own_unref();
-        rm_dosobj(this->fobj.get_far());
+        objtrace_gc(this->fobj.get_far());
     }
 
 public:

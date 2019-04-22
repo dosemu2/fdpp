@@ -23,9 +23,14 @@
     try { \
         c; \
     } catch (std::jmp_buf env) { \
+        if (posth) \
+            posth(); \
+        posth = NULL; \
         std::longjmp(env, 1); \
     } \
 } while(0)
+
+static void (*posth)(void);
 
 template<typename T, typename ...args, typename ...Args,
     typename std::enable_if<!std::is_void<T>::value>::type* = nullptr>
@@ -43,7 +48,8 @@ T fdpp_dispatch(T (*func)(args... fa), Args... a)
     LJ_WRAP(func(a...));
 }
 
-static inline void fdpp_ljmp(std::jmp_buf env)
+static inline void fdpp_ljmp(std::jmp_buf env, void (*post)(void))
 {
+    posth = post;
     throw(env);
 }

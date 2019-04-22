@@ -16,25 +16,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DOSOBJ_H
-#define DOSOBJ_H
+#ifndef OBJTRACE_HPP
+#define OBJTRACE_HPP
 
-#include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-void dosobj_init(far_t fa, int size);
-far_t mk_dosobj(const void *data, UWORD len);
-void pr_dosobj(far_t fa, const void *data, UWORD len);
-void cp_dosobj(void *data, far_t fa, UWORD len);
-void rm_dosobj(far_t fa);
-far_t mk_dosobj_st(const void *data, UWORD len);
-void rm_dosobj_st(const void *data);
-
-uint16_t dosobj_seg(void);
-#ifdef __cplusplus
-}
-#endif
+void objtrace_enter();
+void objtrace_leave();
+void objtrace_mark();
+void objtrace_gc(far_t f);
 
 #endif
