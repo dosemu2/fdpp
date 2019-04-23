@@ -18,7 +18,6 @@
 /* purpose: trace dosobjs and defer their destruction */
 
 #include <forward_list>
-#include <vector>
 #include <cassert>
 #include "portab.h"
 #include "dosobj.h"
@@ -26,59 +25,49 @@
 
 struct gc_s {
     int mark = 0;
+    int idx = 0;
     std::forward_list<far_t> list;
 };
 
-static std::vector<gc_s> gc_vec;
-static int gc_idx;
+static gc_s gc;
 
 void objtrace_enter()
 {
-    gc_s *gc;
     int cnt = 0;
 
-    gc_idx++;
-    if (gc_vec.size() < gc_idx)
-        gc_vec.resize(gc_idx);
-    gc = &gc_vec[gc_idx - 1];
-    if (!gc->mark) {
-        assert(gc->list.empty());
+    /* assumption: enter is never called directly after mark */
+    assert(!gc.mark);
+    gc.idx++;
+    if (gc.list.empty())
         return;
-    }
     /* not the right place for this, but... */
-    std::for_each(gc->list.begin(), gc->list.end(), [&] (far_t f) {
+    std::for_each(gc.list.begin(), gc.list.end(), [&] (far_t f) {
         rm_dosobj(f);
         cnt++;
     });
-    gc->list.clear();
-    gc->mark = 0;
+    gc.list.clear();
     if (cnt)
         fdlogprintf("gc'ed %i objects\n", cnt);
 }
 
 void objtrace_leave()
 {
-    assert(gc_idx > 0);
-    gc_idx--;
+    assert(gc.idx > 0);
+    gc.mark = 0;
+    gc.idx--;
 }
 
 void objtrace_mark()
 {
-    gc_s *gc;
-
-    assert(gc_idx > 0);
-    gc = &gc_vec[gc_idx - 1];
-    gc->mark = 1;
+    assert(gc.idx > 0);
+    gc.mark = 1;
 }
 
 void objtrace_gc(far_t f)
 {
-    gc_s *gc;
-
-    assert(gc_idx > 0);
-    gc = &gc_vec[gc_idx - 1];
-    if (gc->mark)
-        gc->list.push_front(f);
+    assert(gc.idx > 0);
+    if (gc.mark)
+        gc.list.push_front(f);
     else
         rm_dosobj(f);
 }
