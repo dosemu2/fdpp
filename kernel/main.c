@@ -530,6 +530,9 @@ STATIC void kernel()
       Config.cfgInitTail = MK_NEAR_OBJ(&Config, Cmd.ctBuffer);
     }
   }
+#if defined(__GNUC__) && defined(DEBUG)
+  dosobj_dump();
+#endif
   call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
 }
 

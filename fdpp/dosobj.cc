@@ -122,3 +122,8 @@ void rm_dosobj_st(const void *data)
         smfree(&pool, ptr);
     }
 }
+
+void dosobj_dump(void)
+{
+    smdump(&pool);
+}

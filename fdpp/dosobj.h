@@ -31,6 +31,7 @@ void cp_dosobj(void *data, far_t fa, UWORD len);
 void rm_dosobj(far_t fa);
 far_t mk_dosobj_st(const void *data, UWORD len);
 void rm_dosobj_st(const void *data);
+void dosobj_dump(void);
 
 uint16_t dosobj_seg(void);
 #ifdef __cplusplus
