@@ -1842,18 +1842,18 @@ STATIC VOID InitPgm(char * pLine)
   static char init[NAMEMAX];
   static char inittail[NAMEMAX];
 
-  Config.cfgInit = MK_NEAR_OBJ(&Config, init);
-  Config.cfgInitTail = MK_NEAR_OBJ(&Config, inittail);
-
   /* Get the string argument that represents the new init pgm     */
-  pLine = GetStringArg(pLine, Config.cfgInit);
+  pLine = GetStringArg(pLine, init);
 
   /* Now take whatever tail is left and add it on as a single     */
   /* string.                                                      */
-  strcpy(Config.cfgInitTail, pLine);
+  strcpy(inittail, pLine);
 
   /* and add a DOS new line just to be safe                       */
-  strcat(Config.cfgInitTail, "\r\n");
+  strcat(inittail, "\r\n");
+
+  Config.cfgInit = MK_NEAR_STR_OBJ(&Config, init);
+  Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, inittail);
 
   Config.cfgP_0_startmode = 0;
 }
