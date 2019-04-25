@@ -1839,8 +1839,10 @@ STATIC VOID InitPgmHigh(char * pLine)
 
 STATIC VOID InitPgm(char * pLine)
 {
-  char init[NAMEMAX];
-  char inittail[NAMEMAX];
+  /* FDPP: we don't need the below "static" any more.
+   * But kept for the source-level compatibility with freedos. */
+  static char init[NAMEMAX];
+  static char inittail[NAMEMAX];
 
   /* Get the string argument that represents the new init pgm     */
   pLine = GetStringArg(pLine, init);
