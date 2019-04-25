@@ -157,6 +157,8 @@ BSS(COUNT, UmbState, 0);
 STATIC BSSA(char, szLine, 256);
 STATIC BSSA(char, szBuf, 256);
 STATIC BSSAP(char, cfgStrings, 10);
+STATIC BSSA(char, cfginit, NAMEMAX);
+STATIC BSSA(char, cfginittail, NAMEMAX);
 
 #define MAX_CHAINS 5
 struct CfgFile {
@@ -364,8 +366,8 @@ void PreConfig(void)
      KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
 
-  Config.cfgInit = MK_NEAR_STR_OBJ(&Config, _cfgInit);
-  Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, _cfgInitTail);
+  strcpy(cfginit, _cfgInit);
+  strcpy(cfginittail, _cfgInitTail);
   config_init_buffers(Config.cfgBuffers);
 
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
@@ -486,6 +488,9 @@ void PostConfig(void)
   }
   DebugPrintf(("Allocation completed: top at 0x%x\n", base_seg));
 
+#if defined(__GNUC__) && defined(DEBUG)
+  dosobj_dump();
+#endif
 }
 
 /* This code must be executed after device drivers has been loaded */
@@ -514,6 +519,9 @@ VOID configDone(VOID)
 
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
+
+  Config.cfgInit = MK_NEAR_STR_OBJ(&Config, cfginit);
+  Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, cfginittail);
 
   /* The standard handles should be reopened here, because
      we may have loaded new console or printer drivers in CONFIG.SYS */
@@ -1839,23 +1847,15 @@ STATIC VOID InitPgmHigh(char * pLine)
 
 STATIC VOID InitPgm(char * pLine)
 {
-  /* FDPP: we don't need the below "static" any more.
-   * But kept for the source-level compatibility with freedos. */
-  static char init[NAMEMAX];
-  static char inittail[NAMEMAX];
-
   /* Get the string argument that represents the new init pgm     */
-  pLine = GetStringArg(pLine, init);
+  pLine = GetStringArg(pLine, cfginit);
 
   /* Now take whatever tail is left and add it on as a single     */
   /* string.                                                      */
-  strcpy(inittail, pLine);
+  strcpy(cfginittail, pLine);
 
   /* and add a DOS new line just to be safe                       */
-  strcat(inittail, "\r\n");
-
-  Config.cfgInit = MK_NEAR_STR_OBJ(&Config, init);
-  Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, inittail);
+  strcat(cfginittail, "\r\n");
 
   Config.cfgP_0_startmode = 0;
 }
