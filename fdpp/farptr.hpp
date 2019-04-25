@@ -159,8 +159,8 @@ template <typename T> class FarObj;
 #define NM __FILE__ ":" _Sx(__LINE__)
 #define _RR(t) typename std::remove_reference<t>::type
 #define _MK_FAR(o) std::make_shared<FarObj<_RR(decltype(o))>>(o, NM)
-#define _MK_FAR_S(o) std::make_shared<FarObj<char>>(o, strlen(o) + 1, NM)
-#define _MK_FAR_CS(o) std::make_shared<FarObj<const char>>(o, strlen(o) + 1, NM)
+#define _MK_FAR_S(o) std::make_shared<FarObj<char>>(o, strlen(o) + 1, false, NM)
+#define _MK_FAR_CS(o) std::make_shared<FarObj<const char>>(o, strlen(o) + 1, true, NM)
 
 template<typename T>
 class FarPtr : public FarPtrBase<T>

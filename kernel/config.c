@@ -1839,8 +1839,8 @@ STATIC VOID InitPgmHigh(char * pLine)
 
 STATIC VOID InitPgm(char * pLine)
 {
-  static char init[NAMEMAX];
-  static char inittail[NAMEMAX];
+  char init[NAMEMAX];
+  char inittail[NAMEMAX];
 
   /* Get the string argument that represents the new init pgm     */
   pLine = GetStringArg(pLine, init);
