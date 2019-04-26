@@ -32,7 +32,7 @@
 
 #define FLOPPY_SEC_SIZE 512u  /* common sector size */
 
-#define InitDiskTransferBuffer DiskTransferBuffer
+STATIC BSS(UBYTE FAR *, InitDiskTransferBuffer, NULL);
 BSS(COUNT, nUnits, 0);
 
 /*
@@ -1440,7 +1440,7 @@ COUNT dsk_init()
   }
 #endif
 
-  DiskTransferBuffer = (UBYTE FAR *)DynAlloc("DTB", 1, MAX_SEC_SIZE);
+  InitDiskTransferBuffer = (UBYTE FAR *)DynAlloc("DTB", 1, MAX_SEC_SIZE);
   /* Reset the drives                                             */
   BIOS_drive_reset(0);
 
