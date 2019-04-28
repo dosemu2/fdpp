@@ -20,6 +20,7 @@
 
 #include <unordered_set>
 #include <unordered_map>
+#include <algorithm>
 #include "objhlp.hpp"
 
 static std::unordered_map<const void *, std::unordered_set<ObjRef *> > omap;
@@ -40,20 +41,27 @@ std::unordered_set<ObjRef *> get_owned_list(const void *owner)
     return ret;
 }
 
-static std::unordered_map<const void *, std::unordered_set<sh_ref> > shmap;
+typedef std::unordered_map<const void *, sh_ref> refmap;
+static std::unordered_map<const void *, refmap> shmap;
 
-bool track_owner_sh(const void *owner, sh_ref obj)
+bool track_owner_sh(const void *owner, const void *loc, sh_ref obj)
 {
-    std::unordered_set<sh_ref>& ent = shmap[owner];
-    return ent.insert(obj).second;
+    bool ret;
+    refmap& ent = shmap[owner];
+    ret = (ent.find(loc) == ent.end());
+    ent[loc] = obj;
+    return ret;
 }
 
 std::unordered_set<sh_ref> get_owned_list_sh(const void *owner)
 {
     std::unordered_set<sh_ref> ret;
     if (shmap.find(owner) != shmap.end()) {
-        ret = shmap[owner];
+        refmap& ent = shmap[owner];
         shmap.erase(owner);
+        std::for_each(ent.begin(), ent.end(), [&] (refmap::value_type ref) {
+            ret.insert(ref.second);
+        });
     }
     return ret;
 }

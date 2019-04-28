@@ -523,8 +523,8 @@ VOID configDone(VOID)
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
 
-  Config.cfgInit = MK_NEAR_STR_OBJ(&Config, cfginit);
-  Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, cfginittail);
+  MK_NEAR_STR_OBJ(Config, cfgInit, cfginit);
+  MK_NEAR_STR_OBJ(Config, cfgInitTail, cfginittail);
 
   /* The standard handles should be reopened here, because
      we may have loaded new console or printer drivers in CONFIG.SYS */
@@ -2817,7 +2817,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   args[*args+2] = 0;
 
   exb.exec.env_seg  = 0;
-  exb.exec.cmd_line = MK_FAR_SZ_OBJ(&exb, args, sizeof(CommandTail));
+  MK_FAR_SZ_OBJ(exb, exec.cmd_line, args, sizeof(CommandTail));
   exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *) 0xfffffffful;
 
 
