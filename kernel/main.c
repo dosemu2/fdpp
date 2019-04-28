@@ -527,7 +527,7 @@ STATIC void kernel()
         }
       }
       /* save buffer -- on the stack it's fine here */
-      Config.cfgInitTail = MK_NEAR_OBJ(&Config, Cmd.ctBuffer);
+      Config.cfgInitTail = MK_NEAR_STR_OBJ(&Config, Cmd.ctBuffer);
     }
   }
 #if defined(__GNUC__) && defined(DEBUG)
