@@ -139,11 +139,6 @@ public:
 #define _RC(t) typename std::remove_const<_R(t)>::type
 
 #define MK_FAR(o) FarPtr<decltype(o)>(_MK_FAR(o))
-#define MK_NEAR_OBJ(p, m, o) do { \
-    std::shared_ptr<FarObj<decltype(o)>> _sh = std::make_shared<FarObj<decltype(o)>>(o, NM); \
-    track_owner_sh(&p, &p.m, _sh); \
-    p.m = _sh->get_near(); \
-} while(0)
 #define MK_NEAR_STR_OBJ(p, m, o) do { \
     std::shared_ptr<FarObj<_R(o)>> _sh = \
         std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1, true, NM); \
