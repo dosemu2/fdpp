@@ -13,7 +13,7 @@
 #define DYN_H
 
 struct DynS {
-  AR_MEMB(DynS, char, Buffer, 2048);
+  AR_MEMB(DynS, char, Buffer, 0);
 };
 
 #endif

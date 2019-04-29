@@ -59,11 +59,11 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
   UNREFERENCED_PARAMETER(what);
 #endif
 
-  if ((ULONG) total + Allocated > sizeof(Dynp->Buffer))
+  if ((ULONG) total + Allocated > DynEnd - Dynp->Buffer)
   {
     char buf[256];
-    _snprintf(buf, sizeof(buf), "Dyn %u of %zu\n",
-        (ULONG) total + Allocated, sizeof(Dynp->Buffer));
+    _snprintf(buf, sizeof(buf), "Dyn %u of %zu, enlarge Dyn size in kernel.asm",
+        (ULONG) total + Allocated, DynEnd - Dynp->Buffer);
     panic(buf);
   }
 
