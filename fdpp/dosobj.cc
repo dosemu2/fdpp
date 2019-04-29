@@ -20,13 +20,11 @@
 #include <stdarg.h>
 #include "portab.h"
 #include "smalloc.h"
-#include "farhlp.hpp"
 #include "thunks_priv.h"
 #include "dosobj.h"
 
 static smpool pool;
 static far_t base;
-static farhlp hlp;
 static int initialized;
 
 static void err_printf(int prio, const char *fmt, ...) PRINTF(2);
@@ -48,7 +46,6 @@ void dosobj_init(far_t fa, int size)
     sminit(&pool, ptr, size);
     smregister_error_notifier(&pool, err_printf);
     base = fa;
-    farhlp_init(&hlp);
     initialized = 1;
 }
 
@@ -94,33 +91,6 @@ void rm_dosobj(far_t fa)
 uint16_t dosobj_seg(void)
 {
     return base.seg;
-}
-
-far_t mk_dosobj_st(const void *data, UWORD len)
-{
-    far_t f;
-    far_t ret;
-
-    _assert(initialized);
-    f = lookup_far_ref(&hlp, data);
-    if (f.seg || f.off)
-        return f;
-    ret = mk_dosobj(data, len);
-    store_far(&hlp, data, ret);
-    return ret;
-}
-
-void rm_dosobj_st(const void *data)
-{
-    void *ptr;
-    int rm;
-    far_t f = lookup_far_unref(&hlp, data, &rm);
-
-    _assert(f.seg || f.off);
-    if (rm) {
-        ptr = resolve_segoff(f);
-        smfree(&pool, ptr);
-    }
 }
 
 void dosobj_dump(void)
