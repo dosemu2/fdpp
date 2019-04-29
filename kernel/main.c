@@ -91,10 +91,10 @@ VOID ASMCFUNC FreeDOSmain(void)
   memset(_ib_start, 0, _ib_end - _ib_start);
 #ifdef __GNUC__
   objhlp_reset();
+  run_ctors();
 #define DOSOBJ_POOL 256
   far_t fa = DynAlloc("dosobj", 1, DOSOBJ_POOL);
   dosobj_init(fa, DOSOBJ_POOL);
-  run_ctors();
 #endif
 
                         /*  if the kernel has been UPX'ed,
