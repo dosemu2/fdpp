@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include <stdarg.h>
+#include <assert.h>
 #include "portab.h"
 #include "smalloc.h"
 #include "thunks_priv.h"
@@ -47,6 +48,18 @@ void dosobj_init(far_t fa, int size)
     smregister_error_notifier(&pool, err_printf);
     base = fa;
     initialized = 1;
+}
+
+void dosobj_reinit(far_t fa, int size)
+{
+    void *ptr = resolve_segoff(fa);
+    int leaked;
+
+    assert(initialized);
+    leaked = smdestroy(&pool);
+    assert(!leaked);
+    sminit(&pool, ptr, size);
+    base = fa;
 }
 
 far_t mk_dosobj(const void *data, UWORD len)

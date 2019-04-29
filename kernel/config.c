@@ -490,10 +490,6 @@ void PostConfig(void)
     DebugPrintf(("Stacks allocated at %P\n", GET_FP32(stackBase)));
   }
   DebugPrintf(("Allocation completed: top at 0x%x\n", base_seg));
-
-#if defined(__GNUC__) && defined(DEBUG)
-  dosobj_dump();
-#endif
 }
 
 /* This code must be executed after device drivers has been loaded */
@@ -522,6 +518,12 @@ VOID configDone(VOID)
 
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
+
+#if defined(__GNUC__)
+#define DOSOBJ_POOL2 256
+  void FAR *fa = KernelAlloc(DOSOBJ_POOL2, 'B', Config.cfgDosDataUmb);
+  dosobj_reinit(GET_FAR(fa), DOSOBJ_POOL2);
+#endif
 
   MK_NEAR_STR_OBJ(Config, cfgInit, cfginit);
   MK_NEAR_STR_OBJ(Config, cfgInitTail, cfginittail);
