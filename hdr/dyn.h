@@ -13,8 +13,7 @@
 #define DYN_H
 
 struct DynS {
-  unsigned Allocated;
-  AR_MEMB(DynS, char, Buffer, 0);
+  AR_MEMB(DynS, char, Buffer, 2048);
 };
 
 #endif

@@ -848,8 +848,7 @@ segment DYN_DATA
 
         global _Dyn
 _Dyn:
-        DynAllocated dw 0
-        times 1024 db 0    ; XXX
+        times 2048 db 0
 
 markEndInstanceData:  ; mark end of DOS data seg we say needs instancing
 

@@ -47,6 +47,7 @@ additionally:
 #else
 extern struct DynS FAR ASM Dyn;
 #endif
+STATIC BSS(unsigned, Allocated, 0);
 
 far_t DynAlloc(const char *what, unsigned num, unsigned size)
 {
@@ -58,24 +59,25 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
   UNREFERENCED_PARAMETER(what);
 #endif
 
-  if ((ULONG) total + Dynp->Allocated > 0xffff)
+  if ((ULONG) total + Allocated > sizeof(Dynp->Buffer))
   {
     char buf[256];
-    _snprintf(buf, sizeof(buf), "Dyn %u\n", (ULONG) total + Dynp->Allocated);
+    _snprintf(buf, sizeof(buf), "Dyn %u of %zu\n",
+        (ULONG) total + Allocated, sizeof(Dynp->Buffer));
     panic(buf);
   }
 
 #if 0
   /* can't do prints here as the subsystems are not yet inited */
   DebugPrintf(("DYNDATA:allocating %s - %u * %u bytes, total %u, %u..%u\n",
-               what, num, size, total, Dynp->Allocated,
-               Dynp->Allocated + total));
+               what, num, size, total, Allocated,
+               Allocated + total));
 #endif
 
-  now = (void FAR *)&Dynp->Buffer[Dynp->Allocated];
+  now = (void FAR *)&Dynp->Buffer[Allocated];
   fmemset(now, 0, total);
 
-  Dynp->Allocated += total;
+  Allocated += total;
 
   return GET_FAR(now);
 }
@@ -83,14 +85,14 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
 void DynFree(void *ptr)
 {
   struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
-  Dynp->Allocated = (char *)ptr - (char *)Dynp->Buffer;
+  Allocated = (char *)ptr - (char *)Dynp->Buffer;
 }
 
 far_t DynLast()
 {
   struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
   DebugPrintf(("dynamic data end at %P\n",
-               GET_FP32(Dynp->Buffer + Dynp->Allocated)));
+               GET_FP32(Dynp->Buffer + Allocated)));
 
-  return GET_FAR(Dynp->Buffer + Dynp->Allocated);
+  return GET_FAR(Dynp->Buffer + Allocated);
 }
