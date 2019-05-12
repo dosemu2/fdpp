@@ -141,6 +141,10 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   DoInstall();
 
+  /* purge INIT_TEXT to make sure its not used by mistake */
+  fmemset(_InitTextStart, 0xcc, _InitTextEnd - _InitTextStart);
+  PurgeHook(_InitTextStart, _InitTextEnd - _InitTextStart);
+
   kernel();
 }
 
@@ -379,10 +383,6 @@ STATIC void init_kernel(void)
   configDone();
 
   InitializeAllBPBs();
-
-  /* purge INIT_TEXT to make sure its not used by mistake */
-  fmemset(_InitTextStart, 0xcc, _InitTextEnd - _InitTextStart);
-  PurgeHook(_InitTextStart, _InitTextEnd - _InitTextStart);
 }
 
 #define safe_open(n, m) \
