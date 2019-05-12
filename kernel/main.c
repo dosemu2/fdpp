@@ -92,7 +92,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 #ifdef __GNUC__
   objhlp_reset();
   run_ctors();
-#define DOSOBJ_POOL 256
+#define DOSOBJ_POOL 512
   far_t fa = DynAlloc("dosobj", 1, DOSOBJ_POOL);
   dosobj_init(fa, DOSOBJ_POOL);
 #endif
