@@ -183,18 +183,6 @@ public:
     FarPtr(uint16_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
 
-    template<typename T1 = T,
-        typename std::enable_if<
-          !std::is_same<T1, char>::value &&
-          !std::is_same<T1, const char>::value
-        >::type* = nullptr>
-    FarPtr(T1 *&p) : FarPtr(_MK_FAR(*p)) {}
-    FarPtr(char *&s) : FarPtr(_MK_FAR_S(s)) {}
-    FarPtr(const char *&s) : FarPtr(_MK_FAR_CS(s)) {}
-    template<typename T1 = T, int N,
-        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
-    FarPtr(T1 (&p)[N]) : FarPtr(_MK_FAR(p)) {}
-
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
@@ -256,6 +244,38 @@ public:
             return NULL;
         return (T*)resolve_segoff(this->ptr);
     }
+};
+
+template<typename T>
+class XFarPtr : public FarPtr<T>
+{
+public:
+
+    using FarPtr<T>::FarPtr;
+    XFarPtr() = delete;
+
+    template<typename T1 = T,
+        typename std::enable_if<
+          !std::is_same<T1, char>::value &&
+          !std::is_same<T1, const char>::value
+        >::type* = nullptr>
+    XFarPtr(T1 *&p) : FarPtr<T>(_MK_FAR(*p)) {}
+    template<typename T1 = T,
+        typename std::enable_if<
+          std::is_same<T1, char>::value ||
+          std::is_same<T1, const char>::value ||
+          std::is_void<T1>::value
+        >::type* = nullptr>
+    XFarPtr(char *&s) : FarPtr<T>(_MK_FAR_S(s)) {}
+    template<typename T1 = T,
+        typename std::enable_if<
+          std::is_same<T1, const char>::value ||
+          std::is_same<T1, const void>::value
+        >::type* = nullptr>
+    XFarPtr(const char *&s) : FarPtr<T>(_MK_FAR_CS(s)) {}
+    template<typename T1 = T, int N,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+    XFarPtr(T1 (&p)[N]) : FarPtr<T>(_MK_FAR(p)) {}
 };
 
 #define _MK_F(f, s) f(s)
@@ -572,6 +592,7 @@ public:
 #define __ASMARISYM(t) AsmArNSym<t>
 #define __ASMARIFSYM(t) AsmArFSym<t>
 #define __FAR(t) FarPtr<t>
+#define __XFAR(t) XFarPtr<t>
 #define __ASMFAR(t) AsmFarPtr<t>
 #define __ASMNEAR(t, s) AsmNearPtr<t, s>
 #define __ASMREF(f) f.get_ref()

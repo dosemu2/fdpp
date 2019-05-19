@@ -159,7 +159,7 @@ sft FAR *get_sft(UCOUNT hndl)
   return idx_to_sft(get_sft_idx(hndl));
 }
 
-long DosRWSft(int sft_idx, size_t n, void FAR * bp, int mode)
+long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
 {
   /* Get the SFT block that contains the SFT      */
   sft FAR *s = idx_to_sft(sft_idx);
@@ -354,7 +354,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
   return (sft FAR *) - 1;
 }
 
-const char FAR *get_root(const char FAR * fname)
+const char FAR *get_root(__XFAR(const char)fname)
 {
   /* find the end                                 */
   REG unsigned length = fstrlen(fname);
@@ -1249,7 +1249,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
    returns device header if match, else returns NULL
    can only match character devices (as only they have names)
  */
-struct dhdr FAR *IsDevice(const char FAR * fname)
+struct dhdr FAR *IsDevice(__XFAR(const char)fname)
 {
   struct dhdr FAR *dhp;
   const char FAR *froot = get_root(fname);

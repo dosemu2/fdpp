@@ -72,12 +72,12 @@ size_t read_line_handle(int sft_idx, size_t n,__FAR(char) bp);
 void write_char(int c, int sft_idx);
 void write_char_stdout(int c);
 void update_scr_pos(unsigned char c, unsigned char count);
-long cooked_write(__DOSFAR(struct dhdr)*pdev, size_t n,__FAR(const char)bp);
+long cooked_write(__DOSFAR(struct dhdr)*pdev, size_t n,__XFAR(const char)bp);
 
 __FAR(sft)get_sft(UCOUNT);
 
 /* dosfns.c */
-__FAR(const char)get_root(__FAR(const char));
+__FAR(const char)get_root(__XFAR(const char));
 BOOL check_break(void);
 UCOUNT GenericReadSft(__FAR(sft) sftp, UCOUNT n,__FAR(void) bp,
                       COUNT * err, BOOL force_binary);
@@ -85,7 +85,7 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode);
 /*COUNT DosRead(COUNT hndl, UCOUNT n,__FAR(BYTE) bp,__FAR(COUNT) err); */
 void BinarySftIO(int sft_idx, void *bp, int mode);
 #define BinaryIO(hndl, bp, mode) BinarySftIO(get_sft_idx(hndl), bp, mode)
-long DosRWSft(int sft_idx, size_t n,__FAR(void) bp, int mode);
+long DosRWSft(int sft_idx, size_t n, __XFAR(void) bp, int mode);
 #define DosRead(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_READ)
 #define DosWrite(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_WRITE)
 ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc);
@@ -112,7 +112,7 @@ COUNT DosDelete(__FAR(const char) path, int attrib);
 COUNT DosRename(__FAR(const char) path1,__FAR(const char) path2);
 COUNT DosRenameTrue(const char * path1, const char * path2, int attrib);
 COUNT DosMkRmdir(__FAR(const char) dir, int action);
-__FAR(struct dhdr)IsDevice(__FAR(const char) FileName);
+__FAR(struct dhdr)IsDevice(__XFAR(const char) FileName);
 BOOL IsShareInstalled(BOOL recheck);
 COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock);
 int idx_to_sft_(int SftIndex);
@@ -258,13 +258,13 @@ COUNT lfn_dir_write(COUNT handle);
 /* nls.c */
 BYTE DosYesNo(UWORD ch);
 #ifndef DosUpMem
-VOID DosUpMem(__FAR(VOID) str, unsigned len);
+VOID DosUpMem(__XFAR(VOID) str, unsigned len);
 #endif
 unsigned char ASMCFUNC SEGM(HMA_TEXT) DosUpChar(unsigned char ch);
 VOID DosUpString(__FAR(char) str);
 VOID DosUpFMem(__FAR(VOID) str, unsigned len);
 unsigned char DosUpFChar(unsigned char ch);
-VOID DosUpFString(__FAR(char) str);
+VOID DosUpFString(__XFAR(char) str);
 COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
                  __FAR(VOID) buf);
 #ifndef DosGetCountryInformation
@@ -384,7 +384,7 @@ VOID InitPSP(VOID);
 /* newstuff.c */
 int SetJFTSize(UWORD nHandles);
 long DosMkTmp(__FAR(char) pathname, UWORD attr);
-COUNT truename(__FAR(const char) src, char * dest, COUNT t);
+COUNT truename(__XFAR(const char) src, char * dest, COUNT t);
 
 /* network.c */
 int network_redirector(unsigned cmd);

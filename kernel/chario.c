@@ -180,7 +180,7 @@ void update_scr_pos(unsigned char c, unsigned char count)
 
 STATIC int raw_get_char(__DOSFAR(struct dhdr) *pdev, BOOL check_break);
 
-long cooked_write(__DOSFAR(struct dhdr) *pdev, size_t n, const char FAR *bp)
+long cooked_write(__DOSFAR(struct dhdr) *pdev, size_t n, __XFAR(const char)bp)
 {
   size_t xfer;
 

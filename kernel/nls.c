@@ -490,7 +490,7 @@ BYTE DosYesNo(UWORD ch)
 }
 
 #ifndef DosUpMem
-VOID DosUpMem(VOID FAR * str, unsigned len)
+VOID DosUpMem(__XFAR(VOID)str, unsigned len)
 {
   xUpMem(nlsInfo.actPkg, str, len);
 }
@@ -541,7 +541,7 @@ unsigned char DosUpFChar(unsigned char ch)
   return ch;
 }
 
-VOID DosUpFString(char FAR * str)
+VOID DosUpFString(__XFAR(char)str)
 /* upcase a string for file names */
 {
   DosUpFMem(str, fstrlen(str));

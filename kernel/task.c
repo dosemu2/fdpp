@@ -240,7 +240,7 @@ void child_psp(seg para, seg cur_psp, int psize)
   p->ps_cmd.ctBuffer[0] = 0xd; /* command tail            */
 }
 
-STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, exec_blk FAR * exb,
+STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, __XFAR(exec_blk)exb,
                       const char FAR * fnam)
 {
   psp FAR *_psp;

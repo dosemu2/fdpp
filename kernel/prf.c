@@ -213,19 +213,6 @@ int _vprintf(CONST char *fmt, va_list arg)
 }
 
 PRINTF(2)
-STATIC int VA_CDECL _fsprintf(char FAR * buff, CONST char * fmt, ...)
-{
-  va_list arg;
-
-  va_start(arg, fmt);
-  charp = buff;
-  do_printf(fmt, arg);
-  va_end(arg);
-  handle_char('\0');
-  return 0;
-}
-
-PRINTF(2)
 int VA_CDECL _sprintf(char * buff, CONST char * fmt, ...)
 {
   va_list arg;
@@ -327,7 +314,7 @@ STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list *_arg)
         {
           UDWORD w0 = va_arg(arg, unsigned);
           char SSFAR *tmp = charp;
-          _fsprintf(s, "%04x:%04x", w0 >> 16, w0 & 0xffff);
+          _sprintf(s, "%04x:%04x", w0 >> 16, w0 & 0xffff);
           p = s;
           charp = tmp;
           break;

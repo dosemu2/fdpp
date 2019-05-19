@@ -1967,7 +1967,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
       {
         struct dhdr FAR *dhp;
 
-        dhp = IsDevice((BYTE FAR *) DirEntBuffer.dir_name);
+        dhp = IsDevice(DirEntBuffer.dir_name);
 
         if (dhp == NULL)
         {

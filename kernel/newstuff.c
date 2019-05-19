@@ -253,7 +253,7 @@ STATIC const char _DirChars[] = "\"[]:|<>+=;,";
   *p++ = c; \
 }
 
-COUNT truename(const char FAR * src, char * dest, COUNT mode)
+COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
 {
   COUNT i;
   struct dhdr FAR *dhp;
