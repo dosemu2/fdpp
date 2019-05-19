@@ -34,7 +34,7 @@ struct fh1 {
     far_t f;
 };
 extern fh1 g_farhlp1;
-extern farhlp g_farhlp2;
+extern fh1 g_farhlp2;
 
 void farhlp_init(farhlp *ctx);
 void store_far(farhlp *ctx, const void *ptr, far_t fptr);

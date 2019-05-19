@@ -27,7 +27,7 @@
  * in farptr.hpp */
 
 fh1 g_farhlp1;
-farhlp g_farhlp2;
+fh1 g_farhlp2;
 
 void farhlp_init(farhlp *ctx)
 {

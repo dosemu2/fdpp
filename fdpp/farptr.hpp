@@ -28,23 +28,38 @@
 #include "thunks_priv.h"
 #include "farhlp.hpp"
 
-static inline far_s _lookup_far(const void *ptr)
+static inline far_s __lookup_far(fh1 *fh, const void *ptr)
 {
-    _assert(ptr == g_farhlp1.ptr);
-    far_s f = g_farhlp1.f;
+    _assert(ptr == fh->ptr);
+    far_s f = fh->f;
     _assert(f.seg || f.off);
     return f;
 }
 
+static inline far_s _lookup_far(const void *ptr)
+{
+    return __lookup_far(&g_farhlp1, ptr);
+}
+
+static inline void __store_far(fh1 *fh, const void *ptr, far_s fptr)
+{
+    fh->ptr = ptr;
+    fh->f = fptr;
+}
+
 static inline void _store_far(const void *ptr, far_s fptr)
 {
-    g_farhlp1.ptr = ptr;
-    g_farhlp1.f = fptr;
+    __store_far(&g_farhlp1, ptr, fptr);
+}
+
+static inline far_s do_lookup_far(const void *ptr)
+{
+    return __lookup_far(&g_farhlp2, ptr);
 }
 
 static inline void do_store_far(far_s fptr)
 {
-    store_far_replace(&g_farhlp2, resolve_segoff(fptr), fptr);
+    __store_far(&g_farhlp2, resolve_segoff(fptr), fptr);
 }
 
 #define _MK_S(s, o) (far_s){o, s}
@@ -455,7 +470,7 @@ protected:
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off)
-            f = lookup_far(&g_farhlp2, ptr);
+            f = do_lookup_far(ptr);
         _assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
