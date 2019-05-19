@@ -35,7 +35,7 @@ static BYTE *dskRcsId =
 
 /* #define STATIC  */
 
-STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
+STATIC int LBA_Transfer(ddt FAR * pddt, UWORD mode, VOID FAR * buffer,
                  ULONG LBA_address, unsigned total, UWORD * transferred);
 
 #define NENTRY          26      /* total size of dispatch table */
@@ -95,7 +95,7 @@ STATIC dsk_proc mediachk, bldbpb, blockio, IoctlQueblk,
     Genblkdev, Getlogdev, Setlogdev, blk_Open, blk_Close,
     blk_Media, blk_noerr, blk_nondr, blk_error;
 
-STATIC WORD getbpb(ddt * pddt);
+STATIC WORD getbpb(ddt FAR * pddt);
 #ifdef PROTO
 STATIC WORD dskerr(COUNT);
 #else
@@ -258,7 +258,7 @@ STATIC WORD mediachk(rqptr rp, ddt FAR * pddt)
 /*
  *  Read Write Sector Zero or Hard Drive Dos Bpb
  */
-STATIC WORD RWzero(ddt * pddt, UWORD mode)
+STATIC WORD RWzero(ddt FAR * pddt, UWORD mode)
 {
   UWORD done;
 
@@ -340,7 +340,7 @@ STATIC WORD blk_Media(rqptr rp, ddt FAR * pddt)
     return S_DONE;              /* Floppy */
 }
 
-STATIC WORD getbpb(ddt * pddt)
+STATIC WORD getbpb(ddt FAR * pddt)
 {
   ULONG count;
   bpb *pbpbarray = &pddt->ddt_bpb;
@@ -491,7 +491,7 @@ STATIC WORD IoctlQueblk(rqptr rp, ddt FAR * pddt)
 }
 
 /* read/write block with CHS based off start of drive's partition */
-STATIC COUNT Genblockio(ddt * pddt, UWORD mode, WORD head, WORD track,
+STATIC COUNT Genblockio(ddt FAR * pddt, UWORD mode, WORD head, WORD track,
                  WORD sector, WORD count, VOID FAR * buffer)
 {
   UWORD transferred;
@@ -504,7 +504,7 @@ STATIC COUNT Genblockio(ddt * pddt, UWORD mode, WORD head, WORD track,
 }
 
 /* read/write block with CHS based off start of disk drive is on */
-STATIC COUNT GenblockioAbs(ddt * pddt, UWORD mode, WORD head, WORD track,
+STATIC COUNT GenblockioAbs(ddt FAR * pddt, UWORD mode, WORD head, WORD track,
                  WORD sector, WORD count, VOID FAR * buffer)
 {
   UWORD transferred;
@@ -874,7 +874,7 @@ STATIC WORD dskerr(COUNT code)
     translate LBA sectors into CHS addressing
 */
 
-STATIC int LBA_to_CHS(ULONG LBA_address, struct CHS *chs, const ddt * pddt,
+STATIC int LBA_to_CHS(ULONG LBA_address, struct CHS *chs, ddt FAR * pddt,
     const bpb ** ppbpb)
 {
   /* we need the defbpb values since those are taken from the
@@ -945,7 +945,7 @@ STATIC unsigned DMA_max_transfer(void FAR * buffer, unsigned count)
 
 */
 
-STATIC int LBA_Transfer(ddt * pddt, UWORD mode, VOID FAR * buffer,
+STATIC int LBA_Transfer(ddt FAR * pddt, UWORD mode, VOID FAR * buffer,
                  ULONG LBA_address, unsigned totaltodo,
                  UWORD * transferred)
 {
