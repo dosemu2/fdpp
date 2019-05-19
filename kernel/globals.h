@@ -212,14 +212,14 @@ struct __PriPathBuffer                  /* Path name parsing buffer             
   AR_MEMB(__PriPathBuffer, BYTE, _PriPathName, 128);
 };
 
-#define PriPathName ((__FAR(char))_PriPathBuffer._PriPathName)
+#define PriPathName _PriPathBuffer._PriPathName
 
 struct __SecPathBuffer                  /* Alternate path name parsing buffer   */
 {
   AR_MEMB(__SecPathBuffer, BYTE, _SecPathName, 128);
 };
 
-#define SecPathName ((__FAR(char))_SecPathBuffer._SecPathName)
+#define SecPathName _SecPathBuffer._SecPathName
 
 /*extern WORD
   NumFloppies; !!*//* How many floppies we have            */

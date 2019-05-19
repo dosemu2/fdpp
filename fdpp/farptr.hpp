@@ -68,8 +68,8 @@ static inline void do_store_far(far_s fptr)
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
 #define _RC(T1) typename std::remove_const<T1>::type
-template<typename T> class SymWrp;
-template<typename T> class SymWrp2;
+template<typename> class SymWrp;
+template<typename> class SymWrp2;
 
 template<typename T>
 class WrpType {
@@ -261,6 +261,8 @@ public:
     }
 };
 
+template<typename, int, typename P, char (P::*)[0]> class ArMemb;
+
 template<typename T>
 class XFarPtr : public FarPtr<T>
 {
@@ -269,6 +271,12 @@ public:
     using FarPtr<T>::FarPtr;
     XFarPtr() = delete;
 
+    template<typename T1 = T, int max_len, typename P, char (P::*M)[0]>
+    XFarPtr(ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p) {}
+
+    /* The below ctors are safe wrt implicit conversions as they take
+     * the lvalue reference to the pointer, not just the pointer itself.
+     * This is the reason why they exist at all. */
     template<typename T1 = T,
         typename std::enable_if<
           !std::is_same<T1, char>::value &&
