@@ -369,7 +369,7 @@ void PreConfig(void)
   strcpy(cfginit, _cfgInit);
   strcpy(cfginittail, _cfgInitTail);
 
-  DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'R', 0);
+  DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'B', 0);
   config_init_buffers(Config.cfgBuffers);
 
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
@@ -458,7 +458,7 @@ void PostConfig(void)
   /* _printf("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch)); */
 #endif
 
-  DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'R', Config.cfgDosDataUmb);
+  DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'B', Config.cfgDosDataUmb);
   config_init_buffers(Config.cfgBuffers);
 
 /* LoL->_sfthead = (sfttbl FAR *)&basesft; */
