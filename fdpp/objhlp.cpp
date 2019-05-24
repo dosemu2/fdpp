@@ -58,7 +58,7 @@ std::unordered_set<sh_ref> get_owned_list_sh(const void *owner)
     std::unordered_set<sh_ref> ret;
     if (shmap.find(owner) != shmap.end()) {
         refmap& ent = shmap[owner];
-        std::for_each(ent.begin(), ent.end(), [&] (refmap::value_type ref) {
+        std::for_each(ent.begin(), ent.end(), [&ret] (refmap::value_type& ref) {
             ret.insert(ref.second);
         });
         shmap.erase(owner);

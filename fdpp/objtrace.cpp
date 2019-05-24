@@ -41,7 +41,7 @@ void objtrace_enter()
     if (gc.list.empty())
         return;
     /* not the right place for this, but... */
-    std::for_each(gc.list.begin(), gc.list.end(), [&] (far_t f) {
+    std::for_each(gc.list.begin(), gc.list.end(), [&cnt] (far_t& f) {
         rm_dosobj(f);
         cnt++;
     });

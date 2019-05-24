@@ -74,7 +74,7 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
         std::for_each(owned.begin(), owned.end(), [] (ObjRef *o) {
             o->cp();
         });
-        std::for_each(owned_sh.begin(), owned_sh.end(), [&] (sh_ref o) {
+        std::for_each(owned_sh.begin(), owned_sh.end(), [] (sh_ref o) {
             o->cp();
         });
     }
