@@ -281,14 +281,14 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     fdlogprintf("dispatch " #f "\n"); \
     objtrace_enter(); \
     rsz = r; \
-    ret = fdpp_dispatch(f, ##__VA_ARGS__); \
+    ret = fdpp_dispatch(f(__VA_ARGS__)); \
     objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 #define _DISPATCH_v(f, ...) { \
     fdlogprintf("dispatch " #f "\n"); \
     objtrace_enter(); \
-    fdpp_dispatch(f, ##__VA_ARGS__); \
+    fdpp_dispatch_v(f(__VA_ARGS__)); \
     objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }

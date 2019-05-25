@@ -19,7 +19,20 @@
 #include <csetjmp>
 #include <type_traits>
 
-#define LJ_WRAP(c) do { \
+#define fdpp_dispatch(c) ({ \
+    int _r; \
+    try { \
+        _r = c; \
+    } catch (std::jmp_buf env) { \
+        if (posth) \
+            posth(); \
+        posth = NULL; \
+        std::longjmp(env, 1); \
+    } \
+    _r; \
+})
+
+#define fdpp_dispatch_v(c) do { \
     try { \
         c; \
     } catch (std::jmp_buf env) { \
@@ -31,22 +44,6 @@
 } while(0)
 
 static void (*posth)(void);
-
-template<typename T, typename ...args, typename ...Args,
-    typename std::enable_if<!std::is_void<T>::value>::type* = nullptr>
-T fdpp_dispatch(T (*func)(args... fa), Args... a)
-{
-    T ret;
-    LJ_WRAP(ret = func(a...));
-    return ret;
-}
-
-template<typename T, typename ...args, typename ...Args,
-    typename std::enable_if<std::is_void<T>::value>::type* = nullptr>
-T fdpp_dispatch(T (*func)(args... fa), Args... a)
-{
-    LJ_WRAP(func(a...));
-}
 
 static inline void fdpp_ljmp(std::jmp_buf env, void (*post)(void))
 {
