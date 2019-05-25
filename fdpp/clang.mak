@@ -23,7 +23,8 @@ DEBUG_MSGS = 0
 USE_UBSAN = 0
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS = $(IFLAGS)
-WFLAGS = -Wall -Wmissing-prototypes
+WFLAGS = -Wall
+WCFLAGS = $(WFLAGS) -Wmissing-prototypes
 ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
 endif
@@ -40,7 +41,7 @@ DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
 CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
-CLCFLAGS = -c -fpic $(IFLAGS) $(WFLAGS) $(DBGFLAGS)
+CLCFLAGS = -c -fpic $(IFLAGS) $(WCFLAGS) $(DBGFLAGS)
 LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
 
 CPPFLAGS += -DI386
