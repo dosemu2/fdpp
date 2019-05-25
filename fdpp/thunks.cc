@@ -40,7 +40,6 @@ static int asm_tab_len;
 static farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
-static jmp_buf *noret_jmp;
 static int recur_cnt;
 
 typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
@@ -308,8 +307,6 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 
 static void _FdppCall(struct vm86_regs *regs)
 {
-    jmp_buf jmp;
-    jmp_buf *volatile prev_jmp = noret_jmp;
     s_regs = *regs;
     UBYTE len;
     UDWORD res;
@@ -328,11 +325,6 @@ static void _FdppCall(struct vm86_regs *regs)
                 (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esp) + 6));
         break;
     case DOS_SUBHELPER_DL_CCALL:
-        noret_jmp = &jmp;
-        if (setjmp(jmp)) {
-            fdlogprintf("noret jump, %i\n", recur_cnt);
-            break;
-        }
         res = FdppThunkCall(LO_WORD(regs->ecx),
                 (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
         switch (len) {
@@ -354,8 +346,6 @@ static void _FdppCall(struct vm86_regs *regs)
         }
         break;
     }
-
-    noret_jmp = prev_jmp;
 }
 
 void FdppCall(struct vm86_regs *regs)
@@ -485,19 +475,19 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
     return -1;
 }
 
-static void leave_h()
-{
-    objtrace_leave();
-}
-
 static void asm_call(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
     jmp_buf *volatile prev = NULL;
     jmp_buf buf;
 
-    if (setjmp(buf))
-        fdpp_ljmp(*prev, leave_h);
+    if (setjmp(buf)) {
+        fdpp_noret({
+            objtrace_leave();
+            recur_cnt--;
+            longjmp(*prev, 1);
+        });
+    }
     fdpp->asm_call(regs, seg, off, sp, len, &buf, const_cast<jmp_buf**>(&prev));
 }
 
@@ -506,7 +496,9 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
 {
     fdpp->asm_call_noret(regs, seg, off, sp, len);
     objtrace_mark();
-    fdpp_ljmp(*noret_jmp, leave_h);
+    fdpp_noret({
+        fdlogprintf("noret jump, %i\n", recur_cnt);
+    });
 }
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)

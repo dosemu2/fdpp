@@ -16,37 +16,46 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <csetjmp>
-#include <type_traits>
+#include <functional>
 
+/* needs the intermediate static store for functor because it may call
+ * longjmp(), in which case the dtor of the functor won't be called.
+ * So we need to leave the catch block first to get the dtor called,
+ * and then call the functor via its static copy. */
 #define fdpp_dispatch(c) ({ \
+    static std::function<void(void)> post; \
+    bool do_post = false; \
     int _r; \
     try { \
         _r = c; \
-    } catch (std::jmp_buf env) { \
-        if (posth) \
-            posth(); \
-        posth = NULL; \
-        std::longjmp(env, 1); \
     } \
+    catch (std::function<void(void)> p) { \
+        do_post = true; \
+        post = p; \
+        _r = 0; \
+    } \
+    if (do_post) \
+        post(); \
     _r; \
 })
 
 #define fdpp_dispatch_v(c) do { \
+    static std::function<void(void)> post; \
+    bool do_post = false; \
     try { \
         c; \
-    } catch (std::jmp_buf env) { \
-        if (posth) \
-            posth(); \
-        posth = NULL; \
-        std::longjmp(env, 1); \
     } \
+    catch (std::function<void(void)> p) { \
+        do_post = true; \
+        post = p; \
+    } \
+    if (do_post) \
+        post(); \
 } while(0)
 
-static void (*posth)(void);
-
-static inline void fdpp_ljmp(std::jmp_buf env, void (*post)(void))
-{
-    posth = post;
-    throw(env);
+#define fdpp_noret(c) \
+{ \
+    throw(std::function<void(void)>([=] () { \
+        c; \
+    })); \
 }
