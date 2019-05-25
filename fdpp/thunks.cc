@@ -276,21 +276,20 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     UBYTE rsz = 0;
 
 #define _SP sp
-#define _DISPATCH(r, f, ...) { \
+#define _DISP_CMN(f, c) { \
     fdlogprintf("dispatch " #f "\n"); \
     objtrace_enter(); \
+    c; \
+    objtrace_leave(); \
+    fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
+}
+#define _DISPATCH(r, f, ...) _DISP_CMN(f, { \
     rsz = r; \
     ret = fdpp_dispatch(f(__VA_ARGS__)); \
-    objtrace_leave(); \
-    fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
-}
-#define _DISPATCH_v(f, ...) { \
-    fdlogprintf("dispatch " #f "\n"); \
-    objtrace_enter(); \
+})
+#define _DISPATCH_v(f, ...) _DISP_CMN(f, { \
     fdpp_dispatch_v(f(__VA_ARGS__)); \
-    objtrace_leave(); \
-    fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
-}
+})
 
     switch (fn) {
         #include <thunk_calls.h>
