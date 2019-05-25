@@ -31,8 +31,7 @@ static int is_rvoid;
 static int is_const;
 static int is_pas;
 static int is_noret;
-static char rbuf[256];
-static char rbuf2[256];
+static int rlen;
 static char abuf[1024];
 static char atype[256];
 static char atype2[256];
@@ -64,7 +63,7 @@ static void init_line(void)
     is_rfar = 0;
     is_ffar = 0;
     is_noret = 0;
-    rbuf2[0] = '\0';
+    rlen = 0;
     beg_arg();
 }
 
@@ -231,12 +230,21 @@ line:		lnum rdecls fname lb args rb SEMIC
 			{
 			  switch (thunk_type) {
 			  case 0:
-			    if (abuf[0])
-			      printf("\tcase %i:\n\t\t%s\n\t\t_DISPATCH(%s, %s, %s);\n\t\tbreak;\n",
-				$1, rbuf, rbuf2, $3, abuf);
-			    else
-			      printf("\tcase %i:\n\t\t%s\n\t\t_DISPATCH_v(%s, %s);\n\t\tbreak;\n",
-				$1, rbuf, rbuf2, $3);
+			    if (!is_rvoid) {
+			      if (abuf[0])
+			        printf("\tcase %i:\n\t\t_DISPATCH(%i, %s, %s);\n\t\tbreak;\n",
+				    $1, rlen, $3, abuf);
+			      else
+			        printf("\tcase %i:\n\t\t_DISPATCH(%i, %s);\n\t\tbreak;\n",
+				    $1, rlen, $3);
+			    } else {
+			      if (abuf[0])
+			        printf("\tcase %i:\n\t\t_DISPATCH_v(%s, %s);\n\t\tbreak;\n",
+				    $1, $3, abuf);
+			      else
+			        printf("\tcase %i:\n\t\t_DISPATCH_v(%s);\n\t\tbreak;\n",
+				    $1, $3);
+			    }
 			    break;
 			  case 1:
 			    if (!is_rvoid)
@@ -305,36 +313,29 @@ rq_fa:		  rquals fatrs
 		|
 ;
 
-rtype:		  VOID		{ strcpy(rbuf, "_RSZ = 0;");
+rtype:		  VOID		{ rlen = 0;
 				  strcpy(rtbuf, "void");
 				  is_rvoid = 1;
 				}
-		| WORD		{ strcpy(rbuf, "_RSZ = 2;");
-				  strcpy(rbuf2, "_RET=");
+		| WORD		{ rlen = 2;
 				  strcpy(rtbuf, "WORD");
 				}
-		| UWORD		{ strcpy(rbuf, "_RSZ = 2;");
-				  strcpy(rbuf2, "_RET=");
+		| UWORD		{ rlen = 2;
 				  strcpy(rtbuf, "UWORD");
 				}
-		| DWORD		{ strcpy(rbuf, "_RSZ = 4;");
-				  strcpy(rbuf2, "_RET=");
+		| DWORD		{ rlen = 4;
 				  strcpy(rtbuf, "DWORD");
 				}
-		| UDWORD	{ strcpy(rbuf, "_RSZ = 4;");
-				  strcpy(rbuf2, "_RET=");
+		| UDWORD	{ rlen = 4;
 				  strcpy(rtbuf, "UDWORD");
 				}
-		| BYTE		{ strcpy(rbuf, "_RSZ = 1;");
-				  strcpy(rbuf2, "_RET=");
+		| BYTE		{ rlen = 1;
 				  strcpy(rtbuf, "BYTE");
 				}
-		| CHAR		{ strcpy(rbuf, "_RSZ = 1;");
-				  strcpy(rbuf2, "_RET=");
+		| CHAR		{ rlen = 1;
 				  strcpy(rtbuf, "char");
 				}
-		| UBYTE		{ strcpy(rbuf, "_RSZ = 1;");
-				  strcpy(rbuf2, "_RET=");
+		| UBYTE		{ rlen = 1;
 				  strcpy(rtbuf, "UBYTE");
 				}
 ;

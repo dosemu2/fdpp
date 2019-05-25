@@ -276,20 +276,19 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     UDWORD ret = 0;
     UBYTE rsz = 0;
 
-#define _RET ret
-#define _RSZ rsz
 #define _SP sp
 #define _DISPATCH(r, f, ...) { \
     fdlogprintf("dispatch " #f "\n"); \
     objtrace_enter(); \
-    r fdpp_dispatch(f, __VA_ARGS__); \
+    rsz = r; \
+    ret = fdpp_dispatch(f, ##__VA_ARGS__); \
     objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
-#define _DISPATCH_v(r, f) { \
+#define _DISPATCH_v(f, ...) { \
     fdlogprintf("dispatch " #f "\n"); \
     objtrace_enter(); \
-    r fdpp_dispatch(f); \
+    fdpp_dispatch(f, ##__VA_ARGS__); \
     objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }

@@ -204,7 +204,7 @@ thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
-parsers/thunk_gen:
+parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	if [ ! -f parsers/makefile ]; then \
 	    ln -s $(abspath $(srcdir))/parsers/makefile parsers/makefile ; \
 	fi
