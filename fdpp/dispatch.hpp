@@ -20,14 +20,14 @@
     try { \
         c; \
     } \
-    catch (void *p) { \
+    catch (int p) { \
         r = p; \
         c2; \
     } \
 } while(0)
 
 template<typename T, typename ...args, typename ...Args>
-static inline T fdpp_dispatch(void **rt, T (*func)(args... fa), Args... a)
+static inline T fdpp_dispatch(int *rt, T (*func)(args... fa), Args... a)
 {
     T ret;
     static_assert(!std::is_void<T>::value, "something wrong");
@@ -36,12 +36,12 @@ static inline T fdpp_dispatch(void **rt, T (*func)(args... fa), Args... a)
 }
 
 template<typename ...args, typename ...Args>
-static inline void fdpp_dispatch_v(void **rt, void (*func)(args... fa), Args... a)
+static inline void fdpp_dispatch_v(int *rt, void (*func)(args... fa), Args... a)
 {
     LJ_WRAP(func(a...),, *rt);
 }
 
-static inline void fdpp_noret(void *p = NULL)
+static inline void fdpp_noret(int stat)
 {
-    throw(p);
+    throw(stat);
 }

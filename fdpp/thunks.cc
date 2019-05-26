@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>
 #include "../hdr/portab.h"
 #include "globals.h"
 #include "proto.h"
@@ -41,6 +40,8 @@ static farhlp sym_tab;
 static struct far_s *near_wrp;
 static int num_wrps;
 static int recur_cnt;
+
+enum { DISP_OK, DISP_NORET, DISP_ABORT };
 
 typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
@@ -270,10 +271,11 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FP_FROM_D(t, __d); \
 })
 
-static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len, void **r_ptr)
+static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
     UDWORD ret = 0;
     UBYTE rsz = 0;
+    int stat = DISP_OK;
 
 #define _SP sp
 #define _DISP_CMN(f, c) { \
@@ -284,11 +286,13 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len, void **r_ptr)
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
 #define _DISPATCH(r, f, ...) _DISP_CMN(f, { \
-    rsz = r; \
-    ret = fdpp_dispatch(r_ptr, f, ##__VA_ARGS__); \
+    ret = fdpp_dispatch(&stat, f, ##__VA_ARGS__); \
+    _assert(stat != DISP_NORET); \
+    if (stat == DISP_OK) \
+        rsz = r; \
 })
 #define _DISPATCH_v(f, ...) _DISP_CMN(f, { \
-    fdpp_dispatch_v(r_ptr, f, ##__VA_ARGS__); \
+    fdpp_dispatch_v(&stat, f, ##__VA_ARGS__); \
 })
 
     switch (fn) {
@@ -304,7 +308,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len, void **r_ptr)
     return ret;
 }
 
-static void _FdppCall(struct vm86_regs *regs, void **r_ptr)
+static void _FdppCall(struct vm86_regs *regs)
 {
     s_regs = *regs;
     UBYTE len;
@@ -325,7 +329,7 @@ static void _FdppCall(struct vm86_regs *regs, void **r_ptr)
         break;
     case DOS_SUBHELPER_DL_CCALL:
         res = FdppThunkCall(LO_WORD(regs->ecx),
-                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len, r_ptr);
+                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
         switch (len) {
         case 0:
             break;
@@ -349,12 +353,9 @@ static void _FdppCall(struct vm86_regs *regs, void **r_ptr)
 
 void FdppCall(struct vm86_regs *regs)
 {
-    jmp_buf *reboot_jmp = NULL;
     recur_cnt++;
-    _FdppCall(regs, (void **)&reboot_jmp);
+    _FdppCall(regs);
     recur_cnt--;
-    if (reboot_jmp)
-        longjmp(*reboot_jmp, 1);
 }
 
 void do_abort(const char *file, int line)
@@ -480,14 +481,15 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
 static void asm_call(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len)
 {
-    jmp_buf *volatile prev = NULL;
-    jmp_buf buf;
-
-    if (setjmp(buf)) {
+    int rc = fdpp->asm_call(regs, seg, off, sp, len);
+    switch (rc) {
+    case ASM_CALL_OK:
+        break;
+    case ASM_CALL_ABORT:
         fdlogprintf("reboot jump, %i\n", recur_cnt);
-        fdpp_noret(prev);
+        fdpp_noret(DISP_ABORT);
+        break;
     }
-    fdpp->asm_call(regs, seg, off, sp, len, &buf, const_cast<jmp_buf**>(&prev));
 }
 
 static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
@@ -496,7 +498,7 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
     fdpp->asm_call_noret(regs, seg, off, sp, len);
     objtrace_mark();
     fdlogprintf("noret jump, %i\n", recur_cnt);
-    fdpp_noret();
+    fdpp_noret(DISP_NORET);
 }
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
