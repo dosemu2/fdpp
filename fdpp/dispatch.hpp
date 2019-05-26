@@ -16,46 +16,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <functional>
-
-/* needs the intermediate static store for functor because it may call
- * longjmp(), in which case the dtor of the functor won't be called.
- * So we need to leave the catch block first to get the dtor called,
- * and then call the functor via its static copy. */
-#define fdpp_dispatch(c) ({ \
-    static std::function<void(void)> post; \
-    bool do_post = false; \
-    int _r; \
-    try { \
-        _r = c; \
-    } \
-    catch (std::function<void(void)> p) { \
-        do_post = true; \
-        post = p; \
-        _r = 0; \
-    } \
-    if (do_post) \
-        post(); \
-    _r; \
-})
-
-#define fdpp_dispatch_v(c) do { \
-    static std::function<void(void)> post; \
-    bool do_post = false; \
+#define LJ_WRAP(c, c2, r) do { \
     try { \
         c; \
     } \
-    catch (std::function<void(void)> p) { \
-        do_post = true; \
-        post = p; \
+    catch (void *p) { \
+        r = p; \
+        c2; \
     } \
-    if (do_post) \
-        post(); \
 } while(0)
 
-#define fdpp_noret(c) \
-{ \
-    throw(std::function<void(void)>([=] () { \
-        c; \
-    })); \
+template<typename T, typename ...args, typename ...Args>
+static inline T fdpp_dispatch(void **rt, T (*func)(args... fa), Args... a)
+{
+    T ret;
+    static_assert(!std::is_void<T>::value, "something wrong");
+    LJ_WRAP(ret = func(a...), ret = 0, *rt);
+    return ret;
+}
+
+template<typename ...args, typename ...Args>
+static inline void fdpp_dispatch_v(void **rt, void (*func)(args... fa), Args... a)
+{
+    LJ_WRAP(func(a...),, *rt);
+}
+
+static inline void fdpp_noret(void *p = NULL)
+{
+    throw(p);
 }

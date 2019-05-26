@@ -270,7 +270,7 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FP_FROM_D(t, __d); \
 })
 
-static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
+static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len, void **r_ptr)
 {
     UDWORD ret = 0;
     UBYTE rsz = 0;
@@ -285,10 +285,10 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 }
 #define _DISPATCH(r, f, ...) _DISP_CMN(f, { \
     rsz = r; \
-    ret = fdpp_dispatch(f(__VA_ARGS__)); \
+    ret = fdpp_dispatch(r_ptr, f, ##__VA_ARGS__); \
 })
 #define _DISPATCH_v(f, ...) _DISP_CMN(f, { \
-    fdpp_dispatch_v(f(__VA_ARGS__)); \
+    fdpp_dispatch_v(r_ptr, f, ##__VA_ARGS__); \
 })
 
     switch (fn) {
@@ -304,7 +304,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     return ret;
 }
 
-static void _FdppCall(struct vm86_regs *regs)
+static void _FdppCall(struct vm86_regs *regs, void **r_ptr)
 {
     s_regs = *regs;
     UBYTE len;
@@ -325,7 +325,7 @@ static void _FdppCall(struct vm86_regs *regs)
         break;
     case DOS_SUBHELPER_DL_CCALL:
         res = FdppThunkCall(LO_WORD(regs->ecx),
-                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
+                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len, r_ptr);
         switch (len) {
         case 0:
             break;
@@ -349,9 +349,12 @@ static void _FdppCall(struct vm86_regs *regs)
 
 void FdppCall(struct vm86_regs *regs)
 {
+    jmp_buf *reboot_jmp = NULL;
     recur_cnt++;
-    _FdppCall(regs);
+    _FdppCall(regs, (void **)&reboot_jmp);
     recur_cnt--;
+    if (reboot_jmp)
+        longjmp(*reboot_jmp, 1);
 }
 
 void do_abort(const char *file, int line)
@@ -481,11 +484,8 @@ static void asm_call(struct vm86_regs *regs, uint16_t seg,
     jmp_buf buf;
 
     if (setjmp(buf)) {
-        fdpp_noret({
-            objtrace_leave();
-            recur_cnt--;
-            longjmp(*prev, 1);
-        });
+        fdlogprintf("reboot jump, %i\n", recur_cnt);
+        fdpp_noret(prev);
     }
     fdpp->asm_call(regs, seg, off, sp, len, &buf, const_cast<jmp_buf**>(&prev));
 }
@@ -495,9 +495,8 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
 {
     fdpp->asm_call_noret(regs, seg, off, sp, len);
     objtrace_mark();
-    fdpp_noret({
-        fdlogprintf("noret jump, %i\n", recur_cnt);
-    });
+    fdlogprintf("noret jump, %i\n", recur_cnt);
+    fdpp_noret();
 }
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
