@@ -253,7 +253,7 @@ STATIC const char _DirChars[] = "\"[]:|<>+=;,";
   *p++ = c; \
 }
 
-COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
+COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 {
   COUNT i;
   struct dhdr FAR *dhp;
@@ -287,7 +287,7 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
       unc_src++;
     } while (src0);
     current_ldt = (struct cds FAR *)MK_FP(0xFFFF,0xFFFF);
-    tn_printf(("Returning path: \"%s\"\n", dest));
+    tn_printf(("Returning path: \"%s\"\n", GET_PTR(dest)));
     /* Flag as network - drive bits are empty but shouldn't get */
     /* referenced for network with empty current_ldt.           */
     return IS_NETWORK;
@@ -310,7 +310,7 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
     {
       if (dhp)
       {
-        strcpy(dest, src);
+        fstrcpy(dest, src);
         return IS_DEVICE;
       }
       return DE_PATHNOTFND;
@@ -334,11 +334,11 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
                                    included by original truename() */
   /* MUX succeeded and really something */
   {
-  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(MK_FAR_SZ_SCP(dest, PATHLEN), src) == SUCCESS && dest[0] != '\0')
+  if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(dest, src) == SUCCESS && dest[0] != '\0')
   {
-    tn_printf(("QRemoteFn() returned: \"%s\"\n", dest));
+    tn_printf(("QRemoteFn() returned: \"%s\"\n", GET_PTR(dest)));
 #ifdef DEBUG_TRUENAME
-    if (strlen(dest) >= SFTMAX)
+    if (fstrlen(dest) >= SFTMAX)
       panic("Truename: QRemote_Fn() overflowed output buffer");
 #endif
     if (dest[2] == '/' && (result & IS_DEVICE))
@@ -375,7 +375,7 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
         if (dest[3] == '/') dest[3] = '\\';
         if (dest[7] == '/') dest[7] = '\\';
       }
-      if (froot == src || memcmp(dest + 3, "\\DEV\\", 5) == 0)
+      if (froot == src || fmemcmp(dest + 3, "\\DEV\\", 5) == 0)
       {
         /* /// Bugfix: NUL.LST is the same as NUL.  This is true for all
            devices.  On a device name, the extension is irrelevant
@@ -426,7 +426,7 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
    SUBST drives. For local drives it should not harm.
    This is actually the reverse mechanism of JOINED drives. */
 
-      strcpy(dest, cp);
+      fstrcpy(dest, cp);
       if (TempCDS.cdsFlags & CDSSUBST)
       {
         /* The drive had been changed --> update the CDS pointer */
@@ -573,7 +573,7 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
     assumed that the CDS is configured correctly and if it contains
     lower case letters, it is required so **/
 
-  tn_printf(("Absolute logical path: \"%s\"\n", dest));
+  tn_printf(("Absolute logical path: \"%s\"\n", GET_PTR(dest)));
 
   /* Now, all the steps 1) .. 7) are fullfilled. Join now */
   /* search, if this path is a joined drive */
@@ -600,14 +600,14 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
         }
         else if (j != 2)
         {
-          strcpy(dest + 2, dest + j);
+          fstrcpy(dest + 2, dest + j);
         }
         result = (result & 0xffe0) | i; /* tweak drive letter (JOIN) */
         current_ldt = cdsp;
         result &= ~IS_NETWORK;
         if (cdsp->cdsFlags & CDSNETWDRV)
           result |= IS_NETWORK;
-	tn_printf(("JOINed path: \"%s\"\n", dest));
+	tn_printf(("JOINed path: \"%s\"\n", GET_PTR(dest)));
         return result;
       }
     }
@@ -627,6 +627,6 @@ COUNT truename(__XFAR(const char)src, char * dest, COUNT mode)
     else
       result = 0; /* AL is 00, 2f, 5c, or last-of-TempCDS.cdsCurrentPath? */
   }
-  tn_printf(("Physical path: \"%s\"\n", dest));
+  tn_printf(("Physical path: \"%s\"\n", GET_PPTR(dest)));
   return result;
 }
