@@ -2817,7 +2817,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   args[*args+2] = 0;
 
   exb.exec.env_seg  = 0;
-  MK_FAR_SZ_OBJ(exb, exec.cmd_line, args, sizeof(CommandTail));
+  MK_FAR_SZ_OBJ(exb, exec.cmd_line, args, 1 + strlen(args + 1) + 1);
   exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *) 0xfffffffful;
 
 
