@@ -809,7 +809,8 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
 /* start process 0 (the shell) */
 VOID ASMCFUNC P_0(struct config FAR *Config)
 {
-  BYTE *tailp, *endp;
+  BYTE FAR *tailp;
+  BYTE FAR *endp;
   COUNT rd;
   exec_blk exb;
   WORD err;
@@ -834,8 +835,8 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   {
     BYTE *p;
     /* if there are no parameters, point to end without "\r\n" */
-    if((tailp = strchr(Shell,'\t')) == NULL &&
-       (tailp = strchr(Shell, ' ')) == NULL)
+    if((tailp = fstrchr(Shell,'\t')) == NULL &&
+       (tailp = fstrchr(Shell, ' ')) == NULL)
         tailp = endp - 2;
     /* shift tail to right by 2 to make room for '\0', ctCount */
     for (p = endp - 1; p >= tailp; p--)
@@ -843,9 +844,9 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     /* terminate name and tail */
     *tailp =  *(endp + 2) = '\0';
     /* ctCount: just past '\0' do not count the "\r\n" */
-    MK_FAR_STR_OBJ(exb, exec.cmd_line, tailp + 1);
+    exb.exec.cmd_line = tailp + 1;
     exb.exec.cmd_line->ctCount = endp - tailp - 2;
-    _printf("Process 0 starting: %s%s", GET_PTR(Shell), tailp + 2);
+    _printf("Process 0 starting: %s%s", GET_PTR(Shell), GET_PTR(tailp + 2));
     err = res_DosExec(mode, &exb, Shell);
     if (!err)
     {
