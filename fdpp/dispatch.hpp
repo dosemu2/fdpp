@@ -16,33 +16,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <functional>
+
 enum DispStat { DISP_OK, DISP_NORET };
 
-#define LJ_WRAP(c, rv, rs) do { \
-    try { \
-        c; \
-        rs = DISP_OK; \
-    } \
-    catch (int p) { \
-        rv = p; \
-        rs = DISP_NORET; \
-    } \
-} while(0)
+template<typename T, typename ...A>
+static inline int _dispatch(enum DispStat *rs,
+        std::function<T(A...)> func, A... a)
+{
+    int ret;
+    try {
+        ret = func(a...);
+        *rs = DISP_OK;
+    }
+    catch (int p) {
+        ret = p;
+        *rs = DISP_NORET;
+    }
+    return ret;
+}
 
 template<typename T, typename ...A>
 static inline int fdpp_dispatch(enum DispStat *rs, T (*func)(A... fa), A... a)
 {
-    int ret;
-    LJ_WRAP(ret = func(a...), ret, *rs);
-    return ret;
+    return _dispatch(rs, std::function<T(A...)>(func), a...);
 }
 
 template<typename ...A>
 static inline int fdpp_dispatch_v(enum DispStat *rs, void (*func)(A... fa), A... a)
 {
-    int ret = 0;
-    LJ_WRAP(func(a...), ret, *rs);
-    return ret;
+    return _dispatch(
+        rs,
+        std::function<int(A...)>([func] (A... _a) {
+            func(_a...);
+            return 0;
+        }),
+        a...
+    );
 }
 
 static inline void fdpp_noret(int stat)
