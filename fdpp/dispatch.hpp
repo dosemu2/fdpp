@@ -16,29 +16,33 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define LJ_WRAP(c, c2, r) do { \
+enum DispStat { DISP_OK, DISP_NORET };
+
+#define LJ_WRAP(c, rv, rs) do { \
     try { \
         c; \
+        rs = DISP_OK; \
     } \
     catch (int p) { \
-        r = p; \
-        c2; \
+        rv = p; \
+        rs = DISP_NORET; \
     } \
 } while(0)
 
-template<typename T, typename ...args, typename ...Args>
-static inline T fdpp_dispatch(int *rt, T (*func)(args... fa), Args... a)
+template<typename T, typename ...A>
+static inline int fdpp_dispatch(enum DispStat *rs, T (*func)(A... fa), A... a)
 {
-    T ret;
-    static_assert(!std::is_void<T>::value, "something wrong");
-    LJ_WRAP(ret = func(a...), ret = 0, *rt);
+    int ret;
+    LJ_WRAP(ret = func(a...), ret, *rs);
     return ret;
 }
 
-template<typename ...args, typename ...Args>
-static inline void fdpp_dispatch_v(int *rt, void (*func)(args... fa), Args... a)
+template<typename ...A>
+static inline int fdpp_dispatch_v(enum DispStat *rs, void (*func)(A... fa), A... a)
 {
-    LJ_WRAP(func(a...),, *rt);
+    int ret = 0;
+    LJ_WRAP(func(a...), ret, *rs);
+    return ret;
 }
 
 static inline void fdpp_noret(int stat)

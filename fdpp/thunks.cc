@@ -41,7 +41,7 @@ static struct far_s *near_wrp;
 static int num_wrps;
 static int recur_cnt;
 
-enum { DISP_OK, DISP_NORET, DISP_ABORT };
+enum { ASM_OK, ASM_NORET, ASM_ABORT };
 
 typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
@@ -273,9 +273,9 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
 
 static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 {
-    UDWORD ret = 0;
+    UDWORD ret;
     UBYTE rsz = 0;
-    int stat = DISP_OK;
+    enum DispStat stat;
 
 #define _SP sp
 #define _DISP_CMN(f, c) { \
@@ -287,12 +287,13 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 }
 #define _DISPATCH(r, f, ...) _DISP_CMN(f, { \
     ret = fdpp_dispatch(&stat, f, ##__VA_ARGS__); \
-    _assert(stat != DISP_NORET); \
     if (stat == DISP_OK) \
-        rsz = r; \
+        rsz = (r); \
+    else \
+        _assert(ret != ASM_NORET); \
 })
 #define _DISPATCH_v(f, ...) _DISP_CMN(f, { \
-    fdpp_dispatch_v(&stat, f, ##__VA_ARGS__); \
+    ret = fdpp_dispatch_v(&stat, f, ##__VA_ARGS__); \
 })
 
     switch (fn) {
@@ -301,6 +302,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
         default:
             fdprintf("unknown fn %i\n", fn);
             _fail();
+            return 0;
     }
 
     if (r_len)
@@ -487,7 +489,7 @@ static void asm_call(struct vm86_regs *regs, uint16_t seg,
         break;
     case ASM_CALL_ABORT:
         fdlogprintf("reboot jump, %i\n", recur_cnt);
-        fdpp_noret(DISP_ABORT);
+        fdpp_noret(ASM_ABORT);
         break;
     }
 }
@@ -498,7 +500,7 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
     fdpp->asm_call_noret(regs, seg, off, sp, len);
     objtrace_mark();
     fdlogprintf("noret jump, %i\n", recur_cnt);
-    fdpp_noret(DISP_NORET);
+    fdpp_noret(ASM_NORET);
 }
 
 static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
