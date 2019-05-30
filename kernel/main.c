@@ -199,7 +199,7 @@ STATIC void PSPInit(void)
   /* memory size in paragraphs                            */
   /*  p->ps_size = 0; clear from above                    */
   /* environment paragraph                                */
-  p->ps_environ = DOS_PSP + 8;
+  p->ps_environ = 0;
   /* terminate address                                    */
   p->ps_isv22 = getvec(0x22);
   /* break address                                        */
@@ -486,7 +486,6 @@ STATIC void kernel()
 
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
-  fmemcpy(MK_FP(DOS_PSP + 8, 0), master_env, sizeof(master_env));
 
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */

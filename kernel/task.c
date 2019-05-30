@@ -114,22 +114,10 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
   pSrc = exp->exec.env_seg ?
       MK_FP(exp->exec.env_seg, 0) : MK_FP(ppsp->ps_environ, 0);
 
-#if 0
-  /* Every process requires an environment because of argv[0]
-     -- 1999/04/21 ska */
-  */if (!pSrc)                  /* no environment to copy */
-  {
-    *pChildEnvSeg = 0;
-    return SUCCESS;
-  }
-#endif
-
-  nEnvSize = 1;
   /* This loop had not counted the very last '\0'
      -- 1999/04/21 ska */
-  if (pSrc)
-  {                             /* if no environment is available, one byte is required */
-
+  if (pSrc && pSrc[0])
+  {
     for (nEnvSize = 0;; nEnvSize++)
     {
       /* Test env size and abort if greater than max          */
@@ -140,6 +128,24 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
         break;
     }
     nEnvSize += 2;              /* account for trailing \0\0 */
+  }
+  else if (!pSrc && master_env[0])
+  {
+    for (nEnvSize = 0;; nEnvSize++)
+    {
+      /* Test env size and abort if greater than max          */
+      if (nEnvSize >= MAXENV - ENV_KEEPFREE)
+        return DE_INVLDENV;
+
+      if (*(UWORD *) (master_env + nEnvSize) == 0)
+        break;
+    }
+    nEnvSize += 2;              /* account for trailing \0\0 */
+    pSrc = MK_FAR_SZ(master_env, nEnvSize);
+  }
+  else
+  {
+    nEnvSize = 1;
   }
 
   /* allocate enough space for env + path                 */
@@ -153,7 +159,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
   /* location throught the psp                            */
 
   /* copy the environment */
-  if (pSrc)
+  if (pSrc && pSrc[0])
   {
     fmemcpy(pDest, pSrc, nEnvSize);
     pDest += nEnvSize;
@@ -819,7 +825,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
 
   /* build exec block and save all parameters here as init part will vanish! */
   exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
-  exb.exec.env_seg = DOS_PSP + 8;
+  exb.exec.env_seg = 0;
   if ((bprm->ShellDrive & 0x80) && Config->cfgInit[1] != ':')
   {
     memcpy(Shell, "C:\\", 3);

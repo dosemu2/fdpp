@@ -139,6 +139,8 @@ public:
 #define _RC(t) typename std::remove_const<_R(t)>::type
 
 #define MK_FAR(o) FarPtr<decltype(o)>(_MK_FAR(o))
+#define MK_FAR_SZ(o, sz) \
+    FarPtr<decltype(o)>(std::make_shared<FarObj<_R(o)>>(o, sz, false, NM))
 #define MK_NEAR_STR_OBJ(p, m, o) do { \
     std::shared_ptr<FarObj<_R(o)>> _sh = \
         std::make_shared<FarObj<_R(o)>>(o, strlen(o) + 1, true, NM); \
