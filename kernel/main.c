@@ -484,9 +484,6 @@ STATIC void kernel()
 {
   CommandTail Cmd;
 
-  if (master_env[0] == '\0')   /* some shells panic on empty master env. */
-    strcpy(master_env, "PATH=.");
-
   /* process 0       */
   /* Execute command.com from the drive we just booted from    */
   memset(Cmd.ctBuffer, 0, sizeof(Cmd.ctBuffer));

@@ -526,6 +526,9 @@ VOID configDone(VOID)
   MK_NEAR_STR_OBJ(Config, cfgInit, cfginit);
   MK_NEAR_STR_OBJ(Config, cfgInitTail, cfginittail);
 
+  if (master_env[0] == '\0')   /* some shells panic on empty master env. */
+    strcpy(master_env, "PATH=.");
+
   /* The standard handles should be reopened here, because
      we may have loaded new console or printer drivers in CONFIG.SYS */
 }
