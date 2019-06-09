@@ -1,3 +1,32 @@
+## beta-6
+
+This beta release got a huge amount of work in all directions.
+We are steadily heading towards a stable release.
+
+- Completed the work of passing interrupt handling to prev handler [fdkernel]
+  This improves the integration with dosemu2 which hooks some int vectors
+  before booting DOS.
+- Extension to load fdppconf.sys from any drive [boot]
+- Extension to config.sys parser to prefix file names with
+  "AT" symbol. [fdkernel]
+  For example DEVICE=@c:\umb.sys. It checks the file existence before use.
+- Improve CHAIN= support [fdkernel]
+- Implement SWITCHES=/Y for single-stepping [fdkernel]
+- Extension to pass strings via bootparams [boot]
+- Extension to refer with #num to the bootparam strings [fdkernel]
+  For example you can write SWITCHES=#0 to use string 0 from boot params.
+- Increase default value of FILES from 16 to 64. [fdkernel]
+  Needed for progs like GEOS.
+- Made int21 handler reentrant [fdkernel]
+  This appears needed as we now pass unhandled int21 calls to prev handler,
+  which, in turn, can call another int21 (that's the life of emulators
+  like dosemu2).
+- Lots of work on memory management and object tracking [fdpp]
+- Resurrect and port INSTALL= directive to fdpp [fdkernel]
+- Completely rework thunks dispatching code to get rid of longjumps [fdpp]
+- Fix initial environment corruption bug [fdkernel]
+
+
 ## beta-5
 
 - Last bits of UMB saga [fdkernel]
@@ -16,6 +45,7 @@
   it all properly.
 - Lots of fixes
 
+
 ## beta-4
 
 All of the bug fixes, including regression fixes and freedos fixes.
@@ -27,6 +57,7 @@ All of the bug fixes, including regression fixes and freedos fixes.
 - Added reboot support. This was the most difficult and intrusive
   change of this beta, even if sounds simple. :)
 - Many fixes to both freedos and fdpp.
+
 
 ## beta-3
 
@@ -41,6 +72,7 @@ A very important milestone as we finally switched to ELF format!
 - Long-standing FreeDOS bug fixed that prevented UMB at A0
 - Started supporting reboot (not finished yet)
 - many fixes (GEOS now works reliably, smaller memory usage)
+
 
 ## beta-2:
 
