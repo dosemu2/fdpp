@@ -142,9 +142,7 @@ CALL_INTR:
 		INTR
 
 ;
-;       void ASMPASCAL call_intr_func(ptr, rp)
-;       void FAR *ptr
-;       struct REGPACK *rp
+;       void ASMPASCAL call_intr_func(void FAR *ptr, struct REGPACK FAR *rp)
 ;
 		global	CALL_INTR_FUNC
 CALL_INTR_FUNC:
@@ -152,8 +150,10 @@ CALL_INTR_FUNC:
                 mov     bp,sp
 
                 push	ds
+                push	es
 
 		mov	bx, [bp+4]		; regpack structure
+		mov	ds, [bp+6]
 		mov	ax, [bx]
 		mov	cx, [bx+4]
 		mov	dx, [bx+6]
@@ -167,7 +167,7 @@ CALL_INTR_FUNC:
 		mov	bx, [bx+2]
 		pop	ds
 		pushf
-		call	far [bp+6]
+		call	far [bp+8]
 
 		pushf
 		push	ds
@@ -175,6 +175,7 @@ CALL_INTR_FUNC:
 		mov	bx, sp
 		mov	ds, [bp-2]		; peek saved ds
 		mov	bx, [bp+4]		; address of REGPACK
+		mov	ds, [bp+6]
 		mov	[bx], ax
 		pop	word [bx+2]		; bx
 		mov	[bx+4], cx
@@ -186,10 +187,11 @@ CALL_INTR_FUNC:
 		mov	[bx+16], es
 		pop	word [bx+22]		; flags
 
+		pop	es
 		pop	ds
 
 		pop	bp
-		ret     6
+		ret     8
 
 
 segment	INIT_TEXT
