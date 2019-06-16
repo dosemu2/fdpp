@@ -115,19 +115,22 @@ no_exec_error:
         leave
         ret
 
-;; UCOUNT ASMPASCAL res_read(int fd, void *buf, UCOUNT count);
-    global RES_READ
-RES_READ:
-        pop ax         ; ret address
-        pop cx         ; count
-        pop dx         ; buf
-        pop bx         ; fd
-        push ax        ; ret address
+;; UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count);
+    global _res_read
+_res_read:
+        enter 0, 0
+        push ds
+        mov cx, [bp + 10]       ; count
+        mov dx, [bp + 6]        ; buf
+        mov ds, [bp + 8]
+        mov bx, [bp + 4]        ; fd
         mov ah, 3fh
         int 21h
         jnc no_read_error
         mov ax, -1
 no_read_error:
+        pop ds
+        leave
         ret
 ;
 ;       void call_intr(nr, rp)
