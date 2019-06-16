@@ -853,7 +853,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     exb.exec.cmd_line = tailp + 1;
     exb.exec.cmd_line->ctCount = endp - tailp - 2;
     _printf("Process 0 starting: %s%s", GET_PTR(Shell), GET_PTR(tailp + 2));
-    err = res_DosExec(mode, &exb, Shell);
+    err = res_DosExec(mode, MK_FAR_SCP(exb), Shell);
     if (!err)
     {
       _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));

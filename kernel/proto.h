@@ -217,7 +217,7 @@ void FcbCloseAll(void);
 UBYTE FcbFindFirstNext(__FAR(xfcb) lpXfcb, BOOL First);
 
 /* intr.asm */
-COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, const char * lp);
+COUNT ASMFUNC res_DosExec(COUNT mode, __FAR(exec_blk) ep, __FAR(const char) lp);
 UCOUNT ASMPASCAL res_read(UWORD fd, void *buf, UCOUNT count);
 #ifdef __WATCOMC__
 #pragma aux (pascal) res_DosExec modify exact [ax bx dx es]

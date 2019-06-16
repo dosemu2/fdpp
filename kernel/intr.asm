@@ -92,23 +92,27 @@
 		ret     4
 %endmacro
 
-segment	HMA_TEXT
+segment HMA_TEXT
 
-;; COUNT ASMPASCAL res_DosExec(COUNT mode, exec_blk * ep, char * lp)
-    global RES_DOSEXEC
-RES_DOSEXEC:
-        pop es                  ; ret address
-        pop dx                  ; filename
-        pop bx                  ; exec block
-        pop ax                  ; mode
-        push es                 ; ret address
-        mov ah, 4bh
+;; COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, char FAR * lp)
+    global _res_DosExec
+_res_DosExec:
+        enter 0, 0
         push ds
-        pop es                  ; es = ds
+        push es
+        mov dx, [bp + 10]       ; filename
+        mov ds, [bp + 12]
+        mov bx, [bp + 6]        ; exec block
+        mov es, [bp + 8]
+        mov al, [bp + 4]        ; mode
+        mov ah, 4bh
         int 21h
         jc short no_exec_error
         xor ax, ax
 no_exec_error:
+        pop es
+        pop ds
+        leave
         ret
 
 ;; UCOUNT ASMPASCAL res_read(int fd, void *buf, UCOUNT count);
