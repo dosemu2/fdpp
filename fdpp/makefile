@@ -64,8 +64,8 @@ $(TARGET).sys: $(OBJS) $(PPOBJS) $(DOBJS)
 
 clean:
 	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
-	-$(RM) *.obj *.bak *.crf *.xrf *.map *.lst *.cod *.err *.elf *.inc \
-		*.lnk *.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
+	-$(RM) .tstamp *.map *.elf *.inc \
+		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
 		$(TARGET).sys kernel.sym *.pc fdpp.spec
 
 #               *Individual File Dependencies*
