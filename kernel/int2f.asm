@@ -344,11 +344,16 @@ _remote_lseek:
         leave
         ret
 
-remote_getfattr:
-                clc                    ; set to succeed
-                int     2fh
-                jc      ret_neg_ax
-                jmp     short ret_int2f
+;UWORD ASMFUNC remote_getfattr(void)
+        global _remote_getfattr
+_remote_getfattr:
+        mov ax, 110fh
+        clc                    ; set to succeed
+        int 2fh
+        jnc .ok
+        neg ax
+.ok:
+        ret
 
 remote_lock_unlock:
 		mov	dx, cx   	; parameter block (dx) in arg
@@ -379,8 +384,8 @@ call_int2f:
                 push    bp
                 push    si
                 push    di
-                cmp     al, 0fh
-                je      remote_getfattr
+;                cmp     al, 0fh
+;                je      remote_getfattr
 
                 mov     di, dx         ; es:di -> s and dx is used for 1125!
                 cmp     al, 08h

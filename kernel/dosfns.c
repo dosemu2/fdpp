@@ -1091,7 +1091,7 @@ COUNT DosGetFattr(const char FAR * name)
   set_fcbname();
 
   if (result & IS_NETWORK)
-    return network_redirector(REM_GETATTRZ);
+    return remote_getfattr();
 
   if (result & IS_DEVICE)
     return DE_FILENOTFND;

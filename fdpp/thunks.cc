@@ -590,6 +590,13 @@ void f(void) \
     do_asm_call(n, NULL, 0, z); \
 }
 
+#define _THUNK0(n, r, f, z) \
+r f(void) \
+{ \
+    _assert(n < asm_tab_len); \
+    return do_asm_call(n, NULL, 0, z); \
+}
+
 #define _THUNK1_v(n, f, t1, at1, aat1, c1, l1, z) \
 void f(t1 a1) \
 { \

@@ -396,6 +396,7 @@ DWORD ASMPASCAL network_redirector_mx_pp(UWORD cmd, __FAR(void)s, far_s *arg);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
 #define remote_getfree(s,d) (WORD)network_redirector_mx_wa4(REM_GETSPACE, s, d)
 UDWORD ASMFUNC remote_lseek(__FAR(void) sft, DWORD new_pos);
+UWORD ASMFUNC remote_getfattr(void);
 #define remote_setfattr(attr) (WORD)network_redirector_mx(REM_SETATTR, NULL, attr)
 #define remote_printredir(dx,ax) (WORD)network_redirector_mx(REM_PRINTREDIR, MK_FP(0,dx), ax)
 #define QRemote_Fn(d,s) (WORD)network_redirector_mx_pp(REM_FILENAME, d, &__ASMREF(s))
