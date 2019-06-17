@@ -161,11 +161,11 @@ CALL_INTR_FUNC:
 ;       mov bp, [bx+12]
         push word [bx+14]            ; ds
         mov es, [bx+16]
+        pushf                           ; old flags for iret
         push word [bx+22]               ; flags
         popf
         mov bx, [bx+2]
         pop ds
-        pushf
         call far [bp+8]
 
         pushf
