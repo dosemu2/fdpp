@@ -144,23 +144,25 @@ plt_init:
     mov ah, FDPP_KERNEL_VERSION
     mov bh, DOS_HELPER_PLUGIN_ID_FDPP
     mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
+    ; fill in struct fdpp_symtab
     push word IGROUP
-    push word init_near_wrp
+    push word init_near_wrp           ; near_wrp[1]
     push word TGROUP
-    push word near_wrp
-    push word 2    ; amount of near wrappers
-    push word __asm_callsymtab_end - __asm_callsymtab_start
+    push word near_wrp                ; near_wrp[0]
+    push word 2                       ; num_wrps
+    push word __asm_callsymtab_end - __asm_callsymtab_start  ; calltab_len
     push word IGROUP
-    push word __asm_callsymtab_start
-    push word __asm_symtab_end - __asm_symtab_start
+    push word __asm_callsymtab_start  ; calltab
+    push word __asm_symtab_end - __asm_symtab_start  ; symtab_len
     push word IGROUP
-    push word __asm_symtab_start
-    push cs
+    push word __asm_symtab_start      ; symtab
+    push cs                           ; cur_cs
+    push word IGROUP                  ; orig_cs
     push word IGROUP
+    push word __InitTextEnd           ; text_end
     push word IGROUP
-    push word __InitTextEnd
-    push word IGROUP
-    push word __InitTextStart
+    push word __InitTextStart         ; text_start
+    ; fdpp_symtab filled
     int DOS_HELPER_INT
     mov sp, bp
     pop bp
