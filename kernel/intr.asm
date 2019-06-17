@@ -33,13 +33,8 @@
                 mov     bp,sp
                 push    si
                 push    di
-%ifdef WATCOM
-                push    bx
-                push    cx
-                push    dx
-                push    es
-%endif
                 push	ds
+                pushf
 
                 mov	ax, [bp+6]		; interrupt number
                 mov	[cs:%%intr_1-1], al
@@ -50,9 +45,11 @@
 		mov	dx, [bx+6]
 		mov	si, [bx+8]
 		mov	di, [bx+10]
-		mov	bp, [bx+12]
+;		mov	bp, [bx+12]
 		push	word [bx+14]		; ds
 		mov	es, [bx+16]
+		push 	word [bx+22]		; flags
+		popf
 		mov	bx, [bx+2]
 		pop	ds
 		int	0
@@ -62,30 +59,21 @@
 		push	ds
 		push	bx
 		mov	bx, sp
-		mov	ds, [ss:bx+6]
-%ifdef WATCOM
-		mov	bx, [ss:bx+24]		; address of REGPACK
-%else
-		mov	bx, [ss:bx+16]		; address of REGPACK
-%endif
+		mov	bx, [bp+4]		; address of REGPACK
+		mov	ds, [bp-6]
 		mov	[bx], ax
-		pop	word [bx+2]
+		pop	word [bx+2]		; bx
 		mov	[bx+4], cx
 		mov	[bx+6], dx
 		mov	[bx+8], si
 		mov	[bx+10], di
-		mov	[bx+12], bp
-		pop	word [bx+14]
+;		mov	[bx+12], bp
+		pop	word [bx+14]		; ds
 		mov	[bx+16], es
-		pop	word [bx+22]
+		pop	word [bx+22]		; flags
 
+		popf
 		pop	ds
-%ifdef WATCOM
-                pop     es
-                pop     dx
-                pop     cx
-                pop     bx
-%endif
 		pop	di
 		pop	si
 		pop	bp
