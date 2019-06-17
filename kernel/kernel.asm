@@ -163,7 +163,7 @@ kernel_start:
                 rep     movsw
 
                                         ; move HMA_TEXT to higher memory
-                sub     ax,dx
+                mov     ax,TGROUP
                 mov     ds,ax           ; ds = HMA_TEXT
                 mov     ax,es
                 sub     ax,dx
