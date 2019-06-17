@@ -355,23 +355,33 @@ _remote_getfattr:
 .ok:
         ret
 
-remote_lock_unlock:
-		mov	dx, cx   	; parameter block (dx) in arg
-		mov	bx, cx
-		mov	bl, [bx + 8]	; unlock or not
-		mov	cx, 1
-		int	0x2f
-		jnc	ret_set_ax_to_carry
-		mov	ah, 0
-                jmp     short ret_neg_ax
+;BYTE ASMFUNC remote_lock_unlock(void FAR *sft, BYTE unlock,
+;    struct remote_lock_unlock FAR *arg)
+        global _remote_lock_unlock
+_remote_lock_unlock:
+        enter 0, 0
+        push ds
+        push es
+        mov di, [bp+4]  ; sft
+        mov es, [bp+6]
+        mov bl, [bp+8]  ; unlock
+        mov cx, 1
+        mov dx, [bp+10] ; arg
+        mov ds, [bp+12]
+        mov ax, 110ah
+        clc                    ; set to succeed
+        int 2fh
+        sbb al, al
+        pop es
+        pop ds
+        leave
+        ret
 
 ;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
                 global NETWORK_REDIRECTOR_MX_WA4
 NETWORK_REDIRECTOR_MX_WA4:
-                global NETWORK_REDIRECTOR_MX_PS
-NETWORK_REDIRECTOR_MX_PS:
                 global NETWORK_REDIRECTOR_MX_PP
 NETWORK_REDIRECTOR_MX_PP:
                 pop     bx             ; ret address
@@ -392,8 +402,8 @@ call_int2f:
                 je      remote_rw
                 cmp     al, 09h
                 je      remote_rw
-                cmp     al, 0ah
-                je      remote_lock_unlock
+;                cmp     al, 0ah
+;                je      remote_lock_unlock
 ;                cmp     al, 21h
 ;                je      remote_lseek
                 cmp     al, 22h

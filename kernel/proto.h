@@ -391,7 +391,7 @@ int network_redirector(unsigned cmd);
 int network_redirector_fp(unsigned cmd, __FAR(void)s);
 DWORD ASMPASCAL network_redirector_mx(UWORD cmd, __FAR(void)s, UWORD arg);
 DWORD ASMPASCAL network_redirector_mx_wa4(UWORD cmd, __FAR(void)s, UWORD arg[4]);
-DWORD ASMPASCAL network_redirector_mx_ps(UWORD cmd, __FAR(void)s, struct _SSS *arg);
+BYTE ASMFUNC remote_lock_unlock(__FAR(void) sft, BYTE unlock, __FAR(struct remote_lock_unlock) arg);
 DWORD ASMPASCAL network_redirector_mx_pp(UWORD cmd, __FAR(void)s, far_s *arg);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
 #define remote_getfree(s,d) (WORD)network_redirector_mx_wa4(REM_GETSPACE, s, d)

@@ -41,7 +41,7 @@ BYTE share_installed = 0;
 
 /* /// End of additions for SHARE.  - Ron Cemer */
 
-STATIC int remote_lock_unlock(sft FAR *sftp,    /* SFT for file */
+STATIC int do_remote_lock_unlock(sft FAR *sftp,    /* SFT for file */
                              unsigned long ofs, /* offset into file */
                              unsigned long len, /* length (in bytes) of region to lock or unlock */
                              int unlock);       /* one to unlock; zero to lock */
@@ -1225,7 +1225,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
     return DE_INVLDHNDL;
 
   if (s->sft_flags & SFT_FSHARED)
-    return remote_lock_unlock(s, pos, len, unlock);
+    return do_remote_lock_unlock(s, pos, len, unlock);
 
   /* Invalid function unless SHARE is installed or remote. */
   if (!IsShareInstalled(FALSE))
@@ -1346,15 +1346,14 @@ COUNT DosTruename(const char FAR *src, char FAR *dest)
   return rc;
 }
 
-STATIC int remote_lock_unlock(sft FAR *sftp,     /* SFT for file */
+STATIC int do_remote_lock_unlock(sft FAR *sftp,     /* SFT for file */
                               unsigned long ofs, /* offset into file */
                               unsigned long len, /* length (in bytes) of region to lock or unlock */
                               int unlock)
                                  /* one to unlock; zero to lock */
 {
-  struct _SSS param_block;
-  param_block.lu.ofs = ofs;
-  param_block.lu.len = len;
-  param_block.unlock = unlock;
-  return (WORD)network_redirector_mx_ps(REM_LOCK, sftp, &param_block);
+  struct remote_lock_unlock param_block;
+  param_block.ofs = ofs;
+  param_block.len = len;
+  return remote_lock_unlock(sftp, unlock, MK_FAR_SCP(param_block));
 }

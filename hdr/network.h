@@ -84,9 +84,3 @@ struct remote_fileattrib {
 struct remote_lock_unlock {
     UDWORD ofs, len;
 };
-
-struct _SSS
-{
-    struct remote_lock_unlock lu;
-    BYTE unlock;
-};
