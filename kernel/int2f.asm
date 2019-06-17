@@ -325,11 +325,24 @@ SHARE_LOCK_UNLOCK:
 ; sumtimes return data *ptr is the push stack word
 ;
 
-remote_lseek:   ; arg is a pointer to the long seek value
-                mov     bx, cx
-                mov     dx, [bx]
-                mov     cx, [bx+2]
-                ; "fall through"
+;UDWORD remote_lseek(void far *sft, DWORD pos)
+        global _remote_lseek
+_remote_lseek:
+        enter 0, 0
+        push es
+        mov di, [bp+4] ; sft
+        mov es, [bp+6]
+        mov dx, [bp+8] ; pos
+        mov cx, [bp+10]
+        mov ax, 1121h
+        clc
+        int 2fh
+        jnc .ok
+        neg ax
+.ok:
+        pop es
+        leave
+        ret
 
 remote_getfattr:
                 clc                    ; set to succeed
@@ -350,8 +363,6 @@ remote_lock_unlock:
 ;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
-                global NETWORK_REDIRECTOR_MX_PD
-NETWORK_REDIRECTOR_MX_PD:
                 global NETWORK_REDIRECTOR_MX_WA4
 NETWORK_REDIRECTOR_MX_WA4:
                 global NETWORK_REDIRECTOR_MX_PS
@@ -378,8 +389,8 @@ call_int2f:
                 je      remote_rw
                 cmp     al, 0ah
                 je      remote_lock_unlock
-                cmp     al, 21h
-                je      remote_lseek
+;                cmp     al, 21h
+;                je      remote_lseek
                 cmp     al, 22h
                 je      remote_process_end
                 cmp     al, 23h

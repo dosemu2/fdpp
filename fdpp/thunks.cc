@@ -616,6 +616,22 @@ void f(t1 a1, t2 a2) \
     clean_stk(sizeof(_args)); \
 }
 
+#define _THUNK2(n, r, f, t1, at1, aat1, c1, l1, t2, at2, aat2, c2, l2, z) \
+r f(t1 a1, t2 a2) \
+{ \
+    r _ret; \
+    _CNV(c1, at1, l1, 1); \
+    _CNV(c2, at2, l2, 2); \
+    struct { \
+	aat1 a1; \
+	aat2 a2; \
+    } PACKED _args = { _a1, _a2 }; \
+    _assert(n < asm_tab_len); \
+    _ret = do_asm_call(n, (UBYTE *)&_args, sizeof(_args), z); \
+    clean_stk(sizeof(_args)); \
+    return _ret; \
+}
+
 #define _THUNK3_v(n, f, t1, at1, aat1, c1, l1, t2, at2, aat2, c2, l2, \
     t3, at3, aat3, c3, l3, z) \
 void f(t1 a1, t2 a2, t3 a3) \
