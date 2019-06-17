@@ -97,12 +97,10 @@ segment	DCONST      	class(DCONST) align=2
 segment	DYN_DATA        class(DYN_DATA)
 segment	HMA_TEXT_START	class(CODE) align=16
 segment	HMA_TEXT	class(CODE) exec
-;segment HMA_TEXT_END	class(CODE) align=16
-segment HMA_TEXT_END	class(CODE)
+segment HMA_TEXT_END	class(CODE) align=16
 segment INIT_TEXT_START class(CODE) align=16
 segment	INIT_TEXT	class(CODE) exec
-;segment	INIT_TEXT_END   class(CODE) align=16
-segment	INIT_TEXT_END   class(CODE)
+segment	INIT_TEXT_END   class(CODE) align=16
 
 %ifdef WATCOM
 segment ID_B            class(FAR_DATA) align=16
