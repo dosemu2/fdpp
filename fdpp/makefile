@@ -52,7 +52,7 @@ all: $(ALL)
 production:     $(ALL) ../bin/country.sys
 clobber:        clean
 
-$(TARGET).sys: $(OBJS) $(PPOBJS) $(DOBJS)
+$(TARGET).sys: $(OBJS) $(PPOBJS) $(DOBJS) $(srcdir)/kernel.ld
 	$(LINK) -T$(srcdir)/kernel.ld -melf_i386 -static -Map kernel.map -o $@ $^
 	chmod -x $@
 
