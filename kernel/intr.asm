@@ -121,13 +121,61 @@ no_read_error:
         leave
         ret
 ;
-;       void call_intr(nr, rp)
-;       REG int nr
-;       REG struct REGPACK *rp
+;       void ASMPASCAL call_intr(WORD nr, struct REGPACK FAR *rp)
 ;
-		global	CALL_INTR
+    global CALL_INTR
 CALL_INTR:
-		INTR
+        push bp                      ; Standard C entry
+        mov  bp,sp
+        push si
+        push di
+        push ds
+        pushf
+
+        mov ax, [bp+8]               ; interrupt number
+        mov [cs:.intr_1-1], al
+        jmp short .intr_2           ; flush the instruction cache
+.intr_2
+        mov bx, [bp+4]               ; regpack structure
+        mov ds, [bp+6]
+        mov ax, [bx]
+        mov cx, [bx+4]
+        mov dx, [bx+6]
+        mov si, [bx+8]
+        mov di, [bx+10]
+;        mov bp, [bx+12]
+        push word [bx+14]            ; ds
+        mov es, [bx+16]
+        push word [bx+22]            ; flags
+        popf
+        mov bx, [bx+2]
+        pop ds
+        int 0
+.intr_1:
+
+        pushf
+        push ds
+        push bx
+        mov bx, sp
+        mov bx, [bp+4]               ; address of REGPACK
+        mov ds, [bp+6]
+        mov [bx], ax
+        pop word [bx+2]              ; bx
+        mov [bx+4], cx
+        mov [bx+6], dx
+        mov [bx+8], si
+        mov [bx+10], di
+;        mov [bx+12], bp
+        pop word [bx+14]             ; ds
+        mov [bx+16], es
+        pop word [bx+22]             ; flags
+
+        popf
+        pop ds
+        pop di
+        pop si
+        pop bp
+        ret 6
 
 ;
 ;       void ASMPASCAL call_intr_func(void FAR *ptr, struct REGPACK FAR *rp)
