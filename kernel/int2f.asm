@@ -305,7 +305,7 @@ share_common:
 ;          Returns zero if successfully locked or unlocked.  Otherwise
 ;          returns non-zero.
 ;          If the return value is non-zero, it is the negated error
-;          return code for the DOS 0x5c call. */
+;          return code for the DOS 0x5c call.
 ;STATIC int share_lock_unlock(unsigned short pspseg,     /* psp segment address of owner process */
 ;                             int fileno,        /* file_table entry number */
 ;                             unsigned long ofs, /* offset into file */
