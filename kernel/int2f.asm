@@ -377,13 +377,30 @@ _remote_lock_unlock:
         leave
         ret
 
+;BYTE ASMFUNC remote_qualify_filename(char FAR *dst, char FAR *src)
+        global _remote_qualify_filename
+_remote_qualify_filename:
+        enter 0, 0
+        push ds
+        push es
+        mov di, [bp+4]  ; dst
+        mov es, [bp+6]
+        mov si, [bp+8]  ; src
+        mov ds, [bp+10]
+        mov ax, 1123h
+        clc                    ; set to succeed
+        int 2fh
+        sbb al, al
+        pop es
+        pop ds
+        leave
+        ret
+
 ;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
                 global NETWORK_REDIRECTOR_MX_WA4
 NETWORK_REDIRECTOR_MX_WA4:
-                global NETWORK_REDIRECTOR_MX_PP
-NETWORK_REDIRECTOR_MX_PP:
                 pop     bx             ; ret address
                 pop     cx             ; stack value (arg); cx in remote_rw
                 pop     dx             ; off s
@@ -408,8 +425,8 @@ call_int2f:
 ;                je      remote_lseek
                 cmp     al, 22h
                 je      remote_process_end
-                cmp     al, 23h
-                je      qremote_fn
+;                cmp     al, 23h
+;                je      qremote_fn
 
                 push    cx             ; arg
                 cmp     al, 0ch
@@ -475,11 +492,6 @@ remote_rw:
 ret_min_dx_ax:  neg     ax
                 cwd
                 jmp     short ret_int2f
-
-qremote_fn:
-                mov     bx, cx
-                lds     si, [bx]
-                jmp     short int2f_restore_ds
 
 remote_process_end:                   ; Terminate process
                 mov     ds, [_cu_psp]

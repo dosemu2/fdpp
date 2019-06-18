@@ -392,14 +392,14 @@ int network_redirector_fp(unsigned cmd, __FAR(void)s);
 DWORD ASMPASCAL network_redirector_mx(UWORD cmd, __FAR(void)s, UWORD arg);
 DWORD ASMPASCAL network_redirector_mx_wa4(UWORD cmd, __FAR(void)s, UWORD arg[4]);
 BYTE ASMFUNC remote_lock_unlock(__FAR(void) sft, BYTE unlock, __FAR(struct remote_lock_unlock) arg);
-DWORD ASMPASCAL network_redirector_mx_pp(UWORD cmd, __FAR(void)s, far_s *arg);
+BYTE ASMFUNC remote_qualify_filename(__FAR(char) dst, __FAR(const char) src);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
 #define remote_getfree(s,d) (WORD)network_redirector_mx_wa4(REM_GETSPACE, s, d)
 UDWORD ASMFUNC remote_lseek(__FAR(void) sft, DWORD new_pos);
 UWORD ASMFUNC remote_getfattr(void);
 #define remote_setfattr(attr) (WORD)network_redirector_mx(REM_SETATTR, NULL, attr)
 #define remote_printredir(dx,ax) (WORD)network_redirector_mx(REM_PRINTREDIR, MK_FP(0,dx), ax)
-#define QRemote_Fn(d,s) (WORD)network_redirector_mx_pp(REM_FILENAME, d, &__ASMREF(s))
+#define QRemote_Fn(d,s) remote_qualify_filename(d, s)
 
 UWORD get_machine_name(__FAR(char) netname);
 VOID set_machine_name(__FAR(const char) netname, UWORD name_num);
