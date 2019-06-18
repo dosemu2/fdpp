@@ -316,14 +316,9 @@ SHARE_LOCK_UNLOCK:
 		mov	ax,0x10a4
 		jmp	short share_common
 
-; Int 2F Multipurpose Remote System Calls
+; Int 2F network redirector functions
 ;
-; added by James Tabor jimtabor@infohwy.com
-; changed by Bart Oldeman
-;
-; assume ss == ds after setup of stack in entry
-; sumtimes return data *ptr is the push stack word
-;
+; added by stsp for fdpp project
 
 ;UDWORD remote_lseek(void far *sft, DWORD pos)
         global _remote_lseek
@@ -421,6 +416,15 @@ _remote_getfree:
         leave
         ret
 
+; Int 2F Multipurpose Remote System Calls
+;
+; added by James Tabor jimtabor@infohwy.com
+; changed by Bart Oldeman
+;
+; assume ss == ds after setup of stack in entry
+; sumtimes return data *ptr is the push stack word
+;
+
 ;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
@@ -434,26 +438,16 @@ call_int2f:
                 push    bp
                 push    si
                 push    di
-;                cmp     al, 0fh
-;                je      remote_getfattr
 
                 mov     di, dx         ; es:di -> s and dx is used for 1125!
                 cmp     al, 08h
                 je      remote_rw
                 cmp     al, 09h
                 je      remote_rw
-;                cmp     al, 0ah
-;                je      remote_lock_unlock
-;                cmp     al, 21h
-;                je      remote_lseek
                 cmp     al, 22h
                 je      remote_process_end
-;                cmp     al, 23h
-;                je      qremote_fn
 
                 push    cx             ; arg
-;                cmp     al, 0ch
-;                je      remote_getfree
                 cmp     al, 1eh
                 je      remote_print_doredir
                 cmp     al, 1fh
