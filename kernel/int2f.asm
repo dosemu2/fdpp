@@ -399,7 +399,7 @@ _remote_getfree:
         push es
         mov di, [bp+4]  ; cds
         mov es, [bp+6]
-        mov ax, 1123h
+        mov ax, 110ch
         clc                    ; set to succeed
         int 2fh
         jc .bad
