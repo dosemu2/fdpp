@@ -396,11 +396,34 @@ _remote_qualify_filename:
         leave
         ret
 
+;BYTE ASMFUNC remote_getfree(void FAR *cds, void FAR *dst)
+        global _remote_getfree
+_remote_getfree:
+        enter 0, 0
+        push ds
+        push es
+        mov di, [bp+4]  ; cds
+        mov es, [bp+6]
+        mov ax, 1123h
+        clc                    ; set to succeed
+        int 2fh
+        jc .bad
+        mov si, [bp+8]  ; dst
+        mov ds, [bp+10]
+        mov [si],ax
+        mov [si+2],bx
+        mov [si+4],cx
+        mov [si+6],dx
+.bad
+        sbb al, al
+        pop es
+        pop ds
+        leave
+        ret
+
 ;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
-                global NETWORK_REDIRECTOR_MX_WA4
-NETWORK_REDIRECTOR_MX_WA4:
                 pop     bx             ; ret address
                 pop     cx             ; stack value (arg); cx in remote_rw
                 pop     dx             ; off s
@@ -429,8 +452,8 @@ call_int2f:
 ;                je      qremote_fn
 
                 push    cx             ; arg
-                cmp     al, 0ch
-                je      remote_getfree
+;                cmp     al, 0ch
+;                je      remote_getfree
                 cmp     al, 1eh
                 je      remote_print_doredir
                 cmp     al, 1fh
@@ -471,17 +494,6 @@ remote_print_doredir:                  ; di points to an lregs structure
 ret_set_ax_to_carry:                    ; carry => -1 else 0 (SUCCESS)
                 sbb     ax, ax
                 jmp     short ret_int2f
-
-remote_getfree:
-                clc                     ; set to succeed
-                int     2fh
-                pop     di              ; retrieve pushed pointer arg
-                jc      ret_set_ax_to_carry
-                mov     [di],ax
-                mov     [di+2],bx
-                mov     [di+4],cx
-                mov     [di+6],dx
-                jmp     short ret_set_ax_to_carry
 
 remote_rw:
                 clc                    ; set to succeed
