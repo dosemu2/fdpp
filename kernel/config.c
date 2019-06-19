@@ -519,6 +519,15 @@ VOID configDone(VOID)
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
 
+  if (master_env[0] == '\0')   /* some shells panic on empty master env. */
+    strcpy(master_env, "PATH=.");
+
+  /* The standard handles should be reopened here, because
+     we may have loaded new console or printer drivers in CONFIG.SYS */
+}
+
+VOID configPreBoot(VOID)
+{
 #if defined(__GNUC__)
 #define DOSOBJ_POOL2 256
   void FAR *fa = KernelAlloc(DOSOBJ_POOL2, 'B', Config.cfgDosDataUmb);
@@ -527,12 +536,6 @@ VOID configDone(VOID)
 
   MK_NEAR_STR_OBJ(Config, cfgInit, cfginit);
   MK_NEAR_STR_OBJ(Config, cfgInitTail, cfginittail);
-
-  if (master_env[0] == '\0')   /* some shells panic on empty master env. */
-    strcpy(master_env, "PATH=.");
-
-  /* The standard handles should be reopened here, because
-     we may have loaded new console or printer drivers in CONFIG.SYS */
 }
 
 STATIC seg prev_mcb(seg cur_mcb, seg start)

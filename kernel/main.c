@@ -144,6 +144,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   /* purge INIT_TEXT to make sure its not used by mistake */
   fmemset(_InitTextStart, 0xcc, _InitTextEnd - _InitTextStart);
   PurgeHook(_InitTextStart, _InitTextEnd - _InitTextStart);
+  configPreBoot();
 
   kernel();
 }
