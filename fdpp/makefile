@@ -52,8 +52,8 @@ all: $(ALL)
 production:     $(ALL) ../bin/country.sys
 clobber:        clean
 
-$(TARGET).sys: $(OBJS) $(PPOBJS) $(DOBJS) $(srcdir)/kernel.ld
-	$(LINK) -T$(srcdir)/kernel.ld -melf_i386 -static -Map kernel.map -o $@ $^
+$(TARGET).sys: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
+	$(LINK) -melf_i386 -static -Map kernel.map -o $@ $(^:%.ld=-T%.ld)
 	chmod -x $@
 
 ../bin/country.sys: $(SRC)country.asm
