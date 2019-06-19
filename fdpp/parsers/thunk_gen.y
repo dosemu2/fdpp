@@ -247,17 +247,21 @@ line:		lnum rdecls fname lb args rb SEMIC
 			    }
 			    break;
 			  case 1:
-			    if (!is_rvoid)
-			      printf("_THUNK%s%i%s(%i, %s, %s",
+			    if (!is_rvoid || is_rptr)
+			      printf("_THUNK%s%i(%i, %s(%s), %s, %s",
 			          is_pas ? "_P_" : "",
 			          arg_num,
-			          is_rptr ? (is_rfar ? "pf" : "p") : "",
-			          $1, rtbuf, $3);
+			          $1,
+			          is_rptr ? (is_rfar ? "__ARG_PTR_FAR" :
+			                  "__ARG_PTR") : "__ARG",
+			          rtbuf,
+			          is_rptr ? (is_rfar ? "__RET_PTR_FAR" :
+			                  "__RET_PTR") : "__RET",
+			          $3);
 			    else
-			      printf("_THUNK%s%i_v%s(%i, %s",
+			      printf("_THUNK%s%i_v(%i, %s",
 			          is_pas ? "_P_" : "",
 			          arg_num,
-			          is_rptr ? (is_rfar ? "pf" : "p") : "",
 			          $1, $3);
 			    if (arg_num)
 			      printf(", %s", abuf);
