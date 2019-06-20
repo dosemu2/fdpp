@@ -17,7 +17,7 @@ VERSION = $(MAJ)$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
 TGZ = $(TAR).gz
-GEN_EXT = fdpp.pc fdpp.spec
+GEN_EXT = fdpp.pc bprm.h thunks.h
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
@@ -210,11 +210,11 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	fi
 	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers
 
-install: $(FDPPLIB) fdpp.pc
+install: $(FDPPLIB) $(GEN_EXT)
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
 	install -D -t $(DESTDIR)$(PKGCONFIGDIR) -m 0644 fdpp.pc
-	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(srcdir)/thunks.h
-	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(HDR)bprm.h
+	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 thunks.h
+	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 bprm.h
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 
 $(TGZ): fdpp.spec
@@ -231,9 +231,14 @@ rpm: $(TGZ)
 deb:
 	debuild -i -us -uc -b
 
-$(GEN_EXT): %: $(srcdir)/%.in makefile
+fdpp.spec fdpp.pc: %: $(srcdir)/%.in makefile
 	sed \
 		-e 's!@PREFIX[@]!$(PREFIX)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
 		-e 's!@VERSION[@]!$(VERSION)!g' \
 		$< >$@
+
+bprm.h: $(HDR)bprm.h
+	ln -s $< $@
+thunks.h: $(srcdir)/thunks.h
+	ln -s $< $@
