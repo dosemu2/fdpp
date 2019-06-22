@@ -139,6 +139,7 @@ CALL_INTR_FUNC:
         mov  bp,sp
         push ds
         push es
+        pushf
 
         mov bx, [bp+4]               ; regpack structure
         mov ds, [bp+6]
@@ -150,11 +151,11 @@ CALL_INTR_FUNC:
 ;       mov bp, [bx+12]
         push word [bx+14]            ; ds
         mov es, [bx+16]
-        pushf                           ; old flags for iret
-        push word [bx+22]               ; flags
+        push word [bx+22]            ; flags
         popf
         mov bx, [bx+2]
         pop ds
+        pushf
         call far [bp+8]
 
         pushf
@@ -175,9 +176,9 @@ CALL_INTR_FUNC:
         mov [bx+16], es
         pop word [bx+22]        ; flags
 
+        popf
         pop es
         pop ds
-
         pop bp
         ret 8
 
