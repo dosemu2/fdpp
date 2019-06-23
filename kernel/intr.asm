@@ -27,7 +27,7 @@
 
 		%include "segs.inc"
 
-%macro INTR 3
+%macro INTR 2
         push bp                      ; Standard C entry
         mov  bp,sp
         push si
@@ -39,9 +39,10 @@
         mov [cs:.intr_1-1], al
         jmp short .intr_2           ; flush the instruction cache
 .intr_2
+%if %2 == 1
+        lds bx, [bp+4]               ; regpack structure FAR
+%else
         mov bx, [bp+4]               ; regpack structure
-%if %3 == 1
-        mov ds, [bp+6]
 %endif
         mov ax, [bx]
         mov cx, [bx+4]
@@ -62,8 +63,12 @@
         push ds
         push bx
         mov bx, sp
+%if %2 == 1
+        lds bx, [bp+4]               ; regpack structure FAR
+%else
         mov bx, [bp+4]               ; address of REGPACK
-        mov ds, [bp%2]
+        mov ds, [bp-6]               ; take saved ds
+%endif
         mov [bx], ax
         pop word [bx+2]              ; bx
         mov [bx+4], cx
@@ -90,10 +95,8 @@ _res_DosExec:
         enter 0, 0
         push ds
         push es
-        mov dx, [bp + 10]       ; filename
-        mov ds, [bp + 12]
-        mov bx, [bp + 6]        ; exec block
-        mov es, [bp + 8]
+        lds dx, [bp + 10]       ; filename
+        les bx, [bp + 6]        ; exec block
         mov al, [bp + 4]        ; mode
         mov ah, 4bh
         int 21h
@@ -111,8 +114,7 @@ _res_read:
         enter 0, 0
         push ds
         mov cx, [bp + 10]       ; count
-        mov dx, [bp + 6]        ; buf
-        mov ds, [bp + 8]
+        lds dx, [bp + 6]        ; buf
         mov bx, [bp + 4]        ; fd
         mov ah, 3fh
         int 21h
@@ -127,7 +129,7 @@ no_read_error:
 ;
     global CALL_INTR
 CALL_INTR:
-        INTR 8,+6,1
+        INTR 8,1
         ret 6
 
 ;
@@ -141,8 +143,7 @@ CALL_INTR_FUNC:
         push es
         pushf
 
-        mov bx, [bp+4]               ; regpack structure
-        mov ds, [bp+6]
+        lds bx, [bp+4]               ; regpack structure
         mov ax, [bx]
         mov cx, [bx+4]
         mov dx, [bx+6]
@@ -191,7 +192,7 @@ segment	INIT_TEXT
 ;
 		global	INIT_CALL_INTR
 INIT_CALL_INTR:
-		INTR 6,-6,0
+		INTR 6,0
 		ret 4
 
 ;

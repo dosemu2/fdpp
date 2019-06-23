@@ -325,8 +325,7 @@ SHARE_LOCK_UNLOCK:
 _remote_lseek:
         enter 0, 0
         push es
-        mov di, [bp+4] ; sft
-        mov es, [bp+6]
+        les di, [bp+4] ; sft
         mov dx, [bp+8] ; pos
         mov cx, [bp+10]
         mov ax, 1121h
@@ -357,12 +356,10 @@ _remote_lock_unlock:
         enter 0, 0
         push ds
         push es
-        mov di, [bp+4]  ; sft
-        mov es, [bp+6]
+        les di, [bp+4]  ; sft
         mov bl, [bp+8]  ; unlock
         mov cx, 1
-        mov dx, [bp+10] ; arg
-        mov ds, [bp+12]
+        lds dx, [bp+10] ; arg
         mov ax, 110ah
         clc                    ; set to succeed
         int 2fh
@@ -378,10 +375,8 @@ _remote_qualify_filename:
         enter 0, 0
         push ds
         push es
-        mov di, [bp+4]  ; dst
-        mov es, [bp+6]
-        mov si, [bp+8]  ; src
-        mov ds, [bp+10]
+        les di, [bp+4]  ; dst
+        lds si, [bp+8]  ; src
         mov ax, 1123h
         clc                    ; set to succeed
         int 2fh
@@ -397,14 +392,12 @@ _remote_getfree:
         enter 0, 0
         push ds
         push es
-        mov di, [bp+4]  ; cds
-        mov es, [bp+6]
+        les di, [bp+4]  ; cds
         mov ax, 110ch
         clc                    ; set to succeed
         int 2fh
         jc .bad
-        mov si, [bp+8]  ; dst
-        mov ds, [bp+10]
+        lds si, [bp+8]  ; dst
         mov [si],ax
         mov [si+2],bx
         mov [si+4],cx
