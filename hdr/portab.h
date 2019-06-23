@@ -264,6 +264,7 @@ void PurgeHook(void *ptr, UDWORD len);
 #define USE_STDLIB
 #define PACKED         __attribute__((packed))
 #define NORETURN
+#define FDPP
 
 #else
 #error Unknown compiler

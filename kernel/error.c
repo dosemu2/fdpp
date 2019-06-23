@@ -48,7 +48,7 @@ VOID dump(void)
 }
 #endif
 
-#ifndef __GNUC__
+#ifndef FDPP
 /* issue a panic message for corrupted data structures          */
 VOID panic(const char * s)
 {

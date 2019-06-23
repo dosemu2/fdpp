@@ -1,4 +1,4 @@
-#ifdef __GNUC__
+#ifdef FDPP
 
 #include <glob_inc.h>
 

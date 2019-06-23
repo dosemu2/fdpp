@@ -123,7 +123,7 @@ BSS(size_t, ebda_size, 0);
 
 STATIC BSSA(UBYTE, ErrorAlreadyPrinted, 128);
 
-#if defined(__GNUC__)
+#ifdef FDPP
 static void FAR *dosobj;
 #endif
 
@@ -493,7 +493,7 @@ void PostConfig(void)
 
     DebugPrintf(("Stacks allocated at %P\n", GET_FP32(stackBase)));
   }
-#if defined(__GNUC__)
+#ifdef FDPP
 #define DOSOBJ_POOL2 256
   dosobj = KernelAlloc(DOSOBJ_POOL2, 'B', Config.cfgDosDataUmb);
 #endif
@@ -536,7 +536,7 @@ VOID configDone(VOID)
 
 VOID configPreBoot(VOID)
 {
-#if defined(__GNUC__)
+#ifdef FDPP
   dosobj_reinit(GET_FAR(dosobj), DOSOBJ_POOL2);
 #endif
 

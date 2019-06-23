@@ -89,7 +89,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   /* clear the Init BSS area (what normally the RTL does */
   memset(_ib_start, 0, _ib_end - _ib_start);
-#ifdef __GNUC__
+#ifdef FDPP
   objhlp_reset();
   run_ctors();
 #define DOSOBJ_POOL 512
@@ -462,7 +462,7 @@ STATIC VOID signon()
 #elif defined(__WATCOMC__)
   "WATCOMC"
 #elif defined(__GNUC__)
-  "GNUC" /* this is hypothetical only */
+  "GNUC"
 #else
 #error Unknown compiler
   generate some bullshit error here, as the compiler should be known
@@ -527,7 +527,7 @@ STATIC void kernel()
       MK_NEAR_STR_OBJ(Config, cfgInitTail, Cmd.ctBuffer);
     }
   }
-#if defined(__GNUC__) && defined(DEBUG)
+#ifdef FDPP_DEBUG
   dosobj_dump();
 #endif
   call_p_0(MK_FAR_SCP(Config)); /* go execute process 0 (the shell) */
