@@ -38,7 +38,7 @@
         mov ax, [bp+%1]               ; interrupt number
         mov [cs:.intr_1-1], al
         jmp short .intr_2           ; flush the instruction cache
-.intr_2
+.intr_2:
 %if %2 == 1
         lds bx, [bp+4]               ; regpack structure FAR
 %else

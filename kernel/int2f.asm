@@ -402,7 +402,7 @@ _remote_getfree:
         mov [si+2],bx
         mov [si+4],cx
         mov [si+6],dx
-.bad
+.bad:
         sbb al, al
         pop es
         pop ds
