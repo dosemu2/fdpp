@@ -155,7 +155,7 @@ kernel_start:
                 add     ax,dx
 %endif
                 mov     ds,ax
-                mov     si,-2 + INITSIZE - (init_tos - __ib_end) ; exclude stk
+                mov     si,-2 + INITTEXTSIZE
                 lea     cx,[si+2]
                 mov     di,si
                 shr     cx,1
