@@ -418,7 +418,7 @@ _remote_getfree:
 ; sumtimes return data *ptr is the push stack word
 ;
 
-;long ASMPASCAL network_redirector_mx(unsigned cmd, void far *s, void *arg)
+;DWORD ASMPASCAL network_redirector_mx(UWORD cmd, void far *s, UWORD arg)
                 global NETWORK_REDIRECTOR_MX
 NETWORK_REDIRECTOR_MX:
                 pop     bx             ; ret address
@@ -465,13 +465,13 @@ ret_set_ax_to_cx:                      ; ext_open or rw -> status from CX in AX
                 jmp     short ret_int2f
 
 remote_print_doredir:                  ; di points to an lregs structure
-                mov     es,[di+0xe]
-                mov     bx,[di+2]
-                mov     cx,[di+4]
-                mov     dx,[di+6]
-                mov     si,[di+8]
-                lds     di,[di+0xa]
-
+                push word [es:di+0xe]  ; es
+                mov     bx,[es:di+2]
+                mov     cx,[es:di+4]
+                mov     dx,[es:di+6]
+                mov     si,[es:di+8]
+                lds     di,[es:di+0xa]
+                pop     es
                 clc                     ; set to succeed
                 int     2fh
                 pop     bx              ; restore stack and ds=ss
