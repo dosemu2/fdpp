@@ -847,10 +847,7 @@ _p_0_tos:
 segment DYN_DATA
 
         global _Dyn
-        global _DynEnd
 _Dyn:
-        times 4096 db 0
-_DynEnd:
 
 markEndInstanceData:  ; mark end of DOS data seg we say needs instancing
 
