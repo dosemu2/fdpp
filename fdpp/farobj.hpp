@@ -134,7 +134,7 @@ public:
 
 #define _RP(t) typename std::remove_pointer<t>::type
 #define _RE(t) typename std::remove_extent<t>::type
-//#define _RR(t) typename std::remove_reference<t>::type
+#define _RR(t) typename std::remove_reference<t>::type
 #define _R(o) _RP(_RE(_RR(decltype(o))))
 #define _RC(t) typename std::remove_const<_R(t)>::type
 
@@ -163,7 +163,7 @@ public:
     track_owner_sh(&p, &p.m, _sh); \
     p.m = FarPtrBase<_RC(o)> (((FarObj<_R(o)> *)_sh.get())->get_obj()); \
 } while(0)
-#define MK_FAR_SCP(o) FarPtr<decltype(o)>(FarObj<decltype(o)>(o, NM).get_obj())
+#define MK_FAR_SCP(o) FarPtr<_RR(decltype(o))>(FarObj<_RR(decltype(o))>(o, NM).get_obj())
 #define MK_FAR_SZ_SCP(o, sz) FarPtr<_RC(o)>(FarObj<_R(o)>(o, sz, false, NM).get_obj())
 
 #define PTR_MEMB(t) NearPtr_DO<t>

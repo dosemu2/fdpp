@@ -115,6 +115,7 @@ COUNT dsk_init(VOID);
 /* inithma.c */
 int MoveKernelToHMA(void);
 __FAR(VOID) HMAalloc(UCOUNT bytesToAllocate);
+UWORD fd_call_intr(WORD nr, iregs *rp);
 
 /* initoem.c */
 unsigned init_oem(void);

@@ -29,7 +29,7 @@
 #include "portab.h"
 #include "pcb.h"
 #include "globals.h"
-#include "proto.h"
+#include "init-mod.h"
 
 #ifdef FORSYS
 #include <io.h>
@@ -116,7 +116,7 @@ void put_console(int c)
 #else
   iregs r = {};
   r.a.b.l = c;
-  call_intr(0x29, MK_FAR_SCP(r));
+  fd_call_intr(0x29, &r);
 #endif
 }
 #endif                          /*  DOSEMU   */
