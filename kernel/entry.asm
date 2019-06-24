@@ -362,12 +362,13 @@ int21_3:
                 mov     cx,_disk_api_tos
 
 int21_normalentry:
-
+                cmp     byte [_InDOS],0
+                jne     int21_4
                 cli
                 mov     ss,dx
                 mov     sp,cx
                 sti
-
+int21_4:
                 ;
                 ; Push the far pointer to the register frame for
                 ; int21_syscall and remainder of kernel.
