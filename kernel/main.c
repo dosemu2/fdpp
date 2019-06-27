@@ -89,6 +89,8 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   /* clear the Init BSS area (what normally the RTL does */
   memset(_ib_start, 0, _ib_end - _ib_start);
+  /* purge HMAText so that no one uses it on init stage */
+  fmemset(_HMATextStart, 0xcc, _HMATextEnd - _HMATextStart);
 #ifdef FDPP
   objhlp_reset();
   run_ctors();
