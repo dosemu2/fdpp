@@ -1,3 +1,23 @@
+## beta-7
+
+This marks the end of the short but very intensive development cycle
+with lots of changes to freedos. Over 40 commits in 2 weeks.
+Lots of regressions were introduced and are hopfully all now fixed,
+so the release tagging is a due.
+
+- Lots of work on fdkernel to use far pointers for data access.  [fdkernel]
+  This allows to relocate the fdpp memory pool to UMB.
+  Unfortunately freedos can't yet re-use the freed space.
+- Fixes to relocation code for more source-level compatibility   [fdpp]
+  with freedos.
+- Fixed long-standing bug that caused the excessive size of the  [fdkernel]
+  realmode kernel image. Now realmode part shrunk by 4k (from
+  15 to 11k). Certainly that sets a record for the world-smallest
+  realmode part of any available DOS.
+- Set of bug fixes, both reported and found during code review.
+  Code review is mostly over, so we are well set towards the
+  stable releases hopefully (after a few more betas).
+
 ## beta-6
 
 This beta release got a huge amount of work in all directions.
