@@ -318,7 +318,6 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
 
 static void _FdppCall(struct vm86_regs *regs)
 {
-    s_regs = *regs;
     UBYTE len;
     UDWORD res;
 
@@ -336,8 +335,10 @@ static void _FdppCall(struct vm86_regs *regs)
                 (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esp) + 6));
         break;
     case DOS_SUBHELPER_DL_CCALL:
+        s_regs = *regs;
         res = FdppThunkCall(LO_WORD(regs->ecx),
                 (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
+        *regs = s_regs;
         switch (len) {
         case 0:
             break;
