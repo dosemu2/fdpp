@@ -1,9 +1,10 @@
 prefix=@PREFIX@
 fdpplibdir=@LIBDIR@/fdpp
+includedir=${prefix}/include
 fdppincdir=${prefix}/include/fdpp
 
 Name: fdpp
 Description: 64-bit DOS
 Version: @VERSION@
 Libs: -Wl,-rpath,${fdpplibdir} -L${fdpplibdir} -lfdpp
-Cflags: -I${fdppincdir}
+Cflags: -I${includedir}
