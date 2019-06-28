@@ -282,7 +282,7 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FP_FROM_D(t, __d); \
 })
 
-static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
+static UDWORD FdppThunkCall(int fn, UBYTE *sp, int *r_len)
 {
     UDWORD ret;
     UBYTE rsz = 0;
@@ -317,13 +317,13 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, UBYTE *r_len)
     }
 
     if (r_len)
-        *r_len = rsz;
+        *r_len = (stat == DISP_OK ? rsz : -1);
     return ret;
 }
 
 static void _FdppCall(struct vm86_regs *regs)
 {
-    UBYTE len;
+    int len;
     UDWORD res;
 
     if (!fdpp)
@@ -343,8 +343,10 @@ static void _FdppCall(struct vm86_regs *regs)
         s_regs = *regs;
         res = FdppThunkCall(LO_WORD(regs->ecx),
                 (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
-        *regs = s_regs;
+        if (len != -1)
+            *regs = s_regs;
         switch (len) {
+        case -1:
         case 0:
             break;
         case 1:
