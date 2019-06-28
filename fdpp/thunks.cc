@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "../hdr/portab.h"
 #include "globals.h"
 #include "proto.h"
@@ -148,7 +149,19 @@ union dword {
 
 static void *so2lin(uint16_t seg, uint16_t off)
 {
-    void *ret = fdpp->so2lin(seg, off);
+    void *ret = fdpp->so2lin(seg, off, 0);
+    assert(ret != (void *)-1);
+    return ret;
+}
+
+void *resolve_segoff(struct far_s fa)
+{
+    return so2lin(fa.seg, fa.off);
+}
+
+static void *so2lin_unsafe(uint16_t seg, uint16_t off)
+{
+    void *ret = fdpp->so2lin(seg, off, 1);
     if (ret == (void *)-1) {
         fdlogprintf("access to %x:%x aborted\n", seg, off);
         fdpp_noret(PTR_ABORT);
@@ -156,9 +169,9 @@ static void *so2lin(uint16_t seg, uint16_t off)
     return ret;
 }
 
-void *resolve_segoff(struct far_s fa)
+void *resolve_segoff_unsafe(struct far_s fa)
 {
-    return so2lin(fa.seg, fa.off);
+    return so2lin_unsafe(fa.seg, fa.off);
 }
 
 static int FdppSetAsmThunks(struct far_s *ptrs, int len)
