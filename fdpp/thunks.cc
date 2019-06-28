@@ -41,7 +41,7 @@ static struct far_s *near_wrp;
 static int num_wrps;
 static int recur_cnt;
 
-enum { ASM_OK, ASM_NORET, ASM_ABORT };
+enum { ASM_OK, ASM_NORET, ASM_ABORT, PTR_ABORT };
 
 typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
@@ -148,7 +148,12 @@ union dword {
 
 static void *so2lin(uint16_t seg, uint16_t off)
 {
-    return fdpp->so2lin(seg, off);
+    void *ret = fdpp->so2lin(seg, off);
+    if (ret == (void *)-1) {
+        fdlogprintf("access to %x:%x aborted\n", seg, off);
+        fdpp_noret(PTR_ABORT);
+    }
+    return ret;
 }
 
 void *resolve_segoff(struct far_s fa)
