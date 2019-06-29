@@ -106,20 +106,20 @@ public:
 
     T* operator ->() {
         do_store_far(get_far());
-        return (T*)resolve_segoff_unsafe(ptr);
+        return (T*)resolve_segoff_fd(ptr);
     }
     operator T*() {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
         if (!ptr.seg && !ptr.off)
             return NULL;
-        return (T*)resolve_segoff_unsafe(ptr);
+        return (T*)resolve_segoff_fd(ptr);
     }
     template<typename T0>
     explicit operator T0*() {
         if (!ptr.seg && !ptr.off)
             return NULL;
-        return (T0*)resolve_segoff_unsafe(ptr);
+        return (T0*)resolve_segoff_fd(ptr);
     }
 
     wrp_type& get_wrp() {
@@ -228,7 +228,7 @@ public:
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
-    operator T0*() { return (T0*)resolve_segoff_unsafe(this->ptr); }
+    operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }
 
     using FarPtrBase<T>::operator ==;
     template <typename T0, typename T1 = T,
@@ -257,7 +257,7 @@ public:
                 std::is_void<T>::value, "need std layout");
         if (!nonnull && !this->ptr.seg && !this->ptr.off)
             return NULL;
-        return (T*)resolve_segoff_unsafe(this->ptr);
+        return (T*)resolve_segoff_fd(this->ptr);
     }
 };
 

@@ -42,7 +42,7 @@ static struct far_s *near_wrp;
 static int num_wrps;
 static int recur_cnt;
 
-enum { ASM_OK, ASM_NORET, ASM_ABORT, PTR_ABORT };
+enum { ASM_OK, ASM_NORET, ASM_ABORT, PING_ABORT };
 
 typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
@@ -149,9 +149,7 @@ union dword {
 
 static void *so2lin(uint16_t seg, uint16_t off)
 {
-    void *ret = fdpp->so2lin(seg, off, 0);
-    assert(ret != (void *)-1);
-    return ret;
+    return fdpp->so2lin(seg, off);
 }
 
 void *resolve_segoff(struct far_s fa)
@@ -159,19 +157,14 @@ void *resolve_segoff(struct far_s fa)
     return so2lin(fa.seg, fa.off);
 }
 
-static void *so2lin_unsafe(uint16_t seg, uint16_t off)
+void *resolve_segoff_fd(struct far_s fa)
 {
-    void *ret = fdpp->so2lin(seg, off, 1);
-    if (ret == (void *)-1) {
-        fdlogprintf("access to %x:%x aborted\n", seg, off);
-        fdpp_noret(PTR_ABORT);
+    int ret = fdpp->ping();
+    if (ret == -1) {
+        fdlogprintf("access to %x:%x aborted\n", fa.seg, fa.off);
+        fdpp_noret(PING_ABORT);
     }
-    return ret;
-}
-
-void *resolve_segoff_unsafe(struct far_s fa)
-{
-    return so2lin_unsafe(fa.seg, fa.off);
+    return so2lin(fa.seg, fa.off);
 }
 
 static int FdppSetAsmThunks(struct far_s *ptrs, int len)
