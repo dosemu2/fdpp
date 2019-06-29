@@ -329,8 +329,12 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, int *r_len)
             return 0;
     }
 
-    if (r_len)
-        *r_len = (stat == DISP_OK ? rsz : -1);
+    if (stat == DISP_OK)
+        *r_len = rsz;
+    else if (ret == ASM_NORET)
+        *r_len = 0;
+    else
+        *r_len = -1;
     return ret;
 }
 
