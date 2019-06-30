@@ -56,7 +56,8 @@ $(TARGET).sys: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 clean:
 	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) .tstamp *.map *.elf *.inc \
-		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) $(GEN_ASMS) \
+		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
+		$(GEN_HEADERS_FD) $(GEN_ASMS) \
 		$(TARGET).sys kernel.sym *.pc fdpp.spec
 
 #               *Individual File Dependencies*
@@ -82,8 +83,9 @@ HDRS = $(wildcard $(HDR)*.h) $(wildcard $(SRC)*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
 _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h thunks.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
-GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
-GEN_ASMS=plt.asm cdata.asm
+GEN_HEADERS = thunk_calls.h thunk_asms.h
+GEN_HEADERS_FD = glob_asmdefs.h
+GEN_ASMS = plt.asm cdata.asm
 # dont change file order in GEN_TMP as it matches the gen script
 GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
 GEN_CC = $(CFILES:.c=.cc)
@@ -128,7 +130,7 @@ FDPP_COBJS = $(FDPP_CFILES:.c=.o)
 FDPP_CCOBJS = $(FDPP_CCFILES:.cc=.o)
 FDPP_CPPOBJS = $(CPPFILES:.cpp=.o)
 
-$(OBJECTS): %.o: %.cc $(HEADERS)
+$(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS)
