@@ -199,7 +199,8 @@ thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
 	parsers/thunk_gen <$< >$@ || (rm -f $@ ; false)
 
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
-	parsers/thunk_gen 1 <$< >$@ || (rm -f $@ ; false)
+	$(srcdir)/parsers/gen_thunks.sh $< $(srcdir)/parsers >$@ || \
+		(rm -f $@ ; false)
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@

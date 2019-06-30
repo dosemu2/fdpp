@@ -247,6 +247,10 @@ line:		lnum rdecls fname lb args rb SEMIC
 			    }
 			    break;
 			  case 1:
+			    /* for m4 */
+			    printf("THUNK(%i, %i, %i)\n",
+			        arg_num, is_rvoid && !is_rptr, is_pas);
+			    /* for cpp */
 			    if (!is_rvoid || is_rptr)
 			      printf("_THUNK%s%i(%i, %s(%s), %s, %s",
 			          is_pas ? "_P_" : "",
