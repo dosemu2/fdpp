@@ -96,8 +96,8 @@ GEN_ASMS=plt.asm cdata.asm
 # dont change file order as it matches the gen script
 GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
 GEN_CC = $(CFILES:.c=.cc)
-HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(GEN_HEADERS) $(PPHDRS)
-INITHEADERS=$(HDRS) init-mod.h init-dat.h
+INITHEADERS = $(SRC)init-mod.h $(SRC)init-dat.h
+HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(INITHEADERS)
 
 CFILES = blockio.c \
     break.c \
@@ -143,8 +143,8 @@ $(OBJECTS): %.o: %.cc $(HEADERS)
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS)
 	$(CLC) $(CLCFLAGS) -o $@ $<
 
-$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(GEN_HEADERS) $(GIT_REV) \
-    $(srcdir)/makefile
+thunks.o: $(GEN_HEADERS) $(GIT_REV)
+$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
@@ -198,7 +198,7 @@ plt_asmc.inc plt_asmp.inc: thunk_asms.tmp
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
 	parsers/thunk_gen <$< >$@ || (rm -f $@ ; false)
 
-thunk_asms.h: thunk_asms.tmp parsers/thunk_gen
+thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
 	$(srcdir)/parsers/gen_thunks.sh $< $(srcdir)/parsers >$@ || \
 		(rm -f $@ ; false)
 
