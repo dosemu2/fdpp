@@ -62,8 +62,11 @@ kernel core and a 64bit compiler framework for it.
 fdpp can work in any environment with STL/C++ runtime support.
 Requirements to the standard libraries are very small, far
 within the ISO standards. No posix or OS-specific APIs are used.
-But the requirements to the compiler are exceptionally high, so
-clang++ is the only compiler to build fdpp with.
+The build requirements are in line with today's posix-compatible
+environments: you'll need the full stack of tools like bison,
+autoconf, sed etc. Additionally you'll need a clang tool-chain
+as clang++ is the only compiler to build fdpp with. That said,
+building fdpp under itself may be a challenge. :)
 
 ## related projects
 ### FreeDOS
