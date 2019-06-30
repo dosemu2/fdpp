@@ -21,6 +21,7 @@ BuildRequires: clang
 BuildRequires: nasm
 BuildRequires: libstdc++-devel
 BuildRequires: autoconf
+BuildRequires: git
 
 %description
 fdpp is a 64-bit DOS.
