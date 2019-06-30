@@ -49,18 +49,9 @@ ALL = $(FDPPLIB) $(TARGET).sys $(GEN_EXT)
 
 all: $(ALL)
 
-production:     $(ALL) ../bin/country.sys
-clobber:        clean
-
 $(TARGET).sys: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	$(LINK) -melf_i386 -static -Map kernel.map -o $@ $(^:%.ld=-T%.ld)
 	chmod -x $@
-
-../bin/country.sys: $(SRC)country.asm
-	if [ ! -d ../bin ]; then \
-	    mkdir ../bin ; \
-	fi
-	$(NASM) -o $@ $<
 
 clean:
 	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
@@ -93,7 +84,7 @@ _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h thunks.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS=thunk_calls.h thunk_asms.h glob_asmdefs.h
 GEN_ASMS=plt.asm cdata.asm
-# dont change file order as it matches the gen script
+# dont change file order in GEN_TMP as it matches the gen script
 GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
 GEN_CC = $(CFILES:.c=.cc)
 INITHEADERS = $(SRC)init-mod.h $(SRC)init-dat.h
