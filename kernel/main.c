@@ -540,36 +540,37 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
 {
   REG COUNT Index;
   COUNT nunits = dhp->dh_name[0];
-  struct dpb FAR *_dpb;
+  struct dpb FAR *dpb;
 
   if (LoL->_nblkdev == 0)
-    _dpb = LoL->_DPBp;
+    dpb = LoL->_DPBp;
   else
   {
-    for (_dpb = LoL->_DPBp; (ULONG) _dpb->dpb_next != 0xffffffffl;
-         _dpb = _dpb->dpb_next)
+    for (dpb = LoL->_DPBp; (ULONG) dpb->dpb_next != 0xffffffffl;
+         dpb = dpb->dpb_next)
       ;
-    _dpb =
+    struct dpb FAR *_dpb =
       KernelAlloc(nunits * sizeof(struct dpb), 'E', Config.cfgDosDataUmb);
-    _dpb->dpb_next = _dpb;
+    dpb->dpb_next = _dpb;
+    dpb = dpb->dpb_next;
   }
 
   for (Index = 0; Index < nunits; Index++)
   {
-    _dpb->dpb_next = _dpb + 1;
-    _dpb->dpb_unit = LoL->_nblkdev;
-    _dpb->dpb_subunit = Index;
-    _dpb->dpb_device = dhp;
-    _dpb->dpb_flags = M_CHANGED;
+    dpb->dpb_next = dpb + 1;
+    dpb->dpb_unit = LoL->_nblkdev;
+    dpb->dpb_subunit = Index;
+    dpb->dpb_device = dhp;
+    dpb->dpb_flags = M_CHANGED;
     if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
     {
-      LoL->_CDSp[LoL->_nblkdev].cdsDpb = _dpb;
+      LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
       LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
     }
-    ++_dpb;
+    ++dpb;
     ++LoL->_nblkdev;
   }
-  (_dpb - 1)->dpb_next = (void FAR *)0xFFFFFFFFl;
+  (dpb - 1)->dpb_next = (void FAR *)0xFFFFFFFFl;
 }
 
 /* If cmdLine is NULL, this is an internal driver */
