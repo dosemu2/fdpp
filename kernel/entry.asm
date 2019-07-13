@@ -362,7 +362,7 @@ int21_3:
                 mov     cx,_disk_api_tos
 
 int21_normalentry:
-                cmp     byte [_InDOS],0
+                cmp     byte [_InDOS],1
                 jne     int21_4
                 cli
                 mov     ss,dx
