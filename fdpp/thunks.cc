@@ -712,6 +712,9 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
             reloc++;
         }
     }
+    if (fdpp->relocate_notify)
+        fdpp->relocate_notify(old_seg, new_seg, offs, len);
+
     fdlogprintf("processed %i relocs (%i missed)\n", reloc, miss);
 }
 
@@ -755,4 +758,9 @@ const char *FdppKernelName(void)
 const char *FdppVersionString(void)
 {
     return KERNEL_VERSION_STRING;
+}
+
+const char *FdppKernelMapName(void)
+{
+    return _S(KRNL_MAP_NAME);
 }

@@ -23,7 +23,7 @@ GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
 CPPFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
-    -DKRNL_NAME=$(TARGET).sys \
+    -DKRNL_NAME=$(TARGET).sys -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]"
 NASMFLAGS += -i$(SRC)
 
@@ -50,7 +50,7 @@ ALL = $(FDPPLIB) $(TARGET).sys $(GEN_EXT)
 all: $(ALL)
 
 $(TARGET).sys: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
-	$(LINK) -melf_i386 -static -Map kernel.map -o $@ $(^:%.ld=-T%.ld)
+	$(LINK) -melf_i386 -static -Map $(TARGET).map -o $@ $(^:%.ld=-T%.ld)
 	chmod -x $@
 
 clean:
@@ -210,6 +210,7 @@ install: $(FDPPLIB) $(GEN_EXT)
 	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 thunks.h
 	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 bprm.h
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
+	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.map
 
 $(TGZ): fdpp.spec
 	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
