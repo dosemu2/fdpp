@@ -1926,6 +1926,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
   BOOL result;
   UBYTE off = 0;
   seg base, start;
+  char *pArgs;
 
   if (mode)
   {
@@ -1950,7 +1951,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
     off = 3;
   }
   /* Get the device driver name                                   */
-  GetStringArg(pLine, szBuf + off);
+  pArgs = GetStringArg(pLine, szBuf + off);
 
   /* The driver is loaded at the top of allocated memory.         */
   /* The device driver is paragraph aligned.                      */
@@ -1966,6 +1967,8 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
     return result;
   }
 
+  if (pArgs && pArgs[0])
+    strcat(szBuf, pArgs);
   /* uppercase the device driver command */
   _strupr(szBuf);
 
