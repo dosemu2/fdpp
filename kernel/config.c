@@ -1966,6 +1966,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
     return result;
   }
 
+  strcpy(szBuf, pLine);
   /* uppercase the device driver command */
   _strupr(szBuf);
 
