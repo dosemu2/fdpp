@@ -31,6 +31,7 @@
 #include "globals.h"
 #include "init-mod.h"
 #include "dyndata.h"
+#include "memtype.h"
 #include "debug.h"
 
 #ifdef VERSION_STRINGS
@@ -2227,6 +2228,7 @@ STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
   fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
+  fd_mark_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_READONLY);
 }
 
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)

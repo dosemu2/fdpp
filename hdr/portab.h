@@ -190,6 +190,8 @@ void panic(const BYTE * s);
 void fpanic(const BYTE * s, ...) PRINTF(1);
 void cpu_relax(void);
 void fdexit(int rc);
+void _fd_mark_mem(far_t ptr, UWORD size, int type);
+#define fd_mark_mem(p, s, t) _fd_mark_mem(GET_FAR(p), s, t)
 
 #ifdef __cplusplus
 #include "farptr.hpp"

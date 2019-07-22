@@ -17,7 +17,9 @@ VERSION = $(MAJ)$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
 TGZ = $(TAR).gz
-GEN_EXT = fdpp.pc bprm.h thunks.h
+FD_EXT_H = bprm.h memtype.h
+EXT_H = $(FD_EXT_H) thunks.h
+GEN_EXT = fdpp.pc $(EXT_H)
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
@@ -207,8 +209,7 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 install: $(FDPPLIB) $(GEN_EXT)
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
 	install -D -t $(DESTDIR)$(PKGCONFIGDIR) -m 0644 fdpp.pc
-	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 thunks.h
-	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 bprm.h
+	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(EXT_H)
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
 	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.map
 
@@ -233,7 +234,7 @@ fdpp.spec fdpp.pc: %: $(srcdir)/%.in makefile
 		-e 's!@VERSION[@]!$(VERSION)!g' \
 		$< >$@
 
-bprm.h: $(HDR)bprm.h
+$(FD_EXT_H): %: $(HDR)%
 	ln -s $< $@
 thunks.h: $(srcdir)/thunks.h
 	ln -s $< $@

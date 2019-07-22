@@ -743,6 +743,12 @@ void PurgeHook(void *ptr, UDWORD len)
     fdlogprintf("purged %i relocs (%i missed)\n", reloc, miss);
 }
 
+void _fd_mark_mem(far_t ptr, UWORD size, int type)
+{
+    if (fdpp->mark_mem)
+        fdpp->mark_mem(ptr.seg, ptr.off, size, type);
+}
+
 #define __S(x) #x
 #define _S(x) __S(x)
 const char *FdppDataDir(void)

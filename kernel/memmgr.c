@@ -28,6 +28,7 @@
 
 #include "portab.h"
 #include "globals.h"
+#include "memtype.h"
 
 #ifdef VERSION_STRING
 static BYTE *memmgrRcsId =
@@ -74,6 +75,7 @@ STATIC COUNT joinMCBs(seg para)
 #else
     q->m_size = 0xffff;		/* mark the now unlinked MCB as "fake" */
 #endif
+    fd_mark_mem(q, sizeof(*q), FD_MEM_UNINITIALIZED);
   }
 
   return SUCCESS;
@@ -225,6 +227,7 @@ stopIt:                        /* reached from FIRST_FIT on match */
 
       /* initialize stuff because foundSeg > p */
       foundSeg->m_type = p->m_type;
+      fd_mark_mem(foundSeg, sizeof(*foundSeg), FD_MEM_READONLY);
       p->m_type = MCB_NORMAL;
     }
     else
@@ -234,6 +237,7 @@ stopIt:                        /* reached from FIRST_FIT on match */
       /* initialize stuff because p > foundSeg  */
       p->m_type = foundSeg->m_type;
       p->m_size = foundSeg->m_size - size - 1;
+      fd_mark_mem(p, sizeof(*p), FD_MEM_READONLY);
       foundSeg->m_type = MCB_NORMAL;
     }
 
@@ -351,6 +355,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     /* reduce the size of p and add difference to q         */
     q->m_size = p->m_size - size - 1;
     q->m_type = p->m_type;
+    fd_mark_mem(q, sizeof(*q), FD_MEM_READONLY);
 
     p->m_size = size;
 
@@ -494,4 +499,3 @@ void DosUmbLink(unsigned n)
 }
 
 #endif
-
