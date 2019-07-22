@@ -75,7 +75,12 @@ STATIC COUNT joinMCBs(seg para)
 #else
     q->m_size = 0xffff;		/* mark the now unlinked MCB as "fake" */
 #endif
+#if 0
     fd_mark_mem(q, sizeof(*q), FD_MEM_UNINITIALIZED);
+#else
+    /* uninitialized above produces too many false-positives */
+    fd_mark_mem(q, sizeof(*q), FD_MEM_NORMAL);
+#endif
   }
 
   return SUCCESS;
