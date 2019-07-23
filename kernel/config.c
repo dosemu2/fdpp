@@ -31,7 +31,6 @@
 #include "globals.h"
 #include "init-mod.h"
 #include "dyndata.h"
-#include "memtype.h"
 #include "debug.h"
 
 #ifdef VERSION_STRINGS

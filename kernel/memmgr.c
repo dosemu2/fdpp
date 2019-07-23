@@ -28,7 +28,6 @@
 
 #include "portab.h"
 #include "globals.h"
-#include "memtype.h"
 
 #ifdef VERSION_STRING
 static BYTE *memmgrRcsId =

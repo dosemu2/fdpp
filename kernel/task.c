@@ -153,6 +153,8 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
                              mem_access_mode, pChildEnvSeg,
                              NULL /*(UWORD FAR *) MaxEnvSize ska */ )) < 0)
     return RetCode;
+  fd_mark_mem(MK_FP(*pChildEnvSeg, 0), (nEnvSize + ENV_KEEPFREE + 15)/16,
+              FD_MEM_NORMAL);
   pDest = MK_FP(*pChildEnvSeg + 1, 0);
 
   /* fill the new env and inform the process of its       */
@@ -394,6 +396,7 @@ STATIC int ExecMemAlloc(UWORD size, seg *para, UWORD *asize)
   }
   else
   {
+    fd_mark_mem(MK_FP(*para, 0), size, FD_MEM_READEXEC);
     /* with no error, we got exactly what we asked for      */
     *asize = size;
   }

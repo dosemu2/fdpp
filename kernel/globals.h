@@ -62,6 +62,7 @@ static BYTE *Globals_hRcsId =
 #include "bprm.h"
 #include "nls.h"
 #include "dyn.h"
+#include "memtype.h"
 #include "glob_fd.h"
 
 /* fatfs.c */
