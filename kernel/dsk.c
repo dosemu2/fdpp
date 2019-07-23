@@ -1084,7 +1084,7 @@ STATIC int LBA_Transfer(ddt FAR * pddt, UWORD mode, VOID FAR * buffer,
     }
 
     /* copy to user buffer if nesessary */
-    if (transfer_address == DiskTransferBuffer &&
+    if (transfer_address != buffer &&
         (mode & 0xff00) == (LBA_READ & 0xff00))
     {
       fmemcpy(buffer, DiskTransferBuffer, bytes_sector);
