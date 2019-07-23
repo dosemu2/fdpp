@@ -461,8 +461,12 @@ void PostConfig(void)
 #ifdef DEBUG
   /* _printf("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch)); */
 #endif
-
+#if 0
   DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'B', Config.cfgDosDataUmb);
+#else
+  /* dsk.c avoids DMA transfer buffer in UMB */
+  DiskTransferBuffer = InitDiskTransferBuffer;
+#endif
   config_init_buffers(Config.cfgBuffers);
 
 /* LoL->_sfthead = (sfttbl FAR *)&basesft; */

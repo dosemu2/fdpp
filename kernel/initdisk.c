@@ -32,7 +32,7 @@
 
 #define FLOPPY_SEC_SIZE 512u  /* common sector size */
 
-STATIC BSS(UBYTE FAR *, InitDiskTransferBuffer, NULL);
+BSS(UBYTE FAR *, InitDiskTransferBuffer, NULL);
 BSS(COUNT, nUnits, 0);
 
 /*

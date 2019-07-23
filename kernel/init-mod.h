@@ -111,6 +111,7 @@ UWORD GetBiosKey(int timeout);
 
 /* diskinit.c */
 COUNT dsk_init(VOID);
+extern __FAR(UBYTE) InitDiskTransferBuffer;
 
 /* inithma.c */
 int MoveKernelToHMA(void);
