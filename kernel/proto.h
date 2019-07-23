@@ -216,14 +216,6 @@ UBYTE FcbClose(__FAR(xfcb) lpXfcb);
 void FcbCloseAll(void);
 UBYTE FcbFindFirstNext(__FAR(xfcb) lpXfcb, BOOL First);
 
-/* intr.asm */
-COUNT ASMFUNC res_DosExec(COUNT mode, __FAR(exec_blk) ep, __FAR(const char) lp);
-UCOUNT ASMFUNC res_read(UWORD fd, __FAR(void) buf, UCOUNT count);
-#ifdef __WATCOMC__
-#pragma aux (pascal) res_DosExec modify exact [ax bx dx es]
-#pragma aux (pascal) res_read modify exact [ax bx cx dx]
-#endif
-
 /* ioctl.c */
 COUNT DosDevIOctl(lregs * r);
 

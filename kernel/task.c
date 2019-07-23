@@ -61,6 +61,9 @@ static BYTE *RcsId =
  #endif
 #endif
 
+STATIC COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, char FAR * filename);
+STATIC UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count);
+
 #define CHUNK 32256
 #define MAXENV 32768u
 #define ENV_KEEPFREE 83         /* keep unallocated by environment variables */
@@ -877,4 +880,33 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     *endp = '\0';                             /* terminate string for strchr */
   }
   panic("Unable to start shell");
+}
+
+STATIC COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, char FAR * filename)
+{
+    iregs regs = {};
+    regs.ds = FP_SEG(filename);
+    regs.d.x = FP_OFF(filename);
+    regs.es = FP_SEG(ep);
+    regs.b.x = FP_OFF(ep);
+    regs.a.b.l = mode;
+    regs.a.b.h = 0x4b;
+    call_intr(0x21, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return regs.a.x;
+    return 0;
+}
+
+STATIC UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count)
+{
+    iregs regs = {};
+    regs.c.x = count;
+    regs.ds = FP_SEG(buf);
+    regs.d.x = FP_OFF(buf);
+    regs.b.x = fd;
+    regs.a.b.h = 0x3f;
+    call_intr(0x21, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -1;
+    return regs.a.x;
 }

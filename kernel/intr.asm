@@ -88,42 +88,6 @@
 %endmacro
 
 segment HMA_TEXT
-
-;; COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, char FAR * lp)
-    global _res_DosExec
-_res_DosExec:
-        enter 0, 0
-        push ds
-        push es
-        lds dx, [bp + 10]       ; filename
-        les bx, [bp + 6]        ; exec block
-        mov al, [bp + 4]        ; mode
-        mov ah, 4bh
-        int 21h
-        jc short no_exec_error
-        xor ax, ax
-no_exec_error:
-        pop es
-        pop ds
-        leave
-        ret
-
-;; UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count);
-    global _res_read
-_res_read:
-        enter 0, 0
-        push ds
-        mov cx, [bp + 10]       ; count
-        lds dx, [bp + 6]        ; buf
-        mov bx, [bp + 4]        ; fd
-        mov ah, 3fh
-        int 21h
-        jnc no_read_error
-        mov ax, -1
-no_read_error:
-        pop ds
-        leave
-        ret
 ;
 ;       void ASMPASCAL call_intr(WORD nr, struct REGPACK FAR *rp)
 ;
@@ -184,7 +148,7 @@ CALL_INTR_FUNC:
         ret 8
 
 
-segment	INIT_TEXT
+segment INIT_TEXT
 ;
 ;       void init_call_intr(nr, rp)
 ;       REG int nr
