@@ -61,3 +61,79 @@ int network_redirector(unsigned cmd)
   return network_redirector_fp(cmd, NULL);
 }
 
+/* Int 2F network redirector functions
+ *
+ * added by stsp for fdpp project
+ */
+
+UDWORD remote_lseek(void FAR *sft, DWORD pos)
+{
+    iregs regs = {};
+    regs.es = FP_SEG(sft);
+    regs.di = FP_OFF(sft);
+    regs.d.x = pos & 0xffff;
+    regs.c.x = pos >> 16;
+    regs.a.x = 0x1121;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -regs.a.x;
+    return ((regs.d.x << 16) | regs.a.x);
+}
+
+UWORD remote_getfattr(void)
+{
+    iregs regs = {};
+    regs.a.x = 0x110f;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -regs.a.x;
+    return regs.a.x;
+}
+
+BYTE remote_lock_unlock(void FAR *sft, BYTE unlock,
+    struct remote_lock_unlock FAR *arg)
+{
+    iregs regs = {};
+    regs.es = FP_SEG(sft);
+    regs.di = FP_OFF(sft);
+    regs.b.b.l = unlock;
+    regs.c.x = 1;
+    regs.ds = FP_SEG(arg);
+    regs.d.x = FP_OFF(arg);
+    regs.a.x = 0x110a;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -1;
+    return 0;
+}
+
+BYTE remote_qualify_filename(char FAR *dst, const char FAR *src)
+{
+    iregs regs = {};
+    regs.es = FP_SEG(dst);
+    regs.di = FP_OFF(dst);
+    regs.ds = FP_SEG(src);
+    regs.si = FP_OFF(src);
+    regs.a.x = 0x1123;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -1;
+    return 0;
+}
+
+BYTE remote_getfree(void FAR *cds, void FAR *dst)
+{
+    UWORD FAR *udst = dst;
+    iregs regs = {};
+    regs.es = FP_SEG(cds);
+    regs.di = FP_OFF(cds);
+    regs.a.x = 0x110c;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -1;
+    udst[0] = regs.a.x;
+    udst[1] = regs.b.x;
+    udst[2] = regs.c.x;
+    udst[3] = regs.d.x;
+    return 0;
+}

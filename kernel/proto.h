@@ -390,12 +390,12 @@ COUNT truename(__XFAR(const char) src, __FAR(char) dest, COUNT t);
 int network_redirector(unsigned cmd);
 int network_redirector_fp(unsigned cmd, __FAR(void)s);
 DWORD ASMPASCAL network_redirector_mx(UWORD cmd, __FAR(void)s, UWORD arg);
-BYTE ASMFUNC remote_lock_unlock(__FAR(void) sft, BYTE unlock, __FAR(struct remote_lock_unlock) arg);
-BYTE ASMFUNC remote_qualify_filename(__FAR(char) dst, __FAR(const char) src);
+BYTE remote_lock_unlock(__FAR(void) sft, BYTE unlock, __FAR(struct remote_lock_unlock) arg);
+BYTE remote_qualify_filename(__FAR(char) dst, __FAR(const char) src);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
-BYTE ASMFUNC remote_getfree(__FAR(void) cds, __FAR(void) dst);
-UDWORD ASMFUNC remote_lseek(__FAR(void) sft, DWORD new_pos);
-UWORD ASMFUNC remote_getfattr(void);
+BYTE remote_getfree(__FAR(void) cds, __FAR(void) dst);
+UDWORD remote_lseek(__FAR(void) sft, DWORD new_pos);
+UWORD remote_getfattr(void);
 #define remote_setfattr(attr) (WORD)network_redirector_mx(REM_SETATTR, NULL, attr)
 #define remote_printredir(dx,ax) (WORD)network_redirector_mx(REM_PRINTREDIR, MK_FP(0,dx), ax)
 #define QRemote_Fn(d,s) remote_qualify_filename(d, s)
