@@ -52,7 +52,7 @@ int SetJFTSize(UWORD nHandles)
   if ((DosMemAlloc
        ((nHandles + 0xf) >> 4, mem_access_mode, &block, &maxBlock)) < 0)
     return DE_NOMEM;
-  fd_mark_mem(MK_FP(block, 0), (nHandles + 0xf) >> 4, FD_MEM_NOACCESS);
+  fd_mark_mem(MK_FP(block + 1, 0), ((nHandles + 0xf) >> 4) * 16, FD_MEM_NOACCESS);
   ++block;
   newtab = MK_FP(block, 0);
 

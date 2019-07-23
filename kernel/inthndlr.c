@@ -1034,6 +1034,9 @@ dispatch:
         goto error_exit;
       }
       lr.AX++;   /* DosMemAlloc() returns seg of MCB rather than data */
+#if 0
+      fd_mark_mem(MK_FP(lr.AX, 0), lr.BX * 16, FD_MEM_UNINITIALIZED);
+#endif
       break;
 
       /* Free memory */
