@@ -46,8 +46,8 @@ STATIC int InitBcdToByte(int x)
 
 void Init_clk_driver(void)
 {
-  static iregs regsT = {{0x200}}; /* ah=0x02 */
-  static iregs regsD = {{0x400}, {0}, {0x1400}, {0x101}};
+  iregs regsT = {{0x200}}; /* ah=0x02 */
+  iregs regsD = {{0x400}, {0}, {0x1400}, {0x101}};
                       /* ah=4, ch=20^ ^cl=0, ^dh=dl=1 (2000/1/1)
                        * (above date will be set on error) */
   iregs dosregs;

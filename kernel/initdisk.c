@@ -251,7 +251,7 @@ BOOL ExtLBAForce = FALSE;
 
 STATIC COUNT init_readdasd(UBYTE drive)
 {
-  static iregs regs;
+  iregs regs = {};
 
   regs.a.b.h = 0x15;
   regs.d.b.l = drive;
@@ -328,7 +328,7 @@ floppy_bpb floppy_bpbs[5] = {
 
 STATIC COUNT init_getdriveparm(UBYTE drive, bpb * pbpbarray)
 {
-  static iregs regs;
+  iregs regs = {};
   REG UBYTE type;
 
   if (drive & 0x80)
