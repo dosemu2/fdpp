@@ -335,9 +335,6 @@ void MoveKernel(UWORD NewKernelSegment)
     offs = HMAOFFSET;
   }
 
-  HMAInitPrintf(("HMA moving %P up to %P for %04x bytes\n",
-                 GET_FP32(HMASource), GET_FP32(HMADest), len));
-
   if (NewKernelSegment < CurrentKernelSegment ||
       NewKernelSegment == 0xffff)
     fmemcpy(HMADest, HMASource, len);
@@ -359,8 +356,10 @@ void MoveKernel(UWORD NewKernelSegment)
   }
 
   RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
-
   CurrentKernelSegment = NewKernelSegment;
+
+  HMAInitPrintf(("HMA moving %P up to %P for %04x bytes\n",
+                 GET_FP32(HMASource), GET_FP32(HMADest), len));
 }
 
 UWORD fd_call_intr(WORD nr, iregs *rp)

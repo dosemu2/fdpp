@@ -627,6 +627,6 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     else
       result = 0; /* AL is 00, 2f, 5c, or last-of-TempCDS.cdsCurrentPath? */
   }
-  tn_printf(("Physical path: \"%s\"\n", GET_PPTR(dest)));
+  tn_printf(("Physical path: \"%s\"\n", GET_PTR(dest)));
   return result;
 }
