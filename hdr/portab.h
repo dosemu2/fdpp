@@ -188,6 +188,7 @@ void do_abort(const char *file, int line);
 void panic(const BYTE * s);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
 void fpanic(const BYTE * s, ...) PRINTF(1);
+void fdebug(const BYTE * s, ...) PRINTF(1);
 void cpu_relax(void);
 void fdexit(int rc);
 void _fd_mark_mem(far_t ptr, UWORD size, int type);

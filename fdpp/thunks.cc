@@ -686,6 +686,16 @@ void fpanic(const BYTE * s, ...)
     fdpp->panic(buf);
 }
 
+void fdebug(const BYTE * s, ...)
+{
+    char buf[128];
+    va_list l;
+    va_start(l, s);
+    _vsnprintf(buf, sizeof(buf), s, l);
+    va_end(l);
+    fdpp->debug(buf);
+}
+
 void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
 {
     unsigned i;

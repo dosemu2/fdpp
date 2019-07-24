@@ -44,7 +44,10 @@ static BYTE *memmgrRcsId =
 	((mcb)->m_type == MCB_NORMAL || (mcb)->m_type == MCB_LAST)
 
 #define para2far(seg) (mcb FAR *)MK_FP((seg) , 0)
-#define MCBDESTRY() (fdprintf("MCB corruption\n"),_fail(),DE_MCBDESTRY)
+#define MCBDESTRY2(p, q) (fdebug("MCB corruption, good:%P bad:%P\n", \
+	GET_FAR(p), GET_FAR(q)),_fail(),DE_MCBDESTRY)
+#define MCBDESTRY(p) (fdebug("MCB corruption, bad:%P\n", \
+	GET_FAR(p)),_fail(),DE_MCBDESTRY)
 
 /*
  * Join any following unused MCBs to MCB 'p'.
@@ -65,7 +68,7 @@ STATIC COUNT joinMCBs(seg para)
     if (!mcbFree(q))
       break;
     if (!mcbValid(q))
-      return MCBDESTRY();
+      return MCBDESTRY2(p, q);
     /* join both MCBs */
     fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_type = q->m_type;      /* possibly the next MCB is the last one */
@@ -123,6 +126,7 @@ void FAR * adjust_far(const void FAR * fp)
 COUNT DosMemAlloc(UWORD size, COUNT mode, seg *para, UWORD *asize)
 {
   REG mcb FAR *p;
+  REG mcb FAR *q = NULL;
   mcb FAR *foundSeg;
   mcb FAR *biggestSeg;
   /* Initialize                                           */
@@ -148,12 +152,12 @@ searchAgain:
   {
     /* check for corruption                         */
     if (!mcbValid(p))
-      return MCBDESTRY();
+      return MCBDESTRY2(q, p);
 
     if (mcbFree(p))
     {                           /* unused block, check if it applies to the rule */
       if (joinMCBs(FP_SEG(p)) != SUCCESS)       /* join following unused blocks */
-        return MCBDESTRY();    /* error */
+        return MCBDESTRY2(q, p);    /* error */
 
       if (!biggestSeg || biggestSeg->m_size < p->m_size)
         biggestSeg = p;
@@ -196,6 +200,7 @@ searchAgain:
     if (p->m_type == MCB_LAST)
       break;                    /* end of chain reached */
 
+    q = p;
     p = nxtMCB(p);              /* advance to next MCB */
   }
 
@@ -346,7 +351,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
 
   /* check for corruption                                         */
   if (!mcbValid(p))
-    return MCBDESTRY();
+    return MCBDESTRY(p);
 
   /* check if to grow the block                                   */
   if (size > p->m_size)
@@ -354,7 +359,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     /* first try to make the MCB larger by joining with any following
        unused blocks */
     if (joinMCBs(FP_SEG(p)) != SUCCESS)
-      return MCBDESTRY();
+      return MCBDESTRY(p);
 
     if (size > p->m_size)
     {                           /* block is still too small */
@@ -389,7 +394,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
 
     /* try to join q with the free MCBs following it if possible */
     if (joinMCBs(FP_SEG(q)) != SUCCESS)
-      return MCBDESTRY();
+      return MCBDESTRY2(p, q);
   }
 
   /* MS network client NET.EXE: DosMemChange sets the PSP              *
@@ -422,7 +427,7 @@ COUNT DosMemCheck(void)
       put_unsigned(first_mcb, 16, 4);
       hexd("\nprev ", pprev, 16);
       hexd("notMZ", p, 16);
-      return MCBDESTRY();
+      return MCBDESTRY2(pprev, p);
     }
 
     /* not corrupted - but not end, bump the pointer */
@@ -435,17 +440,18 @@ COUNT DosMemCheck(void)
 COUNT FreeProcessMem(UWORD ps)
 {
   mcb FAR *p;
+  mcb FAR *q = NULL;
   BYTE oldumbstate = uppermem_link & 1;
 
   /* link in upper memory to free those , too */
   DosUmbLink(1);
 
   /* Search through all memory blocks                         */
-  for (p = para2far(first_mcb);; p = nxtMCB(p))
+  for (p = para2far(first_mcb);; q = p, p = nxtMCB(p))
   {
 
     if (!mcbValid(p))           /* check for corruption */
-      return MCBDESTRY();
+      return MCBDESTRY2(q, p);
 
     if (p->m_psp == ps)
       DosMemFree(FP_SEG(p));
