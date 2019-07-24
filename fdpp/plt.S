@@ -22,18 +22,31 @@
 
 %define _SEG(s) _SEG_%+s
 
+extern _BootParamSeg
+
+%macro call_plt 0
+    push es
+    push ds
+    mov di, DGROUP
+    mov ds, di
+    mov es, [_BootParamSeg]
+    call far [es:0]
+    pop ds
+    pop es
+%endmacro
+
 %macro asmcfunc 4
 segment %3
     global _%1
     _%1:
-    mov al, DOS_HELPER_PLUGIN
-    mov bh, DOS_HELPER_PLUGIN_ID_FDPP
-    mov bl, DOS_SUBHELPER_DL_CCALL
+    mov al, 0 ; reserved
+    mov bh, 0 ; reserved
+    mov bl, DL_CCALL
     mov cx, %2
     mov dx, sp
     add dx, %4
     mov si, cs
-    int DOS_HELPER_INT
+    call_plt
 %endmacro
 
 %macro asmcfunc_f 3
@@ -140,10 +153,10 @@ init_near_wrp:
 plt_init:
     push bp
     mov bp, sp
-    mov al, DOS_HELPER_PLUGIN
+    mov al, 0 ; reserved
     mov ah, FDPP_KERNEL_VERSION
-    mov bh, DOS_HELPER_PLUGIN_ID_FDPP
-    mov bl, DOS_SUBHELPER_DL_SET_SYMTAB
+    mov bh, 0 ; reserved
+    mov bl, DL_SET_SYMTAB
     ; fill in struct fdpp_symtab
     push word IGROUP
     push word init_near_wrp           ; near_wrp[1]
@@ -163,7 +176,8 @@ plt_init:
     push word IGROUP
     push word __InitTextStart         ; text_start
     ; fdpp_symtab filled
-    int DOS_HELPER_INT
+    mov si, sp
+    call_plt
     mov sp, bp
     pop bp
     ret

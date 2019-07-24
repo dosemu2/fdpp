@@ -102,6 +102,7 @@ VOID DoConfig(int pass);
 VOID PostConfig(VOID);
 VOID configDone(VOID);
 VOID configPreBoot(VOID);
+__FAR(VOID) AlignParagraph(__FAR(VOID) lpPtr);
 __FAR(VOID) KernelAlloc(size_t nBytes, char type, int mode);
 __FAR(void) KernelAllocPara(size_t nPara, char type, char *name, int mode);
 //char *strcat(char * d, const char * s);

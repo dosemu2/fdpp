@@ -340,16 +340,16 @@ static void _FdppCall(struct vm86_regs *regs)
         return;
 
     switch (LO_BYTE(regs->ebx)) {
-    case DOS_SUBHELPER_DL_SET_SYMTAB:
+    case DL_SET_SYMTAB:
         if (HI_BYTE(regs->eax) != FDPP_KERNEL_VERSION) {
             fdloudprintf("\nfdpp version mismatch: expected %i, got %i\n",
                     FDPP_KERNEL_VERSION, HI_BYTE(regs->eax));
             _fail();
         }
         FdppSetSymTab(regs,
-                (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esp) + 6));
+                (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esi)));
         break;
-    case DOS_SUBHELPER_DL_CCALL:
+    case DL_CCALL:
         s_regs = *regs;
         res = FdppThunkCall(LO_WORD(regs->ecx),
                 (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);

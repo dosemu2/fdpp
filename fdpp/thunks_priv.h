@@ -19,14 +19,10 @@
 #ifndef THUNKS_PRIV_H
 #define THUNKS_PRIV_H
 
-#define FDPP_KERNEL_VERSION          3
+#define FDPP_KERNEL_VERSION          4
 
-#define DOS_HELPER_PLUGIN            0x60
-#define DOS_HELPER_PLUGIN_ID_FDPP    0
-#define DOS_SUBHELPER_DL_SET_SYMTAB  0
-#define DOS_SUBHELPER_DL_CCALL       1
-
-#define DOS_HELPER_INT               0xE6
+#define DL_SET_SYMTAB                0
+#define DL_CCALL                     1
 
 #ifndef __ASSEMBLER__
 

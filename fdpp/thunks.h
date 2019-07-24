@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 22
+#define FDPP_API_VER 23
 
 #ifdef __cplusplus
 extern "C" {

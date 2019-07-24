@@ -72,7 +72,8 @@ __segment DosTextSeg = 0;
 #endif
 
 ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
-struct _bprm *bprm;
+struct _bprm FAR *bprm;
+static UBYTE FAR *bprm_buf;
 
 VOID ASMCFUNC FreeDOSmain(void)
 {
@@ -126,7 +127,11 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   if (LoL->_BootParamVer != BPRM_VER)
     fpanic("Wrong boot param version %i, need %i", LoL->_BootParamVer, BPRM_VER);
-  bprm = MK_FP(LoL->_BootParamSeg, 0);
+  bprm_buf = (UBYTE FAR *)DynAlloc("bprm", 1, sizeof(struct _bprm) + 15);
+  bprm = AlignParagraph(bprm_buf);
+  fmemcpy_n(bprm, MK_FP(LoL->_BootParamSeg, 0), sizeof(struct _bprm));
+  LoL->_BootParamSeg = FP_SEG(bprm);
+  _assert(FP_SEG(bprm) >= FP_SEG(adjust_far(bprm_buf)) && FP_OFF(bprm) == 0);
 
   CheckContinueBootFromHarddisk();
 

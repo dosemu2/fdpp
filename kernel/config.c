@@ -255,8 +255,6 @@ STATIC void umb_init(void);
 void HMAconfig(int finalize);
 STATIC void config_init_buffers(int anzBuffers);     /* from BLOCKIO.C */
 
-STATIC VOID FAR * AlignParagraph(VOID FAR * lpPtr);
-
 #define _EOF 0x1a
 
 STATIC struct table * LookUp(struct table *p, const char * token);
@@ -2153,7 +2151,7 @@ STATIC BYTE FAR * KernelAllocDma(WORD bytes, char type)
 }
 #endif
 
-STATIC void FAR * AlignParagraph(VOID FAR * lpPtr)
+void FAR * AlignParagraph(VOID FAR * lpPtr)
 {
   UWORD uSegVal;
 
