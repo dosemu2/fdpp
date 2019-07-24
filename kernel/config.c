@@ -523,9 +523,11 @@ VOID configDone(VOID)
     kernel_seg = allocmem(hma_paras);
     p = para2far(kernel_seg - 1);
 
+    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_name[0] = 'S';
     p->m_name[1] = 'C';
     p->m_psp = 8;
+    fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
     DebugPrintf(("HMA not available, moving text to %x\n", kernel_seg));
     MoveKernel(kernel_seg);
