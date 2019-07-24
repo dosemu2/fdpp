@@ -156,7 +156,7 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
                              mem_access_mode, pChildEnvSeg,
                              NULL /*(UWORD FAR *) MaxEnvSize ska */ )) < 0)
     return RetCode;
-  fd_mark_mem(MK_FP(*pChildEnvSeg + 1, 0), ((nEnvSize + ENV_KEEPFREE + 15)/16)*16,
+  fd_mark_mem_np(MK_FP(*pChildEnvSeg + 1, 0), ((nEnvSize + ENV_KEEPFREE + 15)/16)*16,
               FD_MEM_NORMAL);
   pDest = MK_FP(*pChildEnvSeg + 1, 0);
 
@@ -272,11 +272,16 @@ STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, __XFAR(exec_blk)exb,
   }
 
   /* identify the mcb as this functions'                  */
+  fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_NORMAL);
   pspmcb->m_psp = pspseg;
+  fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_READONLY);
   /* Patch in environment segment, if present, also adjust its MCB */
   if (envseg)
   {
-    ((mcb FAR *) MK_FP(envseg, 0))->m_psp = pspseg;
+    mcb FAR *pe = (mcb FAR *) MK_FP(envseg, 0);
+    fd_prot_mem(pe, sizeof(*pe), FD_MEM_NORMAL);
+    pe->m_psp = pspseg;
+    fd_prot_mem(pe, sizeof(*pe), FD_MEM_READONLY);
     envseg++;
   }
   _psp->ps_environ = envseg;
@@ -298,10 +303,15 @@ STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, __XFAR(exec_blk)exb,
 set_name:
   for (i = 0; i < 8 && np[i] != '.' && np[i] != '\0'; i++)
   {
+    fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_NORMAL);
     pspmcb->m_name[i] = toupper(np[i]);
+    fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_READONLY);
   }
-  if (i < 8)
+  if (i < 8) {
+    fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_NORMAL);
     pspmcb->m_name[i] = '\0';
+    fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_READONLY);
+  }
 
   /* return value: AX value to be passed based on FCB values */
   return (get_cds1(_psp->ps_fcb1.fcb_drive) ? 0 : 0xff) |
@@ -399,7 +409,7 @@ STATIC int ExecMemAlloc(UWORD size, seg *para, UWORD *asize)
   }
   else
   {
-    fd_mark_mem(MK_FP(*para + 1, 0), size * 16, FD_MEM_READEXEC);
+    fd_mark_mem_np(MK_FP(*para + 1, 0), size * 16, FD_MEM_READEXEC);
     /* with no error, we got exactly what we asked for      */
     *asize = size;
   }

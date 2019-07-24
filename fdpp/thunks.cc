@@ -749,6 +749,18 @@ void _fd_mark_mem(far_t ptr, UWORD size, int type)
         fdpp->mark_mem(ptr.seg, ptr.off, size, type);
 }
 
+void _fd_prot_mem(far_t ptr, UWORD size, int type)
+{
+    if (fdpp->prot_mem)
+        fdpp->prot_mem(ptr.seg, ptr.off, size, type);
+}
+
+void _fd_mark_mem_np(far_t ptr, UWORD size, int type)
+{
+    _fd_mark_mem(ptr, size, type);
+    _fd_prot_mem(ptr, size, FD_MEM_NORMAL);
+}
+
 #define __S(x) #x
 #define _S(x) __S(x)
 const char *FdppDataDir(void)

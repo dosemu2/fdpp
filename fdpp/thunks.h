@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 21
+#define FDPP_API_VER 22
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,6 +50,7 @@ struct fdpp_api {
     void (*relocate_notify)(uint16_t oldseg, uint16_t newseg,
         uint16_t startoff, uint32_t blklen);
     void (*mark_mem)(uint16_t seg, uint16_t off, uint16_t size, int type);
+    void (*prot_mem)(uint16_t seg, uint16_t off, uint16_t size, int type);
 };
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 

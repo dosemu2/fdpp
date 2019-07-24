@@ -67,8 +67,11 @@ STATIC COUNT joinMCBs(seg para)
     if (!mcbValid(q))
       return MCBDESTRY();
     /* join both MCBs */
+    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_type = q->m_type;      /* possibly the next MCB is the last one */
     p->m_size += q->m_size + 1; /* one for q's MCB itself */
+    fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
+    fd_prot_mem(q, sizeof(*q), FD_MEM_NORMAL);
 #if 0				/* this spoils QB4's habit to double-free: */
     q->m_type = 'K';            /* Invalidate the magic number (whole MCB) */
 #else
@@ -225,10 +228,12 @@ stopIt:                        /* reached from FIRST_FIT on match */
     {
       /* allocate the block from the end of the found block */
       p = foundSeg;
+      fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
       p->m_size -= size + 1;    /* size+1 paragraphes are allocated by
                                    the new segment (+1 for MCB itself) */
       foundSeg = nxtMCB(p);
 
+      fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_NORMAL);
       /* initialize stuff because foundSeg > p */
       foundSeg->m_type = p->m_type;
       fd_mark_mem(foundSeg, sizeof(*foundSeg), FD_MEM_READONLY);
@@ -238,10 +243,12 @@ stopIt:                        /* reached from FIRST_FIT on match */
     {                           /* all other modes allocate from the beginning */
       p = nxtMCBsize(foundSeg, size);
 
+      fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
       /* initialize stuff because p > foundSeg  */
       p->m_type = foundSeg->m_type;
       p->m_size = foundSeg->m_size - size - 1;
       fd_mark_mem(p, sizeof(*p), FD_MEM_READONLY);
+      fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_NORMAL);
       foundSeg->m_type = MCB_NORMAL;
     }
 
@@ -249,15 +256,19 @@ stopIt:                        /* reached from FIRST_FIT on match */
        p->m_size, ->m_type, foundSeg->m_type
      */
     p->m_psp = FREE_PSP;        /* unused */
+    fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
     foundSeg->m_size = size;
+    fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_READONLY);
   }
 
   /* Already initialized:
      foundSeg->m_size, ->m_type
    */
+  fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_NORMAL);
   foundSeg->m_psp = cu_psp;     /* the new block is for current process */
   foundSeg->m_name[0] = '\0';
+  fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_READONLY);
 
   *para = FP_SEG(foundSeg);
   return SUCCESS;
@@ -307,10 +318,12 @@ COUNT DosMemFree(UWORD para)
   if (!mcbFreeable(p))	/* does not have to be valid, freeable is enough */
     return DE_INVLDMCB;
 
+  fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
   /* Mark the mcb as free so that we can later    */
   /* merge with other surrounding free MCBs       */
   p->m_psp = FREE_PSP;
   fmemset(p->m_name, '\0', 8);
+  fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
   return SUCCESS;
 }
@@ -357,10 +370,12 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     /* make q a pointer to the new next block               */
     q = nxtMCBsize(p, size);
     /* reduce the size of p and add difference to q         */
+    fd_prot_mem(q, sizeof(*q), FD_MEM_NORMAL);
     q->m_size = p->m_size - size - 1;
     q->m_type = p->m_type;
     fd_mark_mem(q, sizeof(*q), FD_MEM_READONLY);
 
+    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_size = size;
 
     /* Make certian the old psp is not last (if it was)     */
@@ -370,6 +385,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     /* merge with other surrounding free MCBs       */
     q->m_psp = FREE_PSP;
     fmemset(q->m_name, '\0', 8);
+    fd_prot_mem(q, sizeof(*q), FD_MEM_READONLY);
 
     /* try to join q with the free MCBs following it if possible */
     if (joinMCBs(FP_SEG(q)) != SUCCESS)
@@ -380,6 +396,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
    *               not tested, if always, or only on success         TE*
    * only on success seems more logical to me - Bart                                                                                                                   */
   p->m_psp = cu_psp;
+  fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
   return SUCCESS;
 }
@@ -492,11 +509,17 @@ void DosUmbLink(unsigned n)
   }
   if (n == 0)
   {
-    if (q->m_type == MCB_NORMAL && FP_SEG(p) == uppermem_root)
+    if (q->m_type == MCB_NORMAL && FP_SEG(p) == uppermem_root) {
+      fd_prot_mem(q, sizeof(*q), FD_MEM_NORMAL);
       q->m_type = MCB_LAST;
+      fd_prot_mem(q, sizeof(*q), FD_MEM_READONLY);
+    }
   }
-  else if (p->m_type == MCB_LAST)
+  else if (p->m_type == MCB_LAST) {
+    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_type = MCB_NORMAL;
+    fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
+  }
   else
     return;
   uppermem_link = n;

@@ -507,8 +507,12 @@ void PostConfig(void)
 /* This code must be executed after device drivers has been loaded */
 VOID configDone(VOID)
 {
-  if (UmbState == 1)
-    para2far(base_seg)->m_type = MCB_LAST;
+  if (UmbState == 1) {
+    mcb FAR *p = para2far(base_seg);
+    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
+    p->m_type = MCB_LAST;
+    fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
+  }
 
   if (HMAState != HMA_DONE)
   {
@@ -578,6 +582,7 @@ STATIC void umb_init(void)
 
   if (UMB_get_largest(xms_addr, &umb_seg, &umb_size))
   {
+    mcb FAR *pb;
     UmbState = 1;
 
     /* reset root */
@@ -586,8 +591,11 @@ STATIC void umb_init(void)
     LoL->_uppermem_root = ram_top * 64 - 1;
 
     /* create link mcb (below) */
-    para2far(base_seg)->m_type = MCB_NORMAL;
-    para2far(base_seg)->m_size--;
+    pb = para2far(base_seg);
+    fd_prot_mem(pb, sizeof(*pb), FD_MEM_NORMAL);
+    pb->m_type = MCB_NORMAL;
+    pb->m_size--;
+    fd_prot_mem(pb, sizeof(*pb), FD_MEM_READONLY);
     mumcb_init(LoL->_uppermem_root, umb_seg - LoL->_uppermem_root - 1);
 
     /* setup the real mcb for the devicehigh block */
@@ -616,16 +624,22 @@ STATIC void umb_init(void)
 
       if (umb_seg < umb_max)
       {
+        mcb FAR *ps;
         /* make sure prev mcb is link */
         _assert(para2far(umb_prev)->m_psp == 8);
-        para2far(umb_seg)->m_type = MCB_NORMAL;
-        para2far(umb_seg)->m_size--;
+        ps = para2far(umb_seg);
+        fd_prot_mem(ps, sizeof(*ps), FD_MEM_NORMAL);
+        ps->m_type = MCB_NORMAL;
+        ps->m_size--;
+        fd_prot_mem(ps, sizeof(*ps), FD_MEM_READONLY);
         if (umb_next - umb_seg - umb_size == 0)
         {
           /* should the UMB driver return
              adjacent memory in several pieces */
           umb_size += para2far(umb_next)->m_size + 1;
-          para2far(umb_seg)->m_size = umb_size;
+          fd_prot_mem(ps, sizeof(*ps), FD_MEM_NORMAL);
+          ps->m_size = umb_size;
+          fd_prot_mem(ps, sizeof(*ps), FD_MEM_READONLY);
         }
         else
         {
@@ -638,21 +652,28 @@ STATIC void umb_init(void)
         /* make sure to adjust not link */
         _assert(para2far(umb_prev)->m_psp != 8);
         if (umb_seg > umb_next) {
+            mcb FAR *pp = para2far(umb_prev);
+            fd_prot_mem(pp, sizeof(*pp), FD_MEM_NORMAL);
             /* will create link, so adjust non-link type */
-            para2far(umb_prev)->m_type = MCB_NORMAL;
-            para2far(umb_prev)->m_size--;
+            pp->m_type = MCB_NORMAL;
+            pp->m_size--;
+            fd_prot_mem(pp, sizeof(*pp), FD_MEM_READONLY);
         }
         umb_prev = umb_next - 1;
       }
 
       if (umb_seg - umb_prev - 1 == 0 && umb_prev > ram_top * 64)
       {
+        mcb FAR *pp;
         /* should the UMB driver return
            adjacent memory in several pieces */
         umb_prev = prev_mcb(umb_prev, LoL->_uppermem_root);
         /* make sure we are still in UMB and adjusting non-link */
         _assert(umb_prev >= ram_top * 64 && para2far(umb_prev)->m_psp != 8);
-        para2far(umb_prev)->m_size += umb_size;
+        pp = para2far(umb_prev);
+        fd_prot_mem(pp, sizeof(*pp), FD_MEM_NORMAL);
+        pp->m_size += umb_size;
+        fd_prot_mem(pp, sizeof(*pp), FD_MEM_READONLY);
       }
       else
       {
@@ -2047,6 +2068,7 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
 {
   seg base, start;
   struct submcb FAR *p;
+  mcb FAR *pb;
 
   /* if no umb available force low allocation */
   if (UmbState != 1)
@@ -2072,19 +2094,26 @@ void FAR * KernelAllocPara(size_t nPara, char type, char *name, int mode)
     base++;
     mcb_init(base, p->m_size - 1, p->m_type);
     mumcb_init(FP_SEG(p), 0);
+    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_name[1] = 'D';
+    fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
   }
 
   nPara++;
   mcb_init(base + nPara, para2far(base)->m_size - nPara, para2far(base)->m_type);
-  para2far(start)->m_size += nPara;
+  pb = para2far(start);
+  fd_prot_mem(pb, sizeof(*pb), FD_MEM_NORMAL);
+  pb->m_size += nPara;
+  fd_prot_mem(pb, sizeof(*pb), FD_MEM_READONLY);
 
   p = (struct submcb FAR *)para2far(base);
+  fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
   p->type = type;
   p->start = FP_SEG(p)+1;
   p->size = nPara-1;
   if (name)
     memcpy(p->name, name, 8);
+  fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
   base += nPara;
   if (mode)
     umb_base_seg = base;
@@ -2230,8 +2259,10 @@ STATIC VOID _strupr(char *s)
 STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
+  fd_prot_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_NORMAL);
   fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
   fd_mark_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_READONLY);
+  fd_prot_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_READONLY);
 }
 
 STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)

@@ -1035,7 +1035,7 @@ dispatch:
       }
       lr.AX++;   /* DosMemAlloc() returns seg of MCB rather than data */
 #if 0
-      fd_mark_mem(MK_FP(lr.AX, 0), lr.BX * 16, FD_MEM_UNINITIALIZED);
+      fd_mark_mem_np(MK_FP(lr.AX, 0), lr.BX * 16, FD_MEM_UNINITIALIZED);
 #endif
       break;
 
