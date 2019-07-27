@@ -92,7 +92,7 @@ GEN_ASMS = plt.asm cdata.asm
 GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
 GEN_CC = $(CFILES:.c=.cc)
 INITHEADERS = $(SRC)init-mod.h $(SRC)init-dat.h
-HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(INITHEADERS)
+HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(INITHEADERS) $(PPHDRS)
 
 CFILES = blockio.c \
     break.c \
