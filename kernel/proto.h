@@ -223,7 +223,12 @@ COUNT DosDevIOctl(lregs * r);
 seg far2para(__FAR(VOID) p);
 seg long2para(ULONG size);
 __FAR(void)add_far(__FAR(void) fp, unsigned off);
+#ifndef FDPP
 __FAR(VOID)adjust_far(__FAR(const void) fp);
+#else
+__FAR(VOID)adjust_far(__FAR(void) fp);
+__FAR(const VOID)adjust_far(__XFAR(const char) &fp);
+#endif
 COUNT DosMemAlloc(UWORD size, COUNT mode, seg * para, UWORD * asize);
 COUNT DosMemLargest(UWORD * size);
 COUNT DosMemFree(UWORD para);

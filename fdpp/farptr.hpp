@@ -94,6 +94,12 @@ protected:
     far_s ptr;
 
     using wrp_type = typename WrpType<T>::type;
+    void do_adjust_far() {
+        if (ptr.seg == 0xffff)
+            return;
+        ptr.seg += ptr.off >> 4;
+        ptr.off &= 0xf;
+    }
 public:
     FarPtrBase() = default;
     FarPtrBase(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
@@ -238,8 +244,19 @@ public:
         return ((f.seg() == this->ptr.seg) && (f.off() == this->ptr.off));
     }
 
-    uint16_t seg() const { _assert(!obj); return this->ptr.seg; }
-    uint16_t off() const { _assert(!obj); return this->ptr.off; }
+    /* below is a bit tricky. If we have a dosobj here, then we
+     * should use the "owner" form to link the objects together.
+     * But if the object is const, we don't have to link it to
+     * the owner, because the fwd copy is already done and bwd
+     * copy is not needed. So the simple form can be used then. */
+    uint16_t seg() const {
+        _assert(!obj || std::is_const<T>::value);
+        return this->ptr.seg;
+    }
+    uint16_t off() const {
+        _assert(!obj || std::is_const<T>::value);
+        return this->ptr.off;
+    }
     uint16_t seg(void *owner) const {
         _assert(obj);
         obj->ref(owner);
@@ -259,6 +276,7 @@ public:
             return NULL;
         return (T*)resolve_segoff_fd(this->ptr);
     }
+    FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
 template<typename, int, typename P, char (P::*)[0]> class ArMemb;
@@ -270,6 +288,7 @@ public:
 
     using FarPtr<T>::FarPtr;
     XFarPtr() = delete;
+    XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
     template<typename T1 = T, int max_len, typename P, char (P::*M)[0]>
     XFarPtr(ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p) {}
@@ -637,8 +656,6 @@ public:
     SymMemb2<t, p, &p::off_##n> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
-#define _FP_SEG(fp) ((fp)._seg_())
-#define _FP_OFF(fp) ((fp)._off_())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
 #define FP_OFF_OBJ(o, fp) ((fp).off(o))
 #define MK_FP(seg, ofs) ({ \
@@ -652,6 +669,7 @@ public:
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()
+#define ADJUST_FAR(f) (f).adjust_far()
 
 #undef NULL
 #define NULL           nullptr

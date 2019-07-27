@@ -91,6 +91,7 @@ STATIC COUNT joinMCBs(seg para)
   return SUCCESS;
 }
 
+#ifndef FDPP
 /*
  * Return a normalized far pointer
  */
@@ -99,16 +100,26 @@ void FAR * adjust_far(const void FAR * fp)
   /* and return an adddress adjusted to the nearest paragraph     */
   /* boundary.                                                    */
 
-  if (_FP_SEG(fp) == 0xffff)
+  if (FP_SEG(fp) == 0xffff)
     return (void FAR *)fp;
 
 #ifndef I86
-  if (_FP_SEG(fp) == 0)
+  if (FP_SEG(fp) == 0)
     return (void FAR *)fp;
 #endif
 
-  return MK_FP(_FP_SEG(fp) + (_FP_OFF(fp) >> 4), _FP_OFF(fp) & 0xf);
+  return MK_FP(FP_SEG(fp) + (FP_OFF(fp) >> 4), FP_OFF(fp) & 0xf);
 }
+#else
+void FAR * adjust_far(void FAR * fp)
+{
+    return ADJUST_FAR(fp);
+}
+const void FAR * adjust_far(__XFAR(const char) &fp)
+{
+    return ADJUST_FAR(fp);
+}
+#endif
 
 #undef REG
 #define REG
