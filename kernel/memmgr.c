@@ -380,6 +380,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     }
   }
 
+  fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
   /*       shrink it down                                         */
   if (size < p->m_size)
   {
@@ -391,7 +392,6 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     q->m_type = p->m_type;
     fd_mark_mem(q, sizeof(*q), FD_MEM_READONLY);
 
-    fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     p->m_size = size;
 
     /* Make certian the old psp is not last (if it was)     */
