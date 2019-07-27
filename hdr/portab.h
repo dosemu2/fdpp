@@ -260,6 +260,7 @@ void PurgeHook(void *ptr, UDWORD len);
 #define BSSZ(t, n) CTORZ(t, n)
 #define DATA(t, n, i) CTOR(t, n, i)
 #define DATAAIS(t, n, ...) CTORAI(static, t, n, __VA_ARGS__)
+#define ANNOTATE_SIZE(n, s) static_assert(sizeof(n) == s, "wrong size of " #n)
 
 #define FAR                     /* linear architecture  */
 #define REG

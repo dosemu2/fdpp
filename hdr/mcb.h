@@ -67,3 +67,4 @@ typedef struct _mcb {
 //  AR_MEMB(_mcb, BYTE, m_name, 8);               /* owner name limited to 8 bytes        */
   BYTE m_name[8];               /* owner name limited to 8 bytes        */
 } PACKED mcb;
+ANNOTATE_SIZE(mcb, 16);

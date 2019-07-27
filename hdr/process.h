@@ -51,6 +51,7 @@ typedef struct {
     } _exec;
   } ldata;
 } exec_blk;
+ANNOTATE_SIZE(exec_blk, 22);
 
 #define exec    ldata._exec
 #define load    ldata._load
@@ -107,6 +108,7 @@ typedef struct _psp {
     } _u3;
   } _u;
 } psp;
+ANNOTATE_SIZE(psp, 0x100);
 
 #define ps_fcb1 _u._u1._ps_fcb1
 #define ps_fcb2 _u._u2._ps_fcb2
