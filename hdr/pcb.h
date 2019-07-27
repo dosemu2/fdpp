@@ -66,6 +66,7 @@ typedef union {
     UBYTE h;                    /* access mode for ah, bh, etc.         */
   } b;
 } xreg;
+ANNOTATE_SIZE(xreg, 2);
 
 /* The structure assumes that:
    1) An interrupt was invoked, &
@@ -78,12 +79,14 @@ typedef struct _iregss {
   UWORD si, di, bp, ds, es;
   UWORD ip, cs, flags;
 } iregs;
+ANNOTATE_SIZE(iregs, 24);
 
 /* struct used for local copy of registers */
 typedef struct {
   xreg a, b, c, d;
   UWORD si, di, ds, es;
 } lregs;
+ANNOTATE_SIZE(lregs, 16);
 
 struct int2f12regs {
 #ifdef I386
@@ -105,6 +108,7 @@ struct int2f12regs {
   UWORD ip, cs, flags;
   UWORD callerARG1;             /* used if called from INT2F/12 */
 };
+ANNOTATE_SIZE_S(int2f12regs, 32);
 
 /* Process control block for task switching                             */
 typedef struct {
@@ -112,6 +116,7 @@ typedef struct {
   UWORD pc_sp;
   iregs pc_regs;
 } pcb;
+ANNOTATE_SIZE(pcb, 4 + sizeof(iregs));
 
 /* Note: The following figure is not made by myself and I assume that
    the order of "ES" through "AX" are misinterpreted?!  -- 2000/03/22 ska*/

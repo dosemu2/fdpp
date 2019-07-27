@@ -261,6 +261,7 @@ void PurgeHook(void *ptr, UDWORD len);
 #define DATA(t, n, i) CTOR(t, n, i)
 #define DATAAIS(t, n, ...) CTORAI(static, t, n, __VA_ARGS__)
 #define ANNOTATE_SIZE(n, s) static_assert(sizeof(n) == s, "wrong size of " #n)
+#define ANNOTATE_SIZE_S(n, s) static_assert(sizeof(struct n) == s, "wrong size of " #n)
 
 #define FAR                     /* linear architecture  */
 #define REG
