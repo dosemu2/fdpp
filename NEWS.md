@@ -1,3 +1,15 @@
+## beta-8
+
+Massive stabilization efforts. Many bugs and regressions were fixed.
+Debug infrastructure improved.
+
+- Fixed many bugs in handling of block devices
+- LFN regression fix
+- Export map file for debuggers
+- Integration with valgrind's memcheck. Uncovered some bugs
+- Extensions to boot protocol to get rid of dosemu2-specific calls
+- Various crasher bugs fixed (with thanks to @andrewbird)
+
 ## beta-7
 
 This marks the end of the short but very intensive development cycle
