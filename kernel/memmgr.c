@@ -362,7 +362,7 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
 
   /* check for corruption                                         */
   if (!mcbValid(p))
-    return MCBDESTRY(p);
+    return DE_INVLDMCB;
 
   /* check if to grow the block                                   */
   if (size > p->m_size)
