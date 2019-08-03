@@ -534,10 +534,10 @@ VOID configDone(VOID)
 
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
-
+#if 0
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
-
+#endif
   /* The standard handles should be reopened here, because
      we may have loaded new console or printer drivers in CONFIG.SYS */
 }
