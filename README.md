@@ -27,6 +27,13 @@ You can also get the pre-built dosemu2 packages with
 fdpp support enabled from the aforementioned
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
 
+## configuring
+fdpp uses fdppconf.sys file at boot. This file has
+the standard format of config.sys with some syntax
+extensions. It is fully backward-compatible with the
+DOSish config.sys, and if fdppconf.sys is missing,
+config.sys is attempted instead.
+
 ## but what it *actually* is? why dosemu2?
 fdpp is a user-space library that needs a couple of
 call-backs to be provided to it by the host program.
@@ -47,16 +54,21 @@ asm are among its main goals. As the original freedos
 sources are modified very slightly, it may be possible
 to compile it with the real-mode compilers again, after
 some (back-)porting work.
-fdpp code is separated from the freedos kernel, so you can
-[look at it](https://github.com/stsp/fdpp/tree/master/fdpp)
-yourself. You'll find the set of preprocessors, syntax
-analysers, C++ templates and run-time support routines.
-This forms a meta-compiler.
 
 But compiling the freedos unmodified, is just one of the
 fdpp project's goals. Another goal is the development of
 the freedos core itself. So fdpp aims for a new, freedos-based
 kernel core and a 64bit compiler framework for it.
+
+## compatibility
+fdpp removes some compatibility hacks that FreeDOS had.
+For example it doesn't play tricks with disabling A20 when
+returning to user code (and that, as far as I know, can be
+solved with the "loadfix" command). But the main compatibility
+burden is presented by the host platform rather than by fdpp.
+Running fdpp under dosemu2 gives very similar level of compatibility
+to the one of FreeDOS on dosemu2. If you find some compatibility
+problem, please report a bug.
 
 ## portability
 fdpp can work in any environment with STL/C++ runtime support.
