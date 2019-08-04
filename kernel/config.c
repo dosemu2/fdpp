@@ -537,6 +537,27 @@ VOID configDone(VOID)
 #if 0
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
+#else
+  /* some shells indeed cannot start with an empty env.
+   * There are several different causes of that:
+   *
+   * 1. FreeDOS has a bug that corrupts an empty env
+   *    (non-empty env just overwrites the corruption).
+   *    This bug kills pretty much any shell.
+   *    fdpp does not have such bug so most shells would work.
+   * 2. PC-DOS (check other DOSes please and fill in) has a
+   *    bug to zero out the environment pointer in PSP when
+   *    no environment variables. That way the shell can't
+   *    get its basename (argv0) and some of them panic out.
+   *    fdpp has no such bug (and neither does FreeDOS).
+   * 3. Shell itself is buggy and is not prepared to handle
+   *    the empty environment. Only comcom32 is known to be
+   *    affected by that (well, it is affected by all 3).
+   *
+   * So if we don't count comcom32, there is no such problem
+   * in fdpp, and so the work-around can be disabled. dosemu2
+   * will take care of the rest, making sure the env is never
+   * empty (hence even comcom32 would work). */
 #endif
   /* The standard handles should be reopened here, because
      we may have loaded new console or printer drivers in CONFIG.SYS */
