@@ -223,6 +223,7 @@ STATIC VOID CfgMenuDefault(char * pLine);
 STATIC char * skipwh(char * s);
 STATIC int iswh(unsigned char c);
 STATIC char * scan(char * s, char * d);
+STATIC char * scan_simple(char * s, char * d);
 STATIC BOOL isnum(char ch);
 #if 0
 STATIC COUNT tolower(COUNT c);
@@ -1383,7 +1384,7 @@ char *GetStringArg(char * pLine, char * pszString)
   pLine = skipwh(pLine);
 
   /* just return whatever string is there, including null         */
-  return scan(pLine, pszString);
+  return scan_simple(pLine, pszString);
 }
 
 STATIC void Config_Buffers(char * pLine)
@@ -2246,6 +2247,15 @@ STATIC char * scan(char * s, char * d)
         *d++ = *s;
       s++;
     }
+  *d = '\0';
+  return s;
+}
+
+STATIC char * scan_simple(char * s, char * d)
+{
+  s = skipwh(s);
+  while (*s && !iswh(*s))
+    *d++ = *s++;
   *d = '\0';
   return s;
 }
