@@ -542,10 +542,14 @@ VOID return_user(void)
   psp FAR *q;
   REG COUNT i;
   iregs FAR *irp;
+  seg parent;
+  intvec vec22;
 /*  long j;*/
 
   /* restore parent                                       */
   p = MK_FP(cu_psp, 0);
+  parent = p->ps_parent;
+  vec22 = p->ps_isv22;
 
   /* When process returns - restore the isv               */
   setvec(0x22, p->ps_isv22);
@@ -568,13 +572,13 @@ VOID return_user(void)
     FreeProcessMem(cu_psp);
   }
 
-  cu_psp = p->ps_parent;
+  cu_psp = parent;
   q = MK_FP(cu_psp, 0);
 
   irp = (iregs FAR *) q->ps_stack;
 
-  irp->CS = FP_SEG(p->ps_isv22);
-  irp->IP = FP_OFF(p->ps_isv22);
+  irp->CS = FP_SEG(vec22);
+  irp->IP = FP_OFF(vec22);
   irp->FLAGS = 0x200; /* clear trace and carry flags, set interrupt flag */
 
   if (InDOS)
