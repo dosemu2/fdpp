@@ -384,6 +384,8 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
   COUNT rc;
   long lrc;
   lregs lr; /* 8 local registers (ax, bx, cx, dx, si, di, ds, es) */
+  psp FAR *psp = MK_FP(cu_psp, 0);
+  iregs FAR *user_stack = psp->ps_stack;
 
 #define FP_DS_DX (MK_FP(lr.DS, lr.DX))
 #define FP_ES_DI (MK_FP(lr.ES, lr.DI))
@@ -391,7 +393,7 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
 
-  ((psp FAR *) MK_FP(cu_psp, 0))->ps_stack = (BYTE FAR *) r;
+  psp->ps_stack = (BYTE FAR *) r;
 
   fmemcpy_n(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
@@ -786,7 +788,8 @@ dispatch:
       DosMemChange(cu_psp, lr.DX < 6 ? 6 : lr.DX, 0);
       return_code = lr.AL | 0x300;
       tsr = TRUE;
-      return_user();
+      psp->ps_stack = user_stack;
+      return_user(user_stack);
       break;
 
       /* Get default BPB */
@@ -1073,7 +1076,7 @@ dispatch:
       /* Load and Execute Program */
     case 0x4b:
       break_flg = FALSE;
-
+      psp->ps_stack = user_stack;
       rc = DosExec(lr.AL, MK_FP(lr.ES, lr.BX), FP_DS_DX);
       goto short_check;
 
@@ -1101,7 +1104,8 @@ dispatch:
 #ifdef TSC
       StartTrace();
 #endif
-      return_user();
+      psp->ps_stack = user_stack;
+      return_user(user_stack);
       break;
 
       /* Get Child-program Return Value                               */
@@ -1607,6 +1611,8 @@ exit_dispatch:
   r->DS = lr.DS;
   r->ES = lr.ES;
 real_exit:;
+
+  psp->ps_stack = user_stack;
 
 #ifdef DEBUG
   if (bDumpRegs)

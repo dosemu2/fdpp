@@ -326,7 +326,7 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
   /* Transfer control to the executable                   */
   p->ps_parent = cu_psp;
   p->ps_prevpsp = q;
-  q->ps_stack = (BYTE FAR *)user_r;
+  p->ps_stack = (BYTE FAR *)user_r;
   user_r->FLAGS &= ~FLG_CARRY;
 
   cu_psp = ds;
@@ -536,15 +536,12 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk * exp, COUNT mode, CO
   return SUCCESS;
 }
 
-VOID return_user(void)
+VOID return_user(iregs FAR *irp)
 {
   psp FAR *p;
-  psp FAR *q;
   REG COUNT i;
-  iregs FAR *irp;
   seg parent;
   intvec vec22;
-/*  long j;*/
 
   /* restore parent                                       */
   p = MK_FP(cu_psp, 0);
@@ -573,9 +570,6 @@ VOID return_user(void)
   }
 
   cu_psp = parent;
-  q = MK_FP(cu_psp, 0);
-
-  irp = (iregs FAR *) q->ps_stack;
 
   irp->CS = FP_SEG(vec22);
   irp->IP = FP_OFF(vec22);
@@ -583,7 +577,7 @@ VOID return_user(void)
 
   if (InDOS)
     --InDOS;
-  exec_user((iregs FAR *) q->ps_stack);
+  exec_user(irp);
 }
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)

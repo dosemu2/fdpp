@@ -373,7 +373,7 @@ UWORD DaysFromYearMonthDay(UWORD Year, UWORD Month, UWORD DayOfMonth);
 /* task.c */
 VOID new_psp(seg para, seg cur_psp);
 VOID child_psp(seg para, seg cur_psp, int psize);
-VOID return_user(void);
+VOID return_user(__FAR(iregs) irp);
 COUNT DosExec(COUNT mode,__FAR(exec_blk) ep,__FAR(const char) lp);
 ULONG SftGetFsize(int sft_idx);
 VOID InitPSP(VOID);
