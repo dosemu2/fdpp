@@ -22,14 +22,14 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 23
+#define FDPP_API_VER 24
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct vm86_regs;
-void FdppCall(struct vm86_regs *regs);
+int FdppCall(struct vm86_regs *regs);
 
 enum { FDPP_PRINT_LOG, FDPP_PRINT_TERMINAL, FDPP_PRINT_SCREEN };
 enum { ASM_CALL_OK, ASM_CALL_ABORT };

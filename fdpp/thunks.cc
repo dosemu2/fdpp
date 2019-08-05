@@ -326,18 +326,18 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, int *r_len)
         *r_len = rsz;
     else if (ret == ASM_NORET)
         *r_len = 0;
-    else
+    else    // stat == DISP_NORET && ret == xx_ABORT
         *r_len = -1;
     return ret;
 }
 
-static void _FdppCall(struct vm86_regs *regs)
+static int _FdppCall(struct vm86_regs *regs)
 {
     int len;
     UDWORD res;
 
     if (!fdpp)
-        return;
+        return -1;
 
     switch (LO_BYTE(regs->ebx)) {
     case DL_SET_SYMTAB:
@@ -357,6 +357,7 @@ static void _FdppCall(struct vm86_regs *regs)
             *regs = s_regs;
         switch (len) {
         case -1:
+            return -1;
         case 0:
             break;
         case 1:
@@ -375,13 +376,16 @@ static void _FdppCall(struct vm86_regs *regs)
         }
         break;
     }
+    return 0;
 }
 
-void FdppCall(struct vm86_regs *regs)
+int FdppCall(struct vm86_regs *regs)
 {
+    int ret;
     recur_cnt++;
-    _FdppCall(regs);
+    ret = _FdppCall(regs);
     recur_cnt--;
+    return ret;
 }
 
 void do_abort(const char *file, int line)
