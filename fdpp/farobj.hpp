@@ -49,6 +49,8 @@ template <typename T>
 class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef {
     bool have_obj = false;
     bool is_const = false;
+    const char *err_msg = "error: leaked object";
+    std::string msg;
     ctor_log ct;
     int refcnt = 0;
     std::unordered_set<ObjRef *> owned;
@@ -98,7 +100,9 @@ public:
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value &&
             !std::is_pointer<T1>::value>::type* = nullptr>
-    FarObj(T1& obj, const char *nm) : FarObjBase<T>(&obj, sizeof(T1)), ct(nm) {
+    FarObj(T1& obj, const char *nm) : FarObjBase<T>(&obj, sizeof(T1)),
+            msg(std::string(nm) + std::string(": ") + std::string(err_msg)),
+            ct(msg) {
         _ctor();
     }
     FarObj(T* obj, unsigned sz, bool cst, const char *nm) :

@@ -20,6 +20,7 @@
 #define CTORS_HPP
 
 #include <cstring>
+#include <string>
 
 class ctor_base;
 
@@ -74,10 +75,10 @@ public:
 };
 
 class ctor_log : public ctor_base {
-    const char *msg;
+    const std::string &msg;
 public:
-    ctor_log(const char *m) : msg(m) {}
-    virtual void init() { fdloudprintf("%s\n", msg); }
+    ctor_log(const std::string &m) : msg(m) {}
+    virtual void init() { fdloudprintf("%s\n", msg.c_str()); }
 };
 
 #define CTOR(t, n, i) t n; static ctor<t> _ctor_##n(&n, i)
