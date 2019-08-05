@@ -31,10 +31,7 @@ void pr_dosobj(far_t fa, const void *data, UWORD len);
 void cp_dosobj(void *data, far_t fa, UWORD len);
 void rm_dosobj(far_t fa);
 void dosobj_dump(void);
-#ifdef FDPP_DEBUG
-void dosobj_prev(void);
-void dosobj_next(void);
-#endif
+
 uint16_t dosobj_seg(void);
 #ifdef __cplusplus
 }

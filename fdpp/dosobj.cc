@@ -24,16 +24,8 @@
 #include "thunks_priv.h"
 #include "dosobj.h"
 
-#ifdef FDPP_DEBUG
-static smpool _pool[2];
-static far_t _base[2];
-static int cur_pool;
-#define pool _pool[cur_pool]
-#define base _base[cur_pool]
-#else
 static smpool pool;
 static far_t base;
-#endif
 static int initialized;
 
 static void err_printf(int prio, const char *fmt, ...) PRINTF(2);
@@ -63,30 +55,12 @@ void dosobj_reinit(far_t fa, int size)
     void *ptr = resolve_segoff(fa);
     int leaked;
 
-    assert(initialized == 1);
-    initialized++;
+    assert(initialized);
     leaked = smdestroy(&pool);
     assert(!leaked);
-#ifdef FDPP_DEBUG
-    cur_pool++;
-#endif
     sminit(&pool, ptr, size);
     base = fa;
 }
-
-#ifdef FDPP_DEBUG
-void dosobj_prev(void)
-{
-    assert(cur_pool > 0);
-    cur_pool--;
-}
-
-void dosobj_next(void)
-{
-    assert(initialized == 2 && cur_pool == 0);
-    cur_pool++;
-}
-#endif
 
 far_t mk_dosobj(const void *data, UWORD len)
 {
