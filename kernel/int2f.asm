@@ -71,7 +71,7 @@ WinIdle:					; only HLT if at haltlevel 2+
                 mov     ds, [cs:_DGROUP_]
 		cmp	byte [_HaltCpuWhileIdle],2
 		pop	ds
-		jb	FarTabRetn
+		jb	Int2f?prev
 		pushf
 		sti
 		hlt				; save some energy :-)
@@ -80,7 +80,7 @@ WinIdle:					; only HLT if at haltlevel 2+
                 mov     ds, [cs:_DGROUP_]
 		cmp	byte [_HaltCpuWhileIdle],3
 		pop	ds
-		jb	FarTabRetn
+		jb	Int2f?prev
 		mov	al,0			; even admit we HLTed ;-)
 		jmp	short FarTabRetn
 
@@ -108,7 +108,7 @@ Check4Share:
                 cmp     ah,08h
                 je      DriverSysCal            ; DRIVER.SYS calls
                 cmp     ah,14h                  ; NLSFUNC.EXE interrupt?
-                jne     Int2f?iret              ; no, go out
+                jne     Int2f?prev              ; no, go out
 Int2f?14:      ;; MUX-14 -- NLSFUNC API
                ;; all functions are passed to syscall_MUX14
                push bp                 ; Preserve BP later on
@@ -135,7 +135,7 @@ Int2f?14?1:
                or BYTE [bp-6], 1
                pop bp
                iret
-Int2f?iret:
+Int2f?prev:
                jmp far [cs:_prev_int2f_handler]
 
 ; DRIVER.SYS calls - now only 0803.
