@@ -28,8 +28,9 @@ m4_if($1, 0,, [dnl
         G_S$3($1)dnl
     } PACKED _args = { G_I$3($1) }; \
 ])dnl
-m4_cond($2, 0, [dnl
-    _ret = ])__CALL(n, G_A($1), z); \
+m4_if($2, 0, [dnl
+    _ret = ], [dnl
+    ])__CALL(n, G_A($1), z); \
 m4_cond(m4_eval($3==0&&$1>0), 1, [dnl
     __CSTK(sizeof(_args)); \
 ])dnl
