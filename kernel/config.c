@@ -2834,6 +2834,7 @@ BSSA(struct instCmds, InstallCommands, 10);
 STATIC VOID _CmdInstall(char * pLine,int mode)
 {
   struct instCmds *cmd;
+  UBYTE off = 0;
 
   InstallPrintf(("Installcmd %d:%s\n",numInstallCmds,pLine));
 
@@ -2844,7 +2845,14 @@ STATIC VOID _CmdInstall(char * pLine,int mode)
     return;
   }
   cmd = &InstallCommands[numInstallCmds];
-  memcpy(cmd->buffer,pLine,127);
+  if (pLine[1] != ':')
+  {
+    strcpy(cmd->buffer, "C:\\");
+    if (bprm->DeviceDrive & 0x80)
+        cmd->buffer[0] += bprm->DeviceDrive & ~0x80;
+    off = 3;
+  }
+  memcpy(cmd->buffer + off, pLine, 127 - off);
   cmd->buffer[127] = 0;
   cmd->mode = mode;
   numInstallCmds++;
