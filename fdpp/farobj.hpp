@@ -41,7 +41,10 @@ public:
     using obj_type = typename std::conditional<std::is_array<T>::value,
         typename std::remove_extent<T>::type, T>::type;
 
-    FarObjBase(T* obj, unsigned sz) : ptr(obj), size(sz) {}
+    FarObjBase(T* obj, unsigned sz) : ptr(obj), size(sz) {
+        if (is_dos_space(ptr))
+            fddebug("redundant conversion for %p\n", ptr);
+    }
     virtual ~FarObjBase() = default;
 };
 

@@ -167,6 +167,11 @@ void *resolve_segoff_fd(struct far_s fa)
     return so2lin(fa.seg, fa.off);
 }
 
+int is_dos_space(const void *ptr)
+{
+    return fdpp->is_dos_space(ptr);
+}
+
 static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 {
     int i;
@@ -696,6 +701,16 @@ void fdebug(const BYTE * s, ...)
     va_list l;
     va_start(l, s);
     _vsnprintf(buf, sizeof(buf), s, l);
+    va_end(l);
+    fdpp->debug(buf);
+}
+
+void fddebug(const BYTE * s, ...)
+{
+    char buf[256];
+    va_list l;
+    va_start(l, s);
+    vsnprintf(buf, sizeof(buf), s, l);
     va_end(l);
     fdpp->debug(buf);
 }

@@ -26,9 +26,6 @@
 
 #ifndef __ASSEMBLER__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void *resolve_segoff(struct far_s fa);
 void *resolve_segoff_fd(struct far_s fa);
 void thunk_call_void(struct far_s fa);
@@ -38,9 +35,8 @@ void fdprintf(const char *format, ...) PRINTF(1);
 void fdlogprintf(const char *format, ...) PRINTF(1);
 void fdloudprintf(const char *format, ...) PRINTF(1);
 void fdvprintf(const char *format, va_list vl);
-#ifdef __cplusplus
-}
-#endif
+void fddebug(const BYTE * s, ...);
+int is_dos_space(const void *ptr);
 
 #endif
 
