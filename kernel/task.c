@@ -51,8 +51,10 @@ static BYTE *RcsId =
                            to save some bytes, both static and on stack,
                            we recycle SecPathBuffer                 TE */
 
-#define ExeHeader (*(exe_header *)(SecPathName + 0))
-#define TempExeBlock (*(exec_blk *)(SecPathName + sizeof(exe_header)))
+#define ExeHeader_p ((exe_header FAR *)(SecPathName + 0))
+#define ExeHeader (*ExeHeader_p)
+#define TempExeBlock_p ((exec_blk FAR *)(SecPathName + sizeof(exe_header)))
+#define TempExeBlock (*TempExeBlock_p)
 #define Shell (SecPathName + sizeof(exe_header) + sizeof(exec_blk))
 
 #ifdef __TURBOC__ /* this is a Borlandism and doesn't work elsewhere */
@@ -804,7 +806,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
     return DE_FILENOTFND;
   }
 
-  exe_header *eh = &ExeHeader;
+  exe_header FAR *eh = ExeHeader_p;
   rc = (WORD)DosRWSft(fd, sizeof(exe_header), eh, XFR_READ);
 
   if (rc == sizeof(exe_header) &&
