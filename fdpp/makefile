@@ -135,14 +135,14 @@ FDPP_CPPOBJS = $(CPPFILES:.cpp=.o)
 $(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD)
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS)
+$(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
 	$(CLC) $(CLCFLAGS) -o $@ $<
 
 thunks.o: $(GEN_HEADERS) $(GIT_REV)
 $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp
+$(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJS): %.o: $(SRC)%.asm
