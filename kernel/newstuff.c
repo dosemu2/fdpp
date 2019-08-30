@@ -261,8 +261,8 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   COUNT result;
   unsigned state;
   struct cds FAR *cdsEntry;
-  char *p = dest;	  /* dynamic pointer into dest */
-  char *rootPos;
+  char FAR *p = dest;	  /* dynamic pointer into dest */
+  char FAR *rootPos;
   char src0;
 
   tn_printf(("truename(%s)\n", GET_PTR(src)));

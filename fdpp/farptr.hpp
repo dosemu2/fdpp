@@ -142,6 +142,11 @@ public:
         ptr.off += sizeof(T);
         return f;
     }
+    FarPtrBase<T> operator --(int) {
+        FarPtrBase<T> f = *this;
+        ptr.off -= sizeof(T);
+        return f;
+    }
     FarPtrBase<T> operator ++() {
         ptr.off += sizeof(T);
         return *this;
