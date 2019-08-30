@@ -425,7 +425,7 @@ STATIC int ExecMemAlloc(UWORD size, seg *para, UWORD *asize)
   return rc;
 }
 
-STATIC COUNT DosComLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
+STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)
 {
   UWORD mem;
   UWORD env, asize = 0;
@@ -582,7 +582,7 @@ VOID return_user(iregs FAR *irp)
   exec_user(irp);
 }
 
-STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk * exp, COUNT mode, COUNT fd)
+STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)
 {
   UWORD mem, env, start_seg, asize = 0;
   UWORD exe_size;
@@ -797,7 +797,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   if ((mode & 0x7f) > 3 || (mode & 0x7f) == 2)
     return DE_INVLDFMT;
 
-  fmemcpy_n(&TempExeBlock, ep, sizeof(exec_blk));
+  fmemcpy_n(TempExeBlock_p, ep, sizeof(exec_blk));
   /* If file not found - free ram and return error        */
 
   if (IsDevice(lp) ||        /* we don't want to execute C:>NUL */
@@ -812,18 +812,18 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   if (rc == sizeof(exe_header) &&
       (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))
   {
-    rc = DosExeLoader(lp, &TempExeBlock, mode, fd);
+    rc = DosExeLoader(lp, TempExeBlock_p, mode, fd);
   }
   else if (rc != 0)
   {
-    rc = DosComLoader(lp, &TempExeBlock, mode, fd);
+    rc = DosComLoader(lp, TempExeBlock_p, mode, fd);
   }
 
   DosCloseSft(fd, FALSE);
 
 
   if (mode == LOAD && rc == SUCCESS)
-    fmemcpy(ep, &TempExeBlock, sizeof(exec_blk));
+    fmemcpy(ep, TempExeBlock_p, sizeof(exec_blk));
 
   return rc;
 }
