@@ -156,6 +156,8 @@ CommonNdRdExit:		; *** tell if key waiting and return its ASCII if yes
 		add     ah,[cs:_kbdType]
                 int     16h                     ; Get status, if zf=0  al=char
                 jz      ConNdRd4                ; Jump if no char available
+                or      ax,ax                   ; See if call was supported
+                jz      ConNdRd4                ; 0 (sometimes) means unsupported
 		call	checke0			; check for e0 scancode
                 or      ax,ax                   ; Zero ?
                 jnz     ConNdRd1                ; Jump if not zero
