@@ -168,7 +168,7 @@ $(INCS): %_seg.inc: %.o
 	objdump -t $< | $(srcdir)/parsers/gen_segs.sh $(SRC)segs.inc >$@
 
 plt_seg.inc: $(INCS)
-	echo $(patsubst %.inc,\%include \"%.inc\",$(INCS)) | sed 's/.inc" /.inc"\n/g' >$@
+	echo -e $(patsubst %.inc,\%include \"%.inc\"\\n,$^) | sed 's/^ //' >$@
 
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
 
