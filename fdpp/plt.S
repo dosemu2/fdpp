@@ -20,12 +20,7 @@
 %include "segs.inc"
 %include "plt_seg.inc"
 
-%ifdef __YASM_BUILD__
-/* work around yasm concatenation bug */
-#define _SEG(s) _SEG_##s
-%else
 %define _SEG(s) _SEG_%+s
-%endif
 
 extern _BootParamSeg
 
