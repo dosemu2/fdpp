@@ -442,7 +442,6 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
     if ((mode & 0x7f) != OVERLAY)
     {
       COUNT rc;
-      UBYTE UMBstate = uppermem_link;
       UBYTE orig_mem_access = mem_access_mode;
 
       if (mode & 0x80)
@@ -466,12 +465,9 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       if (rc != SUCCESS)
         DosMemFree(env);
 
-      if (mode & 0x80)
-      {
-        DosUmbLink(UMBstate);       /* restore link state */
-        mem_access_mode = orig_mem_access;
-        mode &= 0x7f;
-      }
+      DosUmbLink(0);       /* restore link state */
+      mem_access_mode = orig_mem_access;
+      mode &= 0x7f;
 
       if (rc != SUCCESS)
         return rc;
@@ -609,7 +605,6 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
 
     if ((mode & 0x7f) != OVERLAY)
     {
-      UBYTE UMBstate = uppermem_link;
       UBYTE orig_mem_access = mem_access_mode;
       COUNT rc;
 
@@ -651,11 +646,8 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       if (rc != SUCCESS)
         DosMemFree(env);
 
-      if (mode & 0x80)
-      {
-        mem_access_mode = orig_mem_access; /* restore old situation */
-        DosUmbLink(UMBstate);     /* restore link state */
-      }
+      mem_access_mode = orig_mem_access; /* restore old situation */
+      DosUmbLink(0);     /* restore link state */
       if (rc != SUCCESS)
         return rc;
 
