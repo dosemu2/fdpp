@@ -1708,22 +1708,22 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     char name[8];       /* "\377COUNTRY.SYS" */
     char reserved[11];
     ULONG offset;       /* offset of first entry in file */
-  } header;
+  } PACKED header;
   struct {      /* entry */
-    int length;         /* length of entry, not counting this word, = 12 */
-    int country;        /* country ID */
-    int codepage;       /* codepage ID */
-    int reserved[2];
+    UWORD length;         /* length of entry, not counting this word, = 12 */
+    UWORD country;        /* country ID */
+    UWORD codepage;       /* codepage ID */
+    UWORD reserved[2];
     ULONG offset;       /* offset of country-subfunction-header in file */
   } entry;
   struct subf_hdr { /* subfunction header */
-    int length;         /* length of entry, not counting this word, = 6 */
-    int id;             /* subfunction ID */
+    UWORD length;         /* length of entry, not counting this word, = 6 */
+    UWORD id;             /* subfunction ID */
     ULONG offset;       /* offset within file of subfunction data entry */
   };
   static struct {   /* subfunction data */
     char signature[8];  /* \377CTYINFO|UCASE|LCASE|FUCASE|FCHAR|COLLATE|DBCS */
-    int length;         /* length of following table in bytes */
+    UWORD length;         /* length of following table in bytes */
     UBYTE buffer[256];
   } subf_data;
   struct subf_tbl {
