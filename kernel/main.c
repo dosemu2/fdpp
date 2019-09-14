@@ -484,7 +484,7 @@ STATIC VOID signon()
   " - FAT32 support"
 #endif
   "\n\n%s",
-         GET_PTR(MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release))),
+         GET_PTR((char FAR *)MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release))),
          MAJOR_RELEASE, MINOR_RELEASE, copyright);
 }
 
