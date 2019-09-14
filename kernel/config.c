@@ -2888,9 +2888,10 @@ STATIC VOID CmdChain(char * pLine)
 
 STATIC VOID InstallExec(struct instCmds *icmd)
 {
-  char filename[128], *args, *d, *cmd = icmd->buffer;
+  char filename[128], *args, *d, _cmd[128], *cmd = _cmd;
   exec_blk exb;
 
+  memcpy(_cmd, icmd->buffer, sizeof(_cmd));
   InstallPrintf(("installing %s\n",cmd));
 
   cmd=skipwh(cmd);
@@ -2919,10 +2920,8 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   if (init_DosExec(icmd->mode, &exb, filename) != SUCCESS)
   {
     _printf("File not found or corrupted: %s\n", filename);
-    /* restore filename part in cmd - copy w/o \0 */
-    strncpy(cmd, filename, strlen(filename));
-    pLineStart = cmd;
-    CfgFailure(cmd);
+    pLineStart = icmd->buffer;
+    CfgFailure(icmd->buffer);
   }
 }
 
