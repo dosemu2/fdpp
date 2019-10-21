@@ -1530,9 +1530,9 @@ dispatch:
       switch (lr.AL)
       {
         case 0xa6: {
-          iregs saved_r = *r;
+          iregs saved_r;
+          sft FAR *s;
           unsigned char idx;
-          int rel_idx;
 
           if (r->BX >= psp->ps_maxfiles)
           {
@@ -1540,14 +1540,18 @@ dispatch:
             goto error_exit;
           }
           idx = psp->ps_filetab[r->BX];
-          rel_idx = idx_to_sft_(idx);
-          if (rel_idx == -1)
+          s = idx_to_sft(idx);
+          if (s == (sft FAR *)-1)
           {
             rc = DE_INVLDHNDL;
             goto error_exit;
           }
-          r->ES = FP_SEG(lpCurSft);
-          r->DI = FP_OFF(lpCurSft);
+          if (!(s->sft_flags & SFT_FSHARED))
+            goto unsupp;    /* unsupported on local fs yet */
+          /* call to redirector */
+          saved_r = *r;
+          r->ES = FP_SEG(s);
+          r->DI = FP_OFF(s);
           r->flags |= FLG_CARRY;
           r->AX = 0x11a6;
           call_intr(0x2f, r);
