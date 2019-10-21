@@ -608,20 +608,7 @@ dispatch:
       break;
 
     default:
-    {
-      UWORD flg = r->flags;
-#ifdef DEBUG
-      _printf("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL);
-#endif
-      r->flags |= FLG_CARRY;
-      call_intr_func(prev_int21_handler, r);
-      if (!(r->flags & FLG_CARRY))
-        goto real_exit;
-      /* carry still set - unhandled */
-      r->flags = flg;
-      lr.AL = 0;
-      break;
-    }
+      goto unsupp;
 
       /* CP/M compatibility functions                                 */
     case 0x18:
@@ -1538,6 +1525,44 @@ dispatch:
 
       /* case 0x6d and above not implemented : see default; return AL=0 */
 
+    /* LFN API, support only 0xa6 for now */
+    case 0x71:
+      switch (lr.AL)
+      {
+        case 0xa6: {
+          iregs saved_r = *r;
+          unsigned char idx;
+          int rel_idx;
+
+          if (r->BX >= psp->ps_maxfiles)
+          {
+            rc = DE_INVLDHNDL;
+            goto error_exit;
+          }
+          idx = psp->ps_filetab[r->BX];
+          rel_idx = idx_to_sft_(idx);
+          if (rel_idx == -1)
+          {
+            rc = DE_INVLDHNDL;
+            goto error_exit;
+          }
+          r->ES = FP_SEG(lpCurSft);
+          r->DI = FP_OFF(lpCurSft);
+          r->flags |= FLG_CARRY;
+          r->AX = 0x11a6;
+          call_intr(0x2f, r);
+          if (!(r->flags & FLG_CARRY))
+            goto real_exit;
+          /* carry still set - unhandled */
+          *r = saved_r;
+          goto unsupp;
+          break;
+        }
+        default:
+          goto unsupp;
+      }
+      break;
+
 #ifdef WITHFAT32
       /* DOS 7.0+ FAT32 extended functions */
     case 0x73:
@@ -1587,6 +1612,21 @@ dispatch:
 #endif
   }
   goto exit_dispatch;
+unsupp:
+  {
+    UWORD flg = r->flags;
+#ifdef DEBUG
+    _printf("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL);
+#endif
+    r->flags |= FLG_CARRY;
+    call_intr_func(prev_int21_handler, r);
+    if (!(r->flags & FLG_CARRY))
+      goto real_exit;
+    /* carry still set - unhandled */
+    r->flags = flg;
+    lr.AL = 0;
+    goto exit_dispatch;
+  }
 long_check:
   if (lrc >= SUCCESS)
   {
