@@ -46,3 +46,8 @@ typedef struct _kbd {
   AR_MEMB(_kbd, BYTE, _kb_buf, KBD_MAXLENGTH);   /* the buffer itself            */
 } keyboard;
 
+typedef struct {
+  UBYTE kb_size;                /* size of buffer in bytes              */
+  UBYTE kb_count;               /* number of bytes returned             */
+  BYTE _kb_buf[LINEBUFSIZE0A];  /* the buffer itself            */
+} kbd0a;

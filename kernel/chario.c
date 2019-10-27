@@ -362,7 +362,7 @@ unsigned char read_char_stdin(BOOL check_break)
 }
 
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
-void read_line(int sft_in, int sft_out, keyboard FAR * kp)
+void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
 {
   unsigned c;
   unsigned cu_pos = scr_pos;
@@ -416,10 +416,10 @@ void read_line(int sft_in, int sft_out, keyboard FAR * kp)
           }
           else
           {
-            char FAR *sp = fmemchr(&kp->_kb_buf[stored_pos],
+            char *sp = (char *)memchr(&kp->_kb_buf[stored_pos],
                                    c2, stored_size - stored_pos);
             if (sp != NULL)
-                new_pos = (FP_OFF(sp) - FP_OFF(&kp->_kb_buf[stored_pos])) + 1;
+                new_pos = (sp - &kp->_kb_buf[stored_pos]) + 1;
           }
         }
         /* fall through */
@@ -530,7 +530,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp)
       kb_buf.kb_count = 0;
       kb_buf.kb_size = LINEBUFSIZECON;
     }
-    read_line(sft_idx, sft_idx, &kb_buf);
+    read_line(sft_idx, sft_idx, (kbd0a FAR *)&kb_buf);
     kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)

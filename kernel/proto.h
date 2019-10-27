@@ -67,7 +67,7 @@ void con_flush(__DOSFAR(struct dhdr)*pdev);
 unsigned char read_char(int sft_in, int sft_out, BOOL check_break);
 unsigned char read_char_stdin(BOOL check_break);
 long cooked_read(__FAR(struct dhdr)*pdev, size_t n,__FAR(char)bp);
-void read_line(int sft_in, int sft_out,__FAR(keyboard) kp);
+void read_line(int sft_in, int sft_out, __FAR(kbd0a)kp);
 size_t read_line_handle(int sft_idx, size_t n,__FAR(char) bp);
 void write_char(int c, int sft_idx);
 void write_char_stdout(int c);
