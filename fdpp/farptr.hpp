@@ -86,6 +86,7 @@ public:
         std::is_same<_RC(T1), char>::value || \
         std::is_same<_RC(T0), unsigned char>::value || \
         std::is_same<_RC(T1), unsigned char>::value) && \
+        !std::is_same<T0, T1>::value && \
         (_C(T1) || !_C(T0)))
 
 template<typename T>
@@ -226,20 +227,38 @@ public:
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV(T1, T0) &&
+        _C(T0) == _C(T1)>::type* = nullptr>
     operator FarPtrBase<T0>() const & {
         return FarPtrBase<T0>(this->_seg_(), this->_off_());
     }
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV(T1, T0) &&
+        _C(T0) == _C(T1)>::type* = nullptr>
     operator FarPtrBase<T0>() && {
         _assert(!obj);
         return FarPtrBase<T0>(this->seg(), this->off());
     }
 
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV(T1, T0) &&
+        /* adding constness is not allowed here for the quite tricky
+         * reason that bothers only clang but not gcc:
+         * https://bugs.llvm.org/show_bug.cgi?id=36131
+         * The implicit cast to an arbitrary ptr can be triggered by
+         * the dereference operator*. But in clang there are 2 of them:
+         * - built-in candidate operator*(T *)
+         * - built-in candidate operator*(const T *)
+         * ... or even more.
+         * We need to select the one that matches constness.
+         * Hope this does not bring any limitations because the
+         * missing constness will be implicitly added later as needed
+         * (by operator= for example). */
+        _C(T0) == _C(T1)>::type* = nullptr>
     operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<!ALLOW_CNV(T1, T0)>::type* = nullptr>
+    explicit operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }
 
     using FarPtrBase<T>::operator ==;
     template <typename T0, typename T1 = T,
@@ -375,9 +394,6 @@ public:
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
-    template <typename T1 = T,
-        typename std::enable_if<_P(T1) &&
-        !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, _lookup_far(this));
     }
@@ -392,8 +408,6 @@ public:
     AsmRef(FarPtr<T> *s) : sym(s) {}
     T* operator ->() { return *sym; }
     operator FarPtr<T> () { return *sym; }
-    template <typename T1 = T,
-        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     operator FarPtr<void> () { return FarPtr<void>(*sym); }
     uint16_t seg() const { return sym->seg(); }
     uint16_t off() const { return sym->off(); }
@@ -518,12 +532,8 @@ public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
 
-    template <typename T1 = T,
-        typename std::enable_if<!_C(T1)>::type* = nullptr>
     operator FarPtr<void> () { return this->lookup_sym(); }
-    template <typename T1 = T,
-        typename std::enable_if<!_C(T1)>::type* = nullptr>
-    operator FarPtr<const T1> () { return this->lookup_sym(); }
+    operator FarPtr<const T> () { return this->lookup_sym(); }
     operator FarPtr<T> () { return this->lookup_sym(); }
     template <uint16_t (*SEG)(void)>
     operator NearPtr<T, SEG> () {
