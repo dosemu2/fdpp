@@ -394,6 +394,9 @@ public:
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
+    template <typename T1 = T,
+        typename std::enable_if<_P(T1) &&
+        !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, _lookup_far(this));
     }
@@ -408,6 +411,8 @@ public:
     AsmRef(FarPtr<T> *s) : sym(s) {}
     T* operator ->() { return *sym; }
     operator FarPtr<T> () { return *sym; }
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     operator FarPtr<void> () { return FarPtr<void>(*sym); }
     uint16_t seg() const { return sym->seg(); }
     uint16_t off() const { return sym->off(); }
@@ -532,8 +537,12 @@ public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
 
+    template <typename T1 = T,
+        typename std::enable_if<!_C(T1)>::type* = nullptr>
     operator FarPtr<void> () { return this->lookup_sym(); }
-    operator FarPtr<const T> () { return this->lookup_sym(); }
+    template <typename T1 = T,
+        typename std::enable_if<!_C(T1)>::type* = nullptr>
+    operator FarPtr<const T1> () { return this->lookup_sym(); }
     operator FarPtr<T> () { return this->lookup_sym(); }
     template <uint16_t (*SEG)(void)>
     operator NearPtr<T, SEG> () {
