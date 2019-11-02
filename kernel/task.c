@@ -337,21 +337,16 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
 
   if (mode == LOADNGO)
   {
-    iregs FAR *irp;
+    exec_regs FAR *irp;
 
     /* build the user area on the stack                     */
-    irp = (iregs FAR *)(exp->exec.stack - sizeof(iregs));
+    irp = (exec_regs FAR *)(exp->exec.stack - sizeof(exec_regs));
 
-    /* start allocating REGs (as in MS-DOS - some demos expect them so --LG) */
-    /* see http://www.beroset.com/asm/showregs.asm */
-    irp->DX = irp->ES = irp->DS = ds;
+    irp->DS = ds;
     irp->CS = FP_SEG(exp->exec.start_addr);
-    irp->SI = irp->IP = FP_OFF(exp->exec.start_addr);
+    irp->IP = FP_OFF(exp->exec.start_addr);
     irp->DI = FP_OFF(exp->exec.stack);
-    irp->BP = 0x91e; /* this is more or less random but some programs
-                        expect 0x9 in the high byte of BP!! */
-    irp->AX = irp->BX = fcbcode;
-    irp->CX = 0xFF;
+    irp->AX = fcbcode;
     irp->FLAGS = 0x200;
 
     if (InDOS)
@@ -575,7 +570,7 @@ VOID return_user(iregs FAR *irp)
 
   if (InDOS)
     --InDOS;
-  exec_user(irp);
+  ret_user(irp);
 }
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)

@@ -81,6 +81,15 @@ typedef struct _iregss {
 } iregs;
 ANNOTATE_SIZE(iregs, 24);
 
+/* used for exec, should not exceed 12 bytes
+ * as some exe's give very few stack space */
+typedef struct {
+  xreg a;
+  UWORD di, ds;
+  UWORD ip, cs, flags;
+} exec_regs;
+ANNOTATE_SIZE(exec_regs, 12);
+
 /* struct used for local copy of registers */
 typedef struct {
   xreg a, b, c, d;

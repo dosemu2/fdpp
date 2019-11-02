@@ -49,13 +49,30 @@ segment HMA_TEXT
 ;
                 global  _exec_user
 _exec_user:
+                pop     ax		      ; return address (unused)
 
-;                PUSH$ALL
-;                mov     ds,[_DGROUP_]
-;                cld
-;
-;
-;
+                pop     bp		      ; irp (user ss:sp)
+                pop     si
+                cli
+                mov     ss,si
+                mov     sp,bp
+;    /* start allocating REGs (as in MS-DOS - some demos expect them so --LG) */
+;    /* see http://www.beroset.com/asm/showregs.asm */
+                pop     bx
+                mov     cx,0ffh
+                mov     si,[bp + 6] ; IP
+                pop     di
+                pop     ax
+                mov     ds,ax
+                mov     es,ax
+                mov     dx,ax
+                mov     ax,bx
+                mov     bp,091eh ;this is more or less random but some programs
+                                 ;expect 0x9 in the high byte of BP!! */
+                iret
+
+                global  _ret_user
+_ret_user:
                 pop     ax		      ; return address (unused)
 
                 pop     bp		      ; irp (user ss:sp)
