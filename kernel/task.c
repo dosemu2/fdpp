@@ -580,6 +580,12 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
   {
     UWORD image_size;
 
+    if (ExeHeader.exInitSP < sizeof(exec_regs))
+    {
+      _printf("Too small stack, %i bytes\n", ExeHeader.exInitSP);
+      return DE_INVLDDATA;
+    }
+
     /* compute image size by removing the offset from the   */
     /* number pages scaled to bytes plus the remainder and  */
     /* the psp                                              */
