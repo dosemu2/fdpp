@@ -267,11 +267,10 @@ STATIC UWORD patchPSP(UWORD pspseg, UWORD envseg, __XFAR(exec_blk)exb,
 
   /* complete the psp by adding the command line and FCBs     */
   fmemcpy(&_psp->ps_cmd, exb->exec.cmd_line, sizeof(CommandTail));
-  if (FP_OFF(exb->exec.fcb_1) != 0xffff)
-  {
+  if (exb->exec.fcb_1 != NULL && FP_OFF(exb->exec.fcb_1) != 0xffff)
     fmemcpy(&_psp->ps_fcb1, exb->exec.fcb_1, 16);
+  if (exb->exec.fcb_2 != NULL && FP_OFF(exb->exec.fcb_2) != 0xffff)
     fmemcpy(&_psp->ps_fcb2, exb->exec.fcb_2, 16);
-  }
 
   /* identify the mcb as this functions'                  */
   fd_prot_mem(pspmcb, sizeof(*pspmcb), FD_MEM_NORMAL);
