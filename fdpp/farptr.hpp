@@ -303,7 +303,7 @@ public:
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
-template<typename, int, typename P, char (P::*)[0]> class ArMemb;
+template<typename, int, typename P, int (*)(void)> class ArMemb;
 
 template<typename T>
 class XFarPtr : public FarPtr<T>
@@ -314,7 +314,7 @@ public:
     XFarPtr() = delete;
     XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
-    template<typename T1 = T, int max_len, typename P, char (P::*M)[0]>
+    template<typename T1 = T, int max_len, typename P, int (*M)(void)>
     XFarPtr(ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p) {}
 
     /* The below ctors are safe wrt implicit conversions as they take
@@ -505,18 +505,12 @@ public:
     far_s* get_ref() { return &sym.get_ref(); }
 };
 
-template <typename T, char (T::*M)[0]>
-struct offset_of {
-    constexpr operator size_t() const {
-        return (std::uintptr_t)&(((T*)nullptr)->*M);
-    }
-};
-template<typename T, typename P, char (P::*M)[0], int O = 0>
+template<typename T, typename P, int (*M)(void), int O = 0>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
         FarPtr<T> fp;
-        int off = offset_of<P, M>() + O;
+        constexpr int off = M() + O;
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f = lookup_far_st(ptr);
@@ -528,7 +522,7 @@ protected:
     }
 };
 
-template<typename T, int max_len, typename P, char (P::*M)[0]>
+template<typename T, int max_len, typename P, int (*M)(void)>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
 
@@ -626,7 +620,7 @@ public:
     far_s* get_ref() { return &ptr.get_ref(); }
 };
 
-template<typename T, typename P, char (P::*M)[0], int O = 0>
+template<typename T, typename P, int (*M)(void), int O = 0>
 class SymMemb : public T, public MembBase<T, P, M, O> {
 public:
     SymMemb() = default;
@@ -635,7 +629,7 @@ public:
     FarPtr<T> operator &() const { return this->lookup_sym(); }
 };
 
-template<typename T, typename P, char (P::*M)[0], int O = 0>
+template<typename T, typename P, int (*M)(void), int O = 0>
 class SymMemb2 : public MembBase<T, P, M, O> {
     T sym;
 
@@ -666,17 +660,18 @@ public:
 #define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
-#define DUMMY_MARK(n) char off_##n[0]
+#define DUMMY_MARK(p, n) \
+    static constexpr int off_##n(void) { return offsetof(p, n); }
 #define AR_MEMB(p, t, n, l) \
-    DUMMY_MARK(n); \
+    DUMMY_MARK(p, n); \
     ArMemb<t, l, p, &p::off_##n> n
 #define SYM_MEMB(p, t, n) \
-    DUMMY_MARK(n); \
+    DUMMY_MARK(p, n); \
     SymMemb<t, p, &p::off_##n> n
 #define SYM_MEMB2(p, m, o, t, n) \
     SymMemb<t, p, &p::off_##m, o> n
 #define SYM_MEMB_T(p, t, n) \
-    DUMMY_MARK(n); \
+    DUMMY_MARK(p, n); \
     SymMemb2<t, p, &p::off_##n> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
