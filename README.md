@@ -27,7 +27,7 @@ You can also get the pre-built dosemu2 packages with
 fdpp support enabled from the aforementioned
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
 
-## configuring
+## configuration
 fdpp uses fdppconf.sys file at boot. This file has
 the standard format of config.sys with some syntax
 extensions. It is fully backward-compatible with the
@@ -41,34 +41,29 @@ This means it can't be booted from the bare-metal PC,
 as the original freedos could. But all it needs is a
 few call-backs for running real-mode code. So if you
 want to run it on something other than dosemu2, please
-use [this code](https://github.com/stsp/dosemu2/blob/devel/src/plugin/fdpp/fdpp.c)
+use
+[this code](https://github.com/stsp/dosemu2/blob/devel/src/plugin/fdpp/fdpp.c)
 as a reference implementation. Sufficiently DOS-oriented
 kernels like [freedos-32](http://freedos-32.sourceforge.net/)
 are good candidates for running fdpp.
 
 ## what fdpp technically is?
-A meta-compiler that allows to compile the freedos
-kernel from its almost unmodified sources.
-Parsing FAR pointers and generating thunks to real-mode
-asm are among its main goals. As the original freedos
-sources are modified very slightly, it may be possible
-to compile it with the real-mode compilers again, after
-some (back-)porting work.
-
-But compiling the freedos unmodified, is just one of the
-fdpp project's goals. Another goal is the development of
-the freedos core itself. So fdpp aims for a new, freedos-based
-kernel core and a 64bit compiler framework for it.
+A meta-compiler that was initially able to compile the
+freedos kernel from its almost unmodified sources.
+As the project advances, the ability to compile freedos
+from the unmodified sources have lost its value, as our
+copy of freedos is now heavily modified. The main tasks
+of our meta-compiler is to parse FAR pointers and generate
+thunks to real-mode asm code of freedos.
 
 ## compatibility
 fdpp removes some compatibility hacks that FreeDOS had.
 For example it doesn't play tricks with disabling A20 when
-returning to user code (and that, as far as I know, can be
-solved with the "loadfix" command). But the main compatibility
-burden is presented by the host platform rather than by fdpp.
-Running fdpp under dosemu2 gives very similar level of compatibility
-to the one of FreeDOS on dosemu2. If you find some compatibility
-problem, please report a bug.
+returning to user code, so you may see "Packed file is corrupt"
+message on some old exe files. Using "loadfix" command avoids
+that problem.
+On the other hand fdpp supports much more games than does freedos.
+If you find some compatibility problem, please report a bug.
 
 ## portability
 fdpp can work in any environment with STL/C++ runtime support.
