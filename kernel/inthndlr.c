@@ -736,8 +736,7 @@ dispatch:
           lr.BH = version_flags;
       else
           lr.BH = OEM_ID;
-      lr.AL = os_setver_major;
-      lr.AH = os_setver_minor;
+      lr.AX = psp->ps_retdosver;
       lr.BL = REVISION_SEQ;
       lr.CX = 0; /* do not set this to a serial number!
                     32RTM won't like non-zero values   */
