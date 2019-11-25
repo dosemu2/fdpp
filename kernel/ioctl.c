@@ -184,6 +184,15 @@ COUNT DosDevIOctl(lregs * r)
       }
       else
       {
+        if (r->AL == 8)
+        {
+          struct cds FAR *cdsp = get_cds1(r->BL & 0x1f);
+          if (cdsp == NULL)
+            return DE_INVLDDRV;
+          /* remote drive is fixed */
+          r->AX = 1;
+          return SUCCESS;
+        }
         if (r->AL != 9)
           return DE_INVLDDRV;
         dev = NULL;
