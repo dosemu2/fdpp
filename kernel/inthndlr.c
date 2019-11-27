@@ -681,7 +681,7 @@ dispatch:
 
       /* Dos Create New Psp                                           */
     case 0x26:
-      new_psp(lr.DX, r->CS);
+      new_psp(lr.DX, cu_psp);
       break;
 
       /* Read random record(s) using FCB */
