@@ -206,6 +206,8 @@ void new_psp(seg para, seg cur_psp)
   p->ps_isv23 = getvec(0x23);
   /* critical error address                               */
   p->ps_isv24 = getvec(0x24);
+  /* open file table pointer                              */
+  p->ps_filetab = p->ps_files;
   /* RBIL is wrong on zeroing parent_psp, and in fact some
    * progs (Alpha Waves game, https://github.com/stsp/fdpp/issues/112)
    * won't work if its zeroed. */
@@ -239,9 +241,6 @@ void child_psp(seg para, seg cur_psp, int psize)
   /* maximum open files                                   */
   p->ps_maxfiles = 20;
   fmemset(p->ps_files, 0xff, 20);
-
-  /* open file table pointer                              */
-  p->ps_filetab = p->ps_files;
 
   /* clone the file table -- 0xff is unused               */
   for (i = 0; i < 20; i++)
