@@ -2,8 +2,22 @@ language: c
 
 dist:  bionic
 
+addons:
+  apt:
+    packages:
+      - clang
+      - nasm
+      - libstdc++-5-dev
+      - git
+      - bash
+      - autoconf
+      - flex
+      - bison
+      - sed
+    update: true
+
 before_install:
-  - ./travis_prereq.sh
+  - echo "before_install"
 
 install:
   - ./travis_build.sh
