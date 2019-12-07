@@ -207,11 +207,15 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
 
 install: $(FDPPLIB) $(GEN_EXT)
-	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
-	install -D -t $(DESTDIR)$(PKGCONFIGDIR) -m 0644 fdpp.pc
-	install -D -t $(DESTDIR)$(PREFIX)/include/fdpp -m 0644 $(EXT_H)
-	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.sys
-	install -D -t $(DESTDIR)$(DATADIR) -m 0644 fdppkrnl.map
+	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
+	install $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
+	mkdir -p $(DESTDIR)$(PKGCONFIGDIR)
+	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
+	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
+	install -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
+	mkdir -p $(DESTDIR)$(DATADIR)
+	install -m 0644 fdppkrnl.sys $(DESTDIR)$(DATADIR)
+	install -m 0644 fdppkrnl.map $(DESTDIR)$(DATADIR)
 
 $(TGZ): fdpp.spec
 	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
