@@ -64,7 +64,7 @@ struct FS_info {
 /*TE - array access functions */
 ddt FAR *getddt(int dev)
 {
-  _assert(dev < 26);
+  ___assert(dev < 26);
   return ddt_buf[dev];
 }
 

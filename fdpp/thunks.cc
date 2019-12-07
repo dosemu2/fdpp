@@ -283,7 +283,7 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     }
 
     err = FdppSetAsmThunks(thtab, stab_len);
-    _assert(!err);
+    ___assert(!err);
 }
 
 #define _ARG(n, t, ap) (*(t *)(ap + n))
@@ -312,7 +312,7 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, int *r_len)
     if (stat == DISP_OK) \
         rsz = (r); \
     else \
-        _assert(ret != ASM_NORET); \
+        ___assert(ret != ASM_NORET); \
 })
 #define _DISPATCH_v(f, ...) _DISP_CMN(f, { \
     ret = fdpp_dispatch_v(&stat, f, ##__VA_ARGS__); \
@@ -462,7 +462,7 @@ void cpu_relax(void)
 static void _call_wrp(FdppAsmCall_t call, struct vm86_regs *regs, 
         uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len)
 {
-    _assert(seg || off);
+    ___assert(seg || off);
     call(regs, seg, off, sp, len);
 }
 
@@ -477,7 +477,7 @@ static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
             return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
         }
     }
-    _assert(0);
+    ___assert(0);
     return -1;
 }
 
@@ -489,7 +489,7 @@ static uint16_t find_wrp(uint16_t seg)
         if (near_wrp[i].seg == seg)
             return near_wrp[i].off;
     }
-    _assert(0);
+    ___assert(0);
     return -1;
 }
 
@@ -503,13 +503,13 @@ static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
             uint16_t wrp = find_wrp(asm_tab[i].seg);
             LO_WORD(s_regs.eax) = asm_tab[i].off;
             /* argpack should be aligned */
-            _assert(!(len & 1));
+            ___assert(!(len & 1));
             LO_WORD(s_regs.ecx) = len >> 1;
             _call_wrp(call, &s_regs, asm_tab[i].seg, wrp, sp, len);
             return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
         }
     }
-    _assert(0);
+    ___assert(0);
     return -1;
 }
 
@@ -733,7 +733,7 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
             if (!f.seg && !f.off)
                 miss++;
             else
-                _assert(rm);
+                ___assert(rm);
             if (old_seg == asm_thunks.arr[i]->seg)
                 asm_thunks.arr[i]->seg += delta;
             store_far_replace(&sym_tab, resolve_segoff(*asm_thunks.arr[i]),
@@ -764,7 +764,7 @@ void PurgeHook(void *ptr, UDWORD len)
             if (!f.seg && !f.off)
                 miss++;
             else
-                _assert(rm);
+                ___assert(rm);
             asm_thunks.arr[i]->seg = asm_thunks.arr[i]->off = 0;
             reloc++;
         }

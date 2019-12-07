@@ -113,7 +113,7 @@ public:
         _ctor();
     }
     virtual far_s get_obj() {
-        _assert(!have_obj);
+        ___assert(!have_obj);
         pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
         have_obj = true;
         if (is_const)
@@ -132,7 +132,7 @@ public:
         return NearPtr_DO<obj_type>(f.off);
     }
 
-    virtual ~FarObj() { _assert(!refcnt); RmObj(); }
+    virtual ~FarObj() { ___assert(!refcnt); RmObj(); }
 
     /* make it non-copyable */
     FarObj(const FarObj &) = delete;

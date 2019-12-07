@@ -30,9 +30,9 @@
 
 static inline far_s __lookup_far(fh1 *fh, const void *ptr)
 {
-    _assert(ptr == fh->ptr);
+    ___assert(ptr == fh->ptr);
     far_s f = fh->f;
-    _assert(f.seg || f.off);
+    ___assert(f.seg || f.off);
     return f;
 }
 
@@ -236,7 +236,7 @@ public:
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
         _C(T0) == _C(T1)>::type* = nullptr>
     operator FarPtrBase<T0>() && {
-        _assert(!obj);
+        ___assert(!obj);
         return FarPtrBase<T0>(this->seg(), this->off());
     }
 
@@ -274,20 +274,20 @@ public:
      * the owner, because the fwd copy is already done and bwd
      * copy is not needed. So the simple form can be used then. */
     uint16_t seg() const {
-        _assert(!obj || std::is_const<T>::value);
+        ___assert(!obj || std::is_const<T>::value);
         return this->ptr.seg;
     }
     uint16_t off() const {
-        _assert(!obj || std::is_const<T>::value);
+        ___assert(!obj || std::is_const<T>::value);
         return this->ptr.off;
     }
     uint16_t seg(void *owner) const {
-        _assert(obj);
+        ___assert(obj);
         obj->ref(owner);
         return this->ptr.seg;
     }
     uint16_t off(void *owner) const {
-        _assert(obj);
+        ___assert(obj);
         obj->ref(owner);
         return this->ptr.off;
     }
@@ -498,7 +498,7 @@ protected:
     using wrp_type = typename WrpType<T>::type;
 public:
     wrp_type& operator [](int idx) {
-        _assert(!max_len || idx < max_len);
+        ___assert(!max_len || idx < max_len);
         return sym[idx];
     }
 
@@ -516,7 +516,7 @@ protected:
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off)
             f = do_lookup_far(ptr);
-        _assert(f.seg || f.off);
+        ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
     }
@@ -541,7 +541,7 @@ public:
     template <uint16_t (*SEG)(void)>
     operator NearPtr<T, SEG> () {
         FarPtr<T> f = this->lookup_sym();
-        _assert(f.seg() == SEG());
+        ___assert(f.seg() == SEG());
         return NearPtr<T, SEG>(f.off());
     }
     operator T *() { return sym; }
@@ -552,7 +552,7 @@ public:
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
 
     wrp_type& operator [](int idx) {
-        _assert(!max_len || idx < max_len);
+        ___assert(!max_len || idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }

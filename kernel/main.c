@@ -131,7 +131,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   bprm = AlignParagraph(bprm_buf);
   fmemcpy_n(bprm, MK_FP(LoL->_BootParamSeg, 0), sizeof(struct _bprm));
   LoL->_BootParamSeg = FP_SEG(bprm);
-  _assert(FP_SEG(bprm) >= FP_SEG(adjust_far(bprm_buf)) && FP_OFF(bprm) == 0);
+  ___assert(FP_SEG(bprm) >= FP_SEG(adjust_far(bprm_buf)) && FP_OFF(bprm) == 0);
 
   CheckContinueBootFromHarddisk();
 

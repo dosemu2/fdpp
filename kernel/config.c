@@ -579,7 +579,7 @@ STATIC seg prev_mcb(seg cur_mcb, seg start)
   /* determine prev mcb */
   seg mcb_prev, mcb_next;
 
-  _assert(cur_mcb > start);
+  ___assert(cur_mcb > start);
   mcb_prev = mcb_next = start;
   while (mcb_next < cur_mcb)
   {
@@ -648,7 +648,7 @@ STATIC void umb_init(void)
       {
         mcb FAR *ps;
         /* make sure prev mcb is link */
-        _assert(para2far(umb_prev)->m_psp == 8);
+        ___assert(para2far(umb_prev)->m_psp == 8);
         ps = para2far(umb_seg);
         fd_prot_mem(ps, sizeof(*ps), FD_MEM_NORMAL);
         ps->m_type = MCB_NORMAL;
@@ -672,7 +672,7 @@ STATIC void umb_init(void)
       else /* umb_seg >= umb_max */
       {
         /* make sure to adjust not link */
-        _assert(para2far(umb_prev)->m_psp != 8);
+        ___assert(para2far(umb_prev)->m_psp != 8);
         if (umb_seg > umb_next) {
             mcb FAR *pp = para2far(umb_prev);
             fd_prot_mem(pp, sizeof(*pp), FD_MEM_NORMAL);
@@ -691,7 +691,7 @@ STATIC void umb_init(void)
            adjacent memory in several pieces */
         umb_prev = prev_mcb(umb_prev, LoL->_uppermem_root);
         /* make sure we are still in UMB and adjusting non-link */
-        _assert(umb_prev >= ram_top * 64 && para2far(umb_prev)->m_psp != 8);
+        ___assert(umb_prev >= ram_top * 64 && para2far(umb_prev)->m_psp != 8);
         pp = para2far(umb_prev);
         fd_prot_mem(pp, sizeof(*pp), FD_MEM_NORMAL);
         pp->m_size += umb_size;

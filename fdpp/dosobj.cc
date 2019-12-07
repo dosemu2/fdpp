@@ -68,7 +68,7 @@ far_t mk_dosobj(const void *data, UWORD len)
     uint16_t offs;
     far_t ret;
 
-    _assert(initialized);
+    ___assert(initialized);
     ptr = smalloc(&pool, len);
     if (!ptr) {
         fdprintf("dosobj: OOM! len=%i\n", len);

@@ -42,7 +42,7 @@ void store_far(farhlp *ctx, const void *ptr, far_t fptr)
             decltype(ctx->map)::mapped_type()));
     if (!p.second) {
         far_t *f = &p.first->second.f;
-        _assert(f->seg == fptr.seg && f->off == fptr.off);
+        ___assert(f->seg == fptr.seg && f->off == fptr.off);
         /* already exists, do nothing */
         return;
     }
