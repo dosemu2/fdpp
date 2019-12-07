@@ -22,7 +22,13 @@ gen_plt_asmc() {
 }
 
 gen_plt_asmp() {
-	grep ASMPASCAL $1 | sed -E 's/([0-9]+).+ ([^ \(]+) *\(.+/asmpsym \U\2, \1/'
+	set +e
+	GSED=`which gsed 2>/dev/null`
+	set -e
+	if [ -z "$GSED" ]; then
+		GSED=`which sed 2>/dev/null`
+	fi
+	grep ASMPASCAL $1 | $GSED -E 's/([0-9]+).+ ([^ \(]+) *\(.+/asmpsym \U\2, \1/'
 }
 
 case "$1" in
