@@ -8,8 +8,8 @@ gen_calls_tmp() {
 }
 
 gen_plt_inc() {
-	grep ") FAR " $1 | sed -E 's/([0-9]+).+ (SEGM\((.+)\)).* ([^ \(]+) *\(.*/asmcfunc_f \4,\t\t\1,\t\3/'
-	grep -v ") FAR " $1 | sed -E 's/([0-9]+).+ (SEGM\((.+)\)).* ([^ \(]+) *\(.*/asmcfunc_n \4,\t\t\1,\t\3/'
+	grep ") FAR " $1 | sed -E 's/([0-9]+).+ (SEGM\((.+)\)).* ([^ \(]+) *\(.*/asmcfunc_f \4, \1, \3/'
+	grep -v ") FAR " $1 | sed -E 's/([0-9]+).+ (SEGM\((.+)\)).* ([^ \(]+) *\(.*/asmcfunc_n \4, \1, \3/'
 }
 
 gen_asms_tmp() {
@@ -18,11 +18,11 @@ gen_asms_tmp() {
 }
 
 gen_plt_asmc() {
-	grep ASMFUNC $1 | sed -E 's/([0-9]+).+ ([^ \(]+) *\(.+/asmcsym \2,\t\t\1/'
+	grep ASMFUNC $1 | sed -E 's/([0-9]+).+ ([^ \(]+) *\(.+/asmcsym \2, \1/'
 }
 
 gen_plt_asmp() {
-	grep ASMPASCAL $1 | sed -E 's/([0-9]+).+ ([^ \(]+) *\(.+/asmpsym \U\2,\t\t\1/'
+	grep ASMPASCAL $1 | sed -E 's/([0-9]+).+ ([^ \(]+) *\(.+/asmpsym \U\2, \1/'
 }
 
 case "$1" in
