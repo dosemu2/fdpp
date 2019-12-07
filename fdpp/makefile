@@ -56,7 +56,7 @@ $(TARGET).sys: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	chmod -x $@
 
 clean:
-	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers clean
+	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) .tstamp *.map *.elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
@@ -204,7 +204,7 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	if [ ! -f parsers/makefile ]; then \
 	    ln -s $(abspath $(srcdir))/parsers/makefile parsers/makefile ; \
 	fi
-	+cd parsers && make srcdir=$(abspath $(srcdir))/parsers
+	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
 
 install: $(FDPPLIB) $(GEN_EXT)
 	install -D -t $(DESTDIR)$(LIBDIR)/fdpp $(FDPPLIB)
