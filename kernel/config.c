@@ -523,8 +523,7 @@ VOID configDone(VOID)
     p = para2far(kernel_seg - 1);
 
     fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
-    p->m_name[0] = 'S';
-    p->m_name[1] = 'C';
+    strcpy(p->m_name, "SC DOS");
     p->m_psp = 8;
     fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
