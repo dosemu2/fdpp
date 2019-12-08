@@ -8,5 +8,8 @@ if [ $? != 0 ]; then
 fi
 if ! touch --date="$DATE" $TSTAMP 2>/dev/null; then
     echo "touch doesnt support --date, build may be incomplete" >&2
+    if [ ! -f "$TSTAMP" ]; then
+        touch $TSTAMP
+    fi
 fi
 echo $TSTAMP
