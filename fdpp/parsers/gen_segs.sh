@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 while read -a line_a; do
     line=${line_a[@]}

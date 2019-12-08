@@ -12,4 +12,4 @@ PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
 
 DIRSEP = /
 RM = rm -f
-SHELL = /bin/bash
+SHELL = /usr/bin/env bash
