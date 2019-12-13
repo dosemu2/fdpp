@@ -480,10 +480,11 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
   else
   {
     int attr = (lpXfcb->xfcb_flag == 0xff ? lpXfcb->xfcb_attrib : D_ALL);
-    dmatch Dmatch;
+    dmatch _Dmatch;
     dmatch FAR * Dmatch_p;
+#define Dmatch (*Dmatch_p)
 
-    Dmatch_p = MK_FAR(Dmatch);
+    Dmatch_p = MK_FAR(_Dmatch);
     dta = Dmatch_p;
     if ((CritErrCode = -DosFindFirst(attr, SecPathName)) != SUCCESS)
     {
@@ -501,6 +502,7 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
       }
     }
     while ((CritErrCode = -DosFindNext()) == SUCCESS);
+#undef Dmatch
   }
   dta = lpOldDta;
   return result;
@@ -528,12 +530,13 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
   }
   else
   {
-    dmatch Dmatch;
+    dmatch _Dmatch;
     dmatch FAR * Dmatch_p;
+#define Dmatch (*Dmatch_p)
     COUNT _result;
 
     wAttr = (lpXfcb->xfcb_flag == 0xff ? lpXfcb->xfcb_attrib : D_ALL);
-    Dmatch_p = MK_FAR(Dmatch);
+    Dmatch_p = MK_FAR(_Dmatch);
     dta = Dmatch_p;
     if ((CritErrCode = -DosFindFirst(wAttr, SecPathName)) != SUCCESS)
     {
@@ -585,6 +588,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       }
     }
     while ((CritErrCode = -DosFindNext()) == SUCCESS);
+#undef Dmatch
   }
   dta = lpOldDta;
   return result;
