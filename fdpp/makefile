@@ -17,9 +17,9 @@ VERSION = $(MAJ)$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
 TGZ = $(TAR).gz
-FD_EXT_H = bprm.h memtype.h
-EXT_H = $(FD_EXT_H) thunks.h
-GEN_EXT = fdpp.pc $(EXT_H)
+FD_EXT_H = $(HDR)bprm.h $(HDR)memtype.h
+EXT_H = $(FD_EXT_H) $(srcdir)/thunks.h
+GEN_EXT = fdpp.pc fdpp.spec
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
@@ -231,14 +231,9 @@ rpm: $(TGZ)
 deb:
 	debuild -i -us -uc -b
 
-fdpp.spec fdpp.pc: %: $(srcdir)/%.in makefile
+$(GEN_EXT): %: $(srcdir)/%.in makefile
 	sed \
 		-e 's!@PREFIX[@]!$(PREFIX)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
 		-e 's!@VERSION[@]!$(VERSION)!g' \
 		$< >$@
-
-$(FD_EXT_H): %: $(HDR)%
-	ln -s $< $@
-thunks.h: $(srcdir)/thunks.h
-	ln -s $< $@
