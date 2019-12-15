@@ -195,7 +195,11 @@ public:
     virtual bool is_alias(const ObjIf& o) = 0;
     virtual void re_read() = 0;
     virtual ~ObjIf() = default;
-
+    /* below section is only needed because we don't use
+     * dynamic_cast/RTTI. Maybe one day I'll give up and enable
+     * RTTI, but for now let's fight. */
+protected:
+    template <typename> friend class FarObj;
     virtual const void *get_ptr() const = 0;
     virtual FarPtrBase<uint8_t> get_far() const = 0;
 };
