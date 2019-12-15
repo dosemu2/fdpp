@@ -19,12 +19,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include "../hdr/portab.h"
+#include "portab.h"
 #include "globals.h"
 #include "proto.h"
 
 #include "dispatch.hpp"
 #include "objtrace.hpp"
+#include "farhlp.hpp"
 #include "thunks_priv.h"
 #include "thunks.h"
 

@@ -26,9 +26,6 @@
  * Need this to work around some C++ deficiencies, see comments
  * in farptr.hpp */
 
-fh1 g_farhlp1;
-fh1 g_farhlp2;
-
 void farhlp_init(farhlp *ctx)
 {
     ctx->map.clear();

@@ -29,13 +29,6 @@ struct farhlp {
     std::unordered_map<const void *, struct f_m> map;
 };
 
-struct fh1 {
-    const void *ptr;
-    far_t f;
-};
-extern fh1 g_farhlp1;
-extern fh1 g_farhlp2;
-
 void farhlp_init(farhlp *ctx);
 void store_far(farhlp *ctx, const void *ptr, far_t fptr);
 void store_far_replace(farhlp *ctx, const void *ptr, far_t fptr);
