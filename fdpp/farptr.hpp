@@ -28,7 +28,8 @@
 #include "farhlp_sta.h"
 
 /* for get_sym() */
-static const int sym_store[] = { SYM_STORE, ARR_STORE, STORE_MAX };
+static const int sym_store[] = { SYM_STORE, STORE_MAX };
+static const int arr_store[] = { ARR_STORE, STORE_MAX };
 /* for -> */
 static const int memb_store[] = { SYM_STORE, ARROW_STORE, STORE_MAX };
 
@@ -71,16 +72,19 @@ static inline void store_far(int idx, far_s fptr)
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
 #define _RC(T1) typename std::remove_const<T1>::type
-template<typename> class SymWrp;
-template<typename> class SymWrp2;
+template<typename, const int *> class SymWrp;
+template<typename, const int *> class SymWrp2;
 
-template<typename T>
-class WrpType {
+template<typename T, const int *st>
+class WrpTypeS {
 public:
     using type = typename std::conditional<std::is_class<T>::value,
-        SymWrp<T>, SymWrp2<T>>::type;
+        SymWrp<T, st>, SymWrp2<T, st>>::type;
     using ref_type = typename std::add_lvalue_reference<type>::type;
 };
+
+template<typename T>
+using WrpType = WrpTypeS<T, sym_store>;
 
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
@@ -97,7 +101,11 @@ class FarPtrBase {
 protected:
     far_s ptr;
 
-    using wrp_type = typename WrpType<T>::type;
+    template<const int *st>
+    using wrp_type = typename WrpTypeS<T, st>::type;
+    using wrp_type_s = wrp_type<sym_store>;
+    using wrp_type_a = wrp_type<arr_store>;
+
     void do_adjust_far() {
         if (ptr.seg == 0xffff)
             return;
@@ -132,14 +140,14 @@ public:
         return (T0*)resolve_segoff_fd(ptr);
     }
 
-    wrp_type& get_wrp() {
-        wrp_type *s = new(get_buf()) wrp_type;
+    wrp_type_s& get_wrp() {
+        wrp_type_s *s = new(get_buf()) wrp_type_s;
         _store_far(SYM_STORE, s, get_far());
         return *s;
     }
-    wrp_type& operator [](int idx) {
+    wrp_type_a& operator [](int idx) {
         FarPtrBase<T>f = FarPtrBase<T>(*this + idx);
-        wrp_type *s = new(f.get_buf()) wrp_type;
+        wrp_type_a *s = new(f.get_buf()) wrp_type_a;
         _store_far(ARR_STORE, s, f.get_far());
         return *s;
     }
@@ -410,17 +418,17 @@ public:
  * map somewhere that will allow to look up the "lost" far pointers.
  * Thus farhlp.cpp
  */
-template<typename T>
+template<typename T, const int *st>
 class SymWrp : public T {
 public:
     SymWrp() = default;
     SymWrp(const SymWrp&) = delete;
-    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
+    SymWrp<T, st>& operator =(T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
-            lookup_far(sym_store, this)); }
+            lookup_far(st, this)); }
 };
 
-template<typename T>
+template<typename T, const int *st>
 class SymWrp2 {
     /* remove const or default ctor will be deleted */
     _RC(T) sym;
@@ -428,16 +436,16 @@ class SymWrp2 {
 public:
     SymWrp2() = default;
     SymWrp2(const SymWrp2&) = delete;
-    SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
+    SymWrp2<T, st>& operator =(const T& f) { sym = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
-            lookup_far(sym_store, this)); }
+            lookup_far(st, this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
-        return _MK_F(FarPtr<const void>, lookup_far(sym_store, this));
+        return _MK_F(FarPtr<const void>, lookup_far(st, this));
     }
 };
 
@@ -567,7 +575,7 @@ template<typename T, int max_len, typename P, int (*M)(void)>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
 
-    using wrp_type = typename WrpType<T>::type;
+    using wrp_type = typename WrpTypeS<T, arr_store>::type;
 public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
