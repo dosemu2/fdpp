@@ -177,7 +177,13 @@ class ObjIf {
 public:
     virtual far_s get_obj() = 0;
     virtual void ref(const void *owner) = 0;
+    virtual bool is_dupe(const ObjIf& o) = 0;
+    virtual bool is_alias(const ObjIf& o) = 0;
+    virtual void re_read() = 0;
     virtual ~ObjIf() = default;
+
+    virtual const void *get_ptr() const = 0;
+    virtual FarPtrBase<uint8_t> get_far() const = 0;
 };
 
 template <typename T> class FarObj;
@@ -266,6 +272,31 @@ public:
         typename std::enable_if<std::is_void<T1>::value>::type* = nullptr>
     bool operator == (const FarPtrBase<T0>& f) const {
         return ((f.seg() == this->ptr.seg) && (f.off() == this->ptr.off));
+    }
+
+    FarPtr<T>& operator = (const FarPtr<T>& f) {
+        bool clash = false;
+        bool dupe = false;
+        if (obj && f.obj) {
+            clash = obj->is_alias(*f.obj);
+            dupe = obj->is_dupe(*f.obj);
+        }
+        /* just ignore dupe */
+        if (!dupe && (obj || f.obj))
+            obj = f.obj;  // this implicitly does write (aka copy-back)
+        if (clash) {
+            ___assert(!dupe);
+            /* clash is tricky as it makes the order of reads and writes
+             * important. And at that point read was done before write
+             * (write is just done few line above). We can retry read to
+             * recover from that madness. */
+            obj->re_read();
+        }
+
+        /* copy rest by hands, sigh */
+        nonnull = f.nonnull;
+        this->ptr = f.ptr;
+        return *this;
     }
 
     /* below is a bit tricky. If we have a dosobj here, then we

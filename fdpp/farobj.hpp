@@ -124,6 +124,26 @@ public:
         if (track_owner(owner, this))
             refcnt++;
     }
+    virtual bool is_dupe(const ObjIf& o) {
+        /* dupe can happen after adjust_far() */
+        return (this->ptr == o.get_ptr() && this->fobj == o.get_far());
+    }
+    virtual bool is_alias(const ObjIf& o) {
+        /* aliases can happen on static data and are usually
+         * short-lived (or we are screwed). They should be assigned
+         * to the same destination, overwriting each other - this
+         * is the only case we cover. The rest we do not support
+         * and do not detect, so things will subtly crash if aliases
+         * are used too liberally. */
+        return (this->ptr == o.get_ptr() && this->fobj != o.get_far());
+    }
+    virtual void re_read() {
+        ___assert(have_obj);
+        pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
+    }
+    virtual const void *get_ptr() const { return this->ptr; }
+    virtual __DOSFAR(uint8_t) get_far() const { return this->fobj; }
+
     virtual void cp() { do_cp(); }
     virtual void unref() { refcnt--; }
 
