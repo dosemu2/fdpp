@@ -28,38 +28,29 @@
 #include "thunks_priv.h"
 #include "farhlp.hpp"
 
-static inline far_s __lookup_far(fh1 *fh, const void *ptr)
+/* for get_sym() */
+#define sym_store g_farhlp1
+/* for -> */
+#define arrow_store g_farhlp2
+
+static inline far_s lookup_far(fh1 *fh, const void *ptr)
 {
-    ___assert(ptr == fh->ptr);
-    far_s f = fh->f;
-    ___assert(f.seg || f.off);
+    far_s f = {};
+    if (ptr != fh->ptr)
+        return f;
+    f = fh->f;
     return f;
 }
 
-static inline far_s _lookup_far(const void *ptr)
-{
-    return __lookup_far(&g_farhlp1, ptr);
-}
-
-static inline void __store_far(fh1 *fh, const void *ptr, far_s fptr)
+static inline void _store_far(fh1 *fh, const void *ptr, far_s fptr)
 {
     fh->ptr = ptr;
     fh->f = fptr;
 }
 
-static inline void _store_far(const void *ptr, far_s fptr)
+static inline void store_far(fh1 *fh, far_s fptr)
 {
-    __store_far(&g_farhlp1, ptr, fptr);
-}
-
-static inline far_s do_lookup_far(const void *ptr)
-{
-    return __lookup_far(&g_farhlp2, ptr);
-}
-
-static inline void do_store_far(far_s fptr)
-{
-    __store_far(&g_farhlp2, resolve_segoff(fptr), fptr);
+    _store_far(fh, resolve_segoff(fptr), fptr);
 }
 
 #define _MK_S(s, o) (far_s){o, s}
@@ -112,7 +103,7 @@ public:
     FarPtrBase(const FarPtrBase<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
     T* operator ->() {
-        do_store_far(get_far());
+        store_far(&arrow_store, get_far());
         return (T*)resolve_segoff_fd(ptr);
     }
     operator T*() {
@@ -131,7 +122,7 @@ public:
 
     wrp_type& get_wrp() {
         wrp_type *s = new(get_buf()) wrp_type;
-        _store_far(s, get_far());
+        _store_far(&sym_store, s, get_far());
         return *s;
     }
     wrp_type& operator [](int idx) {
@@ -375,7 +366,7 @@ public:
     XFarPtr(T1 (&p)[N]) : FarPtr<T>(_MK_FAR(p)) {}
 };
 
-#define _MK_F(f, s) f(s)
+#define _MK_F(f, s) ({ ___assert(s.seg || s.off); (f)s; })
 
 /* These SymWrp are tricky, and are needed only because we
  * can't provide 'operator.':
@@ -410,7 +401,8 @@ public:
     SymWrp() = default;
     SymWrp(const SymWrp&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
-    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
+            lookup_far(&sym_store, this)); }
 };
 
 template<typename T>
@@ -422,14 +414,15 @@ public:
     SymWrp2() = default;
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
-    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, _lookup_far(this)); }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
+            lookup_far(&sym_store, this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
-        return _MK_F(FarPtr<const void>, _lookup_far(this));
+        return _MK_F(FarPtr<const void>, lookup_far(&sym_store, this));
     }
 };
 
@@ -546,7 +539,7 @@ protected:
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f = lookup_far_st(ptr);
         if (!f.seg && !f.off)
-            f = do_lookup_far(ptr);
+            f = lookup_far(&arrow_store, ptr);
         ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
