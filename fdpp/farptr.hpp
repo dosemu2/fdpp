@@ -30,7 +30,7 @@
 /* for get_sym() */
 static const int sym_store[] = { SYM_STORE, ARR_STORE, STORE_MAX };
 /* for -> */
-static const int arrow_store[] = { ARROW_STORE, STORE_MAX };
+static const int memb_store[] = { SYM_STORE, ARROW_STORE, STORE_MAX };
 
 static inline far_s _lookup_far(int idx, const void *ptr)
 {
@@ -556,9 +556,7 @@ protected:
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f;
-        f = lookup_far(sym_store, ptr);
-        if (!f.seg && !f.off)
-            f = lookup_far(arrow_store, ptr);
+        f = lookup_far(memb_store, ptr);
         ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
