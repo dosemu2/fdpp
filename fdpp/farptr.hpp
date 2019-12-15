@@ -433,7 +433,10 @@ class AsmRef {
 
 public:
     AsmRef(FarPtr<T> *s) : sym(s) {}
-    T* operator ->() { return *sym; }
+    T* operator ->() {
+        store_far(&arrow_store, sym->get_far());
+        return *sym;
+    }
     operator FarPtr<T> () { return *sym; }
     template <typename T1 = T,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
@@ -537,7 +540,8 @@ protected:
         constexpr int off = M() + O;
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - off;
-        far_s f = lookup_far_st(ptr);
+        far_s f;
+        f = lookup_far(&sym_store, ptr);
         if (!f.seg && !f.off)
             f = lookup_far(&arrow_store, ptr);
         ___assert(f.seg || f.off);
