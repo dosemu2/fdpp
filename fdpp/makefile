@@ -1,4 +1,5 @@
 -include config.mak
+-include local.mak
 srcdir ?= $(CURDIR)
 # the below is needed to prevent _our_ srcdir being passed
 # down to rpmbuild/debuild, and, subsequently, to their make!

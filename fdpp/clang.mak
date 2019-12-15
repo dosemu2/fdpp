@@ -17,10 +17,11 @@ endif
 
 TARGET=fdppkrnl
 
-DEBUG_MODE = 1
-EXTRA_DEBUG = 0
-DEBUG_MSGS = 0
-USE_UBSAN = 0
+DEBUG_MODE ?= 1
+EXTRA_DEBUG ?= 0
+DEBUG_MSGS ?= 0
+USE_UBSAN ?= 0
+
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS = $(IFLAGS)
 WFLAGS = -Wall
