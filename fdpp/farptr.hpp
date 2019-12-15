@@ -31,7 +31,8 @@
 static const int sym_store[] = { SYM_STORE, STORE_MAX };
 static const int arr_store[] = { ARR_STORE, STORE_MAX };
 /* for -> */
-static const int memb_store[] = { SYM_STORE, ARROW_STORE, STORE_MAX };
+static const int memb_store[] = { SYM_STORE, ARROW_STORE,
+    ASTER_STORE, STORE_MAX };
 
 static inline far_s _lookup_far(int idx, const void *ptr)
 {
@@ -131,6 +132,7 @@ public:
                 std::is_void<T>::value, "need std layout");
         if (!ptr.seg && !ptr.off)
             return NULL;
+        store_far(ASTER_STORE, get_far());
         return (T*)resolve_segoff_fd(ptr);
     }
     template<typename T0>
@@ -347,6 +349,7 @@ public:
                 std::is_void<T>::value, "need std layout");
         if (!nonnull && !this->ptr.seg && !this->ptr.off)
             return NULL;
+        store_far(ASTER_STORE, this->get_far());
         return (T*)resolve_segoff_fd(this->ptr);
     }
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
