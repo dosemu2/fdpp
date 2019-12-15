@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-enum { SYM_STORE, ARROW_STORE, STORE_MAX };
+enum { SYM_STORE, ARROW_STORE, ARR_STORE, STORE_MAX };
 struct fh1 {
     const void *ptr;
     far_t f;

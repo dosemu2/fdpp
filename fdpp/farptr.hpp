@@ -28,17 +28,28 @@
 #include "farhlp_sta.h"
 
 /* for get_sym() */
-#define sym_store store[SYM_STORE]
+static const int sym_store[] = { SYM_STORE, ARR_STORE, STORE_MAX };
 /* for -> */
-#define arrow_store store[ARROW_STORE]
+static const int arrow_store[] = { ARROW_STORE, STORE_MAX };
 
-static inline far_s lookup_far(int idx, const void *ptr)
+static inline far_s _lookup_far(int idx, const void *ptr)
 {
     fh1 *fh = &store[idx];
     far_s f = {};
     if (ptr != fh->ptr)
         return f;
     f = fh->f;
+    return f;
+}
+
+static inline far_s lookup_far(const int *st, const void *ptr)
+{
+    far_s f = {};
+    while (*st != STORE_MAX) {
+        f = _lookup_far(*st++, ptr);
+        if (f.seg || f.off)
+            break;
+    }
     return f;
 }
 
@@ -127,7 +138,10 @@ public:
         return *s;
     }
     wrp_type& operator [](int idx) {
-        return FarPtrBase<T>(*this + idx).get_wrp();
+        FarPtrBase<T>f = FarPtrBase<T>(*this + idx);
+        wrp_type *s = new(f.get_buf()) wrp_type;
+        _store_far(ARR_STORE, s, f.get_far());
+        return *s;
     }
 
     FarPtrBase<T> operator ++(int) {
@@ -403,7 +417,7 @@ public:
     SymWrp(const SymWrp&) = delete;
     SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
-            lookup_far(SYM_STORE, this)); }
+            lookup_far(sym_store, this)); }
 };
 
 template<typename T>
@@ -416,14 +430,14 @@ public:
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
-            lookup_far(SYM_STORE, this)); }
+            lookup_far(sym_store, this)); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
-        return _MK_F(FarPtr<const void>, lookup_far(SYM_STORE, this));
+        return _MK_F(FarPtr<const void>, lookup_far(sym_store, this));
     }
 };
 
@@ -542,9 +556,9 @@ protected:
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f;
-        f = lookup_far(SYM_STORE, ptr);
+        f = lookup_far(sym_store, ptr);
         if (!f.seg && !f.off)
-            f = lookup_far(ARROW_STORE, ptr);
+            f = lookup_far(arrow_store, ptr);
         ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
