@@ -53,8 +53,9 @@ STATIC const char FAR *GetNameField(__FAR(const char) lpFileName,
 #define TestCmnSeps(lpFileName) (*lpFileName && strchr(":;,=+ \t", *lpFileName) != NULL)
 #define TestFieldSeps(lpFileName) ((unsigned char)*lpFileName <= ' ' || strchr("/\\\"[]<>|.:;,=+\t", *lpFileName) != NULL)
 
-static dmatch Dmatch_ff;
+static dmatch _Dmatch_ff;
 static dmatch FAR * Dmatch_ff_p;
+#define Dmatch_ff (*Dmatch_ff_p)
 
 UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 {
@@ -643,7 +644,7 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
   /* First, move the dta to a local and change it around to match */
   /* our functions.                                               */
   lpDir = (BYTE FAR *)dta;
-  Dmatch_ff_p = MK_FAR(Dmatch_ff);
+  Dmatch_ff_p = MK_FAR(_Dmatch_ff);
   dta = Dmatch_ff_p;
 
   /* Next initialze local variables by moving them from the fcb   */
