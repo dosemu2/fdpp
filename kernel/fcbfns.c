@@ -480,10 +480,11 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
   else
   {
     int attr = (lpXfcb->xfcb_flag == 0xff ? lpXfcb->xfcb_attrib : D_ALL);
-    dmatch Dmatch;
+    dmatch _Dmatch;
     dmatch FAR * Dmatch_p;
+#define Dmatch (*Dmatch_p)
 
-    Dmatch_p = MK_FAR(Dmatch);
+    Dmatch_p = MK_FAR(_Dmatch);
     dta = Dmatch_p;
     if ((CritErrCode = -DosFindFirst(attr, SecPathName)) != SUCCESS)
     {
@@ -501,6 +502,7 @@ UBYTE FcbDelete(xfcb FAR * lpXfcb)
       }
     }
     while ((CritErrCode = -DosFindNext()) == SUCCESS);
+#undef Dmatch
   }
   dta = lpOldDta;
   return result;
@@ -528,12 +530,13 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
   }
   else
   {
-    dmatch Dmatch;
+    dmatch _Dmatch;
     dmatch FAR * Dmatch_p;
+#define Dmatch (*Dmatch_p)
     COUNT _result;
 
     wAttr = (lpXfcb->xfcb_flag == 0xff ? lpXfcb->xfcb_attrib : D_ALL);
-    Dmatch_p = MK_FAR(Dmatch);
+    Dmatch_p = MK_FAR(_Dmatch);
     dta = Dmatch_p;
     if ((CritErrCode = -DosFindFirst(wAttr, SecPathName)) != SUCCESS)
     {
@@ -545,7 +548,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       BYTE loc_szBuffer[2 + FNAME_SIZE + 1 + FEXT_SIZE + 1];
       fcb LocalFcb;
       BYTE *pToName;
-      const char FAR *pFromPattern = Dmatch_p->dm_name;
+      const char FAR *pFromPattern = Dmatch.dm_name;
       const char *pToPattern = buf;
       int i;
       UBYTE mode = 0;
@@ -565,7 +568,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
 
       SecPathName[0] = 'A' + FcbDrive - 1;
       SecPathName[1] = ':';
-      strcpy(&SecPathName[2], Dmatch_p->dm_name);
+      strcpy(&SecPathName[2], Dmatch.dm_name);
       _result = truename(SecPathName, PriPathName, 0);
 
       if (_result < SUCCESS || (_result & IS_DEVICE))
@@ -585,6 +588,7 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
       }
     }
     while ((CritErrCode = -DosFindNext()) == SUCCESS);
+#undef Dmatch
   }
   dta = lpOldDta;
   return result;
@@ -649,17 +653,20 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
 
   /* Next initialze local variables by moving them from the fcb   */
   lpFcb = CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
-  /* Reconstrct the dirmatch structure from the fcb - doesn't hurt for first */
-  Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
+  if (First)
+  {
+    /* Reconstruct the dirmatch structure from the fcb - doesn't hurt for first */
+    Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
 
-  fmemcpy(Dmatch_ff_p->dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
-  DosUpFMem((BYTE FAR *) Dmatch_ff_p->dm_name_pat, FNAME_SIZE + FEXT_SIZE);
+    fmemcpy(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
+    DosUpFMem((BYTE FAR *) Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
 
-  Dmatch_ff.dm_attr_srch = wAttr;
-  Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
-  Dmatch_ff.dm_dircluster = lpFcb->fcb_dirclst;
+    Dmatch_ff.dm_attr_srch = wAttr;
+    Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
+    Dmatch_ff.dm_dircluster = lpFcb->fcb_dirclst;
 
-  wAttr = D_ALL;
+    wAttr = D_ALL;
+  }
 
   if ((xfcb FAR *) lpFcb != lpXfcb)
   {
