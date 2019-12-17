@@ -638,7 +638,7 @@ VOID FcbCloseAll()
       DosCloseSft(idx, FALSE);
 }
 
-UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
+UBYTE FcbFindFirst(xfcb FAR * lpXfcb)
 {
   void FAR *orig_dta = dta;
   BYTE FAR *lpDir;
@@ -653,20 +653,18 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
 
   /* Next initialze local variables by moving them from the fcb   */
   lpFcb = CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
-  if (First)
-  {
-    /* Reconstruct the dirmatch structure from the fcb - doesn't hurt for first */
-    Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
 
-    fmemcpy(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
-    DosUpFMem((BYTE FAR *) Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
+  /* Reconstruct the dirmatch structure from the fcb */
+  Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
 
-    Dmatch_ff.dm_attr_srch = wAttr;
-    Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
-    Dmatch_ff.dm_dircluster = lpFcb->fcb_dirclst;
+  fmemcpy(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
+  DosUpFMem((BYTE FAR *) Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
 
-    wAttr = D_ALL;
-  }
+  Dmatch_ff.dm_attr_srch = wAttr;
+  Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
+  Dmatch_ff.dm_dircluster = lpFcb->fcb_dirclst;
+
+  wAttr = D_ALL;
 
   if ((xfcb FAR *) lpFcb != lpXfcb)
   {
@@ -675,7 +673,58 @@ UBYTE FcbFindFirstNext(xfcb FAR * lpXfcb, BOOL First)
     lpDir += 7;
   }
 
-  CritErrCode = -(First ? DosFindFirst(wAttr, SecPathName) : DosFindNext());
+  CritErrCode = -DosFindFirst(wAttr, SecPathName);
+  if (CritErrCode != SUCCESS)
+  {
+    dta = orig_dta;
+    return FCB_ERROR;
+  }
+
+  *lpDir++ = FcbDrive;
+  fmemcpy(lpDir, &SearchDir, sizeof(struct dirent));
+
+  lpFcb->fcb_dirclst = (UWORD) Dmatch_ff.dm_dircluster;
+  lpFcb->fcb_strtclst = Dmatch_ff.dm_entry;
+
+/*
+  This is undocumented and seen using Pcwatch and Ramview.
+  The First byte is the current directory count and the second seems
+  to be the attribute byte.
+ */
+  lpFcb->fcb_sftno = Dmatch_ff.dm_drive;   /* MSD seems to save this @ fcb_date. */
+#if 0
+  lpFcb->fcb_cublock = Dmatch_ff.dm_entry;
+  lpFcb->fcb_cublock *= 0x100;
+  lpFcb->fcb_cublock += wAttr;
+#endif
+  dta = orig_dta;
+  return FCB_SUCCESS;
+}
+
+UBYTE FcbFindNext(xfcb FAR * lpXfcb)
+{
+  void FAR *orig_dta = dta;
+  BYTE FAR *lpDir;
+  COUNT FcbDrive;
+  fcb FAR *lpFcb;
+
+  /* First, move the dta to a local and change it around to match */
+  /* our functions.                                               */
+  lpDir = (BYTE FAR *)dta;
+  Dmatch_ff_p = MK_FAR(_Dmatch_ff);
+  dta = Dmatch_ff_p;
+
+  /* Next initialze local variables by moving them from the fcb   */
+  lpFcb = CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
+
+  if ((xfcb FAR *) lpFcb != lpXfcb)
+  {
+    wAttr = lpXfcb->xfcb_attrib;
+    fmemcpy(lpDir, lpXfcb, 7);
+    lpDir += 7;
+  }
+
+  CritErrCode = -DosFindNext();
   if (CritErrCode != SUCCESS)
   {
     dta = orig_dta;

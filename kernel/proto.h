@@ -214,7 +214,8 @@ UBYTE FcbDelete(__FAR(xfcb) lpXfcb);
 UBYTE FcbRename(__FAR(xfcb) lpXfcb);
 UBYTE FcbClose(__FAR(xfcb) lpXfcb);
 void FcbCloseAll(void);
-UBYTE FcbFindFirstNext(__FAR(xfcb) lpXfcb, BOOL First);
+UBYTE FcbFindFirst(__FAR(xfcb) lpXfcb);
+UBYTE FcbFindNext(__FAR(xfcb) lpXfcb);
 
 /* ioctl.c */
 COUNT DosDevIOctl(lregs * r);
