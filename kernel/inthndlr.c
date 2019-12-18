@@ -578,11 +578,11 @@ dispatch:
       break;
 
     case 0x11:
-      lr.AL = FcbFindFirstNext(FP_DS_DX, TRUE);
+      lr.AL = FcbFindFirst(FP_DS_DX);
       break;
 
     case 0x12:
-      lr.AL = FcbFindFirstNext(FP_DS_DX, FALSE);
+      lr.AL = FcbFindNext(FP_DS_DX);
       break;
 
     case 0x13:
