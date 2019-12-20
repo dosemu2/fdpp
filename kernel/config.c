@@ -1453,6 +1453,7 @@ STATIC VOID sysVersion(char * pLine)
 
   LoL->_os_setver_major = major; /* not the internal os_major */
   LoL->_os_setver_minor = minor; /* not the internal os_minor */
+  ((psp FAR *)MK_FP(DOS_PSP, 0))->ps_retdosver = (minor << 8) + major;
 }
 
 STATIC VOID Files(char * pLine)
