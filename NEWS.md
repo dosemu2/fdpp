@@ -1,3 +1,17 @@
+## beta-9
+
+Desperate stabilization efforts. :) Apart from overall stability,
+we also added support for many games that do not work on FreeDOS.
+Namely: TestDrive2, Tetris Classic, Elite Frontier, Empire Soccer,
+Virtual Chess, Alone in the dark, Alpha Waves and more.
+Around 70 commits with usual thanks to Andrew Bird.
+
+- Implement int21/0x71a6 by the use of dosemu2's int2f/0x11a6 extension
+- Port to FreeBSD, thanks to @PaddyMac for ssh
+- Proper port of the fcb subsystem, with help and testing by @andrewbird
+- Many fixes and extensions to compiler front-end
+- Many improvements to freedos kernel for supporting games
+
 ## beta-8
 
 Massive stabilization efforts. Many bugs and regressions were fixed.
