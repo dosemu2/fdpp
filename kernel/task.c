@@ -479,7 +479,7 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
   }
 
 #ifdef DEBUG
-  _printf("DosComLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem);
+  DebugPrintf(("DosComLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem));
 #endif
   /* Now load the executable                              */
   {
@@ -660,7 +660,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       mode &= 0x7f; /* forget about high loading from now on */
 
 #ifdef DEBUG
-      _printf("DosExeLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem);
+      DebugPrintf(("DosExeLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem));
 #endif
 
       /* memory found large enough - continue processing      */

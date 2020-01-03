@@ -233,12 +233,6 @@ long DosMkTmp(char FAR * pathname, UWORD attr)
 
 */
 
-#ifdef DEBUG_TRUENAME
-#define tn_printf(x) _printf x
-#else
-#define tn_printf(x)
-#endif
-
 #define PNE_WILDCARD 1
 #define PNE_DOT 2
 
@@ -319,7 +313,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 
   fmemcpy(&TempCDS, cdsEntry, sizeof(TempCDS));
   tn_printf(("CDS entry: #%u @%P (%u) '%s'\n", result, GET_FP32(cdsEntry),
-            TempCDS.cdsBackslashOffset, TempCDS.cdsCurrentPath));
+            TempCDS.cdsBackslashOffset, GET_FP32(TempCDS.cdsCurrentPath)));
   /* is the current_ldt thing necessary for compatibly??
      -- 2001/09/03 ska*/
   current_ldt = cdsEntry;

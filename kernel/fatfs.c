@@ -263,7 +263,7 @@ f_node_ptr split_path(const char * path, f_node_ptr fnp)
 #ifdef DEBUG
   if (get_cds(path[0]-'A')->cdsFlags & CDSNETWDRV)
   {
-    _printf("split path called for redirected file: `%s'\n", path);
+    DebugPrintf(("split path called for redirected file: `%s'\n", path));
     return (f_node_ptr) 0;
   }
 #endif
@@ -1084,8 +1084,8 @@ STATIC COUNT dos_extend(f_node_ptr fnp)
     boff = (UWORD)(fnp->f_offset % secsize);
 
 #ifdef DSK_DEBUG
-    _printf("write %d links; dir offset %ld, cluster %d\n",
-           fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster);
+    DebugPrintf(("write %d links; dir offset %ld, cluster %d\n",
+           fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster));
 #endif
 
     xfr_cnt = count < (ULONG) secsize - boff ?
@@ -1209,8 +1209,8 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
 #if 0 /*DSK_DEBUG*/
   if (bDumpRdWrParms)
   {
-    _printf("rwblock:fd %02x  buffer %04x:%04x count %x\n",
-           fd, FP_SEG(buffer), FP_OFF(buffer), count);
+    DebugPrintf(("rwblock:fd %02x  buffer %04x:%04x count %x\n",
+           fd, FP_SEG(buffer), FP_OFF(buffer), count));
   }
 #endif
 
@@ -1381,8 +1381,8 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
   normal_xfer:
 
 #ifdef DSK_DEBUG
-    _printf("r/w %d links; dir offset %d, cluster %d, mode %x\n",
-           fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster, mode);
+    DebugPrintf(("r/w %d links; dir offset %d, cluster %d, mode %x\n",
+           fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster, mode));
 #endif
 
     /* Get the block we need from cache                     */

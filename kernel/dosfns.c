@@ -898,14 +898,14 @@ COUNT DosChangeDir(const char FAR * s)
     return DE_PATHNOTFND;
 
 #if defined(CHDIR_DEBUG)
-  _printf("Remote Chdir: n='%Fs' p='%Fs\n", s, PriPathName);
+  DebugPrintf(("Remote Chdir: n='%Fs' p='%Fs\n", s, PriPathName));
 #endif
   /* now get fs to change to new          */
   /* directory                            */
   result = (result & IS_NETWORK ? network_redirector(REM_CHDIR) :
             dos_cd(PriPathName));
 #if defined(CHDIR_DEBUG)
-  _printf("status = %04x, new_path='%Fs'\n", result, cdsd->cdsCurrentPath);
+  DebugPrintf(("status = %04x, new_path='%Fs'\n", result, cdsd->cdsCurrentPath));
 #endif
   if (result != SUCCESS)
     return result;
@@ -963,7 +963,7 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
   SAttr = (BYTE) attr;
 
 #if defined(FIND_DEBUG)
-  _printf("Remote Find: n='%Fs\n", PriPathName);
+  DebugPrintf(("Remote Find: n='%Fs\n", PriPathName));
 #endif
 
   dta = &sda_tmp_dm;

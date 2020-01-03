@@ -352,12 +352,12 @@ void PreConfig(void)
 
 #ifdef DEBUG
   {
-    _printf("SDA located at 0x%P\n", GET_FP32(internal_data));
+    DebugPrintf(("SDA located at 0x%P\n", GET_FP32(internal_data)));
   }
 #endif
   /* Begin by initializing our system buffers                     */
 #ifdef DEBUG
-/*  _printf("Preliminary %d buffers allocated at 0x%P\n", Config.cfgBuffers, GET_FP32(buffers));*/
+/*  DebugPrintf(("Preliminary %d buffers allocated at 0x%P\n", Config.cfgBuffers, GET_FP32(buffers)));*/
 #endif
 
   LoL->_DPBp = (struct dpb FAR *)
@@ -379,15 +379,15 @@ void PreConfig(void)
 
 #ifdef DEBUG
 /*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
-  _printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead));
-  _printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
-  _printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
+  DebugPrintf((" sft table 0x%P\n", GET_FP32(LoL->_sfthead)));
+  DebugPrintf((" CDS table 0x%P\n", GET_FP32(LoL->_CDSp)));
+  DebugPrintf((" DPB table 0x%P\n", GET_FP32(LoL->_DPBp)));
 #endif
 
   /* Done.  Now initialize the MCB structure                      */
   /* This next line is 8086 and 80x86 real mode specific          */
 #ifdef DEBUG
-  _printf("Preliminary  allocation completed: top at %P\n", GET_FP32(lpTop));
+  DebugPrintf(("Preliminary  allocation completed: top at %P\n", GET_FP32(lpTop)));
 #endif
 }
 
@@ -458,7 +458,7 @@ void PostConfig(void)
   /* Begin by initializing our system buffers                     */
   /* dma_scratch = (BYTE FAR *) KernelAllocDma(BUFFERSIZE); */
 #ifdef DEBUG
-  /* _printf("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch)); */
+  /* DebugPrintf(("DMA scratchpad allocated at 0x%P\n", GET_FP32(dma_scratch))); */
 #endif
 #if 0
   DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'B', Config.cfgDosDataUmb);
@@ -482,10 +482,10 @@ void PostConfig(void)
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
-/*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
-  _printf(" sft table 0x%P\n", GET_FP32(LoL->_sfthead->sftt_next));
-  _printf(" CDS table 0x%P\n", GET_FP32(LoL->_CDSp));
-  _printf(" DPB table 0x%P\n", GET_FP32(LoL->_DPBp));
+/*  DebugPrintf((" FCB table 0x%P\n",GET_FP32(LoL->FCBp)));*/
+  DebugPrintf((" sft table 0x%P\n", GET_FP32(LoL->_sfthead->sftt_next)));
+  DebugPrintf((" CDS table 0x%P\n", GET_FP32(LoL->_CDSp)));
+  DebugPrintf((" DPB table 0x%P\n", GET_FP32(LoL->_DPBp)));
 #endif
   if (Config.cfgStacks)
   {
@@ -2004,7 +2004,7 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
   eb.load.reloc = eb.load.load_seg = base;
 
 #ifdef DEBUG
-  _printf("Loading device driver %s at segment %04x\n", szBuf, base);
+  DebugPrintf(("Loading device driver %s at segment %04x\n", szBuf, base));
 #endif
 
   if ((result = init_DosExec(3, &eb, szBuf)) != SUCCESS)
@@ -2825,7 +2825,7 @@ struct instCmds {
 BSSA(struct instCmds, InstallCommands, 10);
 
 #ifdef DEBUG
-#define InstallPrintf(x) _printf x
+#define InstallPrintf(x) DebugPrintf(x)
 #else
 #define InstallPrintf(x)
 #endif

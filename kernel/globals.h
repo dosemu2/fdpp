@@ -64,6 +64,7 @@ static BYTE *Globals_hRcsId =
 #include "dyn.h"
 #include "memtype.h"
 #include "glob_fd.h"
+#include "debug.h"
 
 /* fatfs.c */
 #ifdef WITHFAT32

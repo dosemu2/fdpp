@@ -92,7 +92,7 @@ void int3()
 #endif
 
 #ifdef DEBUG
-#define HMAInitPrintf(x) _printf x
+#define HMAInitPrintf(x) DebugPrintf(x)
 #else
 #define HMAInitPrintf(x)
 #endif
@@ -107,7 +107,7 @@ STATIC VOID hdump(BYTE FAR * p)
   for (loop = 0; loop < 16; loop++)
     HMAInitPrintf(("%02x ", (const char)p[loop]));
 
-  _printf("\n");
+  DebugPrintf(("\n"));
 }
 #else
 #define hdump(ptr)
@@ -142,14 +142,14 @@ STATIC int EnableHMA(VOID)
 #ifdef DEBUG
   if (EnabledA20())
   {
-    _printf("HMA can't be disabled - no problem for us\n");
+    DebugPrintf(("HMA can't be disabled - no problem for us\n"));
   }
 #endif
 
   _EnableA20();
   if (!EnabledA20())
   {
-    _printf("HMA can't be enabled second time\n");
+    DebugPrintf(("HMA can't be enabled second time\n"));
     return FALSE;
   }
 
@@ -189,8 +189,8 @@ int MoveKernelToHMA()
    */
   if (KeyboardShiftState() & 0x0f)
   {
-    _printf("Keyboard state is %0x, NOT moving to HMA\n",
-           KeyboardShiftState());
+    DebugPrintf(("Keyboard state is %0x, NOT moving to HMA\n",
+           KeyboardShiftState()));
     return FALSE;
   }
 #endif

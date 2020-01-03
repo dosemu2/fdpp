@@ -49,7 +49,7 @@
 #ifdef DEBUG_PRINT_COMPORT
 #define DebugPrintf(x) dbgc_printf x
 #else
-#define DebugPrintf(x) _printf x
+#define DebugPrintf(x) fdlogprintf x
 #endif
 #else
 #define DebugPrintf(x)

@@ -143,7 +143,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 
 #ifdef DEBUG
   /* Non-portable message kludge alert!   */
-  _printf("KERNEL: Boot drive = %c\n", 'A' + LoL->_BootDrive - 1);
+  DebugPrintf(("KERNEL: Boot drive = %c\n", 'A' + LoL->_BootDrive - 1));
 #endif
 
   DoInstall();

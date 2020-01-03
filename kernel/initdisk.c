@@ -458,12 +458,12 @@ STATIC VOID CalculateFATData(_nddt * pddt, ULONG NumSectors, UBYTE FileSystem)
       unsigned maxclust = (defbpb->bpb_nfsect * 2 * MAX_SEC_SIZE) / 3;
       if (maxclust > FAT12MAX)
         maxclust = FAT12MAX;
-      _printf("FAT12: #clu=%u, fatlength=%u, maxclu=%u, limit=%u\n",
-             clust, defbpb->bpb_nfsect, maxclust, FAT12MAX);
+      DebugPrintf(("FAT12: #clu=%u, fatlength=%u, maxclu=%u, limit=%u\n",
+             clust, defbpb->bpb_nfsect, maxclust, FAT12MAX));
       if (clust > maxclust - 2)
       {
         clust = maxclust - 2;
-        _printf("FAT12: too many clusters: setting to maxclu-2\n");
+        DebugPrintf(("FAT12: too many clusters: setting to maxclu-2\n"));
       }
     }
 #endif
@@ -961,11 +961,11 @@ STATIC BOOL ScanForPrimaryPartitions(struct DriveParamS * driveParam, int scan_t
 
       /* else its a diagnostic message only */
 #ifdef DEBUG
-      _printf("found and using LBA partition %s FS %02x",
-             partitionName, pEntry->FileSystem);
+      DebugPrintf(("found and using LBA partition %s FS %02x",
+             partitionName, pEntry->FileSystem));
       printCHS(" start ", &chs);
       printCHS(", end ", &end);
-      _printf("\n");
+      DebugPrintf(("\n"));
 #endif
     }
 

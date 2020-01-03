@@ -420,14 +420,14 @@ STATIC WORD getbpb(ddt FAR * pddt)
   }
 
 #ifdef DSK_DEBUG
-  _printf("BPB_NBYTE     = %04x\n", pbpbarray->bpb_nbyte);
-  _printf("BPB_NSECTOR   = %02x\n", pbpbarray->bpb_nsector);
-  _printf("BPB_NRESERVED = %04x\n", pbpbarray->bpb_nreserved);
-  _printf("BPB_NFAT      = %02x\n", pbpbarray->bpb_nfat);
-  _printf("BPB_NDIRENT   = %04x\n", pbpbarray->bpb_ndirent);
-  _printf("BPB_NSIZE     = %04x\n", pbpbarray->bpb_nsize);
-  _printf("BPB_MDESC     = %02x\n", pbpbarray->bpb_mdesc);
-  _printf("BPB_NFSECT    = %04x\n", pbpbarray->bpb_nfsect);
+  DebugPrintf(("BPB_NBYTE     = %04x\n", pbpbarray->bpb_nbyte));
+  DebugPrintf(("BPB_NSECTOR   = %02x\n", pbpbarray->bpb_nsector));
+  DebugPrintf(("BPB_NRESERVED = %04x\n", pbpbarray->bpb_nreserved));
+  DebugPrintf(("BPB_NFAT      = %02x\n", pbpbarray->bpb_nfat));
+  DebugPrintf(("BPB_NDIRENT   = %04x\n", pbpbarray->bpb_ndirent));
+  DebugPrintf(("BPB_NSIZE     = %04x\n", pbpbarray->bpb_nsize));
+  DebugPrintf(("BPB_MDESC     = %02x\n", pbpbarray->bpb_mdesc));
+  DebugPrintf(("BPB_NFSECT    = %04x\n", pbpbarray->bpb_nfsect));
 #endif
 
   count =
@@ -447,10 +447,10 @@ STATIC WORD getbpb(ddt FAR * pddt)
   tmark(pddt);
 
 #ifdef DSK_DEBUG
-  _printf("BPB_NSECS     = %04x\n", pbpbarray->bpb_nsecs);
-  _printf("BPB_NHEADS    = %04x\n", pbpbarray->bpb_nheads);
-  _printf("BPB_HIDDEN    = %08lx\n", pbpbarray->bpb_hidden);
-  _printf("BPB_HUGE      = %08lx\n", pbpbarray->bpb_huge);
+  DebugPrintf(("BPB_NSECS     = %04x\n", pbpbarray->bpb_nsecs));
+  DebugPrintf(("BPB_NHEADS    = %04x\n", pbpbarray->bpb_nheads));
+  DebugPrintf(("BPB_HIDDEN    = %08lx\n", pbpbarray->bpb_hidden));
+  DebugPrintf(("BPB_HUGE      = %08lx\n", pbpbarray->bpb_huge));
 #endif
 
   return 0;
@@ -890,7 +890,7 @@ STATIC int LBA_to_CHS(ULONG LBA_address, struct CHS *chs, ddt FAR * pddt,
   if (LBA_address > 1023ul)
   {
 #ifdef DEBUG
-    _printf("LBA-Transfer error : cylinder %u > 1023\n", LBA_address);
+    DebugPrintf(("LBA-Transfer error : cylinder %u > 1023\n", LBA_address));
 #else
     put_string("LBA-Transfer error : cylinder > 1023\n");
 #endif

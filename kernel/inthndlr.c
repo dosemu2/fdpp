@@ -405,7 +405,7 @@ dispatch:
   if (bDumpRegs)
   {
     fmemcpy_n(&error_regs, user_r, sizeof(iregs));
-    _printf("System call (21h): %02x\n", user_r->AX);
+    DebugPrintf(("System call (21h): %02x\n", user_r->AX));
     dump_regs = TRUE;
     dump();
   }
@@ -1443,10 +1443,10 @@ dispatch:
 #ifdef NLS_DEBUG
           if ((rc = DosGetData(lr.AL, lr.BX, lr.DX, lr.CX, FP_ES_DI)) < 0)
           {
-            _printf("DosGetData() := %d\n", rc);
+            DebugPrintf(("DosGetData() := %d\n", rc));
             goto error_exit;
           }
-          _printf("DosGetData() returned successfully\n");
+          DebugPrintf(("DosGetData() returned successfully\n"));
           break;
 #else
           rc = DosGetData(lr.AL, lr.BX, lr.DX, lr.CX, FP_ES_DI);
@@ -1619,7 +1619,7 @@ unsupp:
   {
     UWORD flg = r->flags;
 #ifdef DEBUG
-    _printf("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL);
+    DebugPrintf(("Unsupported INT21 AH = 0x%x, AL = 0x%x.\n", lr.AH, lr.AL));
 #endif
     r->flags |= FLG_CARRY;
     call_intr_func(prev_int21_handler, r);

@@ -391,7 +391,7 @@ COUNT dos_findnext(void)
 
 
 #ifdef DEBUG
-  _printf("dos_findnext: %11s\n", fnp->f_dir.dir_name);
+  DebugPrintf(("dos_findnext: %11s\n", fnp->f_dir.dir_name));
 #endif
   /* return the result                                            */
   return DE_NFILES;
