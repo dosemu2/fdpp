@@ -557,24 +557,26 @@ VOID return_user(iregs FAR *irp)
   seg parent;
   intvec vec22;
 
+  p = MK_FP(cu_psp, 0);
+
   /* Alpha Waves game frees PSP before terminating it (it creates
-   * many PSPs, then frees and terminates them all). It expects no
-   * PSP-associated resources are freed in the process. */
+   * many PSPs, then resizes to 0 and terminates them all). It
+   * expects no PSP-associated resources are freed in the process. */
   mcb = MK_FP(cu_psp - 1, 0);
-  if (mcb->m_psp == FREE_PSP)
+  if (mcb->m_psp == FREE_PSP || p->ps_exit != PSP_SIG)
   {
 #ifdef DEBUG
-    DebugPrintf(("return_user: terminating freed PSP\n"));
+    DebugPrintf(("return_user: terminating bad PSP, sig %x\n", p->ps_exit));
 #endif
+    ___assert(!tsr);    // 0x31 fixes up PSP and size
+    if (mcb->m_psp != FREE_PSP)
+      FreeProcessMem(cu_psp);
     do_ret_user(irp, getvec(0x22));
     return;
   }
 
-  /* restore parent                                       */
-  p = MK_FP(cu_psp, 0);
   parent = p->ps_parent;
   vec22 = p->ps_isv22;
-
   /* When process returns - restore the isv               */
   setvec(0x22, p->ps_isv22);
   setvec(0x23, p->ps_isv23);

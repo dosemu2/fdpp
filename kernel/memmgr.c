@@ -357,9 +357,12 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
   REG mcb FAR *p;
   REG mcb FAR *q;
 
+  /* checked with PC-DOS: realloc to 0 doesn't mean free. :(
+   * If you change this, also see handling in return_user(). */
+#if 0
   if (size == 0)
     return DosMemFree(para - 1);
-
+#endif
   /* Initialize                                                   */
   p = para2far(para - 1);       /* pointer to MCB */
 
