@@ -403,7 +403,11 @@ COUNT DosMemChange(UWORD para, UWORD size, UWORD * maxSize)
     /* Mark the mcb as free so that we can later    */
     /* merge with other surrounding free MCBs       */
     q->m_psp = FREE_PSP;
+    /* Alone in the Dark game accesses the free area after realloc.
+     * It will crash with the below memset() - disable to match MS-DOS. */
+#if 0
     fmemset(q->m_name, '\0', 8);
+#endif
     fd_prot_mem(q, sizeof(*q), FD_MEM_READONLY);
 
     /* try to join q with the free MCBs following it if possible */
