@@ -772,6 +772,14 @@ dispatch:
       /* Keep Program (Terminate and stay resident) */
     case 0x31:
       DosMemChange(cu_psp, lr.DX < 6 ? 6 : lr.DX, 0);
+      if (psp->ps_exit != PSP_SIG)
+      {
+        /* fix for Alpha Waves game: next MCB (before resize)
+         * could be at the beginning of PSP, corrupting it.
+         * Need to restore it now, after resize. */
+        DebugPrintf(("0x31: fixing corrupted PSP\n"));
+        psp->ps_exit = PSP_SIG;
+      }
       return_code = lr.AL | 0x300;
       tsr = TRUE;
       psp->ps_stack = user_stack;
