@@ -113,3 +113,5 @@ ANNOTATE_SIZE(psp, 0x100);
 #define ps_fcb1 _u._u1._ps_fcb1
 #define ps_fcb2 _u._u2._ps_fcb2
 #define ps_cmd  _u._u3._ps_cmd
+
+#define PSP_SIG 0x20cd

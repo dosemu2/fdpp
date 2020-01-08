@@ -200,6 +200,9 @@ void new_psp(seg para, seg cur_psp)
 
   fmemcpy(p, MK_FP(cur_psp, 0), sizeof(psp));
 
+  /* some progs (Alpha Waves game) create new psp from
+   * the corrupted one. So restore also the sig. */
+  p->ps_exit = PSP_SIG;
   /* terminate address                                    */
   p->ps_isv22 = getvec(0x22);
   /* break address                                        */

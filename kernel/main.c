@@ -187,7 +187,7 @@ STATIC void PSPInit(void)
 
   /* initialize all entries and exits                     */
   /* CP/M-like exit point                                 */
-  p->ps_exit = 0x20cd;
+  p->ps_exit = PSP_SIG;
 
   /* CP/M-like entry point - call far to special entry    */
   p->ps_farcall = 0x9a;
