@@ -535,12 +535,37 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
   return SUCCESS;
 }
 
+static VOID do_ret_user(iregs FAR *irp, intvec vec22)
+{
+  irp->CS = FP_SEG(vec22);
+  irp->IP = FP_OFF(vec22);
+  irp->FLAGS = 0x200; /* clear trace and carry flags, set interrupt flag */
+
+  if (InDOS)
+    --InDOS;
+  ret_user(irp);
+}
+
 VOID return_user(iregs FAR *irp)
 {
   psp FAR *p;
+  mcb FAR *mcb;
   REG COUNT i;
   seg parent;
   intvec vec22;
+
+  /* Alpha Waves game frees PSP before terminating it (it creates
+   * many PSPs, then frees and terminates them all). It expects no
+   * PSP-associated resources are freed in the process. */
+  mcb = MK_FP(cu_psp - 1, 0);
+  if (mcb->m_psp == FREE_PSP)
+  {
+#ifdef DEBUG
+    DebugPrintf(("return_user: terminating freed PSP\n"));
+#endif
+    do_ret_user(irp, getvec(0x22));
+    return;
+  }
 
   /* restore parent                                       */
   p = MK_FP(cu_psp, 0);
@@ -557,7 +582,7 @@ VOID return_user(iregs FAR *irp)
   /* might be a good idea to do that after closing
      but doesn't help NET either TE */
 
-  if (!tsr && p->ps_parent != cu_psp)
+  if (!tsr && parent != cu_psp)
   {
     network_redirector(REM_CLOSEALL);
     for (i = 0; i < p->ps_maxfiles; i++)
@@ -570,13 +595,7 @@ VOID return_user(iregs FAR *irp)
 
   cu_psp = parent;
 
-  irp->CS = FP_SEG(vec22);
-  irp->IP = FP_OFF(vec22);
-  irp->FLAGS = 0x200; /* clear trace and carry flags, set interrupt flag */
-
-  if (InDOS)
-    --InDOS;
-  ret_user(irp);
+  do_ret_user(irp, vec22);
 }
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)
