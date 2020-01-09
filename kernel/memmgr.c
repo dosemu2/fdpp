@@ -334,6 +334,9 @@ COUNT DosMemFree(UWORD para)
   if (!mcbFreeable(p))	/* does not have to be valid, freeable is enough */
     return DE_INVLDMCB;
 
+  if (mcbFree(p))
+    return SUCCESS;
+
   fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
   /* Mark the mcb as free so that we can later    */
   /* merge with other surrounding free MCBs       */
@@ -348,6 +351,8 @@ COUNT DosMemFree(UWORD para)
  * Resize an allocated memory block.
  * para is the segment of the data portion of the block rather than
  * the segment of the MCB itself.
+ *
+ * Resize on an unallocated block is allowed and makes it allocated.
  *
  * If the block shall grow, it is resized to the maximal size less than
  * or equal to size. This is the way MS DOS is reported to work.
