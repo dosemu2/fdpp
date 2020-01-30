@@ -681,6 +681,7 @@ dispatch:
 
       /* Dos Create New Psp                                           */
     case 0x26:
+      psp->ps_stack = user_stack;
       new_psp(lr.DX, cu_psp);
       break;
 
@@ -1154,6 +1155,7 @@ dispatch:
       /* ************UNDOCUMENTED************************************* */
       /* Dos Create New Psp & set p_size                              */
     case 0x55:
+      psp->ps_stack = user_stack;
       child_psp(lr.DX, cu_psp, lr.SI);
       /* copy command line from the parent (required for some device loaders) */
       fmemcpy(MK_FP(lr.DX, 0x80), MK_FP(cu_psp, 0x80), 128);
