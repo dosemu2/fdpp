@@ -549,15 +549,17 @@ static VOID do_ret_user(iregs FAR *irp, intvec vec22)
   ret_user(irp);
 }
 
-VOID return_user(iregs FAR *irp)
+VOID return_user(void)
 {
   psp FAR *p;
   mcb FAR *mcb;
   REG COUNT i;
+  iregs FAR *irp;
   seg parent;
   intvec vec22;
 
   p = MK_FP(cu_psp, 0);
+  irp = p->ps_stack;
 
   /* Alpha Waves game frees PSP before terminating it (it creates
    * many PSPs, then resizes to 0 and terminates them all). It

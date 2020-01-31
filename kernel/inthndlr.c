@@ -385,15 +385,12 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
   long lrc;
   lregs lr; /* 8 local registers (ax, bx, cx, dx, si, di, ds, es) */
   psp FAR *psp = MK_FP(cu_psp, 0);
-  iregs FAR *user_stack = psp->ps_stack;
 
 #define FP_DS_DX (MK_FP(lr.DS, lr.DX))
 #define FP_ES_DI (MK_FP(lr.ES, lr.DI))
 
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
-
-  psp->ps_stack = (BYTE FAR *) r;
 
   fmemcpy_n(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
@@ -681,7 +678,6 @@ dispatch:
 
       /* Dos Create New Psp                                           */
     case 0x26:
-      psp->ps_stack = user_stack;
       new_psp(lr.DX, cu_psp);
       break;
 
@@ -783,8 +779,7 @@ dispatch:
       }
       return_code = lr.AL | 0x300;
       tsr = TRUE;
-      psp->ps_stack = user_stack;
-      return_user(user_stack);
+      return_user();
       break;
 
       /* Get default BPB */
@@ -1071,7 +1066,6 @@ dispatch:
       /* Load and Execute Program */
     case 0x4b:
       break_flg = FALSE;
-      psp->ps_stack = user_stack;
       rc = DosExec(lr.AL, MK_FP(lr.ES, lr.BX), FP_DS_DX);
       goto short_check;
 
@@ -1099,8 +1093,7 @@ dispatch:
 #ifdef TSC
       StartTrace();
 #endif
-      psp->ps_stack = user_stack;
-      return_user(user_stack);
+      return_user();
       break;
 
       /* Get Child-program Return Value                               */
@@ -1155,7 +1148,6 @@ dispatch:
       /* ************UNDOCUMENTED************************************* */
       /* Dos Create New Psp & set p_size                              */
     case 0x55:
-      psp->ps_stack = user_stack;
       child_psp(lr.DX, cu_psp, lr.SI);
       /* copy command line from the parent (required for some device loaders) */
       fmemcpy(MK_FP(lr.DX, 0x80), MK_FP(cu_psp, 0x80), 128);
@@ -1664,8 +1656,6 @@ exit_dispatch:
   r->DS = lr.DS;
   r->ES = lr.ES;
 real_exit:;
-
-  psp->ps_stack = user_stack;
 
 #ifdef DEBUG
   if (bDumpRegs)
