@@ -337,7 +337,7 @@ STATIC int load_transfer(UWORD ds, exec_blk *exp, UWORD fcbcode, COUNT mode)
   /* Transfer control to the executable                   */
   p->ps_parent = cu_psp;
   p->ps_prevpsp = q;
-  p->ps_stack = (BYTE FAR *)user_r;
+  q->ps_stack = (BYTE FAR *)user_r;
   user_r->FLAGS &= ~FLG_CARRY;
 
   cu_psp = ds;
@@ -552,6 +552,7 @@ static VOID do_ret_user(iregs FAR *irp, intvec vec22)
 VOID return_user(void)
 {
   psp FAR *p;
+  psp FAR *q;
   mcb FAR *mcb;
   REG COUNT i;
   iregs FAR *irp;
@@ -601,7 +602,8 @@ VOID return_user(void)
   }
 
   cu_psp = parent;
-
+  q = MK_FP(cu_psp, 0);
+  irp = q->ps_stack;
   do_ret_user(irp, vec22);
 }
 
