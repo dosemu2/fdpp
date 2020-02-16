@@ -413,16 +413,17 @@ STATIC VOID FsConfig(VOID)
     memcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
 
     pcds_table->cdsCurrentPath[0] += i;
+    pcds_table->cdsDpb = NULL;
+    pcds_table->cdsFlags = 0;
 
     if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
     {
-      pcds_table->cdsDpb = dpb;
-      pcds_table->cdsFlags = CDSPHYSDRV;
+      if (!((1 << i) & bprm->DriveMask))
+      {
+        pcds_table->cdsDpb = dpb;
+        pcds_table->cdsFlags = CDSPHYSDRV;
+      }
       dpb = dpb->dpb_next;
-    }
-    else
-    {
-      pcds_table->cdsFlags = 0;
     }
     pcds_table->cdsStrtClst = 0xffff;
     pcds_table->cdsParam = 0xffff;

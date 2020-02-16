@@ -3,16 +3,19 @@
 #ifndef BPRM_H
 #define BPRM_H
 
-struct _bprm {
-  /* keep plt at the beginning to not add offsets in plt.S */
-  unsigned short PltOff;
-  unsigned short PltSeg;
-  unsigned short InitEnvSeg;  /* initial env seg                      */
-  unsigned char ShellDrive;   /* drive num to start shell from        */
-  unsigned char DeviceDrive;  /* drive num to load DEVICE= from       */
-  unsigned char CfgDrive;     /* drive num to load fdppconf.sys from  */
-} PACKED;
+#include <stdint.h>
 
-#define BPRM_VER 2
+struct _bprm {
+  /* keep plt at the beginning to not add offsets in plt.S (aka asm_offsets) */
+  uint16_t PltOff;
+  uint16_t PltSeg;
+  uint16_t InitEnvSeg;          /* initial env seg                      */
+  uint8_t ShellDrive;           /* drive num to start shell from        */
+  uint8_t DeviceDrive;          /* drive num to load DEVICE= from       */
+  uint8_t CfgDrive;             /* drive num to load fdppconf.sys from  */
+  uint32_t DriveMask;           /* letters of masked drive are skipped  */
+};
+
+#define BPRM_VER 3
 
 #endif

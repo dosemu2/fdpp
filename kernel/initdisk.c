@@ -326,6 +326,8 @@ floppy_bpb floppy_bpbs[5] = {
   {FLOPPY_SEC_SIZE, 2, 1, 2, 240, 5760, 0xf0, 9, 36, 2}        /* FD2880 3.5  ED   */
 };
 
+STATIC void make_ddt (_nddt *pddt, int Unit, int driveno, int flags);
+
 STATIC COUNT init_getdriveparm(UBYTE drive, bpb * pbpbarray)
 {
   iregs regs = {};
@@ -591,10 +593,18 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
   _nddt *pddt = &nddt;
   struct CHS chs;
 
-  if (nUnits >= NDEV)
+  while (1)
   {
-    _printf("more Partitions detected then possible, max = %d\n", NDEV);
-    return;                     /* we are done */
+    if (nUnits >= NDEV)
+    {
+      _printf("more Partitions detected then possible, max = %d\n", NDEV);
+      return;                     /* we are done */
+    }
+    if (!((1 << nUnits) & bprm->DriveMask))
+      break;
+    /* drive masked out */
+    make_ddt(&nddt, nUnits, 0, DF_NOACCESS);
+    nUnits++;
   }
 
   pddt->ddt_next = MK_FP(0, 0xffff);
