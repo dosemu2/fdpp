@@ -294,7 +294,8 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     FP_FROM_D(t, __d); \
 })
 
-static UDWORD FdppThunkCall(int fn, UBYTE *sp, int *r_len)
+static UDWORD FdppThunkCall(int fn, UBYTE *sp, enum DispStat *r_stat,
+        int *r_len)
 {
     UDWORD ret;
     UBYTE rsz = 0;
@@ -328,12 +329,8 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, int *r_len)
             return 0;
     }
 
-    if (stat == DISP_OK)
-        *r_len = rsz;
-    else if (ret == ASM_NORET)
-        *r_len = 0;
-    else    // stat == DISP_NORET && ret == xx_ABORT
-        *r_len = -1;
+    *r_stat = stat;
+    *r_len = rsz;
     return ret;
 }
 
@@ -341,9 +338,9 @@ static int _FdppCall(struct vm86_regs *regs)
 {
     int len;
     UDWORD res;
+    enum DispStat stat;
 
-    if (!fdpp)
-        return -1;
+    assert(fdpp);
 
     switch (LO_BYTE(regs->ebx)) {
     case DL_SET_SYMTAB:
@@ -358,12 +355,11 @@ static int _FdppCall(struct vm86_regs *regs)
     case DL_CCALL:
         s_regs = *regs;
         res = FdppThunkCall(LO_WORD(regs->ecx),
-                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &len);
-        if (len != -1)
-            *regs = s_regs;
+                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &stat, &len);
+        *regs = s_regs;
+        if (stat == DISP_NORET)
+            return (res == ASM_NORET ? FDPP_RET_NORET : FDPP_RET_ABORT);
         switch (len) {
-        case -1:
-            return -1;
         case 0:
             break;
         case 1:
@@ -382,7 +378,7 @@ static int _FdppCall(struct vm86_regs *regs)
         }
         break;
     }
-    return 0;
+    return FDPP_RET_OK;
 }
 
 int FdppCall(struct vm86_regs *regs)

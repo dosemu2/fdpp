@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 25
+#define FDPP_API_VER 26
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +33,7 @@ int FdppCall(struct vm86_regs *regs);
 
 enum { FDPP_PRINT_LOG, FDPP_PRINT_TERMINAL, FDPP_PRINT_SCREEN };
 enum { ASM_CALL_OK, ASM_CALL_ABORT };
+enum { FDPP_RET_ABORT = -1, FDPP_RET_OK, FDPP_RET_NORET };
 
 struct fdpp_api {
     uint8_t *(*so2lin)(uint16_t seg, uint16_t off);
