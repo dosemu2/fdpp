@@ -402,7 +402,8 @@ UWORD get_machine_name(__FAR(char) netname);
 VOID set_machine_name(__FAR(const char) netname, UWORD name_num);
 
 /* procsupt.asm */
-VOID ASMFUNC NORETURN exec_user(__FAR(exec_regs) irp);
+/* note that exec_user() is special and can't work w/o NORETURN */
+VOID ASMFUNC NORETURN exec_user(__FAR(exec_regs) erp);
 VOID ASMFUNC NORETURN ret_user(__FAR(iregs) irp);
 
 /* new by TE */

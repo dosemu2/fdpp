@@ -45,13 +45,13 @@ segment HMA_TEXT
 ;
 ;       Special call for switching processes
 ;
-;       void exec_user(iregs far *irp)
+;       void exec_user(exec_regs far *erp)
 ;
                 global  _exec_user
 _exec_user:
                 pop     ax		      ; return address (unused)
 
-                pop     bp		      ; irp (user ss:sp)
+                pop     bp		      ; erp (user ss:sp)
                 pop     si
                 cli
                 mov     ss,si
