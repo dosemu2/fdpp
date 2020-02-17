@@ -553,7 +553,6 @@ VOID return_user(void)
 {
   psp FAR *p;
   psp FAR *q;
-  mcb FAR *mcb;
   REG COUNT i;
   iregs FAR *irp;
   seg parent;
@@ -562,18 +561,25 @@ VOID return_user(void)
   p = MK_FP(cu_psp, 0);
   irp = p->ps_stack;
 
-  /* Alpha Waves game frees PSP before terminating it (it creates
-   * many PSPs, then resizes to 0 and terminates them all). It
-   * expects no PSP-associated resources are freed in the process. */
+  /* Alpha Waves game creates many PSPs, then resizes to 0 and terminates
+   * them all). It expects no PSP-associated resources are freed in the
+   * process. */
+#if 0
+  /* if resize to 0 means free (it does not in DOS), we'd need that code */
   mcb = MK_FP(cu_psp - 1, 0);
-  if (mcb->m_psp == FREE_PSP || p->ps_exit != PSP_SIG)
+  if ((cu_psp != DOS_PSP && mcb->m_psp == FREE_PSP) || p->ps_exit != PSP_SIG)
+#else
+  if (p->ps_exit != PSP_SIG)
+#endif
   {
 #ifdef DEBUG
     DebugPrintf(("return_user: terminating bad PSP, sig %x\n", p->ps_exit));
 #endif
     ___assert(!tsr);    // 0x31 fixes up PSP and size
+#if 0
     if (mcb->m_psp != FREE_PSP)
-      FreeProcessMem(cu_psp);
+#endif
+    FreeProcessMem(cu_psp);
     do_ret_user(irp, getvec(0x22));
     return;
   }
