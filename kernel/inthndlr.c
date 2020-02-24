@@ -104,10 +104,10 @@ VOID ASMCFUNC int21_syscall(iregs FAR * irp)
           irp->DL = BootDrive;
           break;
 
-          /* Get (real) DOS-C version                             */
+          /* Get (real) fdpp version                             */
         case 0x06:
-          irp->BL = os_major;
-          irp->BH = os_minor;
+          irp->BL = MAJOR_RELEASE;
+          irp->BH = MINOR_RELEASE;
           irp->DL = 0;                  /* lower 3 bits revision #, remaining should be 0 */
           irp->DH = version_flags;      /* bit3:runs in ROM,bit 4: runs in HMA */
           break;
