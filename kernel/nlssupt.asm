@@ -46,8 +46,8 @@ reloc_call_CharMapSrvc:
                 push    ds
                 push    es
 ;                push    bp
-;                push    si
-;                push    di
+                push    si
+                push    di
                 push    dx
                 push    cx
                 push    bx
@@ -64,8 +64,8 @@ reloc_call_CharMapSrvc:
                 pop     bx
                 pop     cx
                 pop     dx
-;                pop     di
-;                pop     si
+                pop     di
+                pop     si
 ;                pop     bp
                 pop     es
                 pop     ds
