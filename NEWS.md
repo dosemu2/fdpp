@@ -1,3 +1,19 @@
+## rc-1
+
+The first release candidate.
+The code base is believed to be very stable at that point,
+and hence not many development is going on here.
+
+- Rework Alpha Waves and Alone in the Dark hacks to be more
+  in line with what MS-DOS does (these progs resize PSP to 0
+  and then terminate it... among other bad things)
+- Boot protocol extension to allow skipping the particular
+  letters when assigning drives
+- Stop reporting MSDOS-7.1 version to the programs, as FreeDOS
+  did. Programs from that MSDOS distribution will now print
+  "Incorrect DOS version"
+- Fix nasty bug to allow Volkov Commander to work
+
 ## beta-9
 
 Desperate stabilization efforts. :) Apart from overall stability,
