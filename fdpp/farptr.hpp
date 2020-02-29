@@ -193,17 +193,10 @@ class ObjIf {
 public:
     virtual far_s get_obj() = 0;
     virtual void ref(const void *owner) = 0;
-    virtual bool is_dupe(const ObjIf& o) = 0;
-    virtual bool is_alias(const ObjIf& o) = 0;
+    virtual bool is_dupe(const ObjIf *o) = 0;
+    virtual bool is_alias(const ObjIf *o) = 0;
     virtual void re_read() = 0;
     virtual ~ObjIf() = default;
-    /* below section is only needed because we don't use
-     * dynamic_cast/RTTI. Maybe one day I'll give up and enable
-     * RTTI, but for now let's fight. */
-protected:
-    template <typename> friend class FarObj;
-    virtual const void *get_ptr() const = 0;
-    virtual FarPtrBase<uint8_t> get_far() const = 0;
 };
 
 template <typename T> class FarObj;
@@ -298,8 +291,8 @@ public:
         bool clash = false;
         bool dupe = false;
         if (obj && f.obj) {
-            clash = obj->is_alias(*f.obj);
-            dupe = obj->is_dupe(*f.obj);
+            clash = obj->is_alias(f.obj.get());
+            dupe = obj->is_dupe(f.obj.get());
         }
         /* just ignore dupe */
         if (!dupe && (obj || f.obj))

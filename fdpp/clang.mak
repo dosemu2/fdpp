@@ -8,7 +8,7 @@ CLC = clang
 NASM = nasm
 LINK = ld.bfd
 
-TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fno-rtti -fpic
+TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line
 TARGETOPT_XTRA = -Wno-format-invalid-specifier
 ifneq ($(XCPU),386)
