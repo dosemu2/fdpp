@@ -12,8 +12,8 @@ include $(srcdir)/clang.mak
 HDR=$(srcdir)/../hdr/
 SRC=$(srcdir)/../kernel/
 FDPPLIB = libfdpp.so
-RELVER = beta9
-MAJ = 0.1
+RELVER = rc1
+MAJ = 1.0
 VERSION = $(MAJ)$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
