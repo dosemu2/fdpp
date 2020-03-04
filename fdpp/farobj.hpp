@@ -119,7 +119,7 @@ public:
             FarObjBase<T>(obj, sz), is_const(cst), ct(nm) {
         _ctor();
     }
-    virtual far_s get_obj() {
+    far_s get_obj() override {
         ___assert(!have_obj);
         pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
         have_obj = true;
@@ -127,16 +127,16 @@ public:
             this->ptr = NULL;    // never reuse
         return this->fobj.get_far();
     }
-    virtual void ref(const void *owner) {
+    void ref(const void *owner) override {
         if (track_owner(owner, this))
             refcnt++;
     }
-    virtual bool is_dupe(const ObjIf *o) {
+    bool is_dupe(const ObjIf *o) override {
         const ObjPtr *p = dynamic_cast<const ObjPtr *>(o);
         /* dupe can happen after adjust_far() */
         return (this->ptr == p->get_ptr() && this->fobj == p->get_far());
     }
-    virtual bool is_alias(const ObjIf *o) {
+    bool is_alias(const ObjIf *o) override {
         const ObjPtr *p = dynamic_cast<const ObjPtr *>(o);
         /* aliases can happen on static data and are usually
          * short-lived (or we are screwed). They should be assigned
@@ -146,16 +146,16 @@ public:
          * are used too liberally. */
         return (this->ptr == p->get_ptr() && this->fobj != p->get_far());
     }
-    virtual void re_read() {
+    void re_read() override {
         ___assert(have_obj);
         pr_dosobj(this->fobj.get_far(), this->ptr, this->size);
     }
 
-    virtual const void *get_ptr() const { return this->ptr; }
-    virtual __DOSFAR(uint8_t) get_far() const { return this->fobj; }
+    const void *get_ptr() const override { return this->ptr; }
+    __DOSFAR(uint8_t) get_far() const override { return this->fobj; }
 
-    virtual void cp() { do_cp(); }
-    virtual void unref() { refcnt--; }
+    void cp() override { do_cp(); }
+    void unref() override { refcnt--; }
 
     NearPtr_DO<obj_type> get_near() {
         far_s f = get_obj();
