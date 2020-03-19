@@ -140,7 +140,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD)
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
 	$(CLC) $(CLCFLAGS) -o $@ $<
 
-thunks.o: $(GEN_HEADERS) $(GIT_REV)
+thunks.o: $(GEN_HEADERS) $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h $(GIT_REV)
 $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
