@@ -190,6 +190,7 @@ STATIC VOID CfgBuffersHigh(char * pLine);
 STATIC VOID sysScreenMode(char * pLine);
 STATIC VOID sysVersion(char * pLine);
 STATIC VOID CfgBreak(char * pLine);
+STATIC VOID CfgDivz(char * pLine);
 STATIC VOID Device(char * pLine);
 STATIC VOID DeviceHigh(char * pLine);
 STATIC VOID Files(char * pLine);
@@ -285,6 +286,7 @@ DATAAIS(struct table, commands, {
   {"EECHO", 2, CfgMenuEsc},     /* modified ECHO (ea) */
 
   {"BREAK", 1, CfgBreak},
+  {"INT0DIVZ", 1, CfgDivz},
   {"BUFFERS", 1, Config_Buffers},
   {"BUFFERSHIGH", 1, CfgBuffersHigh}, /* as BUFFERS - we use HMA anyway */
   {"COMMAND", 1, InitPgm},
@@ -1929,6 +1931,15 @@ STATIC VOID CfgBreak(char * pLine)
   /* Format:      BREAK = (ON | OFF)      */
   GetStringArg(pLine, szBuf);
   break_ena = strcaseequal(szBuf, "OFF") ? 0 : 1;
+}
+
+STATIC VOID CfgDivz(char * pLine)
+{
+  /* Format:      INT0DIVZ = (ON | OFF)      */
+  GetStringArg(pLine, szBuf);
+  if (strcaseequal(szBuf, "OFF"))
+    setvec(0, (intvec)MK_FP(FP_SEG(int0_handler_suppress),
+        FP_OFF(int0_handler_suppress)));
 }
 
 STATIC VOID Numlock(char * pLine)

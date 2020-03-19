@@ -124,6 +124,7 @@ __ASM(request, CharReqHdr) SEMIC
 __ASM(request, IoReqHdr) SEMIC
 __ASM(request, MediaReqHdr) SEMIC
 __ASM_FUNC(int0_handler) SEMIC
+__ASM_FUNC(int0_handler_suppress) SEMIC
 __ASM_FUNC(int6_handler) SEMIC
 __ASM_FUNC(int19_handler) SEMIC
 __ASM_FUNC(empty_handler) SEMIC

@@ -186,6 +186,14 @@ stack_loop:
 thats_it:       hlt
                 jmp short thats_it  ; it might be command.com that nukes
 
+                global reloc_call_int0_handler_suppress
+reloc_call_int0_handler_suppress:
+                push bp
+                mov bp,sp
+                add word [bp+2],2   ; skip "div cx"
+                pop bp
+                iret
+
 invalid_opcode_message db 0dh,0ah,'Invalid Opcode at ',0
 
                 global reloc_call_int6_handler
