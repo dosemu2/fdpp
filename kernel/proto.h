@@ -458,7 +458,7 @@ UWORD ASMPASCAL floppy_change(UWORD);
            error.  If < 0 is returned, it is the negated error return
            code, so DOS simply negates this value and returns it in
            AX. */
-WORD ASMPASCAL share_open_check(const char * filename, unsigned short pspseg, WORD openmode, WORD sharemode);     /* SHARE_COMPAT, etc... */
+WORD ASMPASCAL share_open_check(__FAR(const char) filename, unsigned short pspseg, WORD openmode, WORD sharemode);     /* SHARE_COMPAT, etc... */
 
         /* DOS calls this to record the fact that it has successfully
            closed a file, or the fact that the open for this file failed. */
