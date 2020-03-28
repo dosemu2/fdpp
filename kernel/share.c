@@ -10,7 +10,7 @@
 /* #include <stdio.h> */ /* (fprintf removed...) */
 /* #include <fcntl.h> */ /* Not used, using defines below... */
 //#include <io.h>		/* write (what else?) */
-#include <stdlib.h>	/* _psp, NULL, malloc, free, atol, atoi */
+//#include <stdlib.h>	/* _psp, NULL, malloc, free, atol, atoi */
 //#include <dos.h>	/* MK_FP, FP_OFF, FP_SEG, int86, intdosx, */
 			/* freemem, keep */
 #include <string.h>	/* strchr, strlen, memset */
@@ -49,22 +49,6 @@
 #define SHARE_DENY_NONE  4
 
 		/* ------------- TYPEDEFS ------------- */
-	/* Register structure for an interrupt function. */
-typedef struct {
-	unsigned bp;
-	unsigned di;
-	unsigned si;
-	unsigned ds;
-	unsigned es;
-	unsigned dx;
-	unsigned cx;
-	unsigned bx;
-	unsigned ax;
-	unsigned ip;
-	unsigned cs;
-	unsigned flags;
-} intregs_t;
-
 	/* This table determines the action to take when attempting to open
 	   a file.  The first array index is the sharing mode of a previous
 	   open on the same file.  The second array index is the sharing mode
@@ -147,17 +131,6 @@ static lock_t *lock_table = NULL;
 
 
 		/* ------------- PROTOTYPES ------------- */
-#if 0
-/* PRINT added by Eric */
-#define ERR 2	/* handle of stderr */
-#define OUT 1	/* handle of stdout */
-static void PRINT(int handle, const char * text);
-static void PRINT(int handle, const char * text) {
-	(void)write (handle, _text, strlen(text));
-	/* return value is -1 error or N bytes_written. Ignored. */
-};
-#endif
-
 	/* DOS calls this to see if it's okay to open the file.
 	   Returns a file_table entry number to use (>= 0) if okay
 	   to open.  Otherwise returns < 0 and may generate a critical
@@ -601,172 +574,3 @@ int share_init(int high)
 	memset(lock_table, 0, lock_table_size*sizeof(lock_t));
 	return 0;
 }
-
-#if 0
-static void usage(void) {
-	PRINT(ERR,
-		 "Installs file-sharing and locking "
-			"capabilities on your hard disk.\r\n\r\n");
-	PRINT(ERR, progname);
-	PRINT(ERR, " [/F:space] [/L:locks]\r\n\r\n"
-		 "  /F:space   Allocates file space (in bytes) "
-			"for file-sharing information.\r\n"
-		 "  /L:locks   Sets the number of files that can "
-			"be locked at one time.\r\n");
-}
-
-static void bad_params(void) {
-	PRINT(ERR, progname);
-	PRINT(ERR, ": parameter out of range!\r\n");
-}
-
-static void out_of_memory(void) {
-	PRINT(ERR, progname);
-	PRINT(ERR,": out of memory!\r\n");
-}
-
-		/* ------------- MAIN ------------- */
-int main(int argc, char **argv) {
-	unsigned short FAR  *usfptr;
-	unsigned char FAR  *uscptr;
-	unsigned short top_of_tsr;
-	int installed = 0;
-	int i;
-
-		/* Extract program name from argv[0] into progname. */
-	if (argv[0] != NULL) {
-		char *p = argv[0], *p2, c;
-		int i;
-		if ( (p[0] != '\0') && (p[1] == ':') )
-			p += 2;
-		while ((p2 = strchr(p, '\\')) != NULL)
-			p = p2+1;
-		p2 = progname;
-		for (i = 0; i < 8; i++) {
-			c = p[i];
-			if ( (c == '.') || (c == '\0') )
-				break;
-			*(p2++) = c;
-		}
-		*p2 = '\0';
-	}
-
-		/* See if the TSR is already installed. */
-	/* disable(); */	/* no multitasking, so don't worry */
-	if (getvect(MUX_INT_NO) != NULL) {
-		iregs regs;
-		/* enable(); */
-		regs.a.b.h = MULTIPLEX_ID;
-		regs.a.b.l = 0;
-		call_intr(MUX_INT_NO, MK_FAR_SCP(regs));
-		installed = ((regs.a.x & 0xff) == 0xff);
-
-	} /* else { enable(); } */
-
-		/* Process command line arguments.  Bail if errors. */
-	for (i = 1; i < argc; i++) {
-		char *arg = argv[i];
-		if (arg == NULL) continue;
-		if (arg[0] != '/') {
-			usage();
-			return 3;
-		}
-		arg++;
-		switch(*arg) {
-		case '?':
-			usage();
-			return 3;
-		case 'f':
-		case 'F':
-			arg++;
-			if (*arg != ':') {
-				usage();
-				return 3;
-			}
-			arg++;
-			{
-				long temp = atol(arg);
-				if (   (temp < (long)FILE_TABLE_MIN)
-					|| (temp > (long)FILE_TABLE_MAX)   ) {
-					bad_params();
-					return 3;
-				}
-				file_table_size_bytes = (unsigned int)temp;
-			}
-			break;
-		case 'l':
-		case 'L':
-			arg++;
-			if (*arg != ':') {
-				usage();
-				return 3;
-			}
-			arg++;
-			lock_table_size = atoi(arg);
-			if (   (lock_table_size < LOCK_TABLE_MIN)
-				|| (lock_table_size > LOCK_TABLE_MAX)   ) {
-				bad_params();
-				return 3;
-			}
-			break;
-		}
-	}
-
-		/* Now try to install. */
-
-	if (installed) {
-		PRINT(ERR, progname);
-		PRINT(ERR, " is already installed!\r\n");
-		return 1;
-	}
-
-	if (init() != 0) {
-		out_of_memory();
-		return 2;
-	}
-
-		/* Allocate a single byte.  This tells us the size of the TSR.
-		   Free the byte when we know the address. */
-	uscptr = (unsigned char FAR  *)malloc(1);
-	if (uscptr == NULL) {
-		out_of_memory();
-		return 2;
-	}
-	top_of_tsr = (FP_SEG(uscptr)+((FP_OFF(uscptr)+15) >> 4)) - _psp;
-				/* resident paras, counting from PSP:0 */
-	free((void *)uscptr);
-
-#if 0
-		/* Hook the interrupt for the handler routine. */
-	/* disable(); */
-	old_handler2f = getvect(MUX_INT_NO);
-	setvect(MUX_INT_NO,handler2f);
-	/* enable(); */
-#endif
-		/* Let them know we're installed. */
-	PRINT(OUT, progname);
-	PRINT(OUT, " installed.\r\n");
-
-		/* Any access to environment variables must */
-		/* be done prior to this point.  Here we    */
-		/* free the environment table to prevent    */
-		/* wasting that memory.  In fact, if the    */
-		/* TSR were removed from memory and we did  */
-		/* not do this, we would not be able to     */
-		/* recover this memory.                     */
-
-	usfptr = MK_FP(_psp, 0x2c);	/* MK_FP is the counterpart */
-					/* of FP_OFF and FP_SEG ... */
-	freemem(*usfptr);	/* deallocate MCB of ENV segment */
-
-#if 0
-		/* Free the remainder of memory for use by applications. */
-	setblock(_psp,top_of_tsr);
-				/*  resize self: already done by keep()  */
-
-		/* Terminate and stay resident. */
-	keep(0,top_of_tsr);	/* size is set to top_of_tsr paragraphs */
-#endif
-	return 0;
-}
-#endif
