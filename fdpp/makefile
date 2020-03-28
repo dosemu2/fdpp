@@ -123,7 +123,8 @@ CFILES = blockio.c \
     dyninit.c \
     initdisk.c \
     initclk.c \
-    prf.c
+    prf.c \
+    share.c
 
 FDPP_CFILES = smalloc.c farhlp_sta.c
 FDPP_CCFILES = thunks.cc dosobj.cc

@@ -401,6 +401,9 @@ UWORD remote_getfattr(void);
 UWORD get_machine_name(__FAR(char) netname);
 VOID set_machine_name(__FAR(const char) netname, UWORD name_num);
 
+/* share.c */
+int share_init(int high);
+
 /* procsupt.asm */
 /* note that exec_user() is special and can't work w/o NORETURN */
 VOID ASMFUNC NORETURN exec_user(__FAR(exec_regs) erp);
@@ -430,6 +433,7 @@ VOID ASMCFUNC SEGM(HMA_TEXT) P_0(__FAR(struct config)Config);
 struct int2f12regs;
 VOID ASMCFUNC SEGM(HMA_TEXT) int2F_12_handler(__FAR(struct int2f12regs) r);
 VOID ASMCFUNC SEGM(HMA_TEXT) int2F_08_handler(__FAR(iregs) regs);
+VOID ASMCFUNC SEGM(HMA_TEXT) int2F_10_handler(__FAR(iregs) regs);
 
 BOOL ASMPASCAL fl_reset(WORD);
 COUNT ASMPASCAL fl_diskchanged(WORD);

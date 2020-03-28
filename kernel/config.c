@@ -478,6 +478,7 @@ void PostConfig(void)
   sp = sp->sftt_next = (sfttbl FAR *)
     KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 8) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
+  share_init(Config.cfgFilesHigh);
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = Config.cfgFiles - 8;
 
