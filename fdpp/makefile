@@ -219,6 +219,10 @@ install: $(FDPPLIB) $(GEN_EXT)
 	install -m 0644 fdppkrnl.sys $(DESTDIR)$(DATADIR)/fdpp
 	install -m 0644 fdppkrnl.map $(DESTDIR)$(DATADIR)/fdpp
 
+local_install_hdrs: $(GEN_EXT)
+	mkdir -p fdpp
+	install -m 0644 $(EXT_H) fdpp
+
 uninstall:
 	rm -rf $(DESTDIR)$(LIBDIR)/fdpp
 	rm -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
