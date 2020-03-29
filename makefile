@@ -18,5 +18,8 @@ clean:
 install:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp install
 
+uninstall:
+	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp uninstall
+
 rpm deb tar:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp $@

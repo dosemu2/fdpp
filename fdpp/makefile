@@ -25,7 +25,7 @@ GEN_EXT = fdpp.pc fdpp.spec
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
-CPPFLAGS += -I . -I $(SRC) -I $(srcdir) -DDATADIR=$(DATADIR) \
+CPPFLAGS += -I . -I $(SRC) -I $(srcdir) -DFDPPDATADIR=$(DATADIR)/fdpp \
     -DKRNL_NAME=$(TARGET).sys -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]"
 NASMFLAGS += -i$(SRC)
@@ -215,9 +215,15 @@ install: $(FDPPLIB) $(GEN_EXT)
 	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
 	install -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
-	mkdir -p $(DESTDIR)$(DATADIR)
-	install -m 0644 fdppkrnl.sys $(DESTDIR)$(DATADIR)
-	install -m 0644 fdppkrnl.map $(DESTDIR)$(DATADIR)
+	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
+	install -m 0644 fdppkrnl.sys $(DESTDIR)$(DATADIR)/fdpp
+	install -m 0644 fdppkrnl.map $(DESTDIR)$(DATADIR)/fdpp
+
+uninstall:
+	rm -rf $(DESTDIR)$(LIBDIR)/fdpp
+	rm -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
+	rm -rf $(DESTDIR)$(PREFIX)/include/fdpp
+	rm -rf $(DESTDIR)$(DATADIR)/fdpp
 
 $(TGZ): fdpp.spec
 	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD

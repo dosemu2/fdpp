@@ -6,7 +6,7 @@ XCPU=386
 XFAT=32
 
 PREFIX ?= /usr/local
-DATADIR ?= $(PREFIX)/share/fdpp
+DATADIR ?= $(PREFIX)/share
 LIBDIR ?= $(PREFIX)/lib
 PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
 

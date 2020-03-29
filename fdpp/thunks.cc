@@ -791,7 +791,7 @@ void _fd_mark_mem_np(far_t ptr, UWORD size, int type)
 #define _S(x) __S(x)
 const char *FdppDataDir(void)
 {
-    return _S(DATADIR);
+    return _S(FDPPDATADIR);
 }
 
 const char *FdppKernelName(void)
