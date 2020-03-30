@@ -55,14 +55,17 @@ rst2f:
 ;                cmp     ah,11h                  ; Network interrupt?
 ;                jne     Int2f3                  ; No, continue
 Int2f1:
-                or      al,al                   ; Installation check?
-                jz      FarTabRetn              ; yes, just return
-Int2f2:
-                mov ax,1                        ; TE 07/13/01
-                                                ; at least for redirected INT21/5F44
-                                                ; --> 2f/111e
-                                                ; the error code is AX=0001 = unknown function
-                stc
+                PUSH$ALL
+                mov bp, sp              ; Save pointer to iregs struct
+                push ss
+                push bp                 ; Pass pointer to iregs struct to C
+                mov ds, [cs:_DGROUP_]
+                extern   _int2F_10_handler
+                call _int2F_10_handler
+                add sp, 4               ; Remove SS,SP
+                POP$ALL
+                iret
+
 FarTabRetn:
                 retf    2                       ; Return far
 
