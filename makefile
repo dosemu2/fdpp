@@ -15,11 +15,5 @@ all:
 clean:
 	+$(call mdir,fdpp,clean)
 
-install:
-	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp install
-
-uninstall:
-	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp uninstall
-
-rpm deb tar:
+install uninstall rpm deb tar local_install_hdrs:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp $@

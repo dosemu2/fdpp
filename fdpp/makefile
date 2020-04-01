@@ -62,6 +62,7 @@ clean:
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
 		$(TARGET).sys kernel.sym *.pc fdpp.spec
+	-$(RM) -rf fdpp
 
 #               *Individual File Dependencies*
 #apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
