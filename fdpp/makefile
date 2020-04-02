@@ -62,7 +62,6 @@ clean:
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
 		$(TARGET).sys kernel.sym *.pc fdpp.spec
-	-$(RM) -rf fdpp
 
 #               *Individual File Dependencies*
 #apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -220,10 +219,6 @@ install: $(FDPPLIB) $(GEN_EXT)
 	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
 	install -m 0644 fdppkrnl.sys $(DESTDIR)$(DATADIR)/fdpp
 	install -m 0644 fdppkrnl.map $(DESTDIR)$(DATADIR)/fdpp
-
-local_install_hdrs: $(GEN_EXT)
-	mkdir -p fdpp
-	install -m 0644 $(EXT_H) fdpp
 
 uninstall:
 	rm -rf $(DESTDIR)$(LIBDIR)/fdpp
