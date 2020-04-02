@@ -1,7 +1,8 @@
 prefix=@PREFIX@
-fdpplibdir=@LIBDIR@/fdpp
-includedir=${prefix}/include
-fdppincdir=${prefix}/include/fdpp
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+fdpplibdir=${libdir}/fdpp
+fdppincdir=${includedir}/fdpp
 
 Name: fdpp
 Description: 64-bit DOS

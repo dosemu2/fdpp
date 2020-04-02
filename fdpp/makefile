@@ -243,6 +243,7 @@ deb:
 $(GEN_EXT): %: $(srcdir)/%.in makefile
 	sed \
 		-e 's!@PREFIX[@]!$(PREFIX)!g' \
+		-e 's!@INCLUDEDIR[@]!$(INCLUDEDIR)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
 		-e 's!@VERSION[@]!$(VERSION)!g' \
 		$< >$@
