@@ -9,8 +9,9 @@ MAKEOVERRIDES =
 include $(srcdir)/defs.mak
 include $(srcdir)/clang.mak
 
-HDR=$(srcdir)/../hdr/
-SRC=$(srcdir)/../kernel/
+TOP = $(abspath $(srcdir)/..)
+HDR=$(TOP)/hdr/
+SRC=$(TOP)/kernel/
 FDPPLIB = libfdpp.so
 RELVER = rc1
 MAJ = 1.0
@@ -18,14 +19,15 @@ VERSION = $(MAJ)$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
 TGZ = $(TAR).gz
-FD_EXT_H = $(HDR)bprm.h $(HDR)memtype.h
-EXT_H = $(FD_EXT_H) $(srcdir)/thunks.h
+FD_EXT_H = $(TOP)/include/fdpp
+EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h
 GEN_EXT = fdpp.pc fdpp.spec
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
-CPPFLAGS += -I . -I $(SRC) -I $(srcdir) -DFDPPDATADIR=$(DATADIR)/fdpp \
+CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir) \
+    -DFDPPDATADIR=$(DATADIR)/fdpp \
     -DKRNL_NAME=$(TARGET).sys -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]"
 NASMFLAGS += -i$(SRC)
@@ -84,7 +86,7 @@ serial.obj:	$(SRC)serial.asm  $(SRC)io.inc
 
 HDRS = $(wildcard $(HDR)*.h) $(wildcard $(SRC)*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
-_PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h thunks.h smalloc.h \
+_PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
     farhlp_sta.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS = thunk_calls.h thunk_asms.h
@@ -227,7 +229,7 @@ uninstall:
 	rm -rf $(DESTDIR)$(DATADIR)/fdpp
 
 $(TGZ): fdpp.spec
-	cd $(srcdir)/.. && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
+	cd $(TOP) && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
 	tar rf $(TAR) --add-file=fdpp.spec
 	gzip $(TAR)
 .PHONY: $(TGZ)
