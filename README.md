@@ -103,7 +103,7 @@ depending on your use-case. dosbox is cleanly written in C++,
 whereas fdpp wraps the C-coded freedos kernel into a C++ framework,
 resulting in a nuclear C/C++ mix.
 
-### freedos-32
+### freedos-32 (inactive)
 [freedos-32](http://freedos-32.sourceforge.net/) is a
 kernel written with DOS compatibility in mind. It has a
 rich user-space part with libc. Very good candidate for
@@ -113,7 +113,7 @@ was scrapped, and currently
 [something else](https://github.com/salvois/kernel)
 is being developed.
 
-### freedos-64
+### freedos-64 (inactive)
 [freedos-64](https://sourceforge.net/projects/dos64/)
 seems to be a project
 [planning](http://freedos.10956.n7.nabble.com/DOS-Development-Idea-td16159.html)
