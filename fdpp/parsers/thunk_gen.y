@@ -69,7 +69,7 @@ static void init_line(void)
 
 static void do_start_arg(int anum)
 {
-    if (thunk_type == 1)
+    if (thunk_type == 1 || thunk_type == 2)
 	strcat(abuf, "_");
     if (is_ptr) {
 	if (is_far) {
@@ -145,6 +145,7 @@ static void fin_arg(int last)
 	sprintf(abuf + strlen(abuf), "%i, %s, _SP)", arg_offs, atype);
 	break;
     case 1:
+    case 2:
 	sprintf(abuf + strlen(abuf), "%s)", atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
@@ -250,6 +251,8 @@ line:		lnum rdecls fname lb args rb SEMIC
 			    /* for m4 */
 			    printf("THUNK(%i, %i, %i)\n",
 			        arg_num, is_rvoid && !is_rptr, is_pas);
+			    break;
+			  case 2:
 			    /* for cpp */
 			    if (!is_rvoid || is_rptr)
 			      printf("_THUNK%s%i(%i, %s(%s), %s, %s",
