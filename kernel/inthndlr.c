@@ -1991,6 +1991,43 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
       r.AL = (r.CL & 3) ? 28 : 29;
       break;
 
+    case 0x1f:
+      {
+        int drv = (r.callerARG1 & 0x1f) - 1;
+        struct cds FAR *cdsp;
+        if (drv < 0)
+        {
+          r.FLAGS |= FLG_CARRY;
+          break;
+        }
+        cdsp = get_cds_unvalidated(drv);
+        if (cdsp == NULL)
+        {
+          r.FLAGS |= FLG_CARRY;
+          break;
+        }
+        _sprintf(TempCDS.cdsCurrentPath, "%c:\\", r.callerARG1 & 0xff);
+        TempCDS.cdsBackslashOffset = 2;
+        if (cdsp->cdsFlags)
+        {
+          TempCDS.cdsDpb = cdsp->cdsDpb;
+          TempCDS.cdsFlags = cdsp->cdsFlags;
+        }
+        else
+        {
+          TempCDS.cdsDpb = NULL;
+          TempCDS.cdsFlags = 0;
+        }
+        TempCDS.cdsStrtClst = 0xffff;
+        TempCDS.cdsParam = 0xffff;
+        TempCDS.cdsStoreUData = 0xffff;
+        r.CX = sizeof(TempCDS);
+        r.DS = FP_SEG(&TempCDS);
+        r.SI = FP_OFF(&TempCDS);
+        r.FLAGS &= ~FLG_CARRY;
+        break;
+      }
+
     case 0x20:                 /* get job file table entry */
       {
         psp FAR *p = MK_FP(cu_psp, 0);
