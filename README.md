@@ -50,11 +50,15 @@ are good candidates for running fdpp.
 ## what fdpp technically is?
 A meta-compiler that was initially able to compile the
 freedos kernel from its almost unmodified sources.
-As the project advances, the ability to compile freedos
-from the unmodified sources have lost its value, as our
-copy of freedos is now heavily modified. The main tasks
-of our meta-compiler is to parse FAR pointers and generate
-thunks to real-mode asm code of freedos.
+As the project evolves, the ability to compile freedos
+from the unmodified sources have lost its value and was
+dropped, as our copy of freedos is now heavily modified.
+As the result, the compiler is very small and is targeted
+only to our coding patterns.
+The main tasks of it are to parse FAR pointers and generate
+thunks to real-mode asm code of freedos. As with any other
+compiler, fdpp is supplied with a small runtime support
+library and a dynamic linker.
 
 ## compatibility
 fdpp removes some compatibility hacks that FreeDOS had.
