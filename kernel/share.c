@@ -270,7 +270,7 @@ void int2F_10_handler(iregs FAR *iregs_p)
 
 static void remove_all_locks(int fileno) {
 	int i;
-	lock_t *lptr;
+	lock_t FAR *lptr;
 
 	for (i = 0; i < lock_table_size; i++) {
 		lptr = &lock_table[i];
@@ -308,7 +308,8 @@ static int fnmatches(char *fn1, char *fn2) {
 
 static int do_open_check
 	(int fileno) {		/* file_table entry number */
-	file_t *p, *fptr = &file_table[fileno];
+	file_t FAR *p;
+	file_t FAR *fptr = &file_table[fileno];
 	int i, j, action = 0, foundexc;
 	unsigned char current_sharemode = fptr->sharemode;
 	unsigned char current_openmode = fptr->openmode;
@@ -389,7 +390,7 @@ static int open_check
 	 int sharemode) {	/* SHARE_COMPAT, etc... */
 
 	int i, fileno = -1;
-	file_t *fptr;
+	file_t FAR *fptr;
 
 		/* Whack off unused bits in the share mode
 		   in case we were careless elsewhere. */
@@ -457,9 +458,9 @@ static int access_check
 	 unsigned long len,	/* length (in bytes) of region to access */
 	 int allowcriter) {	/* allow a critical error to be generated */
 	int i;
-	file_t *fptr = &file_table[fileno];
-	char *filename = fptr->filename;
-	lock_t *lptr;
+	file_t FAR *fptr = &file_table[fileno];
+	char FAR *filename = fptr->filename;
+	lock_t FAR *lptr;
 	unsigned long endofs = ofs + len;
 
 	if (endofs < ofs) {
@@ -506,7 +507,7 @@ static int lock_unlock
 	 int unlock) {		/* non-zero to unlock; zero to lock */
 
 	int i;
-	lock_t *lptr;
+	lock_t FAR *lptr;
 	unsigned long endofs = ofs + len;
 
     if (endofs < ofs) {
