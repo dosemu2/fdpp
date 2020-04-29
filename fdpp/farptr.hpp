@@ -32,7 +32,7 @@ static const int sym_store[] = { SYM_STORE, STORE_MAX };
 static const int arr_store[] = { ARR_STORE, STORE_MAX };
 /* for -> */
 static const int memb_store[] = { SYM_STORE, ARROW_STORE,
-    ASTER_STORE, STORE_MAX };
+    ASTER_STORE, ARR_STORE, STORE_MAX };
 
 static inline far_s _lookup_far(int idx, const void *ptr)
 {

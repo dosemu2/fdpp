@@ -102,8 +102,8 @@ static open_action_exception_t open_exceptions[] = {
 };
 
 	/* One of these exists for each instance of an open file. */
-typedef struct {
-	char filename[128];		/* fully-qualified filename; "\0" if unused */
+typedef struct _file_t {
+	AR_MEMB(_file_t, char, filename, 128);		/* fully-qualified filename; "\0" if unused */
 	unsigned short psp;		/* PSP of process which opened this file */
 	unsigned char openmode;	/* 0=read-only, 1=write-only, 2=read-write */
 	unsigned char sharemode;/* SHARE_COMPAT, etc... */
@@ -125,7 +125,7 @@ typedef struct {
 //static char progname[9];
 static unsigned int file_table_size_bytes = 2048;
 static unsigned int file_table_size = 0;	/* # of file_t we can have */
-static file_t *file_table = NULL;
+static file_t FAR *file_table = NULL;
 static unsigned int lock_table_size = 20;	/* # of lock_t we can have */
 static lock_t *lock_table = NULL;
 
@@ -566,9 +566,9 @@ int share_init(int high)
 	/* int i; */
 #define malloc(x) high_malloc(x, high)
 	file_table_size = file_table_size_bytes/sizeof(file_t);
-	if ((file_table=(file_t *)malloc(file_table_size_bytes)) == NULL)
+	if ((file_table = malloc(file_table_size_bytes)) == NULL)
 		return 1;
-	memset(file_table, 0, file_table_size_bytes);
+	fmemset(file_table, 0, file_table_size_bytes);
 	if ((lock_table=(lock_t *)malloc(lock_table_size*sizeof(lock_t))) == NULL)
 		return 1;
 	memset(lock_table, 0, lock_table_size*sizeof(lock_t));
