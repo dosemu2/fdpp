@@ -127,7 +127,7 @@ static unsigned int file_table_size_bytes = 2048;
 static unsigned int file_table_size = 0;	/* # of file_t we can have */
 static file_t FAR *file_table = NULL;
 static unsigned int lock_table_size = 20;	/* # of lock_t we can have */
-static lock_t *lock_table = NULL;
+static lock_t FAR *lock_table = NULL;
 
 
 		/* ------------- PROTOTYPES ------------- */
@@ -569,8 +569,8 @@ int share_init(int high)
 	if ((file_table = malloc(file_table_size_bytes)) == NULL)
 		return 1;
 	fmemset(file_table, 0, file_table_size_bytes);
-	if ((lock_table=(lock_t *)malloc(lock_table_size*sizeof(lock_t))) == NULL)
+	if ((lock_table = malloc(lock_table_size*sizeof(lock_t))) == NULL)
 		return 1;
-	memset(lock_table, 0, lock_table_size*sizeof(lock_t));
+	fmemset(lock_table, 0, lock_table_size*sizeof(lock_t));
 	return 0;
 }
