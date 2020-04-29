@@ -83,16 +83,21 @@ typedef struct {
 static open_action_exception_t open_exceptions[] = {
 	{ 0, 0, 2, 0, 3 },
 	{ 0, 0, 4, 0, 3 },	/* compatibility-read/deny none-read, MED 08/2004 */
+
 	{ 2, 0, 0, 0, 4 },
 	{ 2, 0, 2, 0, 0 },
 	{ 2, 0, 4, 0, 0 },
+	{ SHARE_DENY_WRITE, OPEN_WRITE_ONLY, SHARE_DENY_READ, OPEN_READ_ONLY, 0 },
+	{ SHARE_DENY_WRITE, OPEN_WRITE_ONLY, SHARE_DENY_NONE, OPEN_READ_ONLY, 0 },
+	{ SHARE_DENY_WRITE, OPEN_READ_WRITE, SHARE_DENY_NONE, OPEN_READ_ONLY, 0 },
+
 	{ 3, 0, 2, 1, 0 },
 	{ 3, 0, 4, 1, 0 },
 	{ 3, 1, 4, 1, 0 },
 	{ 3, 2, 4, 1, 0 },
+	{ SHARE_DENY_READ, OPEN_WRITE_ONLY, SHARE_DENY_READ, OPEN_WRITE_ONLY, 0 },
+
 	{ 4, 0, 0, 0, 4 },
-	{ 4, 0, 0, 1, 0 },	/* deny none-read/compatibility-write */
-	{ 4, 0, 0, 2, 0 },	/* deny none-read/compatibility-read+write */
 	{ 4, 0, 2, 0, 0 },
 	{ 4, 0, 2, 1, 0 },
 	{ 4, 0, 2, 2, 0 },
@@ -282,20 +287,46 @@ static void free_file_table_entry(int fileno) {
 	file_table[fileno].filename[0] = '\0';
 }
 
-/* DOS 7 does not have read-only restrictions, MED 08/2004 */
-/*
-static int file_is_read_only(char FAR  *filename) {
-	union REGS regs;
-	struct SREGS sregs;
+static int file_is_read_only(char FAR *filename)
+{
+	iregs regs = {};
 
-	regs.x.ax = 0x4300;
-	sregs.ds = FP_SEG(filename);
-	regs.x.dx = FP_OFF(filename);
-	intdosx(&regs, &regs, &sregs);
-	if (regs.x.cflag) return 0;
-	return ((regs.h.cl & 0x19) == 0x01);
-}
+/*
+   DOS 2+ - GET FILE ATTRIBUTES
+
+   AX = 4300h
+   DS:DX -> ASCIZ filename
+
+   Return:
+      CF clear if successful
+         CX = file attributes (see #01420)
+         AX = CX (DR DOS 5.0)
+      CF set on error
+         AX = error code (01h,02h,03h,05h) (see #01680 at AH=59h)
+
+   Bitfields for file attributes:
+
+   Bit(s)  Description     (Table 01420)
+   7      shareable (Novell NetWare)
+   7      pending deleted files (Novell DOS, OpenDOS)
+   6      unused
+   5      archive
+   4      directory
+   3      volume label.
+          Execute-only (Novell NetWare)
+   2      system
+   1      hidden
+   0      read-only
 */
+
+	regs.a.x = 0x4300;
+	regs.ds = FP_SEG(filename);
+	regs.d.x = FP_OFF(filename);
+	call_intr(0x21, MK_FAR_SCP(regs));
+	if (regs.flags & FLG_CARRY)
+		return 0;
+	return ((regs.c.b.l & 0x19) == 0x01);
+}
 
 static int fnmatches(char *fn1, char *fn2) {
 	while (*fn1) {
@@ -345,19 +376,21 @@ static int do_open_check
 			/* Fail appropriately based on action. */
 		switch (action) {
 
-/* DOS 7 does not have read-only restrictions, fall through to proceed, MED 08/2004 */
-		case 3:
-		case 4:
-
 		case 0:		/* proceed with open */
 			break;
-/*		case 3:	*/		/* succeed if file read-only, else fail with error 05h */
-/*			if (file_is_read_only(fptr->filename)) break;	*/
+
+		case 3:		/* succeed if file read-only, else fail with error 05h */
+			if (file_is_read_only(fptr->filename))
+				break;
+			/* fall through */
 		case 1:		/* fail with error code 05h */
 			free_file_table_entry(fileno);
 			return -5;
-/*		case 4:	*/		/* succeed if file read-only, else fail with int 24h */
-/*			if (file_is_read_only(fptr->filename)) break;	*/
+
+		case 4:		/* succeed if file read-only, else fail with int 24h */
+			if (file_is_read_only(fptr->filename))
+				break;
+			/* fall through */
 		case 2:		/* fail with int 24h */
 			{
 				iregs regs;
