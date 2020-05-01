@@ -110,7 +110,7 @@ COUNT DosSetFattr(__FAR(const char) name, UWORD attrp);
 UBYTE DosSelectDrv(UBYTE drv);
 COUNT DosDelete(__FAR(const char) path, int attrib);
 COUNT DosRename(__FAR(const char) path1,__FAR(const char) path2);
-COUNT DosRenameTrue(const char * path1, const char * path2, int attrib);
+COUNT DosRenameTrue(__FAR(const char) path1, __FAR(const char) path2, int attrib);
 COUNT DosMkRmdir(__FAR(const char) dir, int action);
 __FAR(struct dhdr)IsDevice(__XFAR(const char) FileName);
 BOOL IsShareInstalled(BOOL recheck);
@@ -488,6 +488,12 @@ WORD ASMPASCAL share_access_check(unsigned short pspseg, WORD fileno, UDWORD ofs
            If the return value is non-zero, it is the negated error
            return code for the DOS 0x5c call. */
 WORD ASMPASCAL share_lock_unlock(unsigned short pspseg, WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       /* one to unlock; zero to lock */
+
+        /* DOS calls this to see if share already has the file marked as open.
+           Returns:
+             1 if open
+             0 if not */
+WORD ASMPASCAL share_is_file_open(__FAR(const char) filename);
 
 unsigned char ASMPASCAL share_check(void);
 
