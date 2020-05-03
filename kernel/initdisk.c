@@ -1197,7 +1197,7 @@ STATIC int BIOS_nrdrives(void)
 
 void BIOS_drive_reset(unsigned drive)
 {
-  iregs regs;
+  iregs regs = {};
 
   regs.d.b.l = drive | 0x80;
   regs.a.b.h = 0;

@@ -50,7 +50,7 @@ void Init_clk_driver(void)
   iregs regsD = {{0x400}, {0}, {0x1400}, {0x101}};
                       /* ah=4, ch=20^ ^cl=0, ^dh=dl=1 (2000/1/1)
                        * (above date will be set on error) */
-  iregs dosregs;
+  iregs dosregs = {};
 
   init_call_intr(0x1a, &regsT); /* get BIOS time */
   init_call_intr(0x1a, &regsD); /* get BIOS date */
