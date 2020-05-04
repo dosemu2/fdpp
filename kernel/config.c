@@ -2960,6 +2960,7 @@ VOID DoInstall(void)
 {
   unsigned int i;
   unsigned short installMemory;
+  unsigned short installMemoryPara;
   struct instCmds *cmd;
 
   if (numInstallCmds == 0)
@@ -2974,11 +2975,16 @@ VOID DoInstall(void)
   */
 
   set_strategy(LAST_FIT);
-  installMemory = ((uintptr_t)_init_end + ebda_size + 15) / 16;
+  installMemoryPara = ((FP_SEG(_init_end) << 4) + FP_OFF(_init_end) +
+      ebda_size + 15) / 16;
 #ifdef __WATCOMC__
-  installMemory += (_InitTextEnd - _InitTextStart + 15) / 16;
+  installMemoryPara += (_InitTextEnd - _InitTextStart + 15) / 16;
 #endif
-  installMemory = allocmem(installMemory);
+  installMemory = allocmem(installMemoryPara);
+  if (installMemory == 0xffff) {
+    fpanic("install: unable to allocate %x para", installMemoryPara);
+    return;
+  }
 
   InstallPrintf(("allocated memory at %x\n",installMemory));
 
@@ -2992,7 +2998,6 @@ VOID DoInstall(void)
   _free(installMemory);
 
   InstallPrintf(("Done with installing commands\n"));
-  return;
 }
 
 STATIC char *AddEnv(char *env)

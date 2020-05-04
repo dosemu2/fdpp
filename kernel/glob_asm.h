@@ -86,7 +86,7 @@ __ASM(BYTE, version_flags) SEMIC                /* minor version number         
 __ASM(struct _KernelConfig FAR, LowKernelConfig) SEMIC
 __ASM_ARRI(BYTE, _ib_start) SEMIC
 __ASM_ARRI(BYTE, _ib_end) SEMIC
-__ASM_ARRI(BYTE, _init_end) SEMIC
+__ASM_ARRI_F(BYTE, _init_end) SEMIC
 __ASM(struct lol FAR, DATASTART) SEMIC
 __ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
 __ASM_ARRI_F(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
