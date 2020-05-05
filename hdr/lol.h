@@ -87,6 +87,7 @@ struct lol {
   PTR_MEMB(char) _os_release;  /* 70 near pointer to os_release string    */
   unsigned short _BootParamSeg;/* 72 initial env seg                      */
   unsigned char _BootParamVer; /* 74 bprm version                         */
+  __DOSFAR(struct cds)_old_CDSp; /* 75 old Current Directory Structure    */
 #ifdef WIN31SUPPORT
   unsigned short winInstanced; /* WinInit called                          */
   unsigned long  winStartupInfo[4];

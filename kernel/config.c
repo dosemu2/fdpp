@@ -482,6 +482,7 @@ void PostConfig(void)
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = Config.cfgFiles - 8;
 
+  LoL->_old_CDSp = LoL->_CDSp;
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
 #ifdef DEBUG
