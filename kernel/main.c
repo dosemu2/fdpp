@@ -412,6 +412,8 @@ STATIC VOID FsConfig(BOOL reinit)
       if (old_cds->cdsFlags)
       {
         fmemcpy(pcds_table, old_cds, sizeof(struct cds));
+        if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
+          dpb = dpb->dpb_next;
         continue;
       }
     }
