@@ -183,6 +183,8 @@ static int lock_unlock
 	 unsigned long len,	/* length (in bytes) of region to lock or unlock */
 	 int unlock);		/* non-zero to unlock; zero to lock */
 
+static int is_file_open(char FAR * filename);
+
 	/* Multiplex interrupt handler */
 
 		/* ------------- HOOK ------------- */
@@ -254,6 +256,12 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 				 (   (((unsigned long)iregs.es)<<16) | ((unsigned long)iregs.dx)   ),
 #endif
 				 (iregs.ax & 0x01));
+			return;
+		}
+
+			/* is_file_open (0xa6)*/
+		if ((iregs.ax & 0xff) == 0xa6) {
+			iregs.ax = is_file_open(MK_FP(iregs.ds, iregs.si));
 			return;
 		}
 	}
@@ -585,6 +593,17 @@ static int lock_unlock
 		}
 		return -(0x24);		/* sharing buffer overflow */
 	}
+}
+
+static int is_file_open(char FAR * filename)
+{
+	int i;
+
+	for (i = 0; i < file_table_size; i++) {
+		if (fnmatches(filename, file_table[i].filename))
+			return 1;
+	}
+	return 0;
 }
 
 static void FAR *high_malloc(uint32_t size, int high)

@@ -1156,10 +1156,13 @@ COUNT DosDelete(const char FAR * path, int attrib)
   if (result & IS_DEVICE)
     return DE_FILENOTFND;
 
+  if (IsShareInstalled(TRUE) && share_is_file_open(PriPathName))
+    return DE_ACCESS;
+
   return dos_delete(PriPathName, attrib);
 }
 
-COUNT DosRenameTrue(const char * path1, const char * path2, int attrib)
+COUNT DosRenameTrue(const char FAR * path1, const char FAR * path2, int attrib)
 {
   if (path1[0] != path2[0])
   {
@@ -1167,6 +1170,9 @@ COUNT DosRenameTrue(const char * path1, const char * path2, int attrib)
   }
   if (FP_OFF(current_ldt) == 0xFFFF || (current_ldt->cdsFlags & CDSNETWDRV))
     return network_redirector(REM_RENAME);
+
+  if (IsShareInstalled(TRUE) && share_is_file_open(path1))
+    return DE_ACCESS;
 
   return dos_rename(path1, path2, attrib);
 }
