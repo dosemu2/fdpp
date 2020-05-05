@@ -86,7 +86,7 @@ intvec getvec(unsigned char intno);
 #define NFCBS           16      /* number of fcbs               */
 #define NSTACKS         8       /* number of stacks             */
 #define STACKSIZE       256     /* default stacksize            */
-#define NLAST           5       /* last drive                   */
+#define NLAST           16       /* last drive                   */
 #define NUMBUFF         20      /* Number of track buffers at INIT time     */
                                         /* -- must be at least 3        */
 #define MAX_HARD_DRIVE  8
