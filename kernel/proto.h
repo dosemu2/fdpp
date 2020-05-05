@@ -375,6 +375,7 @@ UWORD DaysFromYearMonthDay(UWORD Year, UWORD Month, UWORD DayOfMonth);
 VOID new_psp(seg para, seg cur_psp);
 VOID child_psp(seg para, seg cur_psp, int psize);
 VOID return_user(void);
+COUNT res_DosExec(COUNT mode, __FAR(exec_blk) ep, __XFAR(const char) filename);
 COUNT DosExec(COUNT mode,__FAR(exec_blk) ep,__FAR(const char) lp);
 ULONG SftGetFsize(int sft_idx);
 VOID InitPSP(VOID);

@@ -2929,7 +2929,7 @@ STATIC VOID InstallExec(struct instCmds *icmd)
 
   InstallPrintf(("cmd[%s] args [%u,%s]\n",filename,*args,args+1));
 
-  if (init_DosExec(icmd->mode, &exb, filename) != SUCCESS)
+  if (res_DosExec(icmd->mode, MK_FAR_SCP(exb), filename) != SUCCESS)
   {
     _printf("File not found or corrupted: %s\n", filename);
     pLineStart = icmd->buffer;
@@ -2937,30 +2937,9 @@ STATIC VOID InstallExec(struct instCmds *icmd)
   }
 }
 
-STATIC void _free(seg segment)
-{
-  iregs r = {};
-
-  r.a.b.h = 0x49;				/* free memory	*/
-  r.es  = segment;
-  init_call_intr(0x21, &r);
-}
-
-/* set memory allocation strategy */
-STATIC void set_strategy(unsigned char strat)
-{
-  iregs r = {};
-
-  r.a.x = 0x5801;
-  r.b.b.l = strat;
-  init_call_intr(0x21, &r);
-}
-
 VOID DoInstall(void)
 {
   unsigned int i;
-  unsigned short installMemory;
-  unsigned short installMemoryPara;
   struct instCmds *cmd;
 
   if (numInstallCmds == 0)
@@ -2968,34 +2947,11 @@ VOID DoInstall(void)
 
   InstallPrintf(("Installing commands now\n"));
 
-  /* grab memory for this install code
-     we KNOW, that we are executing somewhere at top of memory
-     we need to protect the INIT_CODE from other programs
-     that will be executing soon
-  */
-
-  set_strategy(LAST_FIT);
-  installMemoryPara = ((FP_SEG(_init_end) << 4) + FP_OFF(_init_end) +
-      ebda_size + 15) / 16;
-#ifdef __WATCOMC__
-  installMemoryPara += (_InitTextEnd - _InitTextStart + 15) / 16;
-#endif
-  installMemory = allocmem(installMemoryPara);
-  if (installMemory == 0xffff) {
-    fpanic("install: unable to allocate %x para", installMemoryPara);
-    return;
-  }
-
-  InstallPrintf(("allocated memory at %x\n",installMemory));
-
   for (i = 0, cmd = InstallCommands; i < numInstallCmds; i++, cmd++)
   {
     InstallPrintf(("%d:%s\n",i,cmd->buffer));
-    set_strategy(cmd->mode);
     InstallExec(cmd);
   }
-  set_strategy(FIRST_FIT);
-  _free(installMemory);
 
   InstallPrintf(("Done with installing commands\n"));
 }

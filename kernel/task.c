@@ -63,7 +63,6 @@ static BYTE *RcsId =
  #endif
 #endif
 
-STATIC COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, char FAR * filename);
 STATIC UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count);
 
 #define CHUNK 32256
@@ -925,7 +924,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   panic("Unable to start shell");
 }
 
-STATIC COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, char FAR * filename)
+COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, __XFAR(const char) filename)
 {
     iregs regs = {};
     regs.ds = FP_SEG(filename);
