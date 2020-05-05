@@ -1,8 +1,8 @@
 ## rc-2
 
 Development is calming down.
-Everything works as it should, so we can make a release.
-Just a few cool new features below.
+We were busy with chasing the memory corruption bug
+and also added a few cool new features below.
 
 - Add share/locking support
 - Add new config.sys directive INT0DIVZ. Setting it to OFF
@@ -10,6 +10,7 @@ Just a few cool new features below.
   on fast CPU" problem in some games (Zool2).
   Note: it won't cure the famous "Runtime error 200" problem,
   even if it is very similar. You need a separate fix for that.
+- Fix memory corruption in INSTALL= processing
 - Build improvements, add "make uninstall" target and more.
 - Enable and use C++ RTTI - the last of the C++ features I
   wanted to never enable, but couldn't keep it that way.
