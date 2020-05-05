@@ -11,6 +11,8 @@ and also added a few cool new features below.
   Note: it won't cure the famous "Runtime error 200" problem,
   even if it is very similar. You need a separate fix for that.
 - Fix memory corruption in INSTALL= processing
+- Propagate the initial CDS setup. No longer needed to redirect
+  drives twice.
 - Build improvements, add "make uninstall" target and more.
 - Enable and use C++ RTTI - the last of the C++ features I
   wanted to never enable, but couldn't keep it that way.
