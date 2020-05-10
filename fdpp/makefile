@@ -21,7 +21,7 @@ TAR = $(PKG).tar
 TGZ = $(TAR).gz
 FD_EXT_H = $(TOP)/include/fdpp
 EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h
-GEN_EXT = fdpp.pc fdpp.spec
+GEN_EXT = fdpp.pc
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
@@ -63,7 +63,7 @@ clean:
 	-$(RM) .tstamp *.map *.elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
-		$(TARGET).sys kernel.sym *.pc fdpp.spec
+		$(TARGET).sys kernel.sym *.pc
 
 #               *Individual File Dependencies*
 #apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -228,16 +228,12 @@ uninstall:
 	rm -rf $(DESTDIR)$(PREFIX)/include/fdpp
 	rm -rf $(DESTDIR)$(DATADIR)/fdpp
 
-$(TGZ): fdpp.spec
+$(TGZ):
 	cd $(TOP) && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
-	tar rf $(TAR) --add-file=fdpp.spec
 	gzip $(TAR)
 .PHONY: $(TGZ)
 
 tar: $(TGZ)
-
-rpm: $(TGZ)
-	rpmbuild -tb $(TGZ)
 
 deb:
 	debuild -i -us -uc -b

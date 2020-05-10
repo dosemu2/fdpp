@@ -15,5 +15,9 @@ all:
 clean:
 	+$(call mdir,fdpp,clean)
 
-install uninstall rpm deb tar:
+rpm: fdpp.spec.rpkg
+	git clean -fd
+	rpkg local
+
+install uninstall deb tar:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp $@
