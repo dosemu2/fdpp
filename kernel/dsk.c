@@ -691,7 +691,9 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
         {
           REG BYTE extended_BPB_signature =
             DiskTransferBuffer[(pddt->ddt_bpb.bpb_nfsect != 0 ? 0x26 : 0x42)];
-          if ((extended_BPB_signature != 0x29) || (extended_BPB_signature != 0x28))
+          /* 0x29 is usual signature value for serial#,vol label,& fstype;
+             0x28 older EBPB signature indicating only serial# is valid   */
+          if ((extended_BPB_signature != 0x29) && (extended_BPB_signature != 0x28))
             return failure(E_MEDIA);
         }
 
