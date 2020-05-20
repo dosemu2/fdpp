@@ -21,11 +21,9 @@ For the ubuntu package please visit
 ## running
 The simplest way to get it running is to use
 [dosemu2](https://github.com/stsp/dosemu2).<br/>
-After installing fdpp, you can (re-)build dosemu2.
-It will then find fdpp during build, and enable its support.<br/>
-You can also get the pre-built dosemu2 packages with
-fdpp support enabled from the aforementioned
-[ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
+Get the pre-built dosemu2 packages from
+[ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa)
+of build it from sources.
 
 ## configuration
 fdpp uses fdppconf.sys file at boot. This file has
@@ -35,17 +33,23 @@ DOSish config.sys, and if fdppconf.sys is missing,
 config.sys is attempted instead.
 
 ## but what it *actually* is? why dosemu2?
-fdpp is a user-space library that needs a couple of
-call-backs to be provided to it by the host program.
-This means it can't be booted from the bare-metal PC,
-as the original freedos could. But all it needs is a
-few call-backs for running real-mode code. So if you
-want to run it on something other than dosemu2, please
-use
+fdpp is a user-space library that, as any DOS, can
+run DOS programs. Being a library, it can't act on
+its own and needs a host program to operate. This
+also means it can't be booted from the bare-metal
+PC, as the original freedos could.<br/>
+The host program needs to provide a couple of
+call-backs for running real-mode code in v86 or
+similar environment. See
 [this code](https://github.com/stsp/dosemu2/blob/devel/src/plugin/fdpp/fdpp.c)
-as a reference implementation. Sufficiently DOS-oriented
-kernels like [freedos-32](http://freedos-32.sourceforge.net/)
-are good candidates for running fdpp.
+as an example of providing call-backs to fdpp, and
+[this code](https://github.com/stsp/dosemu2/blob/devel/src/plugin/fdpp/boot.c)
+as an example of the boot loader.
+Sufficiently DOS-oriented kernels like
+[freedos-32](http://freedos-32.sourceforge.net/)
+or
+[pdos/386](http://pdos.sourceforge.net/)
+are the good candidates for running fdpp in the future.
 
 ## what fdpp technically is?
 A meta-compiler that was initially able to compile the
@@ -54,20 +58,23 @@ As the project evolves, the ability to compile freedos
 from the unmodified sources have lost its value and was
 dropped, as our copy of freedos is now heavily modified.
 As the result, the compiler is very small and is targeted
-only to our coding patterns.
+only to our coding patterns.<br/>
 The main tasks of it are to parse FAR pointers and generate
 thunks to real-mode asm code of freedos. As with any other
 compiler, fdpp is supplied with a small runtime support
 library and a dynamic linker.
 
 ## compatibility
-fdpp removes some compatibility hacks that FreeDOS had.
+Simply put, fdpp runs every DOS program we tried, so the
+compatibility level is supposed to be very high. Better
+than that of most other known DOS clones, including FreeDOS.<br/>
+OTOH fdpp removes some compatibility hacks that FreeDOS had.
 For example it doesn't play tricks with disabling A20 when
 returning to user code, so you may see "Packed file is corrupt"
 message on some old exe files. Using "loadfix" command avoids
-that problem.
-On the other hand fdpp supports much more games than does freedos.
-If you find some compatibility problem, please report a bug.
+that problem.<br/>
+If you find some compatibility problems, please
+[report a bug](https://github.com/dosemu2/fdpp/issues).
 
 ## portability
 fdpp can work in any environment with STL/C++ runtime support.
@@ -131,3 +138,16 @@ they call themselves. In fact, it is an assembly-written
 ring-0 kernel, currently w/o any DOS compatibility at all.
 Can't be used to run fdpp because it doesn't support user-space
 add-ons.
+
+### PDOS/386
+[pdos/386](http://pdos.sourceforge.net/)
+is a Public Domain Operating System with a user interface as simple
+as MSDOS.
+It supports a "theoretical 32-bit MSDOS API" (probably similar to
+that of 32-bit DOS extenders) and some of the Win32 API, allowing
+a subset of Windows executables to be run. PDOS/386 is good enough to
+run gcc, as, and ld to rebuild itself.<br/>
+As for running fdpp - pdos/386 is a very promising project, but
+its author seems to be reluctant at adding v86 support, preferring
+to switch to real mode for bios calls. The lack of v86 leaves very
+small room for fdpp and for DOS programs in general unfortunately.
