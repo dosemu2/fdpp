@@ -34,7 +34,7 @@ static BYTE *sft_hRcsId =
 #endif
 #endif
 
-#define SFTMAX  128
+#define SFTMAX  256
 
 /* Handle Definition entry                                              */
 typedef struct _sft {
