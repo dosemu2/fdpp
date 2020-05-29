@@ -243,7 +243,7 @@ STATIC const char _DirChars[] = "\"[]:|<>+=;,";
 
 #define addChar(c) \
 { \
-  if (p >= dest + SFTMAX) PATH_ERROR; /* path too long */	\
+  if (p >= dest + REMOTE_PATH_MAX) PATH_ERROR; /* path too long */	\
   *p++ = c; \
 }
 
@@ -332,7 +332,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   {
     tn_printf(("QRemoteFn() returned: \"%s\"\n", GET_PTR(dest)));
 #ifdef DEBUG_TRUENAME
-    if (fstrlen(dest) >= SFTMAX)
+    if (fstrlen(dest) >= REMOTE_PATH_MAX)
       panic("Truename: QRemote_Fn() overflowed output buffer");
 #endif
     if (dest[2] == '/' && (result & IS_DEVICE))
@@ -524,7 +524,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
         /** Alternative implementation:
             if (i)
             {
-              if (dest + SFTMAX - *p < i)
+              if (dest + REMOTE_PATH_MAX - *p < i)
                 PATH_ERROR;
               fmemset(p, '?', i);
               p += i;

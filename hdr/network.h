@@ -59,6 +59,8 @@
 #define REM_PRINTREDIR  0x1125
 #define REM_EXTOC       0x112e
 
+#define REMOTE_PATH_MAX 128
+
 #if 0
 struct rgds {
   UWORD r_spc;
