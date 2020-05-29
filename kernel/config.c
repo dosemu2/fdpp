@@ -1468,6 +1468,12 @@ STATIC VOID Files(char * pLine)
   if (GetNumArg(pLine, &nFiles) == (char *) 0)
     return;
 
+  if (nFiles > SFTMAX)
+  {
+    CfgFailure(pLine);
+    return;
+  }
+
   /* Got the value, assign either default or new value            */
   Config.cfgFiles = max(Config.cfgFiles, nFiles);
   Config.cfgFilesHigh = 0;
