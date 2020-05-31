@@ -17,12 +17,16 @@ After compiling, run `sudo make install` to install.
 ## installing from pre-built package
 For the ubuntu package please visit
 [this PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
+Fedora packages are
+[here](https://copr.fedorainfracloud.org/coprs/stsp/dosemu2/).
 
 ## running
 The simplest way to get it running is to use
 [dosemu2](https://github.com/stsp/dosemu2).<br/>
 Get the pre-built dosemu2 packages from
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa)
+or from
+[COPR repo](https://copr.fedorainfracloud.org/coprs/stsp/dosemu2/)
 of build it from sources.
 
 ## configuration
