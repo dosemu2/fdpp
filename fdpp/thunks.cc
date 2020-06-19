@@ -165,7 +165,7 @@ void *resolve_segoff_fd(struct far_s fa)
         fdlogprintf("access to %x:%x aborted\n", fa.seg, fa.off);
         fdpp_noret(PING_ABORT);
     }
-    return so2lin(fa.seg, fa.off);
+    return resolve_segoff(fa);
 }
 
 int is_dos_space(const void *ptr)
@@ -772,19 +772,34 @@ void PurgeHook(void *ptr, UDWORD len)
 void _fd_mark_mem(far_t ptr, UWORD size, int type)
 {
     if (fdpp->mark_mem)
-        fdpp->mark_mem(ptr.seg, ptr.off, size, type);
+        fdpp->mark_mem(ptr, size, type);
 }
 
 void _fd_prot_mem(far_t ptr, UWORD size, int type)
 {
     if (fdpp->prot_mem)
-        fdpp->prot_mem(ptr.seg, ptr.off, size, type);
+        fdpp->prot_mem(ptr, size, type);
 }
 
 void _fd_mark_mem_np(far_t ptr, UWORD size, int type)
 {
     _fd_mark_mem(ptr, size, type);
     _fd_prot_mem(ptr, size, FD_MEM_NORMAL);
+}
+
+void thunk_fmemcpy(far_t d, far_t s, size_t n)
+{
+    fdpp->fmemcpy(d, s, n);
+}
+
+void thunk_n_fmemcpy(far_t d, const void *s, size_t n)
+{
+    fdpp->n_fmemcpy(d, s, n);
+}
+
+void thunk_fmemset(far_t d, int ch, size_t n)
+{
+    fdpp->fmemset(d, ch, n);
 }
 
 #define __S(x) #x

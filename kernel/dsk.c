@@ -410,12 +410,12 @@ STATIC WORD getbpb(ddt FAR * pddt)
     }
     if (extended_BPB_signature == 0x29)
     {
-      fmemcpy(pddt->ddt_volume, fs->volume, sizeof fs->volume);
-      fmemcpy(pddt->ddt_fstype, fs->fstype, sizeof fs->fstype);
+      n_fmemcpy(pddt->ddt_volume, fs->volume, sizeof fs->volume);
+      memcpy(pddt->ddt_fstype, fs->fstype, sizeof fs->fstype);
     } else {
       /* earlier extended BPB or short BPB, fields not available */
-      fmemcpy(pddt->ddt_volume, "NO NAME    ", 11);
-      fmemcpy(pddt->ddt_fstype, "FAT??   ", 8);
+      memcpy(pddt->ddt_volume, "NO NAME    ", 11);
+      memcpy(pddt->ddt_fstype, "FAT??   ", 8);
     }
   }
 
@@ -689,7 +689,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
 
         /* return error if media lacks extended BPB with serial # */
         {
-          REG BYTE extended_BPB_signature =
+          BYTE extended_BPB_signature =
             DiskTransferBuffer[(pddt->ddt_bpb.bpb_nfsect != 0 ? 0x26 : 0x42)];
           /* 0x29 is usual signature value for serial#,vol label,& fstype;
              0x28 older EBPB signature indicating only serial# is valid   */
@@ -758,7 +758,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
         /* Note: getbpb() will initialize extended BPB fields with default values */
         gioc->ioc_serialno = pddt->ddt_serialno;
         fmemcpy(gioc->ioc_volume, pddt->ddt_volume, 11);
-        fmemcpy(gioc->ioc_fstype, pddt->ddt_fstype, 8);
+        n_fmemcpy(gioc->ioc_fstype, pddt->ddt_fstype, 8);
       }
       break;
     case 0x67:                 /* get access flag */

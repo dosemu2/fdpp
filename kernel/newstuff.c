@@ -420,7 +420,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
    SUBST drives. For local drives it should not harm.
    This is actually the reverse mechanism of JOINED drives. */
 
-      fstrcpy(dest, cp);
+      n_fstrcpy(dest, cp);
       if (TempCDS.cdsFlags & CDSSUBST)
       {
         /* The drive had been changed --> update the CDS pointer */

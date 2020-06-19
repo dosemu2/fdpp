@@ -676,6 +676,10 @@ public:
     SymMemb(const SymMemb&) = delete;
     T& operator =(const T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
+    T& use() {
+        store_far(SYM_STORE, this->lookup_sym().get_far());
+        return *this;
+    }
 };
 
 template<typename T, typename P, int (*M)(void), int O = 0>
@@ -738,6 +742,7 @@ public:
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()
 #define ADJUST_FAR(f) (f).adjust_far()
+#define _DOS_FP(p) p.use()
 
 #undef NULL
 #define NULL           nullptr

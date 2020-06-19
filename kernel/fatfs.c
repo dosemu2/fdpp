@@ -1750,7 +1750,7 @@ STATIC f_node_ptr sft_to_fnode(int fd)
   fnp->f_flags = sftp->sft_flags;
 
   fnp->f_dir.dir_attrib = sftp->sft_attrib;
-  fmemcpy(fnp->f_dir.dir_name, sftp->sft_name, FNAME_SIZE + FEXT_SIZE);
+  memcpy(fnp->f_dir.dir_name, sftp->sft_name, FNAME_SIZE + FEXT_SIZE);
   fnp->f_dir.dir_time = sftp->sft_time;
   fnp->f_dir.dir_date = sftp->sft_date;
   fnp->f_dir.dir_size = sftp->sft_size;
@@ -1777,7 +1777,7 @@ STATIC void fnode_to_sft(f_node_ptr fnp)
   sftp->sft_flags = fnp->f_flags;
 
   sftp->sft_attrib = fnp->f_dir.dir_attrib;
-  fmemcpy(sftp->sft_name, fnp->f_dir.dir_name, FNAME_SIZE + FEXT_SIZE);
+  n_fmemcpy(sftp->sft_name, fnp->f_dir.dir_name, FNAME_SIZE + FEXT_SIZE);
   sftp->sft_time = fnp->f_dir.dir_time;
   sftp->sft_date = fnp->f_dir.dir_date;
   sftp->sft_size = fnp->f_dir.dir_size;

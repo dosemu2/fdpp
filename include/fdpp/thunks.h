@@ -22,7 +22,17 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#define FDPP_API_VER 26
+#define FDPP_API_VER 27
+
+#ifndef FDPP
+struct fdpp_far_s {
+    uint16_t off;
+    uint16_t seg;
+};
+typedef struct fdpp_far_s fdpp_far_t;
+#else
+#define fdpp_far_t far_t
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,10 +58,13 @@ struct fdpp_api {
         uint16_t off, uint8_t *sp, uint8_t len);
     void (*asm_call_noret)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
+    void (*fmemcpy)(fdpp_far_t d, fdpp_far_t s, size_t n);
+    void (*n_fmemcpy)(fdpp_far_t d, const void *s, size_t n);
+    void (*fmemset)(fdpp_far_t d, int ch, size_t n);
     void (*relocate_notify)(uint16_t oldseg, uint16_t newseg,
         uint16_t startoff, uint32_t blklen);
-    void (*mark_mem)(uint16_t seg, uint16_t off, uint16_t size, int type);
-    void (*prot_mem)(uint16_t seg, uint16_t off, uint16_t size, int type);
+    void (*mark_mem)(fdpp_far_t p, uint16_t size, int type);
+    void (*prot_mem)(fdpp_far_t p, uint16_t size, int type);
     int (*is_dos_space)(const void *ptr);
 };
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);

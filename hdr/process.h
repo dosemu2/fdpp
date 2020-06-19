@@ -93,13 +93,13 @@ typedef struct _psp {
   DUMMY_MARK(_psp, _u);
   union {
     struct {
-//      SYM_MEMB2(_psp, _u, 0, fcb, _ps_fcb1);             /* 5c first command line argument */
-      fcb _ps_fcb1;             /* 5c first command line argument */
+      SYM_MEMB2(_psp, _u, 0, fcb, _ps_fcb1);             /* 5c first command line argument */
+//      fcb _ps_fcb1;             /* 5c first command line argument */
     } _u1;
     struct {
       BYTE fill4[16];
-//      SYM_MEMB2(_psp, _u, sizeof(fill4), fcb, _ps_fcb2);             /* second command line argument */
-      fcb _ps_fcb2;             /* second command line argument */
+      SYM_MEMB2(_psp, _u, sizeof(fill4), fcb, _ps_fcb2);             /* second command line argument */
+//      fcb _ps_fcb2;             /* second command line argument */
     } _u2;
     struct {
       BYTE fill5[36];

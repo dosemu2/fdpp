@@ -46,8 +46,11 @@ STATIC fcb FAR *CommonFcbInit(xfcb FAR * lpExtFcb, BYTE * pszBuffer,
 STATIC void FcbNameInit(fcb FAR * lpFcb, BYTE * pszBuffer, COUNT * pCurDrive);
 STATIC void FcbNextRecord(fcb FAR * lpFcb);
 STATIC void FcbCalcRec(xfcb FAR * lpXfcb);
-STATIC const char FAR *GetNameField(__FAR(const char) lpFileName,
+STATIC const char FAR *_GetNameField(const char FAR * lpFileName,
                        char *lpDestField,
+                       COUNT nFieldSize, BOOL * pbWildCard);
+STATIC const char FAR *GetNameField(const char FAR * lpFileName,
+                       char FAR * lpDestField,
                        COUNT nFieldSize, BOOL * pbWildCard);
 
 #define TestCmnSeps(lpFileName) (*lpFileName && strchr(":;,=+ \t", *lpFileName) != NULL)
@@ -156,7 +159,7 @@ UWORD FcbParseFname(UBYTE *wTestMode, const char FAR * lpFileName, fcb FAR * lpF
   /* Do we have an extension? If do, format it else return        */
   if (*lpFileName == '.')
     lpFileName =
-        GetNameField(++lpFileName, (BYTE FAR *) lpFcb->fcb_fext,
+        GetNameField(++lpFileName, lpFcb->fcb_fext,
                      FEXT_SIZE, (BOOL *) & wRetCodeExt);
 
   *wTestMode = (wRetCodeName | wRetCodeExt) ? PARSE_RET_WILD : PARSE_RET_NOWILD;
@@ -171,7 +174,7 @@ const char FAR * ParseSkipWh(const char FAR * lpFileName)
 }
 
 
-const char FAR * GetNameField(const char FAR * lpFileName, char * lpDestField,
+const char FAR * _GetNameField(const char FAR * lpFileName, char * lpDestField,
                        COUNT nFieldSize, BOOL * pbWildCard)
 {
   COUNT nIndex = 0;
@@ -198,8 +201,20 @@ const char FAR * GetNameField(const char FAR * lpFileName, char * lpDestField,
   }
 
   /* Blank out remainder of field on exit                         */
-  fmemset(lpDestField, cFill, nFieldSize - nIndex);
+  memset(lpDestField, cFill, nFieldSize - nIndex);
   return lpFileName;
+}
+
+const char FAR * GetNameField(const char FAR * lpFileName,
+                       char FAR * lpDestField,
+                       COUNT nFieldSize, BOOL * pbWildCard)
+{
+  BYTE buf[FNAME_SIZE + FEXT_SIZE];
+  const char FAR *ret;
+  ___assert(nFieldSize <= sizeof(buf));
+  ret = _GetNameField(lpFileName, buf, nFieldSize, pbWildCard);
+  n_fmemcpy(lpDestField, buf, nFieldSize);
+  return ret;
 }
 
 STATIC VOID FcbNextRecord(fcb FAR * lpFcb)
@@ -520,8 +535,8 @@ UBYTE FcbRename(xfcb FAR * lpXfcb)
   /* Build a traditional DOS file name                            */
   lpRenameFcb = (rfcb FAR *) CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
   /* expand wildcards in dest                                     */
-  GetNameField(lpRenameFcb->renNewName, buf, FNAME_SIZE, &wc);
-  GetNameField(lpRenameFcb->renNewExtent, buf + FNAME_SIZE, FEXT_SIZE, &wc);
+  _GetNameField(lpRenameFcb->renNewName, buf, FNAME_SIZE, &wc);
+  _GetNameField(lpRenameFcb->renNewExtent, buf + FNAME_SIZE, FEXT_SIZE, &wc);
 
   /* check for a device                                           */
   if (IsDevice(SecPathName))

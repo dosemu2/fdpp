@@ -53,15 +53,6 @@ size_t fstrlen(REG CONST BYTE FAR * s)
   return cnt;
 }
 
-#if 0
-VOID _fstrcpy(REG BYTE FAR * d, REG BYTE FAR * s)
-{
-  while (*s != 0)
-    *d++ = *s++;
-  *d = 0;
-}
-#endif
-
 int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
 {
   while (*s != '\0' && *d != '\0')
@@ -125,6 +116,16 @@ char *strchr(const char * s, int c)
   return 0;
 }
 #endif
+
+VOID fstrcpy(char FAR * d, const char FAR * s)
+{
+  fmemcpy(d, s, fstrlen(s) + 1);
+}
+
+VOID n_fstrcpy(char FAR * d, const char * s)
+{
+  n_fmemcpy(d, s, strlen(s) + 1);
+}
 
 char FAR * fstrchr(const char FAR * s, int c)
 {

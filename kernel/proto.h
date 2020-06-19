@@ -288,6 +288,12 @@ void put_unsigned(unsigned n, int base, int width);
 void put_string(const char *s);
 void put_console(int);
 
+void fmemcpy(__FAR(void) d, __FAR(const void) s, size_t n);
+void n_fmemcpy(__FAR(void) d, const void *s, size_t n);
+void fstrcpy(__FAR(char) d, __FAR(const char) s);
+void n_fstrcpy(__FAR(char) d, const char *s);
+void fmemset(__FAR(void) d, int ch, size_t n);
+
 #ifndef USE_STDLIB
 /* strings.c */
 //size_t strlen(const char * s);
@@ -302,12 +308,8 @@ int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
 /* misc.c */
 //char * strcpy(char * d, const char * s);
 //void ASMPASCAL fmemcpyBack(__FAR(void) d,__FAR(const void) s, size_t n);
-void fmemcpy(__FAR(void) d,__FAR(const void) s, size_t n);
 void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
-void fmemmove(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n);
-void fstrcpy(__FAR(char) d,__FAR(const char) s);
 //void * memcpy(void *d, const void * s, size_t n);
-void fmemset(__FAR(void) s, int ch, size_t n);
 //void * memset(void * s, int ch, size_t n);
 
 //int memcmp(const void *m1, const void *m2, size_t n);
@@ -334,15 +336,11 @@ int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 #endif
 #else    // USE_STDLIB
 #define fstrlen strlen
-#define fstrcpy strcpy
 #define fstrcpy_n strcpy
 #define fstrcmp strcmp
 #define fstrncmp strncmp
 
-#define fmemcpy memcpy
 #define fmemcpy_n memcpy
-#define fmemmove memmove
-#define fmemset memset
 #define fmemcmp memcmp
 #endif
 __FAR(char) fstrchr(__FAR(const char) s, int c);
@@ -358,8 +356,8 @@ COUNT BcdToByte(COUNT x);
 VOID getdirent(__FAR(UBYTE) vp,__FAR(struct dirent) dp);
 VOID putdirent(__FAR(struct dirent) dp,__FAR(UBYTE) vp);
 #else
-#define getdirent(vp, dp) fmemcpy(dp, vp, sizeof(struct dirent))
-#define putdirent(dp, vp) fmemcpy(vp, dp, sizeof(struct dirent))
+#define getdirent(vp, dp) memcpy(dp, vp, sizeof(struct dirent))
+#define putdirent(dp, vp) n_fmemcpy(vp, dp, sizeof(struct dirent))
 #endif
 
 /* systime.c */

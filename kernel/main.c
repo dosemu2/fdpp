@@ -147,7 +147,7 @@ VOID ASMCFUNC FreeDOSmain(void)
 #endif
 
   /* purge INIT_TEXT to make sure its not used by mistake */
-  fmemset(_InitTextStart, 0xcc, _InitTextEnd - _InitTextStart);
+  memset(_InitTextStart, 0xcc, _InitTextEnd - _InitTextStart);
   PurgeHook(_InitTextStart, _InitTextEnd - _InitTextStart);
 
   DoInstall();
@@ -230,10 +230,10 @@ STATIC void PSPInit(void)
 
   /* first command line argument                          */
   /* p->ps_fcb1.fcb_drive = 0; already set                */
-  fmemset(p->ps_fcb1.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(_DOS_FP(p->ps_fcb1).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
   /* second command line argument                         */
   /* p->ps_fcb2.fcb_drive = 0; already set                */
-  fmemset(p->ps_fcb2.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(_DOS_FP(p->ps_fcb2).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
 
   /* local command line                                   */
   /* p->ps_cmd.ctCount = 0;     command tail, already set */

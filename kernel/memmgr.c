@@ -341,7 +341,7 @@ COUNT DosMemFree(UWORD para)
   /* Mark the mcb as free so that we can later    */
   /* merge with other surrounding free MCBs       */
   p->m_psp = FREE_PSP;
-  fmemset(p->m_name, '\0', 8);
+  memset(p->m_name, '\0', 8);
   fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
   return SUCCESS;

@@ -252,10 +252,10 @@ void child_psp(seg para, seg cur_psp, int psize)
 
   /* first command line argument                          */
   p->ps_fcb1.fcb_drive = 0;
-  fmemset(p->ps_fcb1.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(_DOS_FP(p->ps_fcb1).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
   /* second command line argument                         */
   p->ps_fcb2.fcb_drive = 0;
-  fmemset(p->ps_fcb2.fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
+  fmemset(_DOS_FP(p->ps_fcb2).fcb_fname, ' ', FNAME_SIZE + FEXT_SIZE);
 
   /* local command line                                   */
   p->ps_cmd.ctCount = 0;

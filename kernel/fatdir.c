@@ -256,7 +256,7 @@ BOOL dir_write_update(REG f_node_ptr fnp, BOOL update)
     if (update)
     {
       /* only update fields that are also in the SFT, for dos_close/commit */
-      fmemcpy(&vp[DIR_NAME], fnp->f_dir.dir_name, FNAME_SIZE + FEXT_SIZE);
+      n_fmemcpy(&vp[DIR_NAME], fnp->f_dir.dir_name, FNAME_SIZE + FEXT_SIZE);
       fputbyte(&vp[DIR_ATTRIB], fnp->f_dir.dir_attrib);
       fputword(&vp[DIR_TIME], fnp->f_dir.dir_time);
       fputword(&vp[DIR_DATE], fnp->f_dir.dir_date);

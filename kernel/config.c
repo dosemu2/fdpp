@@ -1821,19 +1821,19 @@ err:printf("%s has invalid format\n", filename);
         {
           /* if DBCS table (in country.sys) is empty, clear internal table */
           *(DWORD *)(subf_data.buffer) = 0L;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 4);
+          n_fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 4);
         }
         else
         {
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer, subf_data.length);
+          n_fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer, subf_data.length);
           /* write length */
           *(UWORD *)(subf_data.buffer) = subf_data.length;
-          fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 2);
+          n_fmemcpy((BYTE FAR *)(table[hdr[i].id].p), subf_data.buffer, 2);
         }
         continue;
       }
 
-      fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer,
+      n_fmemcpy((BYTE FAR *)(table[hdr[i].id].p) + 2, subf_data.buffer,
                                 /* skip length ^*/  subf_data.length);
     }
     rc = TRUE;
@@ -2310,7 +2310,7 @@ STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
   fd_prot_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_NORMAL);
-  fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
+  n_fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
   fd_mark_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_READONLY);
   fd_prot_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_READONLY);
 }

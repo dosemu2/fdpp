@@ -433,7 +433,7 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
         break;
 
       case F5:
-        fmemcpy(kp->_kb_buf, local_buffer, count);
+        memcpy(kp->_kb_buf, local_buffer, count);
         stored_size = count;
         write_char('@', sft_out);
         goto start_new_line;
@@ -508,7 +508,7 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
     }
     first = FALSE;
   } while (c != CR);
-  fmemcpy(kp->_kb_buf, local_buffer, count);
+  memcpy(kp->_kb_buf, local_buffer, count);
   /* if local_buffer overflows into the CON default buffer we
      must invalidate it */
   if (count > LINEBUFSIZECON)
@@ -544,7 +544,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp)
   if (n > chars_left)
     n = chars_left;
 
-  fmemcpy(bp, inputptr, n);
+  n_fmemcpy(bp, inputptr, n);
   inputptr += n;
   if (n == chars_left)
     inputptr = NULL;
