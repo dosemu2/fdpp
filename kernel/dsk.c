@@ -358,7 +358,7 @@ STATIC WORD getbpb(ddt FAR * pddt)
   if (ret != 0)
     return (dskerr(ret));
 
-  pbpbarray->bpb_nbyte = getword(&DiskTransferBuffer[BT_BPB]);
+  pbpbarray->bpb_nbyte = fgetword(&DiskTransferBuffer[BT_BPB]);
 
   if (DiskTransferBuffer[0x1fe] != 0x55
       || DiskTransferBuffer[0x1ff] != 0xaa || pbpbarray->bpb_nbyte % 512)
@@ -385,13 +385,13 @@ STATIC WORD getbpb(ddt FAR * pddt)
      Use the values from A_BF_BPB_BigSectorsPerFat...
   */
   {
-    struct FS_info *fs = (struct FS_info *)&DiskTransferBuffer[0x27];
+    struct FS_info FAR *fs = (struct FS_info FAR *)&DiskTransferBuffer[0x27];
     REG BYTE extended_BPB_signature;
 #ifdef WITHFAT32
     if (pbpbarray->bpb_nfsect == 0)
     {
       /* FAT32 boot sector */
-      fs = (struct FS_info *)&DiskTransferBuffer[0x43];
+      fs = (struct FS_info FAR *)&DiskTransferBuffer[0x43];
       /* Extended BPB signature, offset differs for FAT32 vs FAT12/16 */
       extended_BPB_signature = DiskTransferBuffer[0x42];
     }
@@ -569,7 +569,8 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
         COUNT tracks;
         struct thst {
           UBYTE track, head, sector, type;
-        } *addrfield, afentry;
+        } afentry;
+        struct thst FAR *addrfield;
 
         pddt->ddt_descflags &= ~DF_DPCHANGED;
         if (hd(descflags))
@@ -640,7 +641,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
         for (tracks = fv->gbfv_spcfunbit & 2 ? fv->gbfv_ntracks : 1;
              tracks > 0; tracks--)
         {
-          addrfield = (struct thst *)DiskTransferBuffer;
+          addrfield = (struct thst FAR *)DiskTransferBuffer;
 
           if (afentry.track > pddt->ddt_ncyl)
             return failure(E_FAILURE);
@@ -681,7 +682,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
     case 0x46:                 /* set volume serial number */
       {
         struct Gioc_media FAR *gioc = rp->r_gioc;
-        struct FS_info *fs;
+        struct FS_info FAR *fs;
 
         ret = getbpb(pddt);
         if (ret != 0)
@@ -698,7 +699,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
         }
 
         /* otherwise, store serial # in extended BPB */
-        fs = (struct FS_info *)&DiskTransferBuffer
+        fs = (struct FS_info FAR *)&DiskTransferBuffer
             [(pddt->ddt_bpb.bpb_nfsect != 0 ? 0x27 : 0x43)];
         fs->serialno = gioc->ioc_serialno;
         pddt->ddt_serialno = fs->serialno;

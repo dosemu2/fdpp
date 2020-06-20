@@ -229,7 +229,7 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
         rc = read_line_handle(sft_idx, n, bp);
       else
         rc = cooked_read(&dev, n, bp);
-      if (*(char *)bp == CTL_Z)
+      if (*(char FAR *)bp == CTL_Z)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
     }

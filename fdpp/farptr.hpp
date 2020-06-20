@@ -260,21 +260,11 @@ public:
     }
 
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) &&
-        /* adding constness is not allowed here for the quite tricky
-         * reason that bothers only clang but not gcc:
-         * https://bugs.llvm.org/show_bug.cgi?id=36131
-         * The implicit cast to an arbitrary ptr can be triggered by
-         * the dereference operator*. But in clang there are 2 of them:
-         * - built-in candidate operator*(T *)
-         * - built-in candidate operator*(const T *)
-         * ... or even more.
-         * We need to select the one that matches constness.
-         * Hope this does not bring any limitations because the
-         * missing constness will be implicitly added later as needed
-         * (by operator= for example). */
-        _C(T0) == _C(T1)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
     operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }
+    template<typename T0, typename T1 = T,
+        typename std::enable_if<ALLOW_CNV(T1, T0) && _C(T0)>::type* = nullptr>
+    operator T0*() const { return (T0*)resolve_segoff_fd(this->ptr); }
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T1, T0)>::type* = nullptr>
     explicit operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }

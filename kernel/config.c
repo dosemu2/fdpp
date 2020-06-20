@@ -129,7 +129,7 @@ static void FAR *dosobj;
 
 BSSA(char, master_env, 128);
 static DATA(char *, envp, master_env);
-STATIC char *AddEnv(char *env);
+STATIC const char *AddEnv(const char *env);
 
 static const char *_cfgInit = "command.com";
 static const char *_cfgInitTail = " /P /E:256\r\n";
@@ -938,7 +938,7 @@ VOID DoConfig(int nPass)
 
     if (bprm->InitEnvSeg)
     {
-      char *p = MK_FP(bprm->InitEnvSeg, 0);
+      const char *p = MK_FP(bprm->InitEnvSeg, 0);
       while (p && *p) {
         if (p[0] == '#' && isnum(p[1]) && p[2] == ' ')
         {
@@ -2963,7 +2963,7 @@ VOID DoInstall(void)
   InstallPrintf(("Done with installing commands\n"));
 }
 
-STATIC char *AddEnv(char *env)
+STATIC const char *AddEnv(const char *env)
 {
   int size = strlen(env);
   if (size < master_env + sizeof(master_env) - envp - 1)
