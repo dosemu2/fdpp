@@ -1,3 +1,17 @@
+## rc-3
+
+This is hopefully the last RC before 1.0 release.
+Added COPR build support, the packages are here:<br/>
+https://copr.fedorainfracloud.org/coprs/stsp/dosemu2/package/fdpp/<br/>
+Below is the summary of few new additions:
+
+- Confined (most of) freedos DOS memory writes.<br/> This is needed
+  for the integration with some JIT engines, like the one in dosemu2.
+  That JIT engine needs to be notified about the DOS memory writes.
+- Support FILES= up to 256 (freedos only supports 128, then crashes)
+- Fix "set volume serial number" fn for drive images/local drives
+- Add support for COPR build system
+
 ## rc-2
 
 Development is calming down.
