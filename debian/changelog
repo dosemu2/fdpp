@@ -1,3 +1,9 @@
+fdpp (1.0~rc3-1) focal; urgency=low
+
+  * rc-3
+
+ -- Stas Sergeev <stsp@users.sourceforge.net>  Sat, 4 Jul 2020 13:00:00 +0300
+
 fdpp (1.0~rc2-1) focal; urgency=low
 
   * rc-2
