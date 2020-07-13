@@ -171,7 +171,7 @@ struct CfgFile {
 };
 BSSA(struct CfgFile, cfgFile, MAX_CHAINS);
 BSS(COUNT, nCurChain, 0);
-BSS(COUNT, nFileDesc, 0);
+BSS(COUNT, nFileDesc, -1);
 
 BSS(BYTE, singleStep, FALSE);        /* F8 processing */
 BSS(BYTE, SkipAllConfig, FALSE);     /* F5 processing */
@@ -1194,6 +1194,7 @@ VOID DoConfig(int nPass)
     pEntry->func(pLine);
   }
   close(nFileDesc);
+  nFileDesc = -1;
 
   if (nPass == 0)
   {
