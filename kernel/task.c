@@ -905,6 +905,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     if (!err)
     {
       _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
+      con_flush_stdin();
       read_char_stdin(1);
       fdexit(0);
     }

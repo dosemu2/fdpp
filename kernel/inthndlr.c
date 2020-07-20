@@ -540,10 +540,7 @@ dispatch:
 
       /* Flush Buffer, Read Keyboard                                 */
     case 0x0c:
-    {
-      struct dhdr FAR *dev = sft_to_dev(get_sft(STDIN));
-      if (dev)
-        con_flush(&dev);
+      con_flush_stdin();
       switch (lr.AL)
       {
       case 0x01: goto DOS_01;
@@ -554,7 +551,6 @@ dispatch:
       }
       lr.AL = 0x00;
       break;
-    }
 
       /* Reset Drive                                                  */
     case 0x0d:

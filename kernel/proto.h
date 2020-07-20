@@ -64,6 +64,7 @@ long BinaryCharIO(__DOSFAR(struct dhdr)*pdev, size_t n,__FAR(void) bp,
 int ndread(__DOSFAR(struct dhdr)*pdev);
 int StdinBusy(void);
 void con_flush(__DOSFAR(struct dhdr)*pdev);
+void con_flush_stdin(void);
 unsigned char read_char(int sft_in, int sft_out, BOOL check_break);
 unsigned char read_char_stdin(BOOL check_break);
 long cooked_read(__FAR(struct dhdr)*pdev, size_t n,__FAR(char)bp);

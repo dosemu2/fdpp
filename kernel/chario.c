@@ -106,6 +106,13 @@ void con_flush(__DOSFAR(struct dhdr) *pdev)
   CharCmd(pdev, C_IFLUSH);
 }
 
+void con_flush_stdin(void)
+{
+  struct dhdr FAR *dev = sft_to_dev(get_sft(STDIN));
+  if (dev)
+    con_flush(&dev);
+}
+
 /* if the sft is invalid, then we just monitor syscon */
 struct dhdr FAR *sft_to_dev(sft FAR *s)
 {
