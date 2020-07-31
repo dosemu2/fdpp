@@ -1989,9 +1989,11 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
 
     case 0x1f:
       {
+        /* this is similar to ARG1-'A', but case-insensitive.
+         * Note: the letter is passed here, not number! */
         int drv = (r.callerARG1 & 0x1f) - 1;
         struct cds FAR *cdsp;
-        if (drv < 0)
+        if (drv < 0 || r.callerARG1 < 'A' || r.callerARG1 > 'z')
         {
           r.FLAGS |= FLG_CARRY;
           break;
@@ -2018,8 +2020,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
         TempCDS.cdsParam = 0xffff;
         TempCDS.cdsStoreUData = 0xffff;
         r.CX = sizeof(TempCDS);
-        r.DS = FP_SEG(&TempCDS);
-        r.SI = FP_OFF(&TempCDS);
+        r.ES = FP_SEG(&TempCDS);
+        r.DI = FP_OFF(&TempCDS);
         r.FLAGS &= ~FLG_CARRY;
         break;
       }
