@@ -2009,7 +2009,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
         if (cdsp->cdsFlags)
         {
           TempCDS.cdsDpb = cdsp->cdsDpb;
-          TempCDS.cdsFlags = cdsp->cdsFlags;
+          TempCDS.cdsFlags = CDSPHYSDRV;    // don't inherit CDS flags
         }
         else
         {
