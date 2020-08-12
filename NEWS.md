@@ -1,3 +1,16 @@
+## 1.0 release
+
+This is a first stable release of fdpp.<br/>
+Not much to say here, because it "just works" - exactly the way
+the (first) stable release should. The minimal set of features that
+we needed from the first release, is also implemented.<br/>
+Note that the main driving force behind this project, is dosemu2.
+Which means that we only implement the features needed for dosemu2,
+and currently they are all in place. So unless the scope of this
+project is widened (like the use with other host kernels), no new
+developments are planned, and the project will remain in a bugfixing
+mode.
+
 ## rc-3
 
 This is hopefully the last RC before 1.0 release.
