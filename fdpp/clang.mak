@@ -30,7 +30,8 @@ ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
 endif
 ifeq ($(EXTRA_DEBUG),1)
-DBGFLAGS += -fdebug-macro -O0 -DFDPP_DEBUG
+DBGFLAGS += -fdebug-macro -O0 -DFDPP_DEBUG -DEXTRA_DEBUG
+NASMFLAGS += -DEXTRA_DEBUG
 else
 DBGFLAGS += -O2
 endif

@@ -93,7 +93,7 @@ configend:
                 cpu 8086                ; (keep initial entry compatible)
 
 realentry:                              ; execution continues here
-
+%ifdef EXTRA_DEBUG
                 push ax
                 push bx
                 pushf
@@ -103,7 +103,7 @@ realentry:                              ; execution continues here
                 popf
                 pop bx
                 pop ax
-
+%endif
                 jmp     IGROUP:kernel_start
 beyond_entry:   times   256-(beyond_entry-entry) db 0
                                         ; scratch area for data (DOS_PSP)
@@ -118,7 +118,7 @@ segment INIT_TEXT
                 ; kernel start-up
                 ;
 kernel_start:
-
+%ifdef EXTRA_DEBUG
                 push ax
                 push bx
                 pushf
@@ -128,7 +128,7 @@ kernel_start:
                 popf
                 pop bx
                 pop ax
-
+%endif
                 mov     si,ax
                 mov     ax,I_GROUP
                 cli
@@ -190,6 +190,7 @@ cont:           ; Now set up call frame
                 mov     bp,sp           ; and set up stack frame for c
 
                 push si
+%ifdef EXTRA_DEBUG
                 push bx
                 pushf
                 mov ax, 0e33h           ; '3' Tracecode - kernel entered
@@ -197,6 +198,7 @@ cont:           ; Now set up call frame
                 int 010h
                 popf
                 pop bx
+%endif
                 pop ax
 
                 mov     byte [_BootDrive],bl ; tell where we came from

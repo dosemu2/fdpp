@@ -469,7 +469,11 @@ STATIC VOID FsConfig(BOOL reinit)
 
 STATIC VOID signon()
 {
-  _printf("\r%s\n"
+#ifdef EXTRA_DEBUG
+  /* erase debug "123" msg */
+  _printf("\r");
+#endif
+  _printf("%s\n"
          "Kernel compatibility %d.%d - "
 #if defined(__BORLANDC__)
   "BORLANDC"
