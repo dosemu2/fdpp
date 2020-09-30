@@ -1,7 +1,5 @@
 /* linker script for fdpp project. Derived from the one of freedos */
 
-OUTPUT_FORMAT(binary)
-
 DOS_PSP = 0x60;
 MEMOFS = DOS_PSP * 16;
 
