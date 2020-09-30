@@ -48,6 +48,16 @@ VOID dump(void)
 }
 #endif
 
+void logprintf(const BYTE * s, ...)
+{
+    char buf[128];
+    va_list l;
+    va_start(l, s);
+    _vsnprintf(buf, sizeof(buf), s, l);
+    va_end(l);
+    fdlogprintf("%s", buf);
+}
+
 #ifndef FDPP
 /* issue a panic message for corrupted data structures          */
 VOID panic(const char * s)

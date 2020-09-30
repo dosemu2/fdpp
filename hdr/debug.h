@@ -44,12 +44,14 @@
 #endif
 #endif
 
+void logprintf(const char *format, ...) PRINTF(1);
+
 /* use to limit output to debug builds */
 #ifdef DEBUG
 #ifdef DEBUG_PRINT_COMPORT
 #define DebugPrintf(x) dbgc_printf x
 #else
-#define DebugPrintf(x) fdlogprintf x
+#define DebugPrintf(x) logprintf x
 #endif
 #else
 #define DebugPrintf(x)
