@@ -6,7 +6,8 @@ CC = clang++
 CL = clang++
 CLC = clang
 NASM = nasm
-LINK = ld.bfd
+LINK = ld.lld
+OBJCOPY = llvm-objcopy
 
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line

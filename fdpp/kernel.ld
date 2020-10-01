@@ -80,6 +80,12 @@ SECTIONS
     .symtab : {
 		*(.symtab)
 	}
+    .rel.plt : {
+		*(.rel.plt)
+	}
+    .rela.plt : {
+		*(.rela.plt)
+	}
 
     /DISCARD/ : { *(.*) }
   }

@@ -59,7 +59,7 @@ $(TARGET).elf: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	chmod -x $@
 
 $(TARGET).sys: $(TARGET).elf
-	objcopy -O binary $^ $@
+	$(OBJCOPY) -O binary $^ $@
 	chmod -x $@
 
 clean:

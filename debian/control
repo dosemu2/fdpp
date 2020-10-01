@@ -10,7 +10,6 @@ Build-Depends:
     bash,
     clang,
     nasm,
-    binutils,
     libstdc++-dev,
     autoconf,
     git,
