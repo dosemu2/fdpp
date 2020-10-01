@@ -173,13 +173,7 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) -o $@ $^ $(LDFLAGS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-$(INCS): %_seg.inc: %.o
-	objdump -t $< | $(srcdir)/parsers/gen_segs.sh $(SRC)segs.inc >$@
-
-plt_seg.inc: $(INCS)
-	echo -e $(patsubst %.inc,\%include \"%.inc\"\\n,$^) | sed 's/^ //' >$@
-
-plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
+plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@

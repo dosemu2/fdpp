@@ -18,9 +18,8 @@
 
 #include "thunks_priv.h"
 %include "segs.inc"
-%include "plt_seg.inc"
 
-%define _SEG(s) _SEG_%+s
+%define _SEG(s) TGROUP
 
 extern _BootParamSeg
 
