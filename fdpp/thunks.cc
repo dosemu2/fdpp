@@ -40,7 +40,7 @@ struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
 static farhlp sym_tab;
 static struct far_s *near_wrp;
-static int num_wrps;
+#define num_wrps 2
 static int recur_cnt;
 
 enum { ASM_OK, ASM_NORET, ASM_ABORT, PING_ABORT };
@@ -195,16 +195,11 @@ static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 }
 
 struct fdpp_symtab {
-    struct far_s text_start;
-    struct far_s text_end;
-    uint16_t orig_cs;
-    uint16_t cur_cs;
     struct far_s symtab;
     uint16_t symtab_len;
     struct far_s calltab;
     uint16_t calltab_len;
-    uint16_t num_wrps;
-    struct far_s near_wrp[0];
+    struct far_s near_wrp[2];
 };
 
 static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
@@ -252,7 +247,6 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     struct far_s *thtab = (struct far_s *)resolve_segoff(symtab->symtab);
     int stab_len = symtab->symtab_len / sizeof(struct far_s);
 
-    num_wrps = symtab->num_wrps;
     free(near_wrp);
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);

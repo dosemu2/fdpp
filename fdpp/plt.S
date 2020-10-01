@@ -161,19 +161,12 @@ plt_init:
     push word init_near_wrp           ; near_wrp[1]
     push word TGROUP
     push word near_wrp                ; near_wrp[0]
-    push word 2                       ; num_wrps
     push word __asm_callsymtab_end - __asm_callsymtab_start  ; calltab_len
     push word IGROUP
     push word __asm_callsymtab_start  ; calltab
     push word __asm_symtab_end - __asm_symtab_start  ; symtab_len
     push word IGROUP
     push word __asm_symtab_start      ; symtab
-    push cs                           ; cur_cs
-    push word IGROUP                  ; orig_cs
-    push word IGROUP
-    push word __InitTextEnd           ; text_end
-    push word IGROUP
-    push word __InitTextStart         ; text_start
     ; fdpp_symtab filled
     mov si, sp
     call_plt
