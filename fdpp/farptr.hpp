@@ -604,6 +604,7 @@ class AsmArNSym : public ArSymBase<T, max_len> {
 public:
     using sym_type = T*;
     sym_type get_sym() { return this->sym.get_ptr(); }
+    const uint16_t get_addr() { return this->sym.off(); }
 
     AsmArNSym() = default;
     AsmArNSym(const AsmArNSym<T> &) = delete;

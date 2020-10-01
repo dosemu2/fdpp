@@ -205,10 +205,12 @@ void _fd_mark_mem_np(far_t ptr, UWORD size, int type);
 #endif
 
 #define VA_CDECL
-UWORD getCS(void);
 void setDS(UWORD);
 void setES(UWORD);
+#define _SS getSS()
+UWORD getSS(void);
 #define _CS getCS()
+UWORD getCS(void);
 uint16_t data_seg(void);
 typedef int32_t  DWORD;
 typedef uint32_t UDWORD;
@@ -329,6 +331,7 @@ typedef unsigned       size_t;
 #define ASMPASCAL
 #define ASM
 #define ASMFUNC
+#define INITTEXT
 /*                                                              */
 /* Boolean type & definitions of TRUE and FALSE boolean values  */
 /*                                                              */

@@ -1,27 +1,25 @@
 /* linker script for fdpp project. Derived from the one of freedos */
 
 DOS_PSP = 0x60;
-MEMOFS = DOS_PSP * 16;
 
 /* these GROUPs play the same role as GROUPS (segments) in OMF */
-PGROUP = (MEMOFS + LOADADDR(.ptext)) / 16;
-LGROUP = (MEMOFS + LOADADDR(.ltext)) / 16;
-DGROUP = (MEMOFS + LOADADDR(.data)) / 16;
-TGROUP = (MEMOFS + LOADADDR(.text)) / 16;
-IGROUP = (MEMOFS + LOADADDR(.itext)) / 16;
-I_GROUP = (MEMOFS + LOADADDR(.idata)) / 16;
-
-INITSIZE = SIZEOF(.itext) + SIZEOF(.idata) + SIZEOF(.ibss);
+/* TINY model, all segments are equal */
+PGROUP = DOS_PSP;
+LGROUP = DOS_PSP;
+DGROUP = DOS_PSP;
+TGROUP = DOS_PSP;
+IGROUP = DOS_PSP;
+I_GROUP = DOS_PSP;
 
 SECTIONS
   {
     /* Target PSP section.  */
-    .ptext 0 : AT (0) {
+    .ptext : {
 		*(PSP)
     }
 
     /* Target low data+text sections.  */
-    .ltext 0 : AT (ALIGN(LOADADDR(.ptext) + SIZEOF(.ptext), 16)) {
+    .ltext : {
 		*(_IRQTEXT)
 		*(_LOWTEXT)
 		*(_IO_TEXT)
@@ -29,7 +27,7 @@ SECTIONS
     }
 
     /* Target data sections.  */
-    .data 0 : AT (ALIGN(LOADADDR(.ltext) + SIZEOF(.ltext), 16)) {
+    .data : {
 		*(_FIXED_DATA)
 		*(_BSS)
 		*(_DATA)
@@ -42,7 +40,7 @@ SECTIONS
 	}
 
     /* Target text sections.  */
-    .text 0 : AT (ALIGN(LOADADDR(.data) + SIZEOF(.data), 16)) {
+    .text : {
 		*(HMA_TEXT_START)
 		*(HMA_TEXT)
 		*(HMA_TEXT_END)
@@ -51,7 +49,7 @@ SECTIONS
 	}
 
     /* Target init text sections. */
-    .itext 0 : AT (ALIGN(LOADADDR(.text) + SIZEOF(.text), 16)) {
+    .itext : {
 		*(INIT_TEXT_START)
 		*(INIT_TEXT)
 		*(INIT_TEXT_END)
@@ -60,17 +58,13 @@ SECTIONS
 	}
 
     /* Target init data sections.  */
-    .idata 0 : AT (ALIGN(LOADADDR(.itext) + SIZEOF(.itext), 16)) {
+    .idata : {
 		*(ID_B)
 		*(ID_E)
 	}
-    .ibss SIZEOF(.idata) (NOLOAD) : AT (LOADADDR(.idata) + SIZEOF(.idata)) {
+    .ibss (NOLOAD) : {
 		*(IB_B)
 		*(IB_E)
-	}
-    .istack 0 (NOLOAD) : AT (ALIGN(LOADADDR(.ibss) + SIZEOF(.ibss), 16)) {
-		*(_STACK)
-		. = 0x1000;
 	}
 
     /*

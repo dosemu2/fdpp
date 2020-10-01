@@ -38,7 +38,7 @@ NASMFLAGS += -i$(SRC)
 
 ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
     execrh.asm nlssupt.asm procsupt.asm dosidle.asm int2f.asm \
-    nls_hc.asm intr.asm irqstack.asm memdisk.asm \
+    nls_hc.asm intr.asm irqstack.asm \
     cpu.asm
 DASMS = floppy.asm rdpcclk.asm wrpcclk.asm wratclk.asm
 AASMS = $(ASMS) $(DASMS)
@@ -81,7 +81,6 @@ intr.obj:	$(SRC)intr.asm    $(SRC)segs.inc
 io.obj:		$(SRC)io.asm	    $(SRC)segs.inc $(HDR)stacks.inc
 irqstack.obj:   $(SRC)irqstack.asm $(SRC)segs.inc
 kernel.obj:	$(SRC)kernel.asm  $(SRC)segs.inc $(SRC)ludivmul.inc
-memdisk.obj:	$(SRC)memdisk.asm  $(SRC)segs.inc
 nls_hc.obj:	$(SRC)nls_hc.asm  $(SRC)segs.inc
 nlssupt.obj:	$(SRC)nlssupt.asm $(SRC)segs.inc $(HDR)stacks.inc
 printer.obj:	$(SRC)printer.asm $(SRC)io.inc

@@ -30,6 +30,7 @@ static int is_void;
 static int is_rvoid;
 static int is_const;
 static int is_pas;
+static int is_init;
 static int is_noret;
 static int rlen;
 static char abuf[1024];
@@ -57,6 +58,7 @@ static void beg_arg(void)
 
 static void init_line(void)
 {
+    is_init = 0;
     is_pas = 0;
     is_rvoid = 0;
     is_rptr = 0;
@@ -204,6 +206,8 @@ static const char *get_flags(void)
 	add_flg(buf, "_TFLG_FAR", flg++);
     if (is_noret)
 	add_flg(buf, "_TFLG_NORET", flg++);
+    if (is_init)
+	add_flg(buf, "_TFLG_INIT", flg++);
     if (!flg)
 	add_flg(buf, "_TFLG_NONE", flg++);
     return buf;
@@ -211,7 +215,8 @@ static const char *get_flags(void)
 
 %}
 
-%token LB RB SEMIC COMMA ASMCFUNC ASMPASCAL FAR ASTER NEWLINE STRING NUM SEGM
+%token LB RB SEMIC COMMA ASTER NEWLINE STRING NUM
+%token ASMCFUNC ASMPASCAL FAR SEGM INITTEXT
 %token VOID WORD UWORD CHAR BYTE UBYTE DWORD UDWORD STRUCT
 %token LBR RBR
 %token CONST
@@ -309,6 +314,7 @@ arr:		  LBR num RBR	{ is_ptr = 1; cvtype = CVTYPE_ARR; arr_sz = $2; }
 
 fatr:		  ASMCFUNC
 		| ASMPASCAL	{ is_pas = 1; }
+		| INITTEXT	{ is_init = 1; }
 		| NORETURN	{ is_noret = 1; }
 		| FAR		{ is_ffar = 1; }
 		| SEGM LB STRING RB
