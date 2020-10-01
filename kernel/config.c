@@ -365,7 +365,7 @@ void PreConfig(void)
   LoL->_DPBp = (struct dpb FAR *)
       DynAlloc("DPBp", blk_dev.dh_name[0], sizeof(struct dpb));
 
-  LoL->_sfthead = MK_FP(FP_SEG(LoL), 0xcc); /* &(LoL->firstsftt) */
+  LoL->_sfthead = MK_FP(FP_SEG(LoL), FP_OFF(LoL) + 0xcc); /* &(LoL->firstsftt) */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = (sfttbl FAR *)
      KernelAlloc(sizeof(sftheader)
