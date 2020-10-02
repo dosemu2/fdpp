@@ -11,7 +11,7 @@ Build-Depends:
     clang,
     nasm,
     lld,
-    llvm,
+    binutils,
     libstdc++-dev,
     autoconf,
     git,

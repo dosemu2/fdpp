@@ -21,7 +21,7 @@ BuildRequires: bash
 BuildRequires: clang
 BuildRequires: nasm
 BuildRequires: lld
-BuildRequires: llvm
+BuildRequires: binutils
 BuildRequires: libstdc++-devel
 BuildRequires: autoconf
 BuildRequires: git
