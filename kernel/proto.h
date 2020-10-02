@@ -505,31 +505,31 @@ VOID ASMPASCAL WritePCClock(ULONG);
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);
 VOID ASMFUNC FAR CharMapSrvc(VOID);
 
-UWORD ASMPASCAL init_call_intr(WORD nr, iregs * rp);
+UWORD ASMPASCAL INITTEXT init_call_intr(WORD nr, iregs * rp);
 UWORD ASMPASCAL call_intr(WORD nr, __FAR(iregs) rp);
 VOID ASMPASCAL call_intr_func(__FAR(VOID) ptr, __FAR(iregs) rp);
-UWORD ASMPASCAL read(WORD fd, void *buf, UWORD count);
-WORD ASMPASCAL init_DosOpen(const char *pathname, WORD flags);
-WORD ASMPASCAL init_exists(const char *pathname);
-WORD ASMPASCAL close(WORD fd);
-WORD ASMPASCAL dup2(WORD oldfd, WORD newfd);
-ULONG ASMPASCAL lseek(WORD fd, DWORD position);
-seg ASMPASCAL allocmem(UWORD size);
-void ASMPASCAL keycheck(void);
-void ASMPASCAL set_DTA(__FAR(void)_dta);
+UWORD ASMPASCAL INITTEXT read(WORD fd, void *buf, UWORD count);
+WORD ASMPASCAL INITTEXT init_DosOpen(const char *pathname, WORD flags);
+WORD ASMPASCAL INITTEXT init_exists(const char *pathname);
+WORD ASMPASCAL INITTEXT close(WORD fd);
+WORD ASMPASCAL INITTEXT dup2(WORD oldfd, WORD newfd);
+ULONG ASMPASCAL INITTEXT lseek(WORD fd, DWORD position);
+seg ASMPASCAL INITTEXT allocmem(UWORD size);
+void ASMPASCAL INITTEXT keycheck(void);
+void ASMPASCAL INITTEXT set_DTA(__FAR(void)_dta);
 WORD ASMPASCAL execrh(__FAR(request),__FAR(struct dhdr));
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
-__FAR(void) ASMPASCAL DetectXMSDriver(VOID);
-WORD ASMPASCAL init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
+__FAR(void) ASMPASCAL INITTEXT DetectXMSDriver(VOID);
+WORD ASMPASCAL INITTEXT init_call_XMScall(__FAR(void) driverAddress, UWORD ax, UWORD dx);
 
-void ASMPASCAL init_PSPSet(seg psp_seg);
-WORD ASMPASCAL init_DosExec(WORD mode, exec_blk * ep, const char * lp);
-WORD ASMPASCAL init_setdrive(WORD drive);
-WORD ASMPASCAL init_switchar(WORD chr);
+void ASMPASCAL INITTEXT init_PSPSet(seg psp_seg);
+WORD ASMPASCAL INITTEXT init_DosExec(WORD mode, exec_blk * ep, const char * lp);
+WORD ASMPASCAL INITTEXT init_setdrive(WORD drive);
+WORD ASMPASCAL INITTEXT init_switchar(WORD chr);
 //COUNT ASMPASCAL Umb_Test(void);
-COUNT ASMPASCAL UMB_get_largest(__FAR(void) driverAddress, UWORD * __seg, UCOUNT * size);
-VOID ASMFUNC init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
+COUNT ASMPASCAL INITTEXT UMB_get_largest(__FAR(void) driverAddress, UWORD * __seg, UCOUNT * size);
+VOID ASMFUNC INITTEXT init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
 void ASMFUNC NORETURN spawn_int23(void);        /* procsupt.asm */
 /* kernel.asm */
 VOID ASMFUNC FAR NORETURN call_p_0(__FAR(struct config)Config); /* P_0, actually */

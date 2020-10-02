@@ -38,7 +38,7 @@ NASMFLAGS += -i$(SRC)
 
 ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
     execrh.asm nlssupt.asm procsupt.asm dosidle.asm int2f.asm \
-    nls_hc.asm intr.asm irqstack.asm memdisk.asm \
+    nls_hc.asm intr.asm irqstack.asm \
     cpu.asm
 DASMS = floppy.asm rdpcclk.asm wrpcclk.asm wratclk.asm
 AASMS = $(ASMS) $(DASMS)
@@ -59,7 +59,7 @@ $(TARGET).elf: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	chmod -x $@
 
 $(TARGET).sys: $(TARGET).elf
-	objcopy -O binary $^ $@
+	$(OBJCOPY) -O binary $^ $@
 	chmod -x $@
 
 clean:
@@ -81,7 +81,6 @@ intr.obj:	$(SRC)intr.asm    $(SRC)segs.inc
 io.obj:		$(SRC)io.asm	    $(SRC)segs.inc $(HDR)stacks.inc
 irqstack.obj:   $(SRC)irqstack.asm $(SRC)segs.inc
 kernel.obj:	$(SRC)kernel.asm  $(SRC)segs.inc $(SRC)ludivmul.inc
-memdisk.obj:	$(SRC)memdisk.asm  $(SRC)segs.inc
 nls_hc.obj:	$(SRC)nls_hc.asm  $(SRC)segs.inc
 nlssupt.obj:	$(SRC)nlssupt.asm $(SRC)segs.inc $(HDR)stacks.inc
 printer.obj:	$(SRC)printer.asm $(SRC)io.inc
@@ -174,13 +173,7 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) -o $@ $^ $(LDFLAGS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-$(INCS): %_seg.inc: %.o
-	objdump -t $< | $(srcdir)/parsers/gen_segs.sh $(SRC)segs.inc >$@
-
-plt_seg.inc: $(INCS)
-	echo -e $(patsubst %.inc,\%include \"%.inc\"\\n,$^) | sed 's/^ //' >$@
-
-plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc plt_seg.inc $(SRC)segs.inc
+plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h
 	cpp -I $(SRC) -P $< >$@

@@ -40,7 +40,7 @@ struct asm_dsc_s *asm_tab;
 static int asm_tab_len;
 static farhlp sym_tab;
 static struct far_s *near_wrp;
-static int num_wrps;
+#define num_wrps 2
 static int recur_cnt;
 
 enum { ASM_OK, ASM_NORET, ASM_ABORT, PING_ABORT };
@@ -195,16 +195,11 @@ static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 }
 
 struct fdpp_symtab {
-    struct far_s text_start;
-    struct far_s text_end;
-    uint16_t orig_cs;
-    uint16_t cur_cs;
     struct far_s symtab;
     uint16_t symtab_len;
     struct far_s calltab;
     uint16_t calltab_len;
-    uint16_t num_wrps;
-    struct far_s near_wrp[0];
+    struct far_s near_wrp[2];
 };
 
 static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
@@ -252,7 +247,6 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     struct far_s *thtab = (struct far_s *)resolve_segoff(symtab->symtab);
     int stab_len = symtab->symtab_len / sizeof(struct far_s);
 
-    num_wrps = symtab->num_wrps;
     free(near_wrp);
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
@@ -260,29 +254,6 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
     memcpy(asm_tab, resolve_segoff(symtab->calltab), symtab->calltab_len);
     asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
-    /* now relocate init text */
-    if (symtab->cur_cs > symtab->orig_cs) {
-        int i;
-        int reloc;
-        uint8_t *start_p = (uint8_t *)resolve_segoff(symtab->text_start);
-        uint8_t *end_p = (uint8_t *)resolve_segoff(symtab->text_end);
-        uint16_t delta = symtab->cur_cs - symtab->orig_cs;
-        fdlogprintf("init reloc %hx --> %hx, %tx\n", symtab->orig_cs,
-                symtab->cur_cs, end_p - start_p);
-        do_relocs(symtab->orig_cs, start_p, end_p, delta);
-        /* sym_tab table is patched in non-relocated code, never used later */
-        reloc = 0;
-        for (i = 0; i < stab_len; i++) {
-            uint8_t *ptr = (uint8_t *)resolve_segoff(thtab[i]);
-            if (thtab[i].seg == symtab->orig_cs && ptr >= start_p &&
-                    ptr <= end_p) {
-                thtab[i].seg += delta;
-                reloc++;
-            }
-        }
-        fdlogprintf("processed %i relocs\n", reloc);
-    }
-
     err = FdppSetAsmThunks(thtab, stab_len);
     ___assert(!err);
 }
@@ -455,6 +426,7 @@ void cpu_relax(void)
 #define _TFLG_NONE 0
 #define _TFLG_FAR 1
 #define _TFLG_NORET 2
+#define _TFLG_INIT 4
 
 static void _call_wrp(FdppAsmCall_t call, struct vm86_regs *regs, 
         uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len)
@@ -478,26 +450,20 @@ static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
     return -1;
 }
 
-static uint16_t find_wrp(uint16_t seg)
+static uint16_t find_wrp(int init, uint16_t seg)
 {
-    int i;
-
-    for (i = 0; i < num_wrps; i++) {
-        if (near_wrp[i].seg == seg)
-            return near_wrp[i].off;
-    }
-    ___assert(0);
-    return -1;
+    ___assert(near_wrp[init].seg == seg);
+    return near_wrp[init].off;
 }
 
-static uint32_t _do_asm_call(int num, uint8_t *sp, uint8_t len,
+static uint32_t _do_asm_call(int num, int init, uint8_t *sp, uint8_t len,
         FdppAsmCall_t call)
 {
     int i;
 
     for (i = 0; i < asm_tab_len; i++) {
         if (asm_tab[i].num == num) {
-            uint16_t wrp = find_wrp(asm_tab[i].seg);
+            uint16_t wrp = find_wrp(init, asm_tab[i].seg);
             LO_WORD(s_regs.eax) = asm_tab[i].off;
             /* argpack should be aligned */
             ___assert(!(len & 1));
@@ -540,7 +506,7 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
     if (flags & _TFLG_FAR)
         ret = _do_asm_call_far(num, sp, len, call);
     else
-        ret = _do_asm_call(num, sp, len, call);
+        ret = _do_asm_call(num, !!(flags & _TFLG_INIT), sp, len, call);
     return ret;
 }
 
@@ -555,6 +521,11 @@ uint16_t getCS(void)
 {
     /* we pass CS in SI */
     return LO_WORD(s_regs.esi);
+}
+
+uint16_t getSS(void)
+{
+    return LO_WORD(s_regs.ss);
 }
 
 void setDS(uint16_t seg)
@@ -720,7 +691,7 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
     uint8_t *start_p = (uint8_t *)so2lin(old_seg, offs);
     uint8_t *end_p = (uint8_t *)so2lin(old_seg + (len >> 4), (len & 0xf) + offs);
     uint16_t delta = new_seg - old_seg;
-    fdlogprintf("relocate %hx --> %hx, %x\n", old_seg, new_seg, len);
+    fdlogprintf("relocate %hx --> %hx:%hx, %x\n", old_seg, new_seg, offs, len);
     do_relocs(old_seg, start_p, end_p, delta);
     for (i = 0; i < _countof(asm_thunks.arr); i++) {
         uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i]);

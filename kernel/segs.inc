@@ -74,8 +74,7 @@ extern IGROUP
 extern I_GROUP
 %define class(x)
 %define stack
-extern INITSIZE
-%define INITTEXTSIZE __InitTextEnd
+%define INITSTACKSIZE 512
 
 %endif
 

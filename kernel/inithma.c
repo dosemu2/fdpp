@@ -321,11 +321,12 @@ void MoveKernel(UWORD NewKernelSegment)
   if (CurrentKernelSegment == 0xffff)
     return;
 
+  ___assert(!(FP_OFF(_HMATextStart) & 0xf));
   HMASource =
-      MK_FP(CurrentKernelSegment, (FP_OFF(_HMATextStart) & 0xfff0));
+      MK_FP(CurrentKernelSegment, FP_OFF(_HMATextStart));
   HMADest = MK_FP(NewKernelSegment, 0x0000);
 
-  len = (FP_OFF(_HMATextEnd) | 0x000f) - (FP_OFF(_HMATextStart) & 0xfff0);
+  len = FP_OFF(_HMATextEnd) - FP_OFF(_HMATextStart);
 
   if (NewKernelSegment == 0xffff)
   {
@@ -343,11 +344,6 @@ void MoveKernel(UWORD NewKernelSegment)
   HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0xfff0;
   /* first free byte after HMA_TEXT on 16 byte boundary */
 
-  for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
-  {
-    *rp->jmpSegment = NewKernelSegment;
-  }
-
   if (NewKernelSegment == 0xffff)
   {
     /* jmp FAR cpm_entry (copy from 0:c0) */
@@ -355,11 +351,17 @@ void MoveKernel(UWORD NewKernelSegment)
     pokel(0xffff, 0x30 * 4 + 0x11, (ULONG)cpm_entry);
   }
 
-  RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
-  CurrentKernelSegment = NewKernelSegment;
-
   HMAInitPrintf(("HMA moving %P up to %P for %04x bytes\n",
                  GET_FP32(HMASource), GET_FP32(HMADest), len));
+
+  NewKernelSegment -= FP_OFF(_HMATextStart) >> 4;
+  offs += FP_OFF(_HMATextStart);
+  for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
+  {
+    *rp->jmpSegment = NewKernelSegment;
+  }
+  RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
+  CurrentKernelSegment = NewKernelSegment;
 }
 
 UWORD fd_call_intr(WORD nr, iregs *rp)

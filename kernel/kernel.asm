@@ -43,6 +43,9 @@ STACK_SIZE      equ     384/2           ; stack allocated in words
 
 %ifidn __OUTPUT_FORMAT__, obj
 ..start:
+%else
+global _start
+_start:
 %endif
 entry:
                 jmp short realentry
@@ -129,87 +132,17 @@ kernel_start:
                 pop bx
                 pop ax
 %endif
-                mov     si,ax
-                mov     ax,I_GROUP
-                cli
-                mov     ss,ax
-                mov     sp,init_tos
-                int     12h             ; move init text+data to higher memory
-                mov     cl,6
-                shl     ax,cl           ; convert kb to para
-                mov     dx,15 + INITSIZE
-                mov     cl,4
-                shr     dx,cl
-                sub     ax,dx
-                mov     es,ax
-                mov     dx,INITTEXTSIZE ; para aligned
-                shr     dx,cl
-                add     ax,dx
-                mov     ss,ax           ; set SS to init data segment
-                sti                     ; now enable them
-                push    si              ; save ax (in si)
-                mov     ax,cs
-                mov     dx,__HMATextEnd ; para aligned
-                shr     dx,cl
-%ifdef WATCOM
-                add     ax,dx
-%endif
-                mov     ds,ax
-                mov     si,-2 + INITTEXTSIZE
-                lea     cx,[si+2]
-                mov     di,si
-                shr     cx,1
-                std                     ; if there's overlap only std is safe
-                rep     movsw
-
-                                        ; move HMA_TEXT to higher memory
-                mov     ax,TGROUP
-                mov     ds,ax           ; ds = HMA_TEXT
-                mov     ax,es
-                sub     ax,dx
-                mov     es,ax           ; es = new HMA_TEXT
-
-                mov     si,-2 + __HMATextEnd
-                lea     cx,[si+2]
-                mov     di,si
-                shr     cx,1
-                rep     movsw
-
-                cld
-%ifndef WATCOM                          ; for WATCOM: CS equal for HMA and INIT
-                add     ax,dx
-                mov     es,ax           ; otherwise CS -> init_text
-%endif
-                pop     si              ; ax value in si
-                push    es
-                mov     ax,cont
-                push    ax
-                retf
-cont:           ; Now set up call frame
                 mov     ds,[cs:_INIT_DGROUP]
-                mov     bp,sp           ; and set up stack frame for c
-
-                push si
-%ifdef EXTRA_DEBUG
-                push bx
-                pushf
-                mov ax, 0e33h           ; '3' Tracecode - kernel entered
-                mov bx, 00f0h
-                int 010h
-                popf
-                pop bx
-%endif
-                pop ax
-
                 mov     byte [_BootDrive],bl ; tell where we came from
                 mov     word [_BootParamSeg],ax ; bprm seg
                 mov     byte [_BootParamVer],bh ; bprm version
-
-;!!             int     11h
-;!!             mov     cl,6
-;!!             shr     al,cl
-;!!             inc     al
-;!!                mov     byte [_NumFloppies],al ; and how many
+                int     12h             ; move stack to higher memory
+                mov     cl,6
+                shl     ax,cl           ; convert kb to para
+                sub     ax,(INITSTACKSIZE >> 4) + 1 ; 1 para for mcb
+                mov     ss,ax
+                mov     sp,INITSTACKSIZE
+                mov     bp,sp           ; and set up stack frame for c
 
                 call _query_cpu
 %if XCPU != 86
@@ -223,9 +156,6 @@ cont:           ; Now set up call frame
 %endif
                 mov     [_CPULevel], al
 
-                mov     ax,ss
-                mov     ds,ax
-                mov     es,ax
                 call    plt_init
                 jmp     _FreeDOSmain
 
@@ -285,9 +215,6 @@ cpu_abort:
 
         cpu XCPU
 %endif        ; XCPU != 86
-
-
-segment INIT_TEXT_END
 
 
 ;************************************************************
@@ -805,14 +732,6 @@ __ib_start:
 segment IB_E
     global __ib_end
 __ib_end:
-        ;; do not clear the other init BSS variables + STACK: too late.
-
-; kernel startup stack
-                global  init_tos
-                resw 512
-init_tos:
-; the last paragraph of conventional memory might become an MCB
-                resb 16
                 global __init_end
 __init_end:
 init_end:
@@ -863,17 +782,22 @@ __INIT_DATA_END:
 
 
 segment INIT_TEXT_START
+                align 10h
+                times 10h db 0      ; guard space from prev sym
                 global  __InitTextStart
 __InitTextStart:                    ; and c version
 
 segment INIT_TEXT_END
                 global  __InitTextEnd
 __InitTextEnd:                      ; and c version
+                times 10h db 0      ; guard space for next sym
 
 ;
 ; start end end of HMA area
 
 segment HMA_TEXT_START
+                align 10h
+                times 10h db 0      ; guard space from prev sym
                 global __HMATextAvailable
 __HMATextAvailable:
                 global  __HMATextStart
@@ -911,16 +835,7 @@ __U4D:
 segment HMA_TEXT_END
                 global  __HMATextEnd
 __HMATextEnd:                   ; and c version
-
-
-
-; The default stack (_TEXT:0) will overwrite the data area, so I create a dummy
-; stack here to ease debugging. -- ror4
-
-segment _STACK  class(STACK) nobits stack
-
-
-
+;               times 10h db 0  ; guard space for next sym not needed here
 
 
 segment CONST

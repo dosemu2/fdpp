@@ -74,6 +74,7 @@ __segment DosTextSeg = 0;
 ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
 struct _bprm FAR *bprm;
 static UBYTE FAR *bprm_buf;
+#define TEXT_SIZE (_InitTextEnd - _HMATextStart)
 
 VOID ASMCFUNC FreeDOSmain(void)
 {
@@ -90,6 +91,11 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   /* clear the Init BSS area (what normally the RTL does */
   memset(_ib_start, 0, _ib_end - _ib_start);
+  /* back up kernel code to the top of ram */
+  lpTop = MK_FP(_SS - (TEXT_SIZE + 15) / 16, 0);
+  fmemcpy(lpTop, _HMATextStart, TEXT_SIZE);
+  RelocHook(_CS, _CS + ((lpTop - _HMATextStart) >> 4),
+      __ASMADDR(_InitTextStart), _InitTextEnd - _InitTextStart);
   /* purge HMAText so that no one uses it on init stage */
   fmemset(_HMATextStart, 0xcc, _HMATextEnd - _HMATextStart);
 #ifdef FDPP
@@ -326,13 +332,7 @@ STATIC void init_kernel(void)
   /* Init oem hook - returns memory size in KB    */
   ram_top = init_oem();
 
-  /* move kernel to high conventional RAM, just below the init code */
-#ifdef __WATCOMC__
-  lpTop = MK_FP(_CS, 0);
-#else
-  lpTop = MK_FP(_CS - (FP_OFF(_HMATextEnd) + 15) / 16, 0);
-#endif
-
+  /* move kernel to high conventional RAM */
   MoveKernel(FP_SEG(lpTop));
   lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
 
