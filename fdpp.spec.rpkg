@@ -20,6 +20,7 @@ BuildRequires: sed
 BuildRequires: bash
 BuildRequires: clang
 BuildRequires: nasm
+BuildRequires: lld
 BuildRequires: libstdc++-devel
 BuildRequires: autoconf
 BuildRequires: git
