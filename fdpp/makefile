@@ -163,9 +163,6 @@ $(DOBJS): %.o: $(SRC)drivers/%.asm
 $(PPOBJS): %.o: %.asm
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
-.cpp.o: $(PLPHDRS)
-	$(CC) $(CFLAGS) -o $@ $<
-
 $(GEN_CC): %.cc: $(SRC)%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
