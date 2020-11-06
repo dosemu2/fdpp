@@ -919,11 +919,21 @@ dispatch:
 
       /* Dos Read                                                     */
     case 0x3f:
+      /* we return error for DS:DX=NULL, but if CX is also 0 then fine */
+      if (!lr.CX) {
+        lrc = SUCCESS;
+        goto long_check;
+      }
       lrc = DosRead(lr.BX, lr.CX, FP_DS_DX);
       goto long_check;
 
       /* Dos Write                                                    */
     case 0x40:
+      /* we return error for DS:DX=NULL, but if CX is also 0 then fine */
+      if (!lr.CX) {
+        lrc = SUCCESS;
+        goto long_check;
+      }
       lrc = DosWrite(lr.BX, lr.CX, FP_DS_DX);
       goto long_check;
 
