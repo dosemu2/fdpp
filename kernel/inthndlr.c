@@ -386,8 +386,16 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
   lregs lr; /* 8 local registers (ax, bx, cx, dx, si, di, ds, es) */
   psp FAR *psp = MK_FP(cu_psp, 0);
 
-#define FP_DS_DX (MK_FP(lr.DS, lr.DX))
-#define FP_ES_DI (MK_FP(lr.ES, lr.DI))
+#define FP_DS_DX ({ void FAR *_fp = MK_FP(lr.DS, lr.DX); \
+    if (!_fp) \
+        goto error_carry; \
+    _fp; \
+})
+#define FP_ES_DI ({ void FAR *_fp = MK_FP(lr.ES, lr.DI); \
+    if (!_fp) \
+        goto error_carry; \
+    _fp; \
+})
 
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
