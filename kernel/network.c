@@ -103,8 +103,8 @@ BYTE remote_lock_unlock(void FAR *sft, BYTE unlock,
     regs.a.x = 0x110a;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
-        return -1;
-    return 0;
+        return -regs.a.x;
+    return SUCCESS;
 }
 
 BYTE remote_qualify_filename(char FAR *dst, const char FAR *src)
