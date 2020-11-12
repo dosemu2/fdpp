@@ -117,8 +117,8 @@ BYTE remote_qualify_filename(char FAR *dst, const char FAR *src)
     regs.a.x = 0x1123;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
-        return -1;
-    return 0;
+        return -regs.a.x;
+    return SUCCESS;
 }
 
 BYTE remote_getfree(void FAR *cds, void FAR *dst)
@@ -130,10 +130,10 @@ BYTE remote_getfree(void FAR *cds, void FAR *dst)
     regs.a.x = 0x110c;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
-        return -1;
+        return -regs.a.x;
     udst[0] = regs.a.x;
     udst[1] = regs.b.x;
     udst[2] = regs.c.x;
     udst[3] = regs.d.x;
-    return 0;
+    return SUCCESS;
 }
