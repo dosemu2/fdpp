@@ -515,7 +515,6 @@ static int access_check
 			regs.di = 0x0e;	/* lock violation */
 			if ( (fptr->filename[0]!='\0') && (fptr->filename[1]==':') )
 				regs.a.b.l = fptr->filename[0]-'A';
-			free_file_table_entry(fileno);
 			call_intr(0x24, MK_FAR_SCP(regs));
 		}
 		return DE_ACCESS;		/* access denied */
