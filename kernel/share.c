@@ -136,34 +136,15 @@ static lock_t FAR *lock_table = NULL;
 
 
 		/* ------------- PROTOTYPES ------------- */
-	/* DOS calls this to see if it's okay to open the file.
-	   Returns a file_table entry number to use (>= 0) if okay
-	   to open.  Otherwise returns < 0 and may generate a critical
-	   error.  If < 0 is returned, it is the negated error return
-	   code, so DOS simply negates this value and returns it in
-	   AX. */
 static int open_check
 	(char FAR  *filename,/* FAR  pointer to fully qualified filename */
 	 unsigned short psp,/* psp segment address of owner process */
 	 int openmode,		/* 0=read-only, 1=write-only, 2=read-write */
 	 int sharemode);	/* SHARE_COMPAT, etc... */
 
-	/* DOS calls this to record the fact that it has successfully
-	   closed a file, or the fact that the open for this file failed. */
 static void close_file
 	(int fileno);		/* file_table entry number */
 
-	/* DOS calls this to determine whether it can access (read or
-	   write) a specific section of a file.  We call it internally
-	   from lock_unlock (only when locking) to see if any portion
-	   of the requested region is already locked.  If psp is zero,
-	   then it matches any psp in the lock table.  Otherwise, only
-	   locks which DO NOT belong to psp will be considered.
-	   Returns zero if okay to access or lock (no portion of the
-	   region is already locked).  Otherwise returns non-zero and
-	   generates a critical error (if allowcriter is non-zero).
-	   If non-zero is returned, it is the negated return value for
-	   the DOS call. */
 static int access_check
 	(unsigned short psp,/* psp segment address of owner process */
 	 int fileno,		/* file_table entry number */
@@ -171,11 +152,6 @@ static int access_check
 	 unsigned long len,	/* length (in bytes) of region to access */
 	 int allowcriter);	/* allow a critical error to be generated */
 
-	/* DOS calls this to lock or unlock a specific section of a file.
-	   Returns zero if successfully locked or unlocked.  Otherwise
-	   returns non-zero.
-	   If the return value is non-zero, it is the negated error
-	   return code for the DOS 0x5c call. */
 static int lock_unlock
 	(unsigned short psp,/* psp segment address of owner process */
 	 int fileno,		/* file_table entry number */
@@ -393,7 +369,7 @@ static int do_open_check
 			/* fall through */
 		case 1:		/* fail with error code 05h */
 			free_file_table_entry(fileno);
-			return -5;
+			return DE_ACCESS;
 
 		case 4:		/* succeed if file read-only, else fail with int 24h */
 			if (file_is_read_only(fptr->filename))
@@ -411,7 +387,7 @@ static int do_open_check
 				free_file_table_entry(fileno);
 				call_intr(0x24, MK_FAR_SCP(regs));
 			}
-			return -0x20;			/* sharing violation */
+			return DE_SHARING;			/* sharing violation */
 		}
 		break;
 	}
@@ -481,26 +457,14 @@ static void close_file
 	free_file_table_entry(fileno);
 }
 
-	/* DOS calls this to determine whether it can access (read or
-	   write) a specific section of a file.  We call it internally
-	   from lock_unlock (only when locking) to see if any portion
-	   of the requested region is already locked.  If psp is zero,
-	   then it matches any psp in the lock table.  Otherwise, only
-	   locks which DO NOT belong to psp will be considered.
-	   Returns zero if okay to access or lock (no portion of the
-	   region is already locked).  Otherwise returns non-zero and
-	   generates a critical error (if allowcriter is non-zero).
-	   If non-zero is returned, it is the negated return value for
-	   the DOS call. */
-static int access_check
-	(unsigned short psp,/* psp segment address of owner process */
-	 int fileno,		/* file_table entry number */
-	 unsigned long ofs,	/* offset into file */
-	 unsigned long len,	/* length (in bytes) of region to access */
-	 int allowcriter) {	/* allow a critical error to be generated */
+static int do_access_check
+	(unsigned short psp,
+	 int fileno,
+	 unsigned long ofs,
+	 unsigned long len)
+{
 	int i;
-	file_t FAR *fptr = &file_table[fileno];
-	char FAR *filename = fptr->filename;
+	char FAR *filename = file_table[fileno].filename;
 	lock_t FAR *lptr;
 	unsigned long endofs = ofs + len;
 
@@ -518,19 +482,43 @@ static int access_check
 			&& (fnmatches(filename, file_table[lptr->fileno].filename))
 			&& (   ( (ofs>=lptr->start) && (ofs<lptr->end) )
 				|| ( (endofs>lptr->start) && (endofs<=lptr->end) )   )   ) {
-			if (allowcriter) {
-				iregs regs;
-
-				regs.a.b.h = 0x0e;	/* disk I/O; fail allowed; data area */
-				regs.a.b.l = 0;
-				regs.di = 0x0e;	/* lock violation */
-				if ( (fptr->filename[0]!='\0') && (fptr->filename[1]==':') )
-					regs.a.b.l = fptr->filename[0]-'A';
-				free_file_table_entry(fileno);
-				call_intr(0x24, MK_FAR_SCP(regs));
-			}
-			return -0x21;			/* lock violation */
+			return -1;
 		}
+	}
+	return 0;
+}
+
+	/* DOS calls this to determine whether it can access (read or
+	   write) a specific section of a file. If psp is zero,
+	   then it matches any psp in the lock table.  Otherwise, only
+	   locks which DO NOT belong to psp will be considered.
+	   Returns zero if okay to access or lock (no portion of the
+	   region is already locked).  Otherwise returns non-zero and
+	   generates a critical error (if allowcriter is non-zero).
+	   If non-zero is returned, it is the negated return value for
+	   the DOS call. */
+static int access_check
+	(unsigned short psp,/* psp segment address of owner process */
+	 int fileno,		/* file_table entry number */
+	 unsigned long ofs,	/* offset into file */
+	 unsigned long len,	/* length (in bytes) of region to access */
+	 int allowcriter)	/* allow a critical error to be generated */
+{
+	int err = do_access_check(psp, fileno, ofs, len);
+	if (err) {
+		if (allowcriter) {
+			file_t FAR *fptr = &file_table[fileno];
+			iregs regs;
+
+			regs.a.b.h = 0x0e;	/* disk I/O; fail allowed; data area */
+			regs.a.b.l = 0;
+			regs.di = 0x0e;	/* lock violation */
+			if ( (fptr->filename[0]!='\0') && (fptr->filename[1]==':') )
+				regs.a.b.l = fptr->filename[0]-'A';
+			free_file_table_entry(fileno);
+			call_intr(0x24, MK_FAR_SCP(regs));
+		}
+		return DE_ACCESS;		/* access denied */
 	}
 	return 0;
 }
@@ -574,11 +562,11 @@ static int lock_unlock
 			}
 		}
 			/* Not already locked by us; can't unlock. */
-		return -(0x21);		/* lock violation */
+		return DE_LOCK;		/* lock violation */
 	} else {
-		if (access_check(0, fileno, ofs, len, 0)) {
+		if (do_access_check(0, fileno, ofs, len)) {
 				/* Already locked; can't lock. */
-			return -(0x21);		/* lock violation */
+			return DE_LOCK;		/* lock violation */
 		}
 		for (i = 0; i < lock_table_size; i++) {
 			lptr = &lock_table[i];

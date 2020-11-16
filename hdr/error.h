@@ -62,8 +62,8 @@ static BYTE *error_hRcsId =
 
 #define DE_INVLDPARM    -0x57   /* invalid parameter */
 
-#define DE_DEADLOCK	-36
-#define DE_LOCK		-39
+#define DE_SHARING	-32
+#define DE_LOCK		-33
 
 #define DE_FILEEXISTS   -80     /* File exists                  */
 
