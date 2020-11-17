@@ -127,9 +127,6 @@ static lock_t lock_table[lock_table_size];
 
 
 		/* ------------- PROTOTYPES ------------- */
-static void close_file
-	(int fileno);		/* file_table entry number */
-
 static int access_check(
 	 int fileno,		/* file_table entry number */
 	 unsigned long ofs,	/* offset into file */
@@ -160,11 +157,6 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 		if ((iregs.ax & 0xff) == 0) {
 				/* Installation check.  Return 0xff in AL. */
 			iregs.ax |= 0xff;
-			return;
-		}
-			/* close_file */
-		if ((iregs.ax & 0xff) == 0xa1) {
-			close_file(iregs.bx);
 			return;
 		}
 			/* access_check (0xa2) */
@@ -417,8 +409,7 @@ WORD share_open_check
 
 	/* DOS calls this to record the fact that it has successfully
 	   closed a file, or the fact that the open for this file failed. */
-static void close_file
-	(int fileno) {		/* file_table entry number */
+void share_close_file(WORD fileno) {		/* file_table entry number */
 
 	remove_all_locks(fileno);
 	free_file_table_entry(fileno);

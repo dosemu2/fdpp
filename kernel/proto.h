@@ -467,7 +467,7 @@ WORD share_open_check(__FAR(const char) filename, WORD openmode, WORD sharemode)
 
         /* DOS calls this to record the fact that it has successfully
            closed a file, or the fact that the open for this file failed. */
-void ASMPASCAL share_close_file(WORD fileno);       /* file_table entry number */
+void share_close_file(WORD fileno);       /* file_table entry number */
 
         /* DOS calls this to determine whether it can access (read or
            write) a specific section of a file.  We call it internally

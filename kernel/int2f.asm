@@ -227,19 +227,6 @@ SHARE_CHECK:
 		int	0x2f
 		ret
 
-;          DOS calls this to record the fact that it has successfully
-;          closed a file, or the fact that the open for this file failed.
-; STATIC void share_close_file(int fileno)  /* file_table entry number */
-
-		global	SHARE_CLOSE_FILE
-SHARE_CLOSE_FILE:
-		pop	ax
-		pop	bx
-		push	ax
-		mov	ax, 0x10a1
-		int	0x2f
-		ret
-
 ;          DOS calls this to determine whether it can access (read or
 ;          write) a specific section of a file.  We call it internally
 ;          from lock_unlock (only when locking) to see if any portion
