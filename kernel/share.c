@@ -127,11 +127,6 @@ static lock_t lock_table[lock_table_size];
 
 
 		/* ------------- PROTOTYPES ------------- */
-static int open_check
-	(char FAR  *filename,/* FAR  pointer to fully qualified filename */
-	 int openmode,		/* 0=read-only, 1=write-only, 2=read-write */
-	 int sharemode);	/* SHARE_COMPAT, etc... */
-
 static void close_file
 	(int fileno);		/* file_table entry number */
 
@@ -165,20 +160,6 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 		if ((iregs.ax & 0xff) == 0) {
 				/* Installation check.  Return 0xff in AL. */
 			iregs.ax |= 0xff;
-			return;
-		}
-			/* These subfuctions are nonstandard, but are highly
-			   unlikely to be used by another multiplex TSR, since
-			   our multiplex Id (0x10) is basically reserved for
-			   SHARE.  So we should be able to get away with using
-			   these for our own purposes. */
-			/* open_check */
-		if ((iregs.ax & 0xff) == 0xa0) {
-			iregs.ax = open_check
-				(MK_FP(iregs.ds, iregs.si),
-//				 iregs.bx,
-				 iregs.cx,
-				 iregs.dx);
 			return;
 		}
 			/* close_file */
@@ -309,7 +290,7 @@ static int fnmatches(char *fn1, char *fn2) {
 	return (*fn1 == *fn2);
 }
 
-static int do_open_check
+static WORD do_open_check
 	(int fileno) {		/* file_table entry number */
 	file_t *p;
 	file_t *fptr = &file_table[fileno];
@@ -388,10 +369,10 @@ static int do_open_check
 	   error.  If < 0 is returned, it is the negated error return
 	   code, so DOS simply negates this value and returns it in
 	   AX. */
-static int open_check
-	(char FAR  *filename,/* FAR  pointer to fully qualified filename */
-	 int openmode,		/* 0=read-only, 1=write-only, 2=read-write */
-	 int sharemode) {	/* SHARE_COMPAT, etc... */
+WORD share_open_check
+	(const char FAR *filename,/* FAR  pointer to fully qualified filename */
+	 WORD openmode,		/* 0=read-only, 1=write-only, 2=read-write */
+	 WORD sharemode) {	/* SHARE_COMPAT, etc... */
 
 	int i, fileno = -1;
 	file_t *fptr;

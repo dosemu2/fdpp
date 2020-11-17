@@ -534,7 +534,7 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
   if (IsShareInstalled(TRUE))
   {
     if ((sftp->sft_shroff =
-         share_open_check(PriPathName, cu_psp,
+         share_open_check(PriPathName,
                           flags & 0x03, (flags >> 4) & 0x07)) < 0)
       return sftp->sft_shroff;
   }
@@ -1122,7 +1122,7 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrp)
     /* SHARE closes the file if it is opened in
      * compatibility mode, else generate a critical error.
      * Here generate a critical error by opening in "rw compat" mode */
-    if ((result = share_open_check(PriPathName, cu_psp, O_RDWR, 0)) < 0)
+    if ((result = share_open_check(PriPathName, O_RDWR, 0)) < 0)
       return result;
     /* else dos_setfattr will close the file */
     share_close_file(result);

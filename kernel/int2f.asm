@@ -227,36 +227,6 @@ SHARE_CHECK:
 		int	0x2f
 		ret
 
-;           DOS calls this to see if it's okay to open the file.
-;           Returns a file_table entry number to use (>= 0) if okay
-;           to open.  Otherwise returns < 0 and may generate a critical
-;           error.  If < 0 is returned, it is the negated error return
-;           code, so DOS simply negates this value and returns it in
-;           AX.
-; STATIC int share_open_check(const char FAR * filename,
-;				/* pointer to fully qualified filename */
-;                            unsigned short pspseg,
-;				/* psp segment address of owner process */
-;			     int openmode,
-;				/* 0=read-only, 1=write-only, 2=read-write */
-;			     int sharemode) /* SHARE_COMPAT, etc... */
-		global SHARE_OPEN_CHECK
-SHARE_OPEN_CHECK:
-		mov	si, ds
-		mov	es, si		; save ds
-		pop	ax		; return address
-		pop	dx		; sharemode;
-		pop	cx		; openmode;
-		pop	bx		; pspseg;
-		pop	si		; filename
-		pop	ds		; SEG filename
-		push	ax		; return address
-		mov	ax, 0x10a0
-		int	0x2f	     	; returns ax
-		mov	si, es		; restore ds
-		mov	ds, si
-		ret
-
 ;          DOS calls this to record the fact that it has successfully
 ;          closed a file, or the fact that the open for this file failed.
 ; STATIC void share_close_file(int fileno)  /* file_table entry number */
