@@ -403,7 +403,7 @@ UWORD get_machine_name(__FAR(char) netname);
 VOID set_machine_name(__FAR(const char) netname, UWORD name_num);
 
 /* share.c */
-int share_init(int high);
+int share_init(void);
 
 /* procsupt.asm */
 /* note that exec_user() is special and can't work w/o NORETURN */

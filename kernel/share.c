@@ -30,12 +30,6 @@
 #define MUX_INT_NO 0x2f
 #define MULTIPLEX_ID 0x10
 
-#define FILE_TABLE_MIN 128
-#define FILE_TABLE_MAX 62000U
-
-#define LOCK_TABLE_MIN 1
-#define LOCK_TABLE_MAX 3800
-
 	/* Valid values for openmode: */
 #define OPEN_READ_ONLY   0
 #define OPEN_WRITE_ONLY  1
@@ -108,7 +102,7 @@ static open_action_exception_t open_exceptions[] = {
 
 	/* One of these exists for each instance of an open file. */
 typedef struct _file_t {
-	AR_MEMB(_file_t, char, filename, 128);		/* fully-qualified filename; "\0" if unused */
+	char filename[128];		/* fully-qualified filename; "\0" if unused */
 	unsigned char openmode;	/* 0=read-only, 1=write-only, 2=read-write */
 	unsigned char sharemode;/* SHARE_COMPAT, etc... */
 	unsigned char first_openmode;	/* openmode of first open */
@@ -126,11 +120,10 @@ typedef struct {
 
 		/* ------------- GLOBALS ------------- */
 //static char progname[9];
-static unsigned int file_table_size_bytes = 2048;
-static unsigned int file_table_size = 0;	/* # of file_t we can have */
-static file_t FAR *file_table = NULL;
-static unsigned int lock_table_size = 20;	/* # of lock_t we can have */
-static lock_t FAR *lock_table = NULL;
+static const int file_table_size = 256;	/* # of file_t we can have */
+static file_t file_table[file_table_size];
+static const int lock_table_size = 20;	/* # of lock_t we can have */
+static lock_t lock_table[lock_table_size];
 
 
 		/* ------------- PROTOTYPES ------------- */
@@ -254,7 +247,7 @@ void int2F_10_handler(iregs FAR *iregs_p)
 
 static void remove_all_locks(int fileno) {
 	int i;
-	lock_t FAR *lptr;
+	lock_t *lptr;
 
 	for (i = 0; i < lock_table_size; i++) {
 		lptr = &lock_table[i];
@@ -266,7 +259,7 @@ static void free_file_table_entry(int fileno) {
 	file_table[fileno].filename[0] = '\0';
 }
 
-static int file_is_read_only(char FAR *filename)
+static int file_is_read_only(__XFAR(char) filename)
 {
 	iregs regs = {};
 
@@ -318,8 +311,8 @@ static int fnmatches(char *fn1, char *fn2) {
 
 static int do_open_check
 	(int fileno) {		/* file_table entry number */
-	file_t FAR *p;
-	file_t FAR *fptr = &file_table[fileno];
+	file_t *p;
+	file_t *fptr = &file_table[fileno];
 	int i, j, action = 0, foundexc;
 	unsigned char current_sharemode = fptr->sharemode;
 	unsigned char current_openmode = fptr->openmode;
@@ -401,7 +394,7 @@ static int open_check
 	 int sharemode) {	/* SHARE_COMPAT, etc... */
 
 	int i, fileno = -1;
-	file_t FAR *fptr;
+	file_t *fptr;
 
 		/* Whack off unused bits in the share mode
 		   in case we were careless elsewhere. */
@@ -456,8 +449,8 @@ static int do_access_check(
 	 unsigned long len)
 {
 	int i;
-	char FAR *filename = file_table[fileno].filename;
-	lock_t FAR *lptr;
+	char *filename = file_table[fileno].filename;
+	lock_t *lptr;
 	unsigned long endofs = ofs + len;
 
 	if (endofs < ofs) {
@@ -495,7 +488,7 @@ static int access_check(
 	int err = do_access_check(fileno, ofs, len);
 	if (err) {
 		if (allowcriter) {
-			file_t FAR *fptr = &file_table[fileno];
+			file_t *fptr = &file_table[fileno];
 			iregs regs;
 
 			regs.a.b.h = 0x0e;	/* disk I/O; fail allowed; data area */
@@ -522,7 +515,7 @@ static int lock_unlock(
 	 int unlock) {		/* non-zero to unlock; zero to lock */
 
 	int i;
-	lock_t FAR *lptr;
+	lock_t *lptr;
 	unsigned long endofs = ofs + len;
 
     if (endofs < ofs) {
@@ -578,24 +571,10 @@ static int is_file_open(char FAR * filename)
 	return 0;
 }
 
-static void FAR *high_malloc(uint32_t size, int high)
-{
-	return KernelAlloc(size, 'F', high);
-}
-
 		/* ------------- INIT ------------- */
-	/* Allocate tables and install hooks into the kernel.
-	   If we run out of memory, return non-zero. */
-int share_init(int high)
+int share_init(void)
 {
-	/* int i; */
-#define malloc(x) high_malloc(x, high)
-	file_table_size = file_table_size_bytes/sizeof(file_t);
-	if ((file_table = malloc(file_table_size_bytes)) == NULL)
-		return 1;
-	fmemset(file_table, 0, file_table_size_bytes);
-	if ((lock_table = malloc(lock_table_size*sizeof(lock_t))) == NULL)
-		return 1;
-	fmemset(lock_table, 0, lock_table_size*sizeof(lock_t));
+	memset(file_table, 0, file_table_size * sizeof(file_t));
+	memset(lock_table, 0, lock_table_size * sizeof(lock_t));
 	return 0;
 }
