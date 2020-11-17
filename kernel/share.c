@@ -145,8 +145,7 @@ static int open_check
 static void close_file
 	(int fileno);		/* file_table entry number */
 
-static int access_check
-	(unsigned short psp,/* psp segment address of owner process */
+static int access_check(
 	 int fileno,		/* file_table entry number */
 	 unsigned long ofs,	/* offset into file */
 	 unsigned long len,	/* length (in bytes) of region to access */
@@ -201,9 +200,9 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 			/* access_check (0xa2) */
 			/* access_check with critical error (0xa3) */
 		if ((iregs.ax & 0xfe) == 0xa2) {
-			iregs.ax = access_check
-				(iregs.bx,
-                 iregs.cx,
+			iregs.ax = access_check(
+//				 iregs.bx,
+				 iregs.cx,
 #if 0
 				 (   ((((unsigned long)iregs.si)<<16) & 0xffff0000L) |
 					 (((unsigned long)iregs.di) & 0xffffL)   ),
@@ -457,8 +456,7 @@ static void close_file
 	free_file_table_entry(fileno);
 }
 
-static int do_access_check
-	(unsigned short psp,
+static int do_access_check(
 	 int fileno,
 	 unsigned long ofs,
 	 unsigned long len)
@@ -478,7 +476,6 @@ static int do_access_check
 	for (i = 0; i < lock_table_size; i++) {
 		lptr = &lock_table[i];
 		if (   (lptr->used)
-			&& ( (psp == 0) || (lptr->psp != psp) )
 			&& (fnmatches(filename, file_table[lptr->fileno].filename))
 			&& (   ( (ofs>=lptr->start) && (ofs<lptr->end) )
 				|| ( (endofs>lptr->start) && (endofs<=lptr->end) )   )   ) {
@@ -497,14 +494,13 @@ static int do_access_check
 	   generates a critical error (if allowcriter is non-zero).
 	   If non-zero is returned, it is the negated return value for
 	   the DOS call. */
-static int access_check
-	(unsigned short psp,/* psp segment address of owner process */
+static int access_check(
 	 int fileno,		/* file_table entry number */
 	 unsigned long ofs,	/* offset into file */
 	 unsigned long len,	/* length (in bytes) of region to access */
 	 int allowcriter)	/* allow a critical error to be generated */
 {
-	int err = do_access_check(psp, fileno, ofs, len);
+	int err = do_access_check(fileno, ofs, len);
 	if (err) {
 		if (allowcriter) {
 			file_t FAR *fptr = &file_table[fileno];
@@ -563,7 +559,7 @@ static int lock_unlock
 			/* Not already locked by us; can't unlock. */
 		return DE_LOCK;		/* lock violation */
 	} else {
-		if (do_access_check(0, fileno, ofs, len)) {
+		if (do_access_check(fileno, ofs, len)) {
 				/* Already locked; can't lock. */
 			return DE_LOCK;		/* lock violation */
 		}
