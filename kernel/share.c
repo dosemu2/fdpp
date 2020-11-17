@@ -165,7 +165,7 @@ static void free_file_table_entry(int fileno) {
 	file_table[fileno].filename[0] = '\0';
 }
 
-static int file_is_read_only(__XFAR(char) filename)
+static int file_is_read_only(__XFAR(const char) filename)
 {
 	iregs regs = {};
 
