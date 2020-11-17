@@ -206,14 +206,7 @@ static int file_is_read_only(__XFAR(char) filename)
 	return ((regs.c.b.l & 0x19) == 0x01);
 }
 
-static int fnmatches(const char *fn1, const char *fn2) {
-	while (*fn1) {
-		if (*fn1 != *fn2) return 0;
-		fn1++;
-		fn2++;
-	}
-	return (*fn1 == *fn2);
-}
+#define fnmatches(fn1, fn2) (strcmp(fn1, fn2) == 0)
 
 static WORD do_open_check
 	(int fileno) {		/* file_table entry number */
