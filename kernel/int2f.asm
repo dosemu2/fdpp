@@ -221,12 +221,6 @@ IntDosCal:
 
     iret
 
-		global	SHARE_CHECK
-SHARE_CHECK:
-		mov	ax, 0x1000
-		int	0x2f
-		ret
-
 ; Int 2F Multipurpose Remote System Calls
 ;
 ; added by James Tabor jimtabor@infohwy.com

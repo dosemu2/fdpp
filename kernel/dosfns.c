@@ -35,12 +35,6 @@ static BYTE *dosfnsRcsId =
 
 #include "globals.h"
 
-/* /// Added for SHARE.  - Ron Cemer */
-
-BYTE share_installed = 0;
-
-/* /// End of additions for SHARE.  - Ron Cemer */
-
 STATIC int do_remote_lock_unlock(sft FAR *sftp,    /* SFT for file */
                              unsigned long ofs, /* offset into file */
                              unsigned long len, /* length (in bytes) of region to lock or unlock */
@@ -1327,11 +1321,7 @@ struct dhdr FAR *IsDevice(__XFAR(const char)fname)
 
 BOOL IsShareInstalled(BOOL recheck)
 {
-  if (recheck == FALSE)
-    return share_installed;
-  if (!share_installed && share_check() == 0xff)
-    share_installed = TRUE;
-  return share_installed;
+  return TRUE;
 }
 
 /* /// End of additions for SHARE.  - Ron Cemer */

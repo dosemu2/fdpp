@@ -126,7 +126,7 @@ static const int lock_table_size = 20;	/* # of lock_t we can have */
 static lock_t lock_table[lock_table_size];
 
 		/* ------------- HOOK ------------- */
-static void interrupt FAR handler2f(iregs FAR *iregs_p)
+void int2F_10_handler(iregs FAR *iregs_p)
 {
 #define iregs (*iregs_p)
 #define ax a.x
@@ -149,13 +149,6 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 #undef bx
 #undef cx
 #undef dx
-}
-
-void int2F_10_handler(iregs FAR *iregs_p)
-{
-	if (!file_table_size)
-		return;
-	handler2f(iregs_p);
 }
 
 static void remove_all_locks(int fileno) {

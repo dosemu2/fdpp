@@ -495,8 +495,6 @@ WORD share_lock_unlock(WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       
              0 if not */
 WORD share_is_file_open(__FAR(const char) filename);
 
-unsigned char ASMPASCAL share_check(void);
-
 DWORD ASMPASCAL call_nls(UWORD,__FAR(VOID), UWORD, UWORD, UWORD, UWORD);
 
 ULONG ASMPASCAL ReadPCClock(VOID);
