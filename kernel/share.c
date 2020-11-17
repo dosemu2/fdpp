@@ -109,7 +109,6 @@ static open_action_exception_t open_exceptions[] = {
 	/* One of these exists for each instance of an open file. */
 typedef struct _file_t {
 	AR_MEMB(_file_t, char, filename, 128);		/* fully-qualified filename; "\0" if unused */
-	unsigned short psp;		/* PSP of process which opened this file */
 	unsigned char openmode;	/* 0=read-only, 1=write-only, 2=read-write */
 	unsigned char sharemode;/* SHARE_COMPAT, etc... */
 	unsigned char first_openmode;	/* openmode of first open */
@@ -122,7 +121,6 @@ typedef struct {
 	unsigned long start;	/* Beginning offset of locked region */
 	unsigned long end;		/* Ending offset of locked region */
 	unsigned short fileno;	/* file_table entry number */
-	unsigned short psp;		/* PSP of process which owns the lock */
 } lock_t;
 
 
@@ -138,7 +136,6 @@ static lock_t FAR *lock_table = NULL;
 		/* ------------- PROTOTYPES ------------- */
 static int open_check
 	(char FAR  *filename,/* FAR  pointer to fully qualified filename */
-	 unsigned short psp,/* psp segment address of owner process */
 	 int openmode,		/* 0=read-only, 1=write-only, 2=read-write */
 	 int sharemode);	/* SHARE_COMPAT, etc... */
 
@@ -151,8 +148,7 @@ static int access_check(
 	 unsigned long len,	/* length (in bytes) of region to access */
 	 int allowcriter);	/* allow a critical error to be generated */
 
-static int lock_unlock
-	(unsigned short psp,/* psp segment address of owner process */
+static int lock_unlock(
 	 int fileno,		/* file_table entry number */
 	 unsigned long ofs,	/* offset into file */
 	 unsigned long len,	/* length (in bytes) of region to lock or unlock */
@@ -187,7 +183,7 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 		if ((iregs.ax & 0xff) == 0xa0) {
 			iregs.ax = open_check
 				(MK_FP(iregs.ds, iregs.si),
-				 iregs.bx,
+//				 iregs.bx,
 				 iregs.cx,
 				 iregs.dx);
 			return;
@@ -218,9 +214,9 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 			/* lock_unlock lock (0xa4)*/
 			/* lock_unlock unlock (0xa5) */
 		if ((iregs.ax & 0xfe) == 0xa4) {
-			iregs.ax = lock_unlock
-				(iregs.bx,
-                 iregs.cx,
+			iregs.ax = lock_unlock(
+//				iregs.bx,
+				 iregs.cx,
 #if 0
 				 (   ((((unsigned long)iregs.si)<<16) & 0xffff0000L) |
   				 (((unsigned long)iregs.di) & 0xffffL)   ),
@@ -401,7 +397,6 @@ static int do_open_check
 	   AX. */
 static int open_check
 	(char FAR  *filename,/* FAR  pointer to fully qualified filename */
-	 unsigned short psp,/* psp segment address of owner process */
 	 int openmode,		/* 0=read-only, 1=write-only, 2=read-write */
 	 int sharemode) {	/* SHARE_COMPAT, etc... */
 
@@ -439,7 +434,6 @@ static int open_check
 	for (i = 0; i < sizeof(fptr->filename); i++) {
 		if ((fptr->filename[i] = filename[i]) == '\0') break;
 	}
-	fptr->psp = psp;
 	fptr->openmode = (unsigned char)openmode;
 	fptr->sharemode = (unsigned char)sharemode;
 		/* Do the sharing check and return fileno if
@@ -486,9 +480,7 @@ static int do_access_check(
 }
 
 	/* DOS calls this to determine whether it can access (read or
-	   write) a specific section of a file. If psp is zero,
-	   then it matches any psp in the lock table.  Otherwise, only
-	   locks which DO NOT belong to psp will be considered.
+	   write) a specific section of a file.
 	   Returns zero if okay to access or lock (no portion of the
 	   region is already locked).  Otherwise returns non-zero and
 	   generates a critical error (if allowcriter is non-zero).
@@ -523,8 +515,7 @@ static int access_check(
 	   returns non-zero.
 	   If the return value is non-zero, it is the negated error
 	   return code for the DOS 0x5c call. */
-static int lock_unlock
-	(unsigned short psp,/* psp segment address of owner process */
+static int lock_unlock(
 	 int fileno,		/* file_table entry number */
 	 unsigned long ofs,	/* offset into file */
 	 unsigned long len,	/* length (in bytes) of region to lock or unlock */
@@ -548,7 +539,6 @@ static int lock_unlock
 		for (i = 0; i < lock_table_size; i++) {
 			lptr = &lock_table[i];
 			if (   (lptr->used)
-				&& (lptr->psp == psp)
 				&& (lptr->fileno == fileno)
 				&& (lptr->start == ofs)
 				&& (lptr->end == endofs)   ) {
@@ -570,7 +560,6 @@ static int lock_unlock
 				lptr->start = ofs;
 				lptr->end = ofs+(unsigned long)len;
 				lptr->fileno = fileno;
-				lptr->psp = psp;
 				return 0;
 			}
 		}
