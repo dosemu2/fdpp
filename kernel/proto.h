@@ -480,7 +480,7 @@ void share_close_file(WORD fileno);       /* file_table entry number */
            generates a critical error (if allowcriter is non-zero).
            If non-zero is returned, it is the negated return value for
            the DOS call. */
-WORD ASMPASCAL share_access_check(unsigned short pspseg, WORD fileno, UDWORD ofs, UDWORD len, WORD allowcriter); /* allow a critical error to be generated */
+WORD share_access_check(WORD fileno, UDWORD ofs, UDWORD len, WORD allowcriter); /* allow a critical error to be generated */
 
         /* DOS calls this to lock or unlock a specific section of a file.
            Returns zero if successfully locked or unlocked.  Otherwise

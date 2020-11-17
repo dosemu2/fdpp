@@ -227,26 +227,6 @@ SHARE_CHECK:
 		int	0x2f
 		ret
 
-;          DOS calls this to determine whether it can access (read or
-;          write) a specific section of a file.  We call it internally
-;          from lock_unlock (only when locking) to see if any portion
-;          of the requested region is already locked.  If pspseg is zero,
-;          then it matches any pspseg in the lock table.  Otherwise, only
-;          locks which DO NOT belong to pspseg will be considered.
-;          Returns zero if okay to access or lock (no portion of the
-;          region is already locked).  Otherwise returns non-zero and
-;          generates a critical error (if allowcriter is non-zero).
-;          If non-zero is returned, it is the negated return value for
-;          the DOS call.
-;STATIC int share_access_check(unsigned short pspseg,
-;				/* psp segment address of owner process */
-;                              int fileno,       /* file_table entry number */
-;                              unsigned long ofs,        /* offset into file */
-;                              unsigned long len,        /* length (in bytes) of region to access */
-;                              int allowcriter)          /* allow a critical error to be generated */
-		global SHARE_ACCESS_CHECK
-SHARE_ACCESS_CHECK:
-		mov	ax, 0x10a2
 share_common:
 		push	bp
 		mov	bp, sp

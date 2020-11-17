@@ -127,12 +127,6 @@ static lock_t lock_table[lock_table_size];
 
 
 		/* ------------- PROTOTYPES ------------- */
-static int access_check(
-	 int fileno,		/* file_table entry number */
-	 unsigned long ofs,	/* offset into file */
-	 unsigned long len,	/* length (in bytes) of region to access */
-	 int allowcriter);	/* allow a critical error to be generated */
-
 static int lock_unlock(
 	 int fileno,		/* file_table entry number */
 	 unsigned long ofs,	/* offset into file */
@@ -157,24 +151,6 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 		if ((iregs.ax & 0xff) == 0) {
 				/* Installation check.  Return 0xff in AL. */
 			iregs.ax |= 0xff;
-			return;
-		}
-			/* access_check (0xa2) */
-			/* access_check with critical error (0xa3) */
-		if ((iregs.ax & 0xfe) == 0xa2) {
-			iregs.ax = access_check(
-//				 iregs.bx,
-				 iregs.cx,
-#if 0
-				 (   ((((unsigned long)iregs.si)<<16) & 0xffff0000L) |
-					 (((unsigned long)iregs.di) & 0xffffL)   ),
-				 (   ((((unsigned long)iregs.es)<<16) & 0xffff0000L) |
-                     (((unsigned long)iregs.dx) & 0xffffL)   ),
-#else
-				 (   (((unsigned long)iregs.si)<<16) + iregs.di   ),
-				 (   (((unsigned long)iregs.es)<<16) + iregs.dx   ),
-#endif
-				 (iregs.ax & 0x01));
 			return;
 		}
 			/* lock_unlock lock (0xa4)*/
@@ -415,10 +391,10 @@ void share_close_file(WORD fileno) {		/* file_table entry number */
 	free_file_table_entry(fileno);
 }
 
-static int do_access_check(
-	 int fileno,
-	 unsigned long ofs,
-	 unsigned long len)
+static WORD do_access_check(
+	 WORD fileno,
+	 UDWORD ofs,
+	 UDWORD len)
 {
 	int i;
 	char *filename = file_table[fileno].filename;
@@ -451,11 +427,11 @@ static int do_access_check(
 	   generates a critical error (if allowcriter is non-zero).
 	   If non-zero is returned, it is the negated return value for
 	   the DOS call. */
-static int access_check(
-	 int fileno,		/* file_table entry number */
-	 unsigned long ofs,	/* offset into file */
-	 unsigned long len,	/* length (in bytes) of region to access */
-	 int allowcriter)	/* allow a critical error to be generated */
+WORD share_access_check(
+	 WORD fileno,		/* file_table entry number */
+	 UDWORD ofs,	/* offset into file */
+	 UDWORD len,	/* length (in bytes) of region to access */
+	 WORD allowcriter)	/* allow a critical error to be generated */
 {
 	int err = do_access_check(fileno, ofs, len);
 	if (err) {

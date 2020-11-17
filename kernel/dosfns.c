@@ -250,8 +250,8 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
   /* /// Added for SHARE - Ron Cemer */
   if (IsShareInstalled(FALSE) && (s->sft_shroff >= 0))
   {
-    int rc = share_access_check(cu_psp, s->sft_shroff, s->sft_posit,
-                                 (unsigned long)n, 1);
+    int rc = share_access_check(s->sft_shroff, s->sft_posit,
+                                 (UDWORD)n, 1);
     if (rc != SUCCESS)
       return rc;
   }
