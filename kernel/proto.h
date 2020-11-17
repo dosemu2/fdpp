@@ -487,7 +487,7 @@ WORD share_access_check(WORD fileno, UDWORD ofs, UDWORD len, WORD allowcriter); 
            returns non-zero.
            If the return value is non-zero, it is the negated error
            return code for the DOS 0x5c call. */
-WORD ASMPASCAL share_lock_unlock(unsigned short pspseg, WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       /* one to unlock; zero to lock */
+WORD share_lock_unlock(WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       /* one to unlock; zero to lock */
 
         /* DOS calls this to see if share already has the file marked as open.
            Returns:

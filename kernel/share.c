@@ -127,12 +127,6 @@ static lock_t lock_table[lock_table_size];
 
 
 		/* ------------- PROTOTYPES ------------- */
-static int lock_unlock(
-	 int fileno,		/* file_table entry number */
-	 unsigned long ofs,	/* offset into file */
-	 unsigned long len,	/* length (in bytes) of region to lock or unlock */
-	 int unlock);		/* non-zero to unlock; zero to lock */
-
 static int is_file_open(char FAR * filename);
 
 	/* Multiplex interrupt handler */
@@ -153,25 +147,6 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 			iregs.ax |= 0xff;
 			return;
 		}
-			/* lock_unlock lock (0xa4)*/
-			/* lock_unlock unlock (0xa5) */
-		if ((iregs.ax & 0xfe) == 0xa4) {
-			iregs.ax = lock_unlock(
-//				iregs.bx,
-				 iregs.cx,
-#if 0
-				 (   ((((unsigned long)iregs.si)<<16) & 0xffff0000L) |
-  				 (((unsigned long)iregs.di) & 0xffffL)   ),
-				 (   ((((unsigned long)iregs.es)<<16) & 0xffff0000L) |
-                     (((unsigned long)iregs.dx) & 0xffffL)   ),
-#else
-				 (   (((unsigned long)iregs.si)<<16) | ((unsigned long)iregs.di)   ),
-				 (   (((unsigned long)iregs.es)<<16) | ((unsigned long)iregs.dx)   ),
-#endif
-				 (iregs.ax & 0x01));
-			return;
-		}
-
 			/* is_file_open (0xa6)*/
 		if ((iregs.ax & 0xff) == 0xa6) {
 			iregs.ax = is_file_open(MK_FP(iregs.ds, iregs.si));
@@ -456,11 +431,11 @@ WORD share_access_check(
 	   returns non-zero.
 	   If the return value is non-zero, it is the negated error
 	   return code for the DOS 0x5c call. */
-static int lock_unlock(
-	 int fileno,		/* file_table entry number */
-	 unsigned long ofs,	/* offset into file */
-	 unsigned long len,	/* length (in bytes) of region to lock or unlock */
-	 int unlock) {		/* non-zero to unlock; zero to lock */
+WORD share_lock_unlock(
+	 WORD fileno,		/* file_table entry number */
+	 UDWORD ofs,	/* offset into file */
+	 UDWORD len,	/* length (in bytes) of region to lock or unlock */
+	 WORD unlock) {		/* non-zero to unlock; zero to lock */
 
 	int i;
 	lock_t *lptr;

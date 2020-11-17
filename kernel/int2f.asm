@@ -227,38 +227,6 @@ SHARE_CHECK:
 		int	0x2f
 		ret
 
-share_common:
-		push	bp
-		mov	bp, sp
-		push	si
-		push	di
-		mov	bx, [bp + 16]	; pspseg
-		mov	cx, [bp + 14]	; fileno
-		mov	si, [bp + 12]	; high word of ofs
-		mov	di, [bp + 10]	; low word of ofs
-		les	dx, [bp + 6]	; len
-		or	ax, [bp + 4]	; allowcriter/unlock
-		int	0x2f
-		pop	di
-		pop	si
-		pop	bp
-		ret	14		; returns ax
-
-;          DOS calls this to lock or unlock a specific section of a file.
-;          Returns zero if successfully locked or unlocked.  Otherwise
-;          returns non-zero.
-;          If the return value is non-zero, it is the negated error
-;          return code for the DOS 0x5c call.
-;STATIC int share_lock_unlock(unsigned short pspseg,     /* psp segment address of owner process */
-;                             int fileno,        /* file_table entry number */
-;                             unsigned long ofs, /* offset into file */
-;                             unsigned long len, /* length (in bytes) of region to lock or unlock */
-;                             int unlock)       /* one to unlock; zero to lock */
-		global	SHARE_LOCK_UNLOCK
-SHARE_LOCK_UNLOCK:
-		mov	ax,0x10a4
-		jmp	short share_common
-
 ;           DOS calls this to see if share already has the file marked as open.
 ;           Returns:
 ;             1 if open

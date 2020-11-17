@@ -1241,7 +1241,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
     return DE_LOCK;
 
   /* Let SHARE do the work. */
-  return share_lock_unlock(cu_psp, s->sft_shroff, pos, len, unlock);
+  return share_lock_unlock(s->sft_shroff, pos, len, unlock);
 }
 
 /* /// End of additions for SHARE.  - Ron Cemer */
