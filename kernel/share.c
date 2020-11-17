@@ -125,12 +125,6 @@ static file_t file_table[file_table_size];
 static const int lock_table_size = 20;	/* # of lock_t we can have */
 static lock_t lock_table[lock_table_size];
 
-
-		/* ------------- PROTOTYPES ------------- */
-static int is_file_open(char FAR * filename);
-
-	/* Multiplex interrupt handler */
-
 		/* ------------- HOOK ------------- */
 static void interrupt FAR handler2f(iregs FAR *iregs_p)
 {
@@ -145,11 +139,6 @@ static void interrupt FAR handler2f(iregs FAR *iregs_p)
 		if ((iregs.ax & 0xff) == 0) {
 				/* Installation check.  Return 0xff in AL. */
 			iregs.ax |= 0xff;
-			return;
-		}
-			/* is_file_open (0xa6)*/
-		if ((iregs.ax & 0xff) == 0xa6) {
-			iregs.ax = is_file_open(MK_FP(iregs.ds, iregs.si));
 			return;
 		}
 	}
@@ -224,7 +213,7 @@ static int file_is_read_only(__XFAR(char) filename)
 	return ((regs.c.b.l & 0x19) == 0x01);
 }
 
-static int fnmatches(char *fn1, char *fn2) {
+static int fnmatches(const char *fn1, const char *fn2) {
 	while (*fn1) {
 		if (*fn1 != *fn2) return 0;
 		fn1++;
@@ -483,7 +472,7 @@ WORD share_lock_unlock(
 	}
 }
 
-static int is_file_open(char FAR * filename)
+WORD share_is_file_open(const char FAR * filename)
 {
 	int i;
 

@@ -493,7 +493,7 @@ WORD share_lock_unlock(WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       
            Returns:
              1 if open
              0 if not */
-WORD ASMPASCAL share_is_file_open(__FAR(const char) filename);
+WORD share_is_file_open(__FAR(const char) filename);
 
 unsigned char ASMPASCAL share_check(void);
 
