@@ -89,6 +89,7 @@ void BinarySftIO(int sft_idx, void *bp, int mode);
 long DosRWSft(int sft_idx, size_t n, __XFAR(void) bp, int mode);
 #define DosRead(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_READ)
 #define DosWrite(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_WRITE)
+#define DosTruncate(hndl) DosRWSft(get_sft_idx(hndl), 0, NULL, XFR_WRITE)
 ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc);
 long DosOpen(__FAR(char) fname, unsigned flags, unsigned attrib);
 COUNT CloneHandle(unsigned hndl);

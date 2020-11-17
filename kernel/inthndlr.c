@@ -929,9 +929,9 @@ dispatch:
 
       /* Dos Write                                                    */
     case 0x40:
-      /* we return error for DS:DX=NULL, but if CX is also 0 then fine */
       if (!lr.CX) {
-        lrc = SUCCESS;
+        /* special "truncate" case */
+        lrc = DosTruncate(lr.BX);
         goto long_check;
       }
       lrc = DosWrite(lr.BX, lr.CX, FP_DS_DX);
