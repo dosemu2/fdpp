@@ -1112,17 +1112,6 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrib)
   if (result & IS_DEVICE)
     return DE_FILENOTFND;
 
-  if (IsShareInstalled(TRUE))
-  {
-    /* SHARE closes the file if it is opened in
-     * compatibility mode, else generate a critical error.
-     * Here generate a critical error by opening in "rw compat" mode */
-    if ((result = share_open_check(PriPathName, O_RDWR, 0,
-            !!(attrib & D_RDONLY))) < 0)
-      return result;
-    /* else dos_setfattr will close the file */
-    share_close_file(result);
-  }
   return dos_setfattr(PriPathName, attrib);
 }
 
@@ -1316,14 +1305,6 @@ struct dhdr FAR *IsDevice(__XFAR(const char)fname)
   }
 
   return NULL;
-}
-
-/* /// Added for SHARE.  - Ron Cemer */
-/* Eric 8/2008: only re-check (2f.1000) on open/close, not on each access */
-
-BOOL IsShareInstalled(BOOL recheck)
-{
-  return TRUE;
 }
 
 /* /// End of additions for SHARE.  - Ron Cemer */
