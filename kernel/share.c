@@ -165,51 +165,12 @@ static void free_file_table_entry(int fileno) {
 	file_table[fileno].filename[0] = '\0';
 }
 
-static int file_is_read_only(__XFAR(const char) filename)
-{
-	iregs regs = {};
-
-/*
-   DOS 2+ - GET FILE ATTRIBUTES
-
-   AX = 4300h
-   DS:DX -> ASCIZ filename
-
-   Return:
-      CF clear if successful
-         CX = file attributes (see #01420)
-         AX = CX (DR DOS 5.0)
-      CF set on error
-         AX = error code (01h,02h,03h,05h) (see #01680 at AH=59h)
-
-   Bitfields for file attributes:
-
-   Bit(s)  Description     (Table 01420)
-   7      shareable (Novell NetWare)
-   7      pending deleted files (Novell DOS, OpenDOS)
-   6      unused
-   5      archive
-   4      directory
-   3      volume label.
-          Execute-only (Novell NetWare)
-   2      system
-   1      hidden
-   0      read-only
-*/
-
-	regs.a.x = 0x4300;
-	regs.ds = FP_SEG(filename);
-	regs.d.x = FP_OFF(filename);
-	call_intr(0x21, MK_FAR_SCP(regs));
-	if (regs.flags & FLG_CARRY)
-		return 0;
-	return ((regs.c.b.l & 0x19) == 0x01);
-}
-
 #define fnmatches(fn1, fn2) (strcmp(fn1, fn2) == 0)
 
-static WORD do_open_check
-	(int fileno) {		/* file_table entry number */
+static WORD do_open_check(
+	int fileno,		/* file_table entry number */
+	BOOL rdonly)
+{
 	file_t *p;
 	file_t *fptr = &file_table[fileno];
 	int i, j, action = 0, foundexc;
@@ -251,7 +212,7 @@ static WORD do_open_check
 			break;
 
 		case 3:		/* succeed if file read-only, else fail with error 05h */
-			if (file_is_read_only(fptr->filename))
+			if (rdonly)
 				break;
 			/* fall through */
 		case 1:		/* fail with error code 05h */
@@ -259,7 +220,7 @@ static WORD do_open_check
 			return DE_ACCESS;
 
 		case 4:		/* succeed if file read-only, else fail with int 24h */
-			if (file_is_read_only(fptr->filename))
+			if (rdonly)
 				break;
 			/* fall through */
 		case 2:		/* fail with int 24h */
@@ -290,7 +251,9 @@ static WORD do_open_check
 WORD share_open_check
 	(const char FAR *filename,/* FAR  pointer to fully qualified filename */
 	 WORD openmode,		/* 0=read-only, 1=write-only, 2=read-write */
-	 WORD sharemode) {	/* SHARE_COMPAT, etc... */
+	 WORD sharemode,	/* SHARE_COMPAT, etc... */
+	 BOOL rdonly)
+{
 
 	int i, fileno = -1;
 	file_t *fptr;
@@ -330,7 +293,7 @@ WORD share_open_check
 	fptr->sharemode = (unsigned char)sharemode;
 		/* Do the sharing check and return fileno if
 		   okay, or < 0 (and free the entry) if error. */
-	return do_open_check(fileno);
+	return do_open_check(fileno, rdonly);
 }
 
 	/* DOS calls this to record the fact that it has successfully

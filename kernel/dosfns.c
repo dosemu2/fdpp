@@ -529,7 +529,8 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
   {
     if ((sftp->sft_shroff =
          share_open_check(PriPathName,
-                          flags & 0x03, (flags >> 4) & 0x07)) < 0)
+                          flags & 0x03, (flags >> 4) & 0x07,
+                          !!(attrib & D_RDONLY))) < 0)
       return sftp->sft_shroff;
   }
 
@@ -1095,7 +1096,7 @@ COUNT DosGetFattr(const char FAR * name)
 /* This function is almost identical to DosGetFattr().
    Maybe it is nice to join both functions.
        -- 2001/09/03 ska*/
-COUNT DosSetFattr(const char FAR * name, UWORD attrp)
+COUNT DosSetFattr(const char FAR * name, UWORD attrib)
 {
   COUNT result;
 
@@ -1106,7 +1107,7 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrp)
   set_fcbname();
 
   if (result & IS_NETWORK)
-    return remote_setfattr(attrp);
+    return remote_setfattr(attrib);
 
   if (result & IS_DEVICE)
     return DE_FILENOTFND;
@@ -1116,12 +1117,13 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrp)
     /* SHARE closes the file if it is opened in
      * compatibility mode, else generate a critical error.
      * Here generate a critical error by opening in "rw compat" mode */
-    if ((result = share_open_check(PriPathName, O_RDWR, 0)) < 0)
+    if ((result = share_open_check(PriPathName, O_RDWR, 0,
+            !!(attrib & D_RDONLY))) < 0)
       return result;
     /* else dos_setfattr will close the file */
     share_close_file(result);
   }
-  return dos_setfattr(PriPathName, attrp);
+  return dos_setfattr(PriPathName, attrib);
 }
 
 UBYTE DosSelectDrv(UBYTE drv)
