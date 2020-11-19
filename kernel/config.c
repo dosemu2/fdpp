@@ -1770,7 +1770,8 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
   }
   if (memcmp(header.name, "\377COUNTRY", sizeof(header.name)))
   {
-err:printf("%s has invalid format\n", filename);
+err:
+    _printf("%s has invalid format\n", filename);
     goto ret;
   }
   if (lseek(fd, header.offset) == 0xffffffffL
