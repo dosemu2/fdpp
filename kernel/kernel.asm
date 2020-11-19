@@ -450,7 +450,12 @@ _winPatchTable: ; returns offsets to various internal variables
                 global _firstsftt
 _firstsftt:
                 dd -1                   ; link to next
-                dw 16                   ; count
+                dw 5                    ; count
+%if __NASM_MAJOR__ > 2 || __NASM_MINOR__ >= 15
+                times 5 db 59 dup 0     ; 5 sft entries, 59 bytes each
+%else
+                times 5 resb 59         ; this gives warning
+%endif
 
 ; Some references seem to indicate that this data should start at 01fbh in
 ; order to maintain 100% MS-DOS compatibility.

@@ -84,6 +84,7 @@ typedef struct _sft {
   __DOSFAR(BYTE)sft_ifsptr;         /* 37 - pointer to IFS driver for file, 0000000h if native DOS */
 #endif
 } PACKED sft;
+ANNOTATE_SIZE(sft, 59);
 
 /* SFT Table header definition                                          */
 typedef struct _sftheader {
@@ -92,6 +93,7 @@ typedef struct _sftheader {
   WORD sftt_count;              /* # of handle definition       */
   /* entries, this table          */
 } sftheader;
+ANNOTATE_SIZE(sftheader, 6);
 
 /* System File Definition List                                          */
 typedef struct sfttbl {

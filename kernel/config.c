@@ -350,6 +350,8 @@ BSS(BYTE, HMAState, 0);
 /* later.                                                               */
 void PreConfig(void)
 {
+  struct sfttbl FAR *sp;
+
   /* Initialize the base memory pointers                          */
 
 #ifdef DEBUG
@@ -379,6 +381,12 @@ void PreConfig(void)
 
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
+  sp = (struct sfttbl FAR *)
+      DynAlloc("sft", 1, sizeof(sftheader) + (16-5) * sizeof(sft));
+  sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  sp->sftt_count = 16-5;
+  LoL->_sfthead->sftt_next = sp;
+
 #ifdef DEBUG
 /*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
   DebugPrintf((" sft table 0x%P\n", GET_FP32(LoL->_sfthead)));
@@ -396,8 +404,6 @@ void PreConfig(void)
 /* Do second pass initialization: near allocation and MCBs              */
 void PreConfig2(void)
 {
-  struct sfttbl FAR *sp;
-
   /* initialize NEAR allocated things */
 
   /* Initialize the base memory pointers from last time.          */
