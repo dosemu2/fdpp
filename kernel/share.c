@@ -248,7 +248,7 @@ static WORD do_open_check(
 	   error.  If < 0 is returned, it is the negated error return
 	   code, so DOS simply negates this value and returns it in
 	   AX. */
-WORD share_open_check
+WORD share_open_file
 	(const char FAR *filename,/* FAR  pointer to fully qualified filename */
 	 WORD openmode,		/* 0=read-only, 1=write-only, 2=read-write */
 	 WORD sharemode,	/* SHARE_COMPAT, etc... */
@@ -294,6 +294,18 @@ WORD share_open_check
 		/* Do the sharing check and return fileno if
 		   okay, or < 0 (and free the entry) if error. */
 	return do_open_check(fileno, rdonly);
+}
+
+
+BOOL share_open_check
+	(const char FAR *filename)/* FAR  pointer to fully qualified filename */
+{
+	int i;
+	for (i = 0; i < file_table_size; i++) {
+		if (fnmatches(filename, file_table[i].filename))
+			return 1;
+	}
+	return 0;
 }
 
 	/* DOS calls this to record the fact that it has successfully

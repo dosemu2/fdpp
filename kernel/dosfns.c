@@ -528,7 +528,7 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
   if (IsShareInstalled(TRUE))
   {
     if ((sftp->sft_shroff =
-         share_open_check(PriPathName,
+         share_open_file(PriPathName,
                           flags & 0x03, (flags >> 4) & 0x07,
                           !!(attrib & D_RDONLY))) < 0)
       return sftp->sft_shroff;
@@ -1112,6 +1112,12 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrib)
   if (result & IS_DEVICE)
     return DE_FILENOTFND;
 
+  if (IsShareInstalled(TRUE))
+  {
+    /* SHARE refuses to change attrs if file is opened */
+    if (share_open_check(PriPathName))
+      return DE_ACCESS;
+  }
   return dos_setfattr(PriPathName, attrib);
 }
 
