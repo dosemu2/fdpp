@@ -1706,6 +1706,13 @@ STATIC VOID CfgKeyBuf(char * pLine)
   keycheck();
 }
 
+static UWORD safe_read(WORD fd, void *buf, UWORD count)
+{
+  if (!count)
+    return 0;
+  return read(fd, buf, count);
+}
+
 /*      LoadCountryInfo():
  *      Searches a file in the COUNTRY.SYS format for an entry
  *      matching the specified code page and country code, and loads
@@ -1729,7 +1736,7 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     UWORD codepage;       /* codepage ID */
     UWORD reserved[2];
     ULONG offset;       /* offset of country-subfunction-header in file */
-  } entry;
+  } PACKED entry;
   struct subf_hdr { /* subfunction header */
     UWORD length;         /* length of entry, not counting this word, = 6 */
     UWORD id;             /* subfunction ID */
@@ -1756,7 +1763,7 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     {"\377DBCS   ", &nlsDBCSHardcoded}      /* 7, not supported [yet] */
   };
   static struct subf_hdr hdr[8];
-  static unsigned int entries, count;
+  static UWORD entries, count;
   int fd;
   unsigned int i;
   const char *filename = filenam == NULL ? "\\COUNTRY.SYS" : filenam;
@@ -1792,7 +1799,7 @@ err:
     if (lseek(fd, entry.offset) == 0xffffffffL
       || read(fd, &count, sizeof(count)) != sizeof(count)
       || count > LENGTH(hdr)
-      || read(fd, &hdr, sizeof(struct subf_hdr) * count)
+      || safe_read(fd, &hdr, sizeof(struct subf_hdr) * count)
                       != sizeof(struct subf_hdr) * count)
       goto err;
     for (i = 0; i < count; i++)
@@ -1805,7 +1812,7 @@ err:
        || read(fd, &subf_data, 10) != 10
        || (memcmp(subf_data.signature, table[hdr[i].id].sig, 8) && (hdr[i].id !=4
        || memcmp(subf_data.signature, table[2].sig, 8)))  /* UCASE for FUCASE ^*/
-       || read(fd, subf_data.buffer, subf_data.length) != (unsigned)subf_data.length)
+       || safe_read(fd, subf_data.buffer, subf_data.length) != (unsigned)subf_data.length)
         goto err;
       if (hdr[i].id == 1)
       {
