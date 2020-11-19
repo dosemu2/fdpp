@@ -1708,8 +1708,11 @@ STATIC VOID CfgKeyBuf(char * pLine)
 
 static UWORD safe_read(WORD fd, void *buf, UWORD count)
 {
+  /* fdpp can emulate only small read()s in INIT_TEXT */
   if (!count)
     return 0;
+  if (count > 256)
+    return -1;
   return read(fd, buf, count);
 }
 

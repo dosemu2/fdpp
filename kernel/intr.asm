@@ -255,9 +255,9 @@ CLOSE:
         mov ah, 3eh
         jmp short common_int21
 
-;; UCOUNT read(int fd, void *buf, UCOUNT count);
-    global READ
-READ:
+;; UCOUNT init_DosRead(int fd, void *buf, UCOUNT count);
+    global INIT_DOSREAD
+INIT_DOSREAD:
         pop ax         ; ret address
         pop cx         ; count
         pop dx         ; buf
