@@ -421,11 +421,6 @@ void PreConfig2(void)
   /* We expect ram_top as Kbytes, so convert to paragraphs */
   mcb_init(base_seg, ram_top * 64 - LoL->_first_mcb - 1, MCB_LAST);
 
-  sp = LoL->_sfthead;
-  sp = sp->sftt_next = KernelAlloc(sizeof(sftheader) + 3 * sizeof(sft), 'F', 0);
-  sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
-  sp->sftt_count = 3;
-
   if (ebda_size)  /* move the Extended BIOS Data Area from top of RAM here */
     movebda(ebda_size, FP_SEG(KernelAlloc(ebda_size, 'I', 0)));
 
@@ -476,14 +471,16 @@ void PostConfig(void)
      + Config.cfgFiles * sizeof(sft)); */
   sp = LoL->_sfthead->sftt_next;
   sp = sp->sftt_next = (sfttbl FAR *)
-    KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 8) * sizeof(sft), 'F',
+    /* have initial 16 sfts in kernel */
+    KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 16) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
-  share_init();
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
-  sp->sftt_count = Config.cfgFiles - 8;
+  sp->sftt_count = Config.cfgFiles - 16;
 
   LoL->_old_CDSp = LoL->_CDSp;
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
+
+  share_init();
 
 #ifdef DEBUG
 /*  DebugPrintf((" FCB table 0x%P\n",GET_FP32(LoL->FCBp)));*/

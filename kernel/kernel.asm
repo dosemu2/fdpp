@@ -450,7 +450,7 @@ _winPatchTable: ; returns offsets to various internal variables
                 global _firstsftt
 _firstsftt:
                 dd -1                   ; link to next
-                dw 5                    ; count
+                dw 16                   ; count
 
 ; Some references seem to indicate that this data should start at 01fbh in
 ; order to maintain 100% MS-DOS compatibility.
