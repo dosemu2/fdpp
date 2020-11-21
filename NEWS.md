@@ -15,6 +15,7 @@ Major development efforts again. Look out for new bugs...
   load country.sys from chained config. 3 extra descriptors
   were added too late for country.sys.
 - Proper port of the country.sys loader.
+- Fix SET command.
 
 ## 1.0 release
 

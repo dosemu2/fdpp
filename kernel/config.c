@@ -2288,7 +2288,7 @@ STATIC char * scan(char * s, char * d)
 STATIC char * scan_simple(char * s, char * d)
 {
   s = skipwh(s);
-  while (*s && !iswh(*s))
+  while (*s && !iswh(*s) && *s != '=')
     *d++ = *s++;
   *d = '\0';
   return s;
