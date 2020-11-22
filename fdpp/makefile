@@ -41,10 +41,8 @@ ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
     nls_hc.asm intr.asm irqstack.asm \
     cpu.asm
 DASMS = floppy.asm rdpcclk.asm wrpcclk.asm wratclk.asm
-AASMS = $(ASMS) $(DASMS)
 OBJS = $(ASMS:.asm=.o)
 DOBJS = $(DASMS:.asm=.o)
-INCS = $(AASMS:.asm=_seg.inc) cdata_seg.inc
 PPASMS = plt.S cdata.S
 PPOBJS = $(PPASMS:.S=.o)
 
@@ -70,22 +68,22 @@ clean:
 		$(TARGET).sys kernel.sym *.pc
 
 #               *Individual File Dependencies*
-#apisupt.obj:	$(SRC)apisupt.asm $(SRC)segs.inc
-console.obj:	$(SRC)console.asm $(SRC)io.inc
-cpu.obj:	$(SRC)cpu.asm  $(SRC)segs.inc
-dosidle.obj:	$(SRC)dosidle.asm $(SRC)segs.inc
-entry.obj:	$(SRC)entry.asm   $(SRC)segs.inc $(HDR)stacks.inc
-execrh.obj:	$(SRC)execrh.asm  $(SRC)segs.inc
-int2f.obj:	$(SRC)int2f.asm   $(SRC)segs.inc $(HDR)stacks.inc
-intr.obj:	$(SRC)intr.asm    $(SRC)segs.inc
-io.obj:		$(SRC)io.asm	    $(SRC)segs.inc $(HDR)stacks.inc
-irqstack.obj:   $(SRC)irqstack.asm $(SRC)segs.inc
-kernel.obj:	$(SRC)kernel.asm  $(SRC)segs.inc $(SRC)ludivmul.inc
-nls_hc.obj:	$(SRC)nls_hc.asm  $(SRC)segs.inc
-nlssupt.obj:	$(SRC)nlssupt.asm $(SRC)segs.inc $(HDR)stacks.inc
-printer.obj:	$(SRC)printer.asm $(SRC)io.inc
-procsupt.obj:	$(SRC)procsupt.asm $(SRC)segs.inc $(HDR)stacks.inc
-serial.obj:	$(SRC)serial.asm  $(SRC)io.inc
+#apisupt.o:	$(SRC)apisupt.asm $(SRC)segs.inc
+console.o:	$(SRC)console.asm $(SRC)io.inc
+cpu.o:	$(SRC)cpu.asm  $(SRC)segs.inc
+dosidle.o:	$(SRC)dosidle.asm $(SRC)segs.inc
+entry.o:	$(SRC)entry.asm   $(SRC)segs.inc $(HDR)stacks.inc
+execrh.o:	$(SRC)execrh.asm  $(SRC)segs.inc
+int2f.o:	$(SRC)int2f.asm   $(SRC)segs.inc $(HDR)stacks.inc
+intr.o:	$(SRC)intr.asm    $(SRC)segs.inc
+io.o:		$(SRC)io.asm	    $(SRC)segs.inc $(HDR)stacks.inc
+irqstack.o:   $(SRC)irqstack.asm $(SRC)segs.inc
+kernel.o:	$(SRC)kernel.asm  $(SRC)segs.inc
+nls_hc.o:	$(SRC)nls_hc.asm  $(SRC)segs.inc
+nlssupt.o:	$(SRC)nlssupt.asm $(SRC)segs.inc $(HDR)stacks.inc
+printer.o:	$(SRC)printer.asm $(SRC)io.inc
+procsupt.o:	$(SRC)procsupt.asm $(SRC)segs.inc $(HDR)stacks.inc
+serial.o:	$(SRC)serial.asm  $(SRC)io.inc
 
 HDRS = $(wildcard $(HDR)*.h) $(wildcard $(SRC)*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
