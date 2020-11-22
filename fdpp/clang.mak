@@ -12,9 +12,6 @@ OBJCOPY = objcopy
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line
 TARGETOPT_XTRA = -Wno-format-invalid-specifier
-ifneq ($(XCPU),386)
-$(error unsupported CPU 186)
-endif
 
 TARGET=fdppkrnl
 
@@ -46,8 +43,6 @@ endif
 CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
 CLCFLAGS = -c -fpic $(IFLAGS) $(WCFLAGS) $(DBGFLAGS)
 LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
-
-CPPFLAGS += -DI386
 
 ifeq ($(XFAT),32)
 CPPFLAGS += -DWITHFAT32
