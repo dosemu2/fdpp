@@ -553,12 +553,10 @@ VOID return_user(void)
   psp FAR *p;
   psp FAR *q;
   REG COUNT i;
-  iregs FAR *irp;
   seg parent;
   intvec vec22;
 
   p = MK_FP(cu_psp, 0);
-  irp = p->ps_stack;
 
   /* Alpha Waves game creates many PSPs, then resizes to 0 and terminates
    * them all). It expects no PSP-associated resources are freed in the
@@ -579,7 +577,7 @@ VOID return_user(void)
     if (mcb->m_psp != FREE_PSP)
 #endif
     FreeProcessMem(cu_psp);
-    do_ret_user(irp, getvec(0x22));
+    do_ret_user(p->ps_stack, getvec(0x22));
     return;
   }
 
@@ -608,8 +606,7 @@ VOID return_user(void)
 
   cu_psp = parent;
   q = MK_FP(cu_psp, 0);
-  irp = q->ps_stack;
-  do_ret_user(irp, vec22);
+  do_ret_user(q->ps_stack, vec22);
 }
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)
