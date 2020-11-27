@@ -400,6 +400,8 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
 
+  psp->ps_stack = (BYTE FAR *) r;
+
   fmemcpy_n(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
   lr.ES = r->ES;
