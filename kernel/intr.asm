@@ -147,6 +147,30 @@ CALL_INTR_FUNC:
         pop bp
         ret 8
 
+;WORD share_criterr(WORD flags, WORD err, struct dhdr FAR *lpDevice, UWORD ax)
+                global  _share_criterr
+_share_criterr:
+                pushf
+                push    cs
+                push    criterr_ret
+                push    es
+                push    ds
+                push    bp
+                push    di
+                push    si
+                push    dx
+                push    cx
+                push    bx
+                push    word [esp + 24 + 8]   ; ax
+                mov     si, [esp + 26 + 4]    ; off lpDevice
+                mov     bp, [esp + 26 + 6]    ; seg lpDevice
+                mov     di, [esp + 26 + 2]    ; err
+                mov     ax, [esp + 26 + 0]    ; flags
+                int     24h
+                add     sp, 24
+criterr_ret:
+                ret
+
 
 segment INIT_TEXT
 ;

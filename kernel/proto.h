@@ -463,7 +463,8 @@ UWORD ASMPASCAL floppy_change(UWORD);
            error.  If < 0 is returned, it is the negated error return
            code, so DOS simply negates this value and returns it in
            AX. */
-WORD share_open_file(__FAR(const char) filename, WORD openmode, WORD sharemode, BOOL rdonly);     /* SHARE_COMPAT, etc... */
+WORD share_open_file(__FAR(const char) filename, WORD openmode, WORD sharemode,
+    BOOL rdonly, __FAR(struct dhdr) lpDevice, UWORD ax);
 BOOL share_open_check(__FAR(const char) filename);
 
         /* DOS calls this to record the fact that it has successfully
@@ -481,7 +482,8 @@ void share_close_file(WORD fileno);       /* file_table entry number */
            generates a critical error (if allowcriter is non-zero).
            If non-zero is returned, it is the negated return value for
            the DOS call. */
-WORD share_access_check(WORD fileno, UDWORD ofs, UDWORD len, WORD allowcriter); /* allow a critical error to be generated */
+WORD share_access_check(WORD fileno, UDWORD ofs, UDWORD len,
+    __FAR(struct dhdr) lpDevice, UWORD ax);
 
         /* DOS calls this to lock or unlock a specific section of a file.
            Returns zero if successfully locked or unlocked.  Otherwise
@@ -495,6 +497,8 @@ WORD share_lock_unlock(WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       
              1 if open
              0 if not */
 WORD share_is_file_open(__FAR(const char) filename);
+
+WORD ASMFUNC share_criterr(WORD flags, WORD err, __FAR(struct dhdr) lpDevice, UWORD ax);
 
 DWORD ASMPASCAL call_nls(UWORD,__FAR(VOID), UWORD, UWORD, UWORD, UWORD);
 

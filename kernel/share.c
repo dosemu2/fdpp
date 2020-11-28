@@ -169,7 +169,9 @@ static void free_file_table_entry(int fileno) {
 
 static WORD do_open_check(
 	int fileno,		/* file_table entry number */
-	BOOL rdonly)
+	BOOL rdonly,
+	__FAR(struct dhdr) lpDevice,
+	UWORD ax)
 {
 	file_t *p;
 	file_t *fptr = &file_table[fileno];
@@ -224,16 +226,16 @@ static WORD do_open_check(
 				break;
 			/* fall through */
 		case 2:		/* fail with int 24h */
-			{
-				iregs regs;
+			if (lpDevice) {
+				UWORD flags;
+				UWORD err;
 
-				regs.a.b.h = 0x0e;	/* disk I/O; fail allowed; data area */
-				regs.a.b.l = 0;
-				regs.di = 0x0d;	/* sharing violation */
+				flags = 0x0e00;	/* disk I/O; fail allowed; data area */
+				err = 0x0d;	/* sharing violation */
 				if ( (fptr->filename[0]!='\0') && (fptr->filename[1]==':') )
-					regs.a.b.l = fptr->filename[0]-'A';
+					flags |= fptr->filename[0]-'A';
 				free_file_table_entry(fileno);
-				call_intr(0x24, MK_FAR_SCP(regs));
+				share_criterr(flags, err, lpDevice, ax);
 			}
 			return DE_SHARING;			/* sharing violation */
 		}
@@ -252,7 +254,9 @@ WORD share_open_file
 	(const char FAR *filename,/* FAR  pointer to fully qualified filename */
 	 WORD openmode,		/* 0=read-only, 1=write-only, 2=read-write */
 	 WORD sharemode,	/* SHARE_COMPAT, etc... */
-	 BOOL rdonly)
+	 BOOL rdonly,
+	 __FAR(struct dhdr) lpDevice,
+	 UWORD ax)
 {
 
 	int i, fileno = -1;
@@ -293,7 +297,7 @@ WORD share_open_file
 	fptr->sharemode = (unsigned char)sharemode;
 		/* Do the sharing check and return fileno if
 		   okay, or < 0 (and free the entry) if error. */
-	return do_open_check(fileno, rdonly);
+	return do_open_check(fileno, rdonly, lpDevice, ax);
 }
 
 
@@ -356,20 +360,21 @@ WORD share_access_check(
 	 WORD fileno,		/* file_table entry number */
 	 UDWORD ofs,	/* offset into file */
 	 UDWORD len,	/* length (in bytes) of region to access */
-	 WORD allowcriter)	/* allow a critical error to be generated */
+	 struct dhdr FAR * lpDevice,	/* allow a critical error to be generated */
+	 UWORD ax)
 {
 	int err = do_access_check(fileno, ofs, len);
 	if (err) {
-		if (allowcriter) {
+		if (lpDevice) {
 			file_t *fptr = &file_table[fileno];
-			iregs regs;
+			UWORD flags;
+			UWORD err;
 
-			regs.a.b.h = 0x0e;	/* disk I/O; fail allowed; data area */
-			regs.a.b.l = 0;
-			regs.di = 0x0e;	/* lock violation */
+			flags = 0x0e00;	/* disk I/O; fail allowed; data area */
+			err = 0x0e;	/* lock violation */
 			if ( (fptr->filename[0]!='\0') && (fptr->filename[1]==':') )
-				regs.a.b.l = fptr->filename[0]-'A';
-			call_intr(0x24, MK_FAR_SCP(regs));
+				flags |= fptr->filename[0]-'A';
+			share_criterr(flags, err, lpDevice, ax);
 		}
 		return DE_ACCESS;		/* access denied */
 	}

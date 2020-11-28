@@ -245,7 +245,8 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
   if (IsShareInstalled(FALSE) && (s->sft_shroff >= 0))
   {
     int rc = share_access_check(s->sft_shroff, s->sft_posit,
-                                 (UDWORD)n, 1);
+                                 (UDWORD)n, s->sft_dcb->dpb_device,
+                                 mode == XFR_READ ? 0x3f : 0x40);
     if (rc != SUCCESS)
       return rc;
   }
@@ -527,10 +528,14 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
 /* /// Added for SHARE.  - Ron Cemer */
   if (IsShareInstalled(TRUE))
   {
+    struct cds FAR *cdsp = get_cds(PriPathName[0] - 'A');
+    if (!cdsp || !cdsp->cdsDpb)
+      return DE_ACCESS;
     if ((sftp->sft_shroff =
          share_open_file(PriPathName,
                           flags & 0x03, (flags >> 4) & 0x07,
-                          !!(attrib & D_RDONLY))) < 0)
+                          !!(attrib & D_RDONLY),
+                          cdsp->cdsDpb->dpb_device, 0x3d)) < 0)
       return sftp->sft_shroff;
   }
 
