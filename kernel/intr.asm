@@ -161,11 +161,12 @@ _share_criterr:
                 push    dx
                 push    cx
                 push    bx
-                push    word [esp + 24 + 8]   ; ax
-                mov     si, [esp + 26 + 4]    ; off lpDevice
-                mov     bp, [esp + 26 + 6]    ; seg lpDevice
-                mov     di, [esp + 26 + 2]    ; err
-                mov     ax, [esp + 26 + 0]    ; flags
+                mov     bx, sp
+                push    word [ss:bx + 24 + 8]   ; ax
+                mov     si,  [ss:bx + 24 + 4]   ; off lpDevice
+                mov     bp,  [ss:bx + 24 + 6]   ; seg lpDevice
+                mov     di,  [ss:bx + 24 + 2]   ; err
+                mov     ax,  [ss:bx + 24 + 0]   ; flags
                 int     24h
                 add     sp, 24
 criterr_ret:
