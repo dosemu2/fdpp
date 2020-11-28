@@ -168,7 +168,16 @@ _share_criterr:
                 mov     di,  [ss:bx + 24 + 2]   ; err
                 mov     ax,  [ss:bx + 24 + 0]   ; flags
                 int     24h
-                add     sp, 24
+                pop     ax
+                pop     bx
+                pop     cx
+                pop     dx
+                pop     si
+                pop     di
+                pop     bp
+                pop     ds
+                pop     es
+                add     sp, 6
 criterr_ret:
                 ret
 
