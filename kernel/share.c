@@ -219,7 +219,8 @@ static WORD do_open_check(
 			/* fall through */
 		case 1:		/* fail with error code 05h */
 			free_file_table_entry(fileno);
-			return DE_ACCESS;
+			/* XXX contrary to RBIL, testlock.exe expects error 20h here -stsp*/
+			return DE_SHARING;
 
 		case 4:		/* succeed if file read-only, else fail with int 24h */
 			if (rdonly)
