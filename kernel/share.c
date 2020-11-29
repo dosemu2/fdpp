@@ -341,6 +341,7 @@ static WORD do_access_check(
 	for (i = 0; i < lock_table_size; i++) {
 		lptr = &lock_table[i];
 		if (   (lptr->used)
+			&& fileno != lptr->fileno
 			&& (fnmatches(filename, file_table[lptr->fileno].filename))
 			&& (   ( (ofs>=lptr->start) && (ofs<lptr->end) )
 				|| ( (endofs>lptr->start) && (endofs<=lptr->end) )   )   ) {
