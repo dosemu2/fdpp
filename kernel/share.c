@@ -324,7 +324,8 @@ void share_close_file(WORD fileno) {		/* file_table entry number */
 static WORD do_access_check(
 	 WORD fileno,
 	 UDWORD ofs,
-	 UDWORD len)
+	 UDWORD len,
+	 BOOL allow_same_fd)
 {
 	int i;
 	char *filename = file_table[fileno].filename;
@@ -341,7 +342,7 @@ static WORD do_access_check(
 	for (i = 0; i < lock_table_size; i++) {
 		lptr = &lock_table[i];
 		if (   (lptr->used)
-			&& fileno != lptr->fileno
+			&& (!allow_same_fd || fileno != lptr->fileno)
 			&& (fnmatches(filename, file_table[lptr->fileno].filename))
 			&& (   ( (ofs>=lptr->start) && (ofs<lptr->end) )
 				|| ( (endofs>lptr->start) && (endofs<=lptr->end) )   )   ) {
@@ -365,7 +366,7 @@ WORD share_access_check(
 	 struct dhdr FAR * lpDevice,	/* allow a critical error to be generated */
 	 UWORD ax)
 {
-	int err = do_access_check(fileno, ofs, len);
+	int err = do_access_check(fileno, ofs, len, 1);
 	if (err) {
 		if (lpDevice) {
 			file_t *fptr = &file_table[fileno];
@@ -422,7 +423,7 @@ WORD share_lock_unlock(
 			/* Not already locked by us; can't unlock. */
 		return DE_LOCK;		/* lock violation */
 	} else {
-		if (do_access_check(fileno, ofs, len)) {
+		if (do_access_check(fileno, ofs, len, 0)) {
 				/* Already locked; can't lock. */
 			return DE_LOCK;		/* lock violation */
 		}
