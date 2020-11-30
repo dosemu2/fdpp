@@ -1,3 +1,8 @@
+## 1.2
+
+Stabilization release. Fixed regressions and done more work
+on file region locking.
+
 ## 1.1
 
 Major development efforts again. Look out for new bugs...
