@@ -6,7 +6,7 @@ CC = clang++
 CL = clang++
 CLC = clang
 NASM = nasm
-LINK = ld.lld
+LINK = ld
 OBJCOPY = objcopy
 
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
