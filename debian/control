@@ -10,7 +10,7 @@ Build-Depends:
     bash,
     clang,
     nasm,
-    lld,
+    lld | lld-8,
     binutils,
     libstdc++-dev,
     autoconf,
