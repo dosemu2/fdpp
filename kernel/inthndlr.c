@@ -1572,8 +1572,12 @@ dispatch:
           r->flags |= FLG_CARRY;
           r->AX = 0x11a6;
           call_intr(0x2f, r);
-          if (!(r->flags & FLG_CARRY))
+          if (!(r->flags & FLG_CARRY)) {
+            r->ES = saved_r.ES;
+            r->DI = saved_r.DI;
+            r->AX = 0;
             goto real_exit;
+          }
           /* carry still set - unhandled */
           *r = saved_r;
           goto unsupp;
