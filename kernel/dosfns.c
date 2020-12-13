@@ -283,12 +283,8 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
  *  from the end of a file opened with sharing modes set in such a manner
  *  that another process is able to change the size of the file while it
  *  is already open
- *  Tested this with Shsucdx ver 0.06 and 1.0. Both now work.
- *  Lredir via mfs.c from DosEMU works when writing appended files.
- *  Mfs.c looks for these mode bits set, so here is my best guess.;^)
  */
-    if ((s->sft_flags & SFT_FSHARED) &&
-        (s->sft_mode & (O_DENYREAD | O_DENYNONE)))
+    if (s->sft_flags & SFT_FSHARED)
       new_pos = remote_lseek(s, new_pos);
     else
       new_pos += s->sft_size;
