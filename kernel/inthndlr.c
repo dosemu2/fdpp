@@ -1575,7 +1575,6 @@ dispatch:
           if (!(r->flags & FLG_CARRY)) {
             r->ES = saved_r.ES;
             r->DI = saved_r.DI;
-            r->AX = 0;
             goto real_exit;
           }
           /* carry still set - unhandled */
