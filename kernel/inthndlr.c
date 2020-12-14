@@ -1141,10 +1141,23 @@ dispatch:
 */
       /* ************UNDOCUMENTED************************************* */
       /* Get List of Lists                                            */
-    case 0x52:
-      lr.BX = FP_OFF(__ASMADDR(DPBp));
-      lr.ES = FP_SEG(__ASMADDR(DPBp));
+
+      /* RBIL says:
+       *  Quarterdeck's suggested check for the use of its DOSDATA.SYS or
+          DOS-UP.SYS is to test whether the list-of-lists segment is greater
+          than the segment of the first memory block
+       *
+       * Unfortunately QEMM's mft treats this literally, and just locks
+       * up if the LoL segment is less-or-equal to the first memoty block.
+       * So we "normalize" the pointer making the segment part larger.
+       */
+    case 0x52: {
+      UWORD loff = FP_OFF(__ASMADDR(DPBp));
+      UWORD lseg = FP_SEG(__ASMADDR(DPBp));
+      lr.BX = loff & 0xf;
+      lr.ES = lseg + (loff >> 4);
       break;
+    }
 
     case 0x53:
       /*  DOS 2+ internal - TRANSLATE BIOS PARAMETER BLOCK TO DRIVE PARAM BLOCK */
