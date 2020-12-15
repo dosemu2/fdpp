@@ -1,7 +1,9 @@
 ## 1.2
 
-Stabilization release. Fixed regressions and done more work
-on file region locking.
+Stabilization release. Fixed many regressions and done lots more
+work on file region locking. We hope the share/locking support
+is now complete. Also worked around the QEMM's mft bug, so it
+should work again.
 
 ## 1.1
 
