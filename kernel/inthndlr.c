@@ -1555,10 +1555,46 @@ dispatch:
 
       /* case 0x6d and above not implemented : see default; return AL=0 */
 
-    /* LFN API, support only 0xa6 for now */
+    /* LFN API, support only 0x42 and 0xA6 for now */
     case 0x71:
       switch (lr.AL)
       {
+        case 0x42: {
+          iregs saved_r;
+          sft FAR *s;
+          unsigned char idx;
+
+          if (r->BX >= psp->ps_maxfiles)
+          {
+            rc = DE_INVLDHNDL;
+            goto error_exit;
+          }
+          idx = psp->ps_filetab[r->BX];
+          s = idx_to_sft(idx);
+          if (s == (sft FAR *)-1)
+          {
+            rc = DE_INVLDHNDL;
+            goto error_exit;
+          }
+          if (!(s->sft_flags & SFT_FSHARED))
+            goto unsupp;    /* unsupported on local fs yet */
+          /* call to redirector */
+          saved_r = *r;
+          r->ES = FP_SEG(s);
+          r->DI = FP_OFF(s);
+          r->flags |= FLG_CARRY;
+          r->AX = 0x1142;
+          call_intr(0x2f, r);
+          if (!(r->flags & FLG_CARRY)) {
+            r->ES = saved_r.ES;
+            r->DI = saved_r.DI;
+            goto real_exit;
+          }
+          /* carry still set - unhandled */
+          *r = saved_r;
+          goto unsupp;
+          break;
+        }
         case 0xa6: {
           iregs saved_r;
           sft FAR *s;
