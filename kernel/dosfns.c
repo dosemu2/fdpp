@@ -254,7 +254,57 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
   return rwblock(sft_idx, bp, n, mode);
 }
 
+static COUNT SftSeek2(int sft_idx, LONG new_pos, unsigned mode, UDWORD * p_result);
 COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
+{
+  UDWORD result;
+  return SftSeek2(sft_idx, new_pos, mode, &result);
+}
+
+static unsigned try_long_compat_remote_seek(sft FAR * s, LONG new_pos,
+	unsigned mode, UDWORD * p_result)
+{
+  struct seek_struct_S {
+    UDWORD member[2];
+  };
+  struct seek_struct_S seek_struct;
+  struct seek_struct_S FAR * ssp;
+  iregs regs = {};
+
+  if (0 == (s->sft_flags & SFT_FSHARED))
+    return 0;
+
+  seek_struct.member[0] = new_pos;
+  if (mode == SEEK_SET)
+    seek_struct.member[1] = 0;
+  else if (0 == (new_pos & 0x80000000))
+    seek_struct.member[1] = 0;
+  else
+    seek_struct.member[1] = 0xFFFFffff;
+
+  regs.es = FP_SEG(s);
+  regs.di = FP_OFF(s);
+  ssp = MK_FAR(seek_struct);
+  regs.ds = FP_SEG_OBJ(&regs, ssp);
+  regs.d.x = FP_OFF_OBJ(&regs, ssp);
+  regs.c.x = mode;
+  regs.a.x = 0x1142;
+  regs.flags |= FLG_CARRY;
+  call_intr(0x2f, MK_FAR_SCP(regs));
+  if (regs.flags & FLG_CARRY)
+    return 0;
+  if (seek_struct.member[1] == 0 || seek_struct.member[1] == 0xFFFFffff)
+  {
+    *p_result = seek_struct.member[0];
+  }
+  else
+  {
+    *p_result = -1;
+  }
+  return 1;
+}
+
+static COUNT SftSeek2(int sft_idx, LONG new_pos, unsigned mode, UDWORD * p_result)
 {
   sft FAR *s = idx_to_sft(sft_idx);
   if (FP_OFF(s) == (UWORD) -1)
@@ -270,6 +320,10 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
   if (s->sft_flags & SFT_FDEVICE)
   {
     new_pos = 0;
+  }
+  else if (try_long_compat_remote_seek(s, new_pos, mode, p_result))
+  {
+    return SUCCESS;
   }
   else if (mode == SEEK_CUR)
   {
@@ -291,17 +345,19 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode)
   }
 
   s->sft_posit = new_pos;
+  *p_result = new_pos;
   return SUCCESS;
 }
 
 ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc)
 {
   int sft_idx = get_sft_idx(hndl);
+  UDWORD result;
 
   /* Get the SFT block that contains the SFT      */
-  *rc = SftSeek(sft_idx, new_pos, mode);
+  *rc = SftSeek2(sft_idx, new_pos, mode, &result);
   if (*rc == SUCCESS)
-    return idx_to_sft(sft_idx)->sft_posit;
+    return result;
   return *rc;
 }
 
