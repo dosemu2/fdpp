@@ -27,7 +27,8 @@ Get the pre-built dosemu2 packages from
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa)
 or from
 [COPR repo](https://copr.fedorainfracloud.org/coprs/stsp/dosemu2/)
-of build it from sources.
+or build it from
+[sources](https://github.com/dosemu2/dosemu2).
 
 ## configuration
 fdpp uses fdppconf.sys file at boot. This file has
