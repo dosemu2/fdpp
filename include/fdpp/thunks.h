@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <stdarg.h>
+#include <stddef.h>
 
 #define FDPP_API_VER 27
 
