@@ -1561,7 +1561,7 @@ dispatch:
       {
         case 0x42:
         case 0xa6: {
-          iregs saved_r;
+          UWORD flg = r->flags;
           sft FAR *s;
           unsigned char idx;
 
@@ -1580,19 +1580,18 @@ dispatch:
           if (!(s->sft_flags & SFT_FSHARED))
             goto unsupp;    /* unsupported on local fs yet */
           /* call to redirector */
-          saved_r = *r;
           r->ES = FP_SEG(s);
           r->DI = FP_OFF(s);
           r->flags |= FLG_CARRY;
           r->AH = 0x11;
           call_intr(0x2f, r);
-          if (!(r->flags & FLG_CARRY) || r->AL != lr.AL) {
-            r->ES = saved_r.ES;
-            r->DI = saved_r.DI;
+          /* restore corrupted regs */
+          r->ES = lr.ES;
+          r->DI = lr.DI;
+          if (!(r->flags & FLG_CARRY) || r->AL != lr.AL)
             goto real_exit;
-          }
           /* carry still set, AL unchanged - unhandled */
-          *r = saved_r;
+          r->flags = flg;
           goto unsupp;
           break;
         }
