@@ -1586,12 +1586,12 @@ dispatch:
           r->flags |= FLG_CARRY;
           r->AH = 0x11;
           call_intr(0x2f, r);
-          if (!(r->flags & FLG_CARRY)) {
+          if (!(r->flags & FLG_CARRY) || r->AL != lr.AL) {
             r->ES = saved_r.ES;
             r->DI = saved_r.DI;
             goto real_exit;
           }
-          /* carry still set - unhandled */
+          /* carry still set, AL unchanged - unhandled */
           *r = saved_r;
           goto unsupp;
           break;
