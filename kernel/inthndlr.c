@@ -1592,6 +1592,7 @@ dispatch:
             goto real_exit;
           /* carry still set, AL unchanged - unhandled */
           r->flags = flg;
+          r->AX = lr.AX;
           goto unsupp;
           break;
         }
