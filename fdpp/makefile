@@ -53,7 +53,7 @@ ALL = $(FDPPLIB) $(TARGET).sys $(GEN_EXT)
 all: $(ALL)
 
 $(TARGET).elf: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
-	$(LINK) -melf_i386 -static -Map $(TARGET).map -o $@ $(^:%.ld=-T%.ld)
+	$(LINK) -melf_i386 -static -Map=$(TARGET).map -o $@ $(^:%.ld=-T%.ld)
 	chmod -x $@
 
 $(TARGET).sys: $(TARGET).elf
