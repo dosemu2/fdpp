@@ -10,7 +10,7 @@ Summary: 64-bit DOS
 Group: System/Emulator
 
 License: GPL-3.0+
-URL: http://www.github.com/dosemu2/fdpp
+URL: https://github.com/dosemu2/fdpp
 VCS: {{{ git_dir_vcs }}}
 Source: {{{ git_dir_archive }}}
 

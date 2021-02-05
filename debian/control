@@ -16,7 +16,7 @@ Build-Depends:
     autoconf,
     git,
     debhelper (>= 9~)
-Homepage: http://www.github.com/stsp/fdpp
+Homepage: https://github.com/dosemu2/fdpp
 
 Package: fdpp
 Architecture: i386 amd64
