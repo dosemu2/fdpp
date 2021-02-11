@@ -439,7 +439,6 @@ public:
     }
 };
 
-template<typename T> class AsmSym;
 template<typename T>
 class AsmRef {
     FarPtr<T> *sym;
