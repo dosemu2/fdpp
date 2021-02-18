@@ -523,6 +523,7 @@ _net_name       db      '               ' ;-27 - 15 Character Network Name
                 global  _return_code
                 global  _internal_data
 
+                times (0315h - ($ - DATASTART)) db 0
                 global  _CritPatch
 _CritPatch      dw      0d0ch           ;-11 zero list of patched critical
                 dw      0d0ch           ;    section variables
