@@ -122,6 +122,7 @@ BSS(UWORD, ram_top, 0); /* How much ram in Kbytes               */
 BSS(size_t, ebda_size, 0);
 
 STATIC BSSA(UBYTE, ErrorAlreadyPrinted, 128);
+struct cds FAR *old_CDSp;
 
 #ifdef FDPP
 static void FAR *dosobj;
@@ -483,7 +484,7 @@ void PostConfig(void)
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = Config.cfgFiles - 16;
 
-  LoL->_old_CDSp = LoL->_CDSp;
+  old_CDSp = LoL->_CDSp;
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
 
   share_init();

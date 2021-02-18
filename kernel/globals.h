@@ -304,3 +304,4 @@ extern BYTE ReturnAnyDosVersionExpected;
 GLOBAL struct f_node fnode[2];
 
 extern __FAR(struct _bprm) bprm;
+extern __FAR(struct cds) old_CDSp;

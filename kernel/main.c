@@ -406,9 +406,9 @@ STATIC VOID FsConfig(BOOL reinit)
   {
     struct cds FAR *pcds_table = &LoL->_CDSp[i];
 
-    if (reinit && LoL->_old_CDSp)
+    if (reinit && old_CDSp)
     {
-      struct cds FAR *old_cds = &LoL->_old_CDSp[i];
+      struct cds FAR *old_cds = &old_CDSp[i];
       if (old_cds->cdsFlags)
       {
         fmemcpy(pcds_table, old_cds, sizeof(struct cds));
