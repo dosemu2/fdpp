@@ -122,7 +122,7 @@ typedef struct {
 //static char progname[9];
 static const int file_table_size = 256;	/* # of file_t we can have */
 static file_t file_table[file_table_size];
-static const int lock_table_size = 20;	/* # of lock_t we can have */
+static const int lock_table_size = 1024;	/* # of lock_t we can have */
 static lock_t lock_table[lock_table_size];
 
 		/* ------------- HOOK ------------- */
