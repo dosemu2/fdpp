@@ -52,8 +52,8 @@ struct lol {
   SYM_MEMB(lol, struct dhdr, _nul_dev);        /* 22 NUL device driver header(no pointer!)*/
   unsigned char _njoined;       /* 34 number of joined devices             */
   unsigned short specialptr;   /* 35 pointer to list of spec. prog(unused)*/
-  __DOSFAR(void)setverPtr;         /* 37 pointer to SETVER list               */
-  PTR_MEMB(void) a20ptr;        /* 3b pointer to fix A20 ctrl              */
+  __DOSFAR(void) setverPtr;    /* 37 pointer to SETVER list               */
+  unsigned short a20ptr;       /* 3b CS-relative offset to fix A20 ctrl   */
   unsigned short recentpsp;    /* 3d PSP of most recently exec'ed prog    */
   unsigned short nbuffers;     /* 3f Number of buffers                    */
   unsigned short nlookahead;   /* 41 Number of lookahead buffers          */

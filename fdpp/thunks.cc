@@ -747,10 +747,11 @@ void RelocSplitSeg(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
                 asm_thunks.arr[i].ptr->seg += delta;
                 assert(asm_thunks.arr[i].ptr->off >= delta * 16);
                 asm_thunks.arr[i].ptr->off -= delta * 16;
-                if ((asm_thunks.arr[i].flags & (THUNKF_SHORT | THUNKF_DEEP)) ==
-                        (THUNKF_SHORT | THUNKF_DEEP)) {
+                if (asm_thunks.arr[i].flags & THUNKF_DEEP) {
                     uint16_t *ptr2 = (uint16_t *)ptr;
-                    *ptr2 -= delta * 16;
+                    ___assert(asm_thunks.arr[i].flags & THUNKF_SHORT);
+                    if (*ptr2)
+                        *ptr2 -= delta * 16;
                 }
             }
             store_far_replace(&sym_tab, resolve_segoff(*asm_thunks.arr[i].ptr),
