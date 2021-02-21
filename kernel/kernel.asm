@@ -531,8 +531,8 @@ _CritPatch      dw      0d0ch           ;-11 zero list of patched critical
                 dw      0d0ch           ;    section variables
                 dw      0d0ch
                 dw      0d0ch
-                dw      0d0ch
-                db      0               ;-01 - unknown
+                dw      0               ; patch list terminator
+                db      90h             ;-01 - unknown
 _internal_data:              ; <-- Address returned by INT21/5D06
 _ErrorMode      db      0               ; 00 - Critical Error Flag
 _InDOS          db      0               ; 01 - Indos Flag
