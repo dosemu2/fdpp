@@ -229,14 +229,14 @@ segment CONST
                 ;
                 global  _nul_strtgy
                 extern GenStrategy
-_nul_strtgy:
+nul_strtgy:
                 jmp LGROUP:GenStrategy
 
                 ;
                 ; NUL device interrupt
                 ;
                 global  _nul_intr
-_nul_intr:
+nul_intr:
                 push    es
                 push    bx
                 mov     bx,LGROUP
@@ -285,6 +285,8 @@ segment _FIXED_DATA
 DATASTART:
                 global  _DATASTART
 _DATASTART:
+                global  _DataStart
+_DataStart:
 dos_data        db      0
                 dw      kernel_start
                 db      0               ; padding
@@ -339,8 +341,8 @@ _nul_dev:           ; 0022 device chain root
                 dw      _con_dev, LGROUP
                                         ; next is con_dev at init time.
                 dw      8004h           ; attributes = char device, NUL bit set
-                dw      _nul_strtgy
-                dw      _nul_intr
+_nul_strtgy     dw      nul_strtgy
+_nul_intr       dw      nul_intr
                 db      'NUL     '
                 global  _njoined
 _njoined        db      0               ; 0034 number of joined devices
@@ -402,9 +404,9 @@ _rev_number     db      0
                 global  _version_flags
 _version_flags  db      0
 
-                global  os_release
+                global  ____os_release
                 extern  _os_release
-os_release      dw      _os_release
+____os_release  dw      _os_release
 
                 global  _BootParamSeg
 _BootParamSeg   dw      0
@@ -719,6 +721,8 @@ _VirtOpen       db      0               ;782 - virtual open flag
 
                 ; controlled variables end at offset 78Ch so pad to end
                 times (78ch - ($ - _internal_data)) db 0
+                global  _DataEnd
+_DataEnd:
 
 ;
 ; end of controlled variables

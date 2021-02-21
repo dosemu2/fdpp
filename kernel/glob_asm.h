@@ -4,6 +4,8 @@ __ASM(UWORD, NetBios) SEMIC
 __ASM(BYTE *, net_name) SEMIC
 __ASM(BYTE, net_set_count) SEMIC
 __ASM_NEAR(char, inputptr) SEMIC         /* pointer to unread CON input          */
+__ASM_NEAR(void, nul_strtgy) SEMIC
+__ASM_NEAR(void, nul_intr) SEMIC
 __ASM_FAR(sfttbl, sfthead) SEMIC    /* System File Table head               */
 __ASM(WORD, maxsecsize) SEMIC
 __ASM(unsigned char, bufloc) SEMIC    /* 0=conv, 1=HMA                        */
@@ -88,6 +90,8 @@ __ASM_ARRI(BYTE, _ib_start) SEMIC
 __ASM_ARRI(BYTE, _ib_end) SEMIC
 __ASM_ARRI_F(BYTE, _init_end) SEMIC
 __ASM(struct lol FAR, DATASTART) SEMIC
+__ASM_ARRI_F(BYTE, DataStart) SEMIC
+__ASM_ARRI_F(BYTE, DataEnd) SEMIC
 __ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
 __ASM_ARRI_F(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
 __ASM_ARRI_F(BYTE, _HMATextEnd) SEMIC
@@ -143,5 +147,6 @@ __ASM_FAR(void, prev_int21_handler) SEMIC
 __ASM_FAR(void, prev_int2f_handler) SEMIC
 __ASM_FUNC(got_cbreak) SEMIC
 __ASM_FUNC(cpm_entry) SEMIC
-__ASM_ARRI_F(const BYTE, os_release) SEMIC
+__ASM_ARRI_F(const char, os_release) SEMIC
+__ASM_NEAR(const char, ___os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC

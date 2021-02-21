@@ -80,15 +80,13 @@ VOID ASMCFUNC FreeDOSmain(void)
 {
   unsigned char drv;
   unsigned char FAR *p;
+  UWORD relo;
 
 #ifdef _MSC_VER
   extern FAR prn_dev;
   DosDataSeg = (__segment) & DATASTART;
   DosTextSeg = (__segment) & prn_dev;
 #endif
-  setDS(FP_SEG(&DATASTART));
-  setES(FP_SEG(&DATASTART));
-
   /* clear the Init BSS area (what normally the RTL does */
   memset(_ib_start, 0, _ib_end - _ib_start);
   /* back up kernel code to the top of ram */
@@ -98,6 +96,15 @@ VOID ASMCFUNC FreeDOSmain(void)
       __ASMADDR(_InitTextStart), _InitTextEnd - _InitTextStart);
   /* purge HMAText so that no one uses it on init stage */
   fmemset(_HMATextStart, 0xcc, _HMATextEnd - _HMATextStart);
+  /* try to split data segment out of our TINY model */
+  ___assert(!(FP_OFF(DataStart) & 0xf));
+  relo = FP_OFF(DataStart) >> 4;
+  RelocSplitSeg(FP_SEG(DataStart), FP_SEG(DataStart) + relo,
+      FP_OFF(DataStart), DataEnd - DataStart);
+  RelocSplitSeg(FP_SEG(&Dyn), FP_SEG(&Dyn) + relo, FP_OFF(&Dyn), 0);
+  setDS(FP_SEG(&DATASTART));
+  setES(FP_SEG(&DATASTART));
+
 #ifdef FDPP
   objhlp_reset();
   run_ctors();

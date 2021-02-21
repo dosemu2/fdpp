@@ -54,6 +54,8 @@ typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
 
 struct athunk {
     struct far_s *ptr;
+#define THUNKF_SHORT 1
+#define THUNKF_DEEP 2
     unsigned flags;
 };
 
@@ -83,7 +85,7 @@ static union asm_thunks_u {
 #define SEMIC ,
 #define __ASM(t, v) _A(__##v)
 #define __ASM_FAR(t, v) _A(__##v)
-#define __ASM_NEAR(t, v) _A(__##v)
+#define __ASM_NEAR(t, v) { __ASMREF(__##v), THUNKF_SHORT | THUNKF_DEEP }
 #define __ASM_ARR(t, v, l) _A(__##v)
 #define __ASM_ARRI(t, v) _A(__##v)
 #define __ASM_ARRI_F(t, v) _A(__##v)
@@ -718,6 +720,44 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
     if (fdpp->relocate_notify)
         fdpp->relocate_notify(old_seg, new_seg, offs, len);
 
+    fdlogprintf("processed %i relocs (%i missed)\n", reloc, miss);
+}
+
+void RelocSplitSeg(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
+{
+    /* For simplicity we only split data segments.
+     * Therefore no relocate_notify here. */
+    int i;
+    int reloc = 0;
+    int miss = 0;
+    uint8_t *start_p = (uint8_t *)so2lin(old_seg, offs);
+    uint8_t *end_p = (uint8_t *)so2lin(old_seg + (len >> 4), (len & 0xf) + offs);
+    uint16_t delta = new_seg - old_seg;
+
+    for (i = 0; i < _countof(asm_thunks.arr); i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i].ptr);
+        if (ptr >= start_p && ptr <= end_p) {
+            int rm;
+            far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
+            if (!f.seg && !f.off)
+                miss++;
+            else
+                ___assert(rm);
+            if (old_seg == asm_thunks.arr[i].ptr->seg) {
+                asm_thunks.arr[i].ptr->seg += delta;
+                assert(asm_thunks.arr[i].ptr->off >= delta * 16);
+                asm_thunks.arr[i].ptr->off -= delta * 16;
+                if ((asm_thunks.arr[i].flags & (THUNKF_SHORT | THUNKF_DEEP)) ==
+                        (THUNKF_SHORT | THUNKF_DEEP)) {
+                    uint16_t *ptr2 = (uint16_t *)ptr;
+                    *ptr2 -= delta * 16;
+                }
+            }
+            store_far_replace(&sym_tab, resolve_segoff(*asm_thunks.arr[i].ptr),
+                    *asm_thunks.arr[i].ptr);
+            reloc++;
+        }
+    }
     fdlogprintf("processed %i relocs (%i missed)\n", reloc, miss);
 }
 

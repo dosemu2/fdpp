@@ -226,6 +226,7 @@ void disable(void);
 void enable(void);
 void int3(void);
 void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len);
+void RelocSplitSeg(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len);
 void PurgeHook(void *ptr, UDWORD len);
 void thunk_fmemcpy(far_t d, far_t s, size_t n);
 void thunk_n_fmemcpy(far_t d, const void *s, size_t n);
