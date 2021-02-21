@@ -1,3 +1,19 @@
+## 1.3
+
+Implemented run-time relinking to fix the regressions from switching
+to Tiny model that happened in 1.1. Unfortunately many programs expect
+the DOS internal areas (like LoL and SDA) at the fixed locations
+relative to DOS DS, rather than to query the addresses of the needed
+structures. So fully compatible DOS cannot use Tiny model. We found
+the way to convert FreeDOS from Tiny to Compact model at run-time.
+Other than that, quite a few developments happened:
+
+- long file seek extension from @ecm-pushbx
+- rmdir fix from @andrewbird
+- increase amount of file locks from 20 to 1024 in share
+- revert mft work-around introduced in 1.2, as our run-time relinking
+  solves that regression in a much better way.
+
 ## 1.2
 
 Stabilization release. Fixed many regressions and done lots more
