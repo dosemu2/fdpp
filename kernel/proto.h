@@ -521,7 +521,7 @@ ULONG ASMPASCAL INITTEXT lseek(WORD fd, DWORD position);
 seg ASMPASCAL INITTEXT allocmem(UWORD size);
 void ASMPASCAL INITTEXT keycheck(void);
 void ASMPASCAL INITTEXT set_DTA(__FAR(void)_dta);
-WORD ASMPASCAL execrh(__FAR(request),__FAR(struct dhdr));
+WORD ASMPASCAL execrh(__FAR(request), __FAR(struct dhdr));
 VOID ASMPASCAL FAR _EnableA20(VOID);
 VOID ASMPASCAL FAR _DisableA20(VOID);
 __FAR(void) ASMPASCAL INITTEXT DetectXMSDriver(VOID);
