@@ -527,10 +527,10 @@ _net_name       db      '               ' ;-27 - 15 Character Network Name
 
                 times (0315h - ($ - DATASTART)) db 0
                 global  _CritPatch
-_CritPatch      dw      0d0ch           ;-11 zero list of patched critical
-                dw      0d0ch           ;    section variables
-                dw      0d0ch
-                dw      0d0ch
+_CritPatch      dw      0               ;-11 zero list of patched critical
+                dw      0               ;    section variables
+                dw      0               ;    DOS puts 0d0ch here but some
+                dw      0               ;    progs really write to that addr.
                 dw      0               ; patch list terminator
                 db      90h             ;-01 - unknown
 _internal_data:              ; <-- Address returned by INT21/5D06
