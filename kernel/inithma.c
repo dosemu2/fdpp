@@ -363,10 +363,3 @@ void MoveKernel(UWORD NewKernelSegment)
   RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
   CurrentKernelSegment = NewKernelSegment;
 }
-
-UWORD fd_call_intr(WORD nr, iregs *rp)
-{
-  if (CurrentKernelSegment)
-    return call_intr(nr, MK_FAR_SCP(*rp));
-  return init_call_intr(nr, rp);
-}

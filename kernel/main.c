@@ -148,11 +148,11 @@ VOID ASMCFUNC FreeDOSmain(void)
 
   CheckContinueBootFromHarddisk();
 
-  /* display copyright info and kernel emulation status */
-  signon();
-
   /* initialize all internal variables, process CONFIG.SYS, load drivers, etc */
   init_kernel();
+
+  /* display copyright info and kernel emulation status */
+  signon();
 
 #ifdef DEBUG
   /* Non-portable message kludge alert!   */
