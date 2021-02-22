@@ -92,6 +92,7 @@ __ASM_ARRI_F(BYTE, _init_end) SEMIC
 __ASM(struct lol FAR, DATASTART) SEMIC
 __ASM_ARRI_F(BYTE, DataStart) SEMIC
 __ASM_ARRI_F(BYTE, DataEnd) SEMIC
+__ASM_ARRI_F(BYTE, MARK0026H) SEMIC
 __ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
 __ASM_ARRI_F(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
 __ASM_ARRI_F(BYTE, _HMATextEnd) SEMIC

@@ -1142,8 +1142,8 @@ dispatch:
       /* ************UNDOCUMENTED************************************* */
       /* Get List of Lists                                            */
     case 0x52:
-      lr.BX = FP_OFF(__ASMADDR(DPBp));
-      lr.ES = FP_SEG(__ASMADDR(DPBp));
+      lr.BX = FP_OFF(MARK0026H);
+      lr.ES = FP_SEG(MARK0026H);
       break;
 
     case 0x53:

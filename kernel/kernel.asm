@@ -312,9 +312,9 @@ _inputptr       dw      0               ;-0004 Unread con input
                 global  _first_mcb
 _first_mcb      dw      0               ;-0002 Start of user memory
                 global  _DPBp
-                global  MARK0026H
+                global  _MARK0026H
 ; A reference seems to indicate that this should start at offset 26h.
-MARK0026H:
+_MARK0026H:
 _DPBp           dd      0               ; 0000 First drive Parameter Block
                 global  _sfthead
 _sfthead        dd      0               ; 0004 System File Table head
