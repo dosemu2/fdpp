@@ -511,8 +511,8 @@ public:
     NearPtr(std::nullptr_t) : _off(0) {}
     explicit operator uint16_t () { return _off; }
     operator T *() { return FarPtr<T>(SEG(), _off); }
-    NearPtr<T, SEG> operator - (const NearPtr<T, SEG>& n) const {
-        return NearPtr<T, SEG>(_off - n.off());
+    int operator - (const NearPtr<T, SEG>& n) const {
+        return _off - n.off();
     }
     NearPtr<T, SEG> operator +=(const int inc) {
         _off += inc * sizeof(T);
@@ -522,9 +522,11 @@ public:
         _off -= dec * sizeof(T);
         return *this;
     }
-    bool operator == (std::nullptr_t) { return !_off; }
-    bool operator != (std::nullptr_t) { return !!_off; }
+    bool operator == (std::nullptr_t) const { return !_off; }
+    bool operator != (std::nullptr_t) const { return !!_off; }
+    uint16_t seg() const { return SEG(); }
     uint16_t off() const { return _off; }
+    uint32_t get_fp32() const { return ((SEG() << 16) | _off); }
 
     NearPtr() = default;
 };
@@ -598,15 +600,17 @@ public:
     ArMemb() = default;
 };
 
-template<typename T, int max_len = 0>
+template<typename T, uint16_t (*SEG)(void), int max_len = 0>
 class AsmArNSym : public ArSymBase<T, max_len> {
 public:
-    using sym_type = T*;
-    sym_type get_sym() { return this->sym.get_ptr(); }
+    NearPtr<T, SEG> get_sym() {
+        ___assert(this->sym.seg() == SEG());
+        return NearPtr<T, SEG>(this->sym.off());
+    }
     const uint16_t get_addr() { return this->sym.off(); }
 
     AsmArNSym() = default;
-    AsmArNSym(const AsmArNSym<T> &) = delete;
+    AsmArNSym(const AsmArNSym<T, SEG, max_len> &) = delete;
 };
 
 template<typename T, int max_len = 0>
@@ -692,7 +696,7 @@ public:
 #define __ASMSYM(t) AsmSym<t>
 #define __ASMFSYM(t) AsmFSym<t>
 #define __ASMARSYM(t, l) AsmArFSym<t, l>
-#define __ASMARISYM(t) AsmArNSym<t>
+#define __ASMARISYM(t, s) AsmArNSym<t, s>
 #define __ASMARIFSYM(t) AsmArFSym<t>
 #define __FAR(t) FarPtr<t>
 #define __XFAR(t) XFarPtr<t>

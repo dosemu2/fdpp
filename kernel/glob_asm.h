@@ -59,9 +59,9 @@ __ASM(struct dirent, SearchDir) SEMIC
 //__ASM(struct _FcbSearchBuffer, FcbSearchBuffer) SEMIC
 __ASM(struct __PriPathBuffer, _PriPathBuffer) SEMIC
 __ASM(struct __SecPathBuffer, _SecPathBuffer) SEMIC
-__ASM_ARRI_F(BYTE, internal_data) SEMIC              /* sda areas                            */
-__ASM_ARRI_F(BYTE, swap_always) SEMIC                /*  "    "                              */
-__ASM_ARRI_F(BYTE, swap_indos) SEMIC                 /*  "    "                              */
+__ASM_ARRI(BYTE, internal_data) SEMIC              /* sda areas                            */
+__ASM_ARRI(BYTE, swap_always) SEMIC                /*  "    "                              */
+__ASM_ARRI(BYTE, swap_indos) SEMIC                 /*  "    "                              */
 __ASM(BYTE, tsr) SEMIC                          /* true if program is TSR               */
 __ASM(BYTE, break_flg) SEMIC                    /* true if break was detected           */
 __ASM(BYTE, break_ena) SEMIC                    /* break enabled flag                   */
@@ -95,8 +95,8 @@ __ASM_ARRI_F(BYTE, DataEnd) SEMIC
 __ASM(BYTE FAR, _HMATextAvailable) SEMIC     /* first byte of available CODE area    */
 __ASM_ARRI_F(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE area      */
 __ASM_ARRI_F(BYTE, _HMATextEnd) SEMIC
-__ASM_ARRI(BYTE, _InitTextStart) SEMIC     /* first available byte of ram          */
-__ASM_ARRI(BYTE, _InitTextEnd) SEMIC
+__ASM_ARRI_F(BYTE, _InitTextStart) SEMIC     /* first available byte of ram          */
+__ASM_ARRI_F(BYTE, _InitTextEnd) SEMIC
 //__ASM(BYTE FAR, ReturnAnyDosVersionExpected) SEMIC
 __ASM(BYTE FAR, HaltCpuWhileIdle) SEMIC
 __ASM(unsigned char FAR, kbdType) SEMIC

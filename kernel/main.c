@@ -95,15 +95,18 @@ VOID ASMCFUNC FreeDOSmain(void)
   lpTop = MK_FP(_SS - (TEXT_SIZE + 15) / 16, 0);
   fmemcpy(lpTop, _HMATextStart, TEXT_SIZE);
   RelocHook(_CS, _CS + ((lpTop - _HMATextStart) >> 4),
-      __ASMADDR(_InitTextStart), _InitTextEnd - _InitTextStart);
+      FP_OFF(_InitTextStart), _InitTextEnd - _InitTextStart);
   /* purge HMAText so that no one uses it on init stage */
   fmemset(_HMATextStart, 0xcc, _HMATextEnd - _HMATextStart);
   /* try to split data segment out of our TINY model */
   ___assert(!(FP_OFF(DataStart) & 0xf));
   relo = FP_OFF(DataStart) >> 4;
+  RelocSplitSeg(FP_SEG(&Dyn), FP_SEG(&Dyn) + relo, FP_OFF(&Dyn), 0);
+  RelocSplitSeg(FP_SEG(swap_indos), FP_SEG(swap_indos) + relo,
+      FP_OFF(swap_indos), 0);
+  /* DataStart should be split after others */
   RelocSplitSeg(FP_SEG(DataStart), FP_SEG(DataStart) + relo,
       FP_OFF(DataStart), DataEnd - DataStart);
-  RelocSplitSeg(FP_SEG(&Dyn), FP_SEG(&Dyn) + relo, FP_OFF(&Dyn), 0);
   setDS(FP_SEG(&DATASTART));
   setES(FP_SEG(&DATASTART));
 

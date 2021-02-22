@@ -548,7 +548,7 @@ void setES(uint16_t seg)
 
 uint16_t data_seg(void)
 {
-    return FP_SEG(__ASMADDR(DATASTART));
+    return FP_SEG(&DATASTART);
 }
 
 #define VIF_MASK	0x00080000	/* virtual interrupt flag */
