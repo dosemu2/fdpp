@@ -183,7 +183,6 @@ public:
     uint32_t get_fp32() const { return ((ptr.seg << 16) | ptr.off); }
     far_s get_far() const { return ptr; }
     far_s& get_ref() { return ptr; }
-    const far_s *get_addr() { return &ptr; }
     T* get_ptr() { return (T*)resolve_segoff(ptr); }
     void *get_buf() { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
@@ -607,7 +606,6 @@ public:
         ___assert(this->sym.seg() == SEG());
         return NearPtr<T, SEG>(this->sym.off());
     }
-    const uint16_t get_addr() { return this->sym.off(); }
 
     AsmArNSym() = default;
     AsmArNSym(const AsmArNSym<T, SEG, max_len> &) = delete;
@@ -624,26 +622,12 @@ public:
 };
 
 template<typename T>
-class FarPtrAsm {
-    FarPtr<FarPtrBase<T>> ptr;
-
-public:
-    explicit FarPtrAsm(const FarPtr<FarPtrBase<T>>& f) : ptr(f) {}
-    operator FarPtrBase<T> *() { return ptr.get_ptr(); }
-    /* some apps do the following: *(UWORD *)&f_ptr = new_offs; */
-    explicit operator uint16_t *() { return &ptr->get_ref().off; }
-    uint16_t seg() const { return ptr.seg(); }
-    uint16_t off() const { return ptr.off(); }
-};
-
-template<typename T>
 class AsmFarPtr {
     FarPtr<FarPtrBase<T>> ptr;
 
 public:
     using sym_type = FarPtrBase<T>&;
     sym_type get_sym() { return *ptr.get_ptr(); }
-    FarPtrAsm<T> get_addr() { return FarPtrAsm<T>(ptr); }
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
