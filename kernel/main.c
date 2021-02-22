@@ -58,7 +58,9 @@ STATIC VOID kernel(VOID);
 STATIC VOID FsConfig(BOOL reinit);
 STATIC VOID InitPrinters(VOID);
 STATIC VOID InitSerialPorts(VOID);
+#ifndef FDPP
 STATIC void CheckContinueBootFromHarddisk(void);
+#endif
 STATIC void setup_int_vectors(void);
 
 #ifdef _MSC_VER
@@ -146,8 +148,9 @@ VOID ASMCFUNC FreeDOSmain(void)
   LoL->_BootParamSeg = FP_SEG(bprm);
   ___assert(FP_SEG(bprm) >= FP_SEG(adjust_far(bprm_buf)) && FP_OFF(bprm) == 0);
 
+#ifndef FDPP
   CheckContinueBootFromHarddisk();
-
+#endif
   /* initialize all internal variables, process CONFIG.SYS, load drivers, etc */
   init_kernel();
 
@@ -759,6 +762,7 @@ STATIC VOID InitSerialPorts(VOID)
   }
 }
 
+#ifndef FDPP
 /*****************************************************************
         if kernel.config.BootHarddiskSeconds is set,
         the default is to boot from harddisk, because
@@ -769,7 +773,6 @@ STATIC VOID InitSerialPorts(VOID)
         to boot from floppy/cd, else the system is
         booted from HD
 */
-
 STATIC int EmulatedDriveStatus(int drive,char statusOnly)
 {
   iregs r = {};
@@ -855,3 +858,4 @@ STATIC void CheckContinueBootFromHarddisk(void)
      (*reboot)();
   }
 }
+#endif
