@@ -1,26 +1,12 @@
 language: c
 
-dist:  bionic
-
-addons:
-  apt:
-    packages:
-      - clang
-      - nasm
-      - libstdc++-5-dev
-      - git
-      - bash
-      - autoconf
-      - flex
-      - bison
-      - sed
-    update: true
+dist:  focal
 
 before_install:
-  - echo "before_install"
+  - ./ci_prereq.sh
 
 install:
-  - ./travis_build.sh
+  - ./ci_build.sh
 
 before_script:
   - echo "before_script"
