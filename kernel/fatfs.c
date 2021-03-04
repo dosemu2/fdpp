@@ -87,7 +87,7 @@ struct dpb FAR *get_dpb(COUNT dsk)
 {
   REG struct cds FAR *cdsp = get_cds(dsk);
 
-  if (cdsp == NULL || cdsp->cdsFlags & CDSNETWDRV)
+  if (cdsp == NULL || !(cdsp->cdsFlags & CDSPHYSDRV))
     return NULL;
   return cdsp->cdsDpb;
 }

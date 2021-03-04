@@ -13,6 +13,7 @@ Other than that, quite a few developments happened:
 - increase amount of file locks from 20 to 1024 in share
 - revert mft work-around introduced in 1.2, as our run-time relinking
   solves that regression in a much better way.
+- fix reading of large (>512 bytes) config.sys files
 
 ## 1.2
 
