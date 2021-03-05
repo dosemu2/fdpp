@@ -728,24 +728,6 @@ _DataEnd:
 ; end of controlled variables
 ;
 
-segment _BSS
-;!!                global  _NumFloppies
-;!!_NumFloppies resw    1
-;!!intr_dos_stk resw    1
-;!!intr_dos_seg resw    1
-
-
-; mark front and end of bss area to clear
-segment IB_B
-    global __ib_start
-__ib_start:
-segment IB_E
-    global __ib_end
-__ib_end:
-                global __init_end
-__init_end:
-init_end:
-
 segment _DATA
 ; blockdev private stack
                 global  blk_stk_top
@@ -783,14 +765,6 @@ _Dyn:
 markEndInstanceData:  ; mark end of DOS data seg we say needs instancing
 
 
-segment ID_B
-    global __INIT_DATA_START
-__INIT_DATA_START:
-segment ID_E
-    global __INIT_DATA_END
-__INIT_DATA_END:
-
-
 segment INIT_TEXT_START
                 align 10h
                 times 10h db 0      ; guard space from prev sym
@@ -800,7 +774,7 @@ __InitTextStart:                    ; and c version
 segment INIT_TEXT_END
                 global  __InitTextEnd
 __InitTextEnd:                      ; and c version
-                times 10h db 0      ; guard space for next sym
+;                times 10h db 0      ; guard space for next sym
 
 ;
 ; start end end of HMA area

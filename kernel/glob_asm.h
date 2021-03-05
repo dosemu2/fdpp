@@ -86,9 +86,6 @@ __ASM(BYTE, os_minor) SEMIC                     /* minor version number         
 //__ASM(BYTE, rev_number) SEMIC                   /* minor version number                 */
 __ASM(BYTE, version_flags) SEMIC                /* minor version number                 */
 __ASM(struct _KernelConfig FAR, LowKernelConfig) SEMIC
-__ASM_ARRI(BYTE, _ib_start) SEMIC
-__ASM_ARRI(BYTE, _ib_end) SEMIC
-__ASM_ARRI_F(BYTE, _init_end) SEMIC
 __ASM(struct lol FAR, DATASTART) SEMIC
 __ASM_ARRI_F(BYTE, DataStart) SEMIC
 __ASM_ARRI_F(BYTE, DataEnd) SEMIC

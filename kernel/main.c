@@ -89,8 +89,6 @@ VOID ASMCFUNC FreeDOSmain(void)
   DosDataSeg = (__segment) & DATASTART;
   DosTextSeg = (__segment) & prn_dev;
 #endif
-  /* clear the Init BSS area (what normally the RTL does */
-  memset(_ib_start, 0, _ib_end - _ib_start);
   /* back up kernel code to the top of ram */
   lpTop = MK_FP(_SS - (TEXT_SIZE + 15) / 16, 0);
   fmemcpy(lpTop, _HMATextStart, TEXT_SIZE);

@@ -57,16 +57,6 @@ SECTIONS
 		    "Error: too large for a small-model .exe file.");
 	}
 
-    /* Target init data sections.  */
-    .idata : {
-		*(ID_B)
-		*(ID_E)
-	}
-    .ibss (NOLOAD) : {
-		*(IB_B)
-		*(IB_E)
-	}
-
     /*
      * Discarding .shstrtab is not supported by LLD (LLVM LD) and will trigger an
      * error. Also keep the rest of the control sections to match GNU LD behavior.
