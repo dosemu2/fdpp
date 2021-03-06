@@ -152,13 +152,13 @@ $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(OBJS): %.o: $(SRC)%.asm
+$(OBJS): %.o: $(SRC)%.asm makefile
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
-$(DOBJS): %.o: $(SRC)drivers/%.asm
+$(DOBJS): %.o: $(SRC)drivers/%.asm makefile
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
-$(PPOBJS): %.o: %.asm
+$(PPOBJS): %.o: %.asm makefile
 	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
 
 $(GEN_CC): %.cc: $(SRC)%.c makefile
