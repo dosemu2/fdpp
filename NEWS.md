@@ -14,6 +14,9 @@ Other than that, quite a few developments happened:
 - revert mft work-around introduced in 1.2, as our run-time relinking
   solves that regression in a much better way.
 - fix reading of large (>512 bytes) config.sys files
+- implement ELF loader for real-mode kernel. For now it doesn't do
+  much but to replace the binary kernel. In the future we may want
+  to (ab)use it as another layer of relocation magic.
 
 ## 1.2
 
