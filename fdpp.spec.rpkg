@@ -23,8 +23,12 @@ BuildRequires: nasm
 BuildRequires: lld
 BuildRequires: binutils
 BuildRequires: libstdc++-devel
+BuildRequires: elfutils-libelf-devel
 BuildRequires: autoconf
 BuildRequires: git
+
+Requires: libstdc++
+Requires: elfutils-libelf
 
 %description
 fdpp is a 64-bit DOS.

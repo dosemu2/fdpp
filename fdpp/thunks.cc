@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -26,6 +27,7 @@
 #include "dispatch.hpp"
 #include "objtrace.hpp"
 #include "farhlp.hpp"
+#include "elf.h"
 #include "thunks_priv.h"
 #include "thunks.h"
 
@@ -827,6 +829,11 @@ const char *FdppDataDir(void)
     return _S(FDPPDATADIR);
 }
 
+const char *FdppLibDir(void)
+{
+    return _S(FDPPLIBDIR);
+}
+
 const char *FdppKernelName(void)
 {
     return _S(KRNL_NAME);
@@ -840,4 +847,32 @@ const char *FdppVersionString(void)
 const char *FdppKernelMapName(void)
 {
     return _S(KRNL_MAP_NAME);
+}
+
+const void *FdppKernelLoad(const char *dname, uint16_t seg, int *len)
+{
+    /* FIXME: seg argument currently unused. */
+    void *start, *end;
+    char *kname;
+    void *handle;
+
+    asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
+    handle = elf_open(kname);
+    free(kname);
+    if (!handle) {
+        fdloudprintf("failed to open %s\n", kname);
+        return NULL;
+    }
+    start = elf_getsym(handle, "_start");
+    if (!start)
+        goto err_close;
+    end = elf_getsym(handle, "__InitTextEnd");
+    if (!end)
+        goto err_close;
+    *len = (uintptr_t)end - (uintptr_t)start;
+    return start;
+
+err_close:
+    elf_close(handle);
+    return NULL;
 }

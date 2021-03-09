@@ -1,0 +1,127 @@
+/*
+ *  FDPP - freedos port to modern C++
+ *  Copyright (C) 2021  Stas Sergeev (stsp)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <libelf.h>
+#include <gelf.h>
+#include "elf.h"
+
+struct elfstate {
+    char *addr;
+    size_t mapsize;
+    Elf *elf;
+    Elf_Scn *symtab_scn;
+    GElf_Shdr symtab_shdr;
+    uint32_t load_offs;
+};
+
+void *elf_open(const char *name)
+{
+    Elf         *elf;
+    Elf_Scn     *scn = NULL;
+    GElf_Shdr   shdr;
+    GElf_Phdr   phdr;
+    int         fd;
+    int         i;
+    uint32_t    load_offs;
+    struct stat st;
+    char        *addr;
+    size_t      mapsize;
+    struct elfstate *ret;
+
+    elf_version(EV_CURRENT);
+
+    fd = open(name, O_RDONLY);
+    fstat(fd, &st);
+    mapsize = (st.st_size + getpagesize() - 1) & ~(getpagesize() - 1);
+    addr = mmap(NULL, mapsize, PROT_READ, MAP_PRIVATE, fd, 0);
+    close(fd);
+    if (addr == MAP_FAILED)
+      return NULL;
+    elf = elf_memory(addr, st.st_size);
+    if (!elf)
+        goto err2;
+
+    for (i = 0, load_offs = 0; gelf_getphdr(elf, i, &phdr); i++) {
+        if (phdr.p_type != PT_LOAD)
+            continue;
+        load_offs = phdr.p_offset;
+        break;
+    }
+    if (!load_offs)
+        goto err;
+
+    while ((scn = elf_nextscn(elf, scn)) != NULL) {
+        gelf_getshdr(scn, &shdr);
+        if (shdr.sh_type == SHT_SYMTAB) {
+            /* found a symbol table, go print it. */
+            break;
+        }
+    }
+    if (!scn)
+        goto err;
+
+    ret = malloc(sizeof(*ret));
+    ret->addr = addr;
+    ret->mapsize = mapsize;
+    ret->elf = elf;
+    ret->symtab_scn = scn;
+    ret->symtab_shdr = shdr;
+    ret->load_offs = load_offs;
+    return ret;
+
+err:
+    elf_end(elf);
+err2:
+    munmap(addr, mapsize);
+    return NULL;
+}
+
+void elf_close(void *arg)
+{
+    struct elfstate *state = arg;
+
+    elf_end(state->elf);
+    munmap(state->addr, state->mapsize);
+}
+
+void *elf_getsym(void *arg, const char *name)
+{
+    struct elfstate *state = arg;
+    Elf_Data *data;
+    int count, i;
+
+    data = elf_getdata(state->symtab_scn, NULL);
+    count = state->symtab_shdr.sh_size / state->symtab_shdr.sh_entsize;
+
+    for (i = 0; i < count; i++) {
+        GElf_Sym sym;
+        gelf_getsym(data, i, &sym);
+        if (strcmp(elf_strptr(state->elf, state->symtab_shdr.sh_link,
+                sym.st_name), name) == 0)
+            return state->addr + state->load_offs + sym.st_value;
+    }
+
+    return NULL;
+}

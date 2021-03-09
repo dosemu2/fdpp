@@ -27,10 +27,11 @@ GIT_REV := $(shell $(srcdir)/git-rev.sh)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
 CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir) \
-    -DFDPPDATADIR=$(DATADIR)/fdpp \
-    -DKRNL_NAME=$(TARGET).sys -DKRNL_MAP_NAME=$(TARGET).map \
+    -DFDPPDATADIR=$(DATADIR)/fdpp -DFDPPLIBDIR=$(LIBDIR)/fdpp \
+    -DKRNL_NAME=$(TARGET).sys -DKRNL_ELFNAME=$(TARGET).elf \
+    -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]"
-NASMFLAGS += -i$(SRC)
+NASMFLAGS += -i$(SRC) -f elf32
 
 # *List Macros*
 # Only 8 files per definition; this is limitation of DOS batch
@@ -60,9 +61,11 @@ $(TARGET).sys: $(TARGET).elf
 	$(OBJCOPY) -O binary $^ $@
 	chmod -x $@
 
+.PRECIOUS: $(TARGET).elf
+
 clean:
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
-	-$(RM) .tstamp *.map *.elf *.inc \
+	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
 		$(TARGET).sys kernel.sym *.pc
@@ -130,9 +133,10 @@ CFILES = blockio.c \
     prf.c \
     share.c
 
-FDPP_CFILES = smalloc.c farhlp_sta.c
+FDPP_CFILES = smalloc.c farhlp_sta.c elf.c
 FDPP_CCFILES = thunks.cc dosobj.cc
 CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp
+LIBS = -lelf
 
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)
@@ -153,19 +157,19 @@ $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJS): %.o: $(SRC)%.asm makefile
-	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
+	$(NASM) $(NASMFLAGS) -o $@ $<
 
 $(DOBJS): %.o: $(SRC)drivers/%.asm makefile
-	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
+	$(NASM) $(NASMFLAGS) -o $@ $<
 
 $(PPOBJS): %.o: %.asm makefile
-	$(NASM) $(NASMFLAGS) -f elf -o $@ $<
+	$(NASM) $(NASMFLAGS) -o $@ $<
 
 $(GEN_CC): %.cc: $(SRC)%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
-	$(CL) -o $@ $^ $(LDFLAGS)
+	$(CL) -o $@ $^ $(LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
@@ -204,16 +208,17 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	fi
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
 
-install: $(FDPPLIB) $(GEN_EXT)
+install: $(FDPPLIB) $(TARGET).sys $(TARGET).elf $(TARGET).map $(GEN_EXT)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
 	install $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
+	install $(TARGET).elf $(DESTDIR)$(LIBDIR)/fdpp
+	install -m 0644 $(TARGET).map $(DESTDIR)$(LIBDIR)/fdpp
 	mkdir -p $(DESTDIR)$(PKGCONFIGDIR)
 	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
 	install -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
 	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
-	install -m 0644 fdppkrnl.sys $(DESTDIR)$(DATADIR)/fdpp
-	install -m 0644 fdppkrnl.map $(DESTDIR)$(DATADIR)/fdpp
+	install -m 0644 $(TARGET).sys $(DESTDIR)$(DATADIR)/fdpp
 
 uninstall:
 	rm -rf $(DESTDIR)$(LIBDIR)/fdpp

@@ -13,6 +13,7 @@ Build-Depends:
     lld | lld-8,
     binutils,
     libstdc++-dev,
+    libelf-dev,
     autoconf,
     git,
     debhelper (>= 9~)

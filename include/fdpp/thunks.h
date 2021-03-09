@@ -23,7 +23,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#define FDPP_API_VER 27
+#define FDPP_API_VER 28
 
 #ifndef FDPP
 struct fdpp_far_s {
@@ -71,9 +71,11 @@ struct fdpp_api {
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 
 const char *FdppDataDir(void);
+const char *FdppLibDir(void);
 const char *FdppKernelName(void);
 const char *FdppVersionString(void);
 const char *FdppKernelMapName(void);
+const void *FdppKernelLoad(const char *dname, uint16_t seg, int *len);
 
 #ifdef __cplusplus
 }
