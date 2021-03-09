@@ -76,6 +76,9 @@ SECTIONS
     .rela.plt : {
 		*(.rela.plt)
 	}
+    .note.gnu.build-id  : {
+		*(.note.gnu.build-id)
+	}
 
     /DISCARD/ : { *(.*) }
   }
