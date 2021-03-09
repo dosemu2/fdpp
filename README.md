@@ -82,9 +82,8 @@ If you find some compatibility problems, please
 [report a bug](https://github.com/dosemu2/fdpp/issues).
 
 ## portability
-fdpp can work in any environment with STL/C++ runtime support.
-Requirements to the standard libraries are very small, far
-within the ISO standards. No posix or OS-specific APIs are used.
+fdpp can work in any environment with STL/C++ runtime & minimal
+posix support.
 The build requirements are in line with today's posix-compatible
 environments: you'll need the full stack of tools like bison,
 autoconf, sed etc. Additionally you'll need a clang tool-chain
