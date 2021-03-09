@@ -11,4 +11,5 @@ sudo apt install -y \
     lld \
     binutils \
     autoconf \
+    libelf-dev \
     git
