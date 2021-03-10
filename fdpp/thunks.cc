@@ -858,11 +858,12 @@ const void *FdppKernelLoad(const char *dname, uint16_t seg, int *len)
 
     asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
     handle = elf_open(kname);
-    free(kname);
     if (!handle) {
         fdloudprintf("failed to open %s\n", kname);
+        free(kname);
         return NULL;
     }
+    free(kname);
     start = elf_getsym(handle, "_start");
     if (!start)
         goto err_close;
