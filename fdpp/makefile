@@ -24,13 +24,14 @@ EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h
 GEN_EXT = fdpp.pc
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
+GIT_DESCRIBE := $(shell git describe)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
 CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir) \
     -DFDPPDATADIR=$(DATADIR)/fdpp -DFDPPLIBDIR=$(LIBDIR)/fdpp \
     -DKRNL_NAME=$(TARGET).sys -DKRNL_ELFNAME=$(TARGET).elf \
     -DKRNL_MAP_NAME=$(TARGET).map \
-    -DKERNEL_VERSION="$(VERSION) [GIT: `git describe`]"
+    -DKERNEL_VERSION="$(VERSION) [GIT: $(GIT_DESCRIBE)]"
 NASMFLAGS += -i$(SRC) -f elf32
 
 # *List Macros*
