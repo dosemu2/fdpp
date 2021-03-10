@@ -213,7 +213,7 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 install: $(FDPPLIB) $(TARGET).sys $(TARGET).elf $(TARGET).map $(GEN_EXT)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
 	install $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
-	install $(TARGET).elf $(DESTDIR)$(LIBDIR)/fdpp
+	install -m 0644 $(TARGET).elf $(DESTDIR)$(LIBDIR)/fdpp
 	install -m 0644 $(TARGET).map $(DESTDIR)$(LIBDIR)/fdpp
 	mkdir -p $(DESTDIR)$(PKGCONFIGDIR)
 	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
