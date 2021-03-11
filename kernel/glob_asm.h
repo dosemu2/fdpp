@@ -11,6 +11,7 @@ __ASM(WORD, maxsecsize) SEMIC
 __ASM(unsigned char, bufloc) SEMIC    /* 0=conv, 1=HMA                        */
 __ASM_FAR(void, deblock_buf) SEMIC  /* pointer to workspace buffer      */
 __ASM_FAR(struct cds, CDSp) SEMIC   /* Current Directory Structure          */
+__ASM_FAR(BYTE, setverPtr) SEMIC
 __ASM(LONG, current_filepos) SEMIC    /* current file position                */
 __ASM_FAR(sfttbl, FCBp) SEMIC       /* FCB table pointer                    */
 __ASM(WORD, nprotfcb) SEMIC           /* number of protected fcbs             */
