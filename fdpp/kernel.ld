@@ -14,7 +14,7 @@ I_GROUP = DOS_PSP;
 SECTIONS
   {
     /* Target PSP section.  */
-    .ptext : {
+    .ptext 0 : {
 		*(PSP)
     }
 
@@ -57,10 +57,9 @@ SECTIONS
 		    "Error: too large for a small-model .exe file.");
 	}
 
-    /*
-     * Discarding .shstrtab is not supported by LLD (LLVM LD) and will trigger an
-     * error. Also keep the rest of the control sections to match GNU LD behavior.
-     */
+    /* We do not DISCARD any sections. But we still need to list them
+     * explicitly to prevent linker from trying to put some _before_ our
+     * sections. */
     .shstrtab : {
 		*(.shstrtab)
 	}
@@ -76,9 +75,24 @@ SECTIONS
     .rela.plt : {
 		*(.rela.plt)
 	}
+    /* for build-id */
     .note.gnu.build-id  : {
 		*(.note.gnu.build-id)
 	}
-
-    /DISCARD/ : { *(.*) }
+    /* for solib */
+    .dynsym         : {
+		*(.dynsym)
+	}
+    .dynstr         : {
+		*(.dynstr)
+	}
+    .dynamic        : {
+		*(.dynamic)
+	}
+    .hash           : {
+		*(.hash)
+	}
+    .gnu.hash       : {
+		*(.gnu.hash)
+	}
   }
