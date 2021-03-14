@@ -27,7 +27,7 @@
 #include "dispatch.hpp"
 #include "objtrace.hpp"
 #include "farhlp.hpp"
-#include "elf.h"
+#include "elf_priv.h"
 #include "thunks_priv.h"
 #include "thunks.h"
 

@@ -25,7 +25,7 @@
 #include <fcntl.h>
 #include <libelf.h>
 #include <gelf.h>
-#include "elf.h"
+#include "elf_priv.h"
 
 /* TODO: write proper d/l support! Get rid of the external reloc table! */
 
