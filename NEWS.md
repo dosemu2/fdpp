@@ -5,7 +5,11 @@ to Tiny model that happened in 1.1. Unfortunately many programs expect
 the DOS internal areas (like LoL and SDA) at the fixed locations
 relative to DOS DS, rather than to query the addresses of the needed
 structures. So fully compatible DOS cannot use Tiny model. We found
-the way to convert FreeDOS from Tiny to Compact model at run-time.
+the way to (partially) convert FreeDOS from Tiny to Compact model at
+run-time.
+Also the first attempt is done to make the kernel fully relocatable.
+So far that was achieved with a horrible hack. In the future that may
+be amended, but who cares - the horrible hack just works. :)
 Other than that, quite a few developments happened:
 
 - long file seek extension from @ecm-pushbx
@@ -14,9 +18,8 @@ Other than that, quite a few developments happened:
 - revert mft work-around introduced in 1.2, as our run-time relinking
   solves that regression in a much better way.
 - fix reading of large (>512 bytes) config.sys files
-- implement ELF loader for real-mode kernel. For now it doesn't do
-  much but to replace the binary kernel. In the future we may want
-  to (ab)use it as another layer of relocation magic.
+- implement ELF loader for real-mode kernel
+- hack to make the kernel relocatable
 
 ## 1.2
 
