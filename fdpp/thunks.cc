@@ -851,13 +851,12 @@ const char *FdppKernelMapName(void)
 
 const void *FdppKernelLoad(const char *dname, uint16_t seg, int *len)
 {
-    /* FIXME: seg argument currently unused. */
     void *start, *end;
     char *kname;
     void *handle;
 
     asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
-    handle = elf_open(kname);
+    handle = elf_open(kname, seg);
     if (!handle) {
         fdloudprintf("failed to open %s\n", kname);
         free(kname);

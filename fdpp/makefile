@@ -54,10 +54,18 @@ ALL = $(FDPPLIB) $(TARGET).sys $(GEN_EXT)
 
 all: $(ALL)
 
+# actually dep on rel.h
+elf.o: $(TARGET).elf
+
 $(TARGET).elf: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	$(LINK) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
-		$(^:%.ld=-T%.ld)
+		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
 	chmod -x $@
+	$(LINK) -melf_i386 -static --build-id=sha1 -o $@.tmp \
+		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0
+	cmp -l $@ $@.tmp | grep "140   0" | sed 's/^ //' | cut -d " " -f 1 | \
+		sed 's/$$/,/' > rel.h
+
 
 $(TARGET).sys: $(TARGET).elf
 	$(OBJCOPY) -O binary $^ $@
@@ -149,7 +157,7 @@ $(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
-	$(CLC) $(CLCFLAGS) -o $@ $<
+	$(CLC) $(CLCFLAGS) -I . -o $@ $<
 
 thunks.o: $(EXT_H) $(GEN_HEADERS) $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h $(GIT_REV)
 $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile

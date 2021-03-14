@@ -1,6 +1,4 @@
-/* linker script for fdpp project. Derived from the one of freedos */
-
-DOS_PSP = 0x60;
+/* linker script for fdpp project */
 
 /* these GROUPs play the same role as GROUPS (segments) in OMF */
 /* TINY model, all segments are equal */
@@ -9,7 +7,6 @@ LGROUP = DOS_PSP;
 DGROUP = DOS_PSP;
 TGROUP = DOS_PSP;
 IGROUP = DOS_PSP;
-I_GROUP = DOS_PSP;
 
 SECTIONS
   {

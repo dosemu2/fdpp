@@ -26,6 +26,8 @@ BuildRequires: libstdc++-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: autoconf
 BuildRequires: git
+# diffutils are only needed for reloc hack, remove!
+BuildRequires: diffutils
 
 Requires: libstdc++
 Requires: elfutils-libelf

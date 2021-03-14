@@ -27,6 +27,8 @@
 #include <gelf.h>
 #include "elf.h"
 
+/* TODO: write proper d/l support! Get rid of the external reloc table! */
+
 struct elfstate {
     char *addr;
     size_t mapsize;
@@ -36,7 +38,19 @@ struct elfstate {
     uint32_t load_offs;
 };
 
-void *elf_open(const char *name)
+static void elf_dl(char *addr, uint16_t seg)
+{
+    const int reloc_tab[] = {
+        #include "rel.h"
+    };
+    int i;
+#define _countof(array) (sizeof(array) / sizeof(array[0]))
+
+    for (i = 0; i < _countof(reloc_tab); i++)
+        memcpy(&addr[reloc_tab[i]-1], &seg, sizeof(seg));
+}
+
+void *elf_open(const char *name, uint16_t seg)
 {
     Elf         *elf;
     Elf_Scn     *scn = NULL;
@@ -55,7 +69,7 @@ void *elf_open(const char *name)
     fd = open(name, O_RDONLY);
     fstat(fd, &st);
     mapsize = (st.st_size + getpagesize() - 1) & ~(getpagesize() - 1);
-    addr = mmap(NULL, mapsize, PROT_READ, MAP_PRIVATE, fd, 0);
+    addr = mmap(NULL, mapsize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
     close(fd);
     if (addr == MAP_FAILED)
       return NULL;
@@ -81,6 +95,8 @@ void *elf_open(const char *name)
     }
     if (!scn)
         goto err;
+
+    elf_dl(addr, seg);
 
     ret = malloc(sizeof(*ret));
     ret->addr = addr;
