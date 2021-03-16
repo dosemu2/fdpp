@@ -47,13 +47,18 @@ additionally:
 #else
 extern struct DynS FAR ASM Dyn;
 #endif
+STATIC struct DynS FAR *Dynp;
 STATIC BSS(unsigned, Allocated, 0);
+
+void DynInit(void FAR *ptr)
+{
+  Dynp = ptr;
+}
 
 far_t DynAlloc(const char *what, unsigned num, unsigned size)
 {
   void FAR *now;
   unsigned total = num * size;
-  struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
 
 #ifndef DEBUG
   UNREFERENCED_PARAMETER(what);
@@ -83,13 +88,11 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
 
 void DynFree(void *ptr)
 {
-  struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
   Allocated = (char *)ptr - (char *)Dynp->Buffer;
 }
 
 far_t DynLast()
 {
-  struct DynS FAR *Dynp = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
   DebugPrintf(("dynamic data end at %P\n",
                GET_FP32(Dynp->Buffer + Allocated)));
 

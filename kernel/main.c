@@ -111,6 +111,11 @@ VOID ASMCFUNC FreeDOSmain(void)
 #ifdef FDPP
   objhlp_reset();
   run_ctors();
+#endif
+
+  DynInit(MK_FP(FP_SEG(LoL), FP_OFF(&Dyn)));
+
+#ifdef FDPP
 #define DOSOBJ_POOL 512
   far_t fa = DynAlloc("dosobj", 1, DOSOBJ_POOL);
   dosobj_init(fa, DOSOBJ_POOL);

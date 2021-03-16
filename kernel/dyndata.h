@@ -12,14 +12,9 @@
 #ifndef DYNDATA_H
 #define DYNDATA_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void DynInit(__FAR(void) ptr);
 far_t DynAlloc(const char *what, unsigned num, unsigned size);
 far_t DynLast(void);
 void DynFree(void *ptr);
-#ifdef __cplusplus
-}
-#endif
 
 #endif
