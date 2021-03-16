@@ -24,7 +24,7 @@
 extern _BootParamSeg
 
 segment _BSS
-fdpp_plt dd ?
+fdpp_plt dd 0
 
 %macro call_plt 0
     push es

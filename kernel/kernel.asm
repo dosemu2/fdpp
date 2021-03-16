@@ -777,7 +777,7 @@ __InitTextEnd:                      ; and c version
 
 segment IB
                 global  _BootParamSeg
-_BootParamSeg   dw      ?
+_BootParamSeg   dw      0
 
 ;
 ; start end end of HMA area
