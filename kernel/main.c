@@ -81,7 +81,6 @@ static UBYTE FAR *bprm_buf;
 VOID ASMCFUNC FreeDOSmain(void)
 {
   unsigned char drv;
-  unsigned char FAR *p;
   UWORD relo;
 
 #ifdef _MSC_VER
@@ -121,26 +120,8 @@ VOID ASMCFUNC FreeDOSmain(void)
   dosobj_init(fa, DOSOBJ_POOL);
 #endif
 
-                        /*  if the kernel has been UPX'ed,
-                                CONFIG info is stored at 50:e2 ..fc
-                            and the bootdrive (passed from BIOS)
-                            at 50:e0
-                        */
-
   drv = LoL->_BootDrive + 1;
-  p = (unsigned char FAR *)MK_FP(0, 0x5e0);
-  if (fmemcmp(p+2,"CONFIG",6) == 0)      /* UPX */
-  {
-    fmemcpy_n(&InitKernelConfig, p+2, sizeof(InitKernelConfig));
-
-    drv = *p + 1;
-    *(DWORD FAR *)(p+2) = 0;
-  }
-  else
-  {
-    *p = drv - 1;
-    fmemcpy_n(&InitKernelConfig, &LowKernelConfig, sizeof(InitKernelConfig));
-  }
+  fmemcpy_n(&InitKernelConfig, &LowKernelConfig, sizeof(InitKernelConfig));
 
   if (drv >= 0x80)
     drv = (LoL->_BootDrive & ~0x80) + 3; /* HDD */
