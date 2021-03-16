@@ -153,7 +153,7 @@ FDPP_COBJS = $(FDPP_CFILES:.c=.o)
 FDPP_CCOBJS = $(FDPP_CCFILES:.cc=.o)
 FDPP_CPPOBJS = $(CPPFILES:.cpp=.o)
 
-$(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD)
+$(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD) $(EXT_H)
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
