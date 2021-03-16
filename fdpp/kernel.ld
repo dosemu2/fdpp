@@ -26,7 +26,9 @@ SECTIONS
     /* Target data sections.  */
     .data : {
 		*(_FIXED_DATA)
+		__bss_start = .;
 		*(_BSS)
+		__bss_end = .;
 		*(_DATA)
 		*(_DATAEND)
 		*(CONST)
@@ -52,6 +54,13 @@ SECTIONS
 		*(INIT_TEXT_END)
 		ASSERT(. <= 0x10000,
 		    "Error: too large for a small-model .exe file.");
+	}
+
+    /* Target init data sections.  */
+    .ibss (NOLOAD) : {
+		__ibss_start = .;
+		*(IB)
+		__ibss_end = .;
 	}
 
     /* We do not DISCARD any sections. But we still need to list them

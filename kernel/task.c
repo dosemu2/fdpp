@@ -915,10 +915,10 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   /* build exec block and save all parameters here as init part will vanish! */
   exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
   exb.exec.env_seg = 0;
-  if ((bprm->ShellDrive & 0x80) && Config->cfgInit[1] != ':')
+  if ((bprm.ShellDrive & 0x80) && Config->cfgInit[1] != ':')
   {
     memcpy(Shell, "C:\\", 3);
-    Shell[0] += bprm->ShellDrive & ~0x80;
+    Shell[0] += bprm.ShellDrive & ~0x80;
     off = 3;
   }
   fstrcpy(Shell + off, _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInit));

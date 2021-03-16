@@ -940,9 +940,9 @@ VOID DoConfig(int nPass)
     }
 #endif
 
-    if (bprm->InitEnvSeg)
+    if (bprm.InitEnvSeg)
     {
-      const char *p = MK_FP(bprm->InitEnvSeg, 0);
+      const char *p = MK_FP(bprm.InitEnvSeg, 0);
       while (p && *p) {
         if (p[0] == '#' && isnum(p[1]) && p[2] == ' ')
         {
@@ -961,10 +961,10 @@ VOID DoConfig(int nPass)
   /* Check to see if we have a config.sys file.  If not, just     */
   /* exit since we don't force the user to have one (but 1st      */
   /* also process MEMDISK passed config options if present).      */
-  if (bprm->CfgDrive & 0x80)
+  if (bprm.CfgDrive & 0x80)
   {
     char buf[] = "c:\\fdppconf.sys";
-    buf[0] += bprm->CfgDrive & ~0x80;
+    buf[0] += bprm.CfgDrive & ~0x80;
     if ((nFileDesc = open(buf, 0)) >= 0)
     {
       DebugPrintf(("Reading FDPPCONF.SYS...\n"));
@@ -2028,8 +2028,8 @@ STATIC BOOL LoadDevice(char * pLine, char FAR *top, COUNT mode)
   if (pLine[1] != ':')
   {
     strcpy(szBuf, "C:\\");
-    if (bprm->DeviceDrive & 0x80)
-        szBuf[0] += bprm->DeviceDrive & ~0x80;
+    if (bprm.DeviceDrive & 0x80)
+        szBuf[0] += bprm.DeviceDrive & ~0x80;
     off = 3;
   }
   /* Get the device driver name                                   */
@@ -2883,8 +2883,8 @@ STATIC VOID _CmdInstall(char * pLine,int mode)
   if (pLine[1] != ':')
   {
     strcpy(cmd->buffer, "C:\\");
-    if (bprm->DeviceDrive & 0x80)
-        cmd->buffer[0] += bprm->DeviceDrive & ~0x80;
+    if (bprm.DeviceDrive & 0x80)
+        cmd->buffer[0] += bprm.DeviceDrive & ~0x80;
     off = 3;
   }
   memcpy(cmd->buffer + off, pLine, 127 - off);

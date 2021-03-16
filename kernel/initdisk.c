@@ -600,7 +600,7 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
       _printf("more Partitions detected then possible, max = %d\n", NDEV);
       return;                     /* we are done */
     }
-    if (!((1 << nUnits) & bprm->DriveMask))
+    if (!((1 << nUnits) & bprm.DriveMask))
       break;
     /* drive masked out */
     make_ddt(&nddt, nUnits, 0, DF_NOACCESS);

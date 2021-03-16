@@ -23,13 +23,15 @@
 
 extern _BootParamSeg
 
+segment _BSS
+fdpp_plt dd ?
+
 %macro call_plt 0
     push es
     push ds
     mov di, DGROUP
     mov ds, di
-    mov es, [_BootParamSeg]
-    call far [es:0]
+    call far [fdpp_plt]
     pop ds
     pop es
 %endmacro
@@ -152,6 +154,14 @@ init_near_wrp:
 plt_init:
     push bp
     mov bp, sp
+
+    ; copy plt entry
+    mov es, [_BootParamSeg]
+    mov ax, [es:0]
+    mov bx, [es:2]
+    mov [fdpp_plt], ax
+    mov [fdpp_plt + 2], bx
+
     mov al, 0 ; reserved
     mov ah, FDPP_KERNEL_VERSION
     mov bh, 0 ; reserved

@@ -74,8 +74,7 @@ __segment DosTextSeg = 0;
 #endif
 
 ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
-struct _bprm FAR *bprm;
-static UBYTE FAR *bprm_buf;
+struct _bprm bprm;
 #define TEXT_SIZE (_InitTextEnd - _HMATextStart)
 
 VOID ASMCFUNC FreeDOSmain(void)
@@ -127,13 +126,9 @@ VOID ASMCFUNC FreeDOSmain(void)
     drv = (LoL->_BootDrive & ~0x80) + 3; /* HDD */
   LoL->_BootDrive = drv;
 
-  if (LoL->_BootParamVer != BPRM_VER)
+  if (BootParamVer != BPRM_VER)
     fpanic("Wrong boot param version %i, need %i", LoL->_BootParamVer, BPRM_VER);
-  bprm_buf = (UBYTE FAR *)DynAlloc("bprm", 1, sizeof(struct _bprm) + 15);
-  bprm = AlignParagraph(bprm_buf);
-  fmemcpy_n(bprm, MK_FP(LoL->_BootParamSeg, 0), sizeof(struct _bprm));
-  LoL->_BootParamSeg = FP_SEG(bprm);
-  ___assert(FP_SEG(bprm) >= FP_SEG(adjust_far(bprm_buf)) && FP_OFF(bprm) == 0);
+  fmemcpy_n(&bprm, MK_FP(BootParamSeg, 0), sizeof(struct _bprm));
 
 #ifndef FDPP
   CheckContinueBootFromHarddisk();
@@ -422,7 +417,7 @@ STATIC VOID FsConfig(BOOL reinit)
 
     if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
     {
-      if (!((1 << i) & bprm->DriveMask))
+      if (!((1 << i) & bprm.DriveMask))
       {
         pcds_table->cdsDpb = dpb;
         pcds_table->cdsFlags = CDSPHYSDRV;

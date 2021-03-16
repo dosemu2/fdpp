@@ -85,8 +85,7 @@ struct lol {
   unsigned char rev_number;    /* 6e DOS revision#, only 3 bits           */
   unsigned char _version_flags;/* 6f DOS version flags                    */
   PTR_MEMB(char) _os_release;  /* 70 near pointer to os_release string    */
-  unsigned short _BootParamSeg;/* 72 initial env seg                      */
-  unsigned char _BootParamVer; /* 74 bprm version                         */
+  unsigned char _BootParamVer; /* 72 bprm version                         */
 #ifdef WIN31SUPPORT
   unsigned short winInstanced; /* WinInit called                          */
   unsigned long  winStartupInfo[4];

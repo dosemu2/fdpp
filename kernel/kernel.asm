@@ -409,8 +409,6 @@ _version_flags  db      0
                 extern  _os_release
 ____os_release  dw      _os_release
 
-                global  _BootParamSeg
-_BootParamSeg   dw      0
                 global  _BootParamVer
 _BootParamVer   db      0
 
@@ -625,7 +623,7 @@ _OpenMode       db      0           ;24E - File Open Attribute
                 global  _Server_Call
 _Server_Call    db      0           ;252 - Server call Func 5D sub 0
                 db      0
-                ; Pad to 05CCh
+                ; Pad to 025Ch
                 times (25ch - ($ - _internal_data)) db 0
 
                 global  _tsr            ; used by break and critical error
@@ -775,7 +773,11 @@ __InitTextStart:                    ; and c version
 segment INIT_TEXT_END
                 global  __InitTextEnd
 __InitTextEnd:                      ; and c version
-;                times 10h db 0      ; guard space for next sym
+                times 10h db 0      ; guard space for next sym
+
+segment IB
+                global  _BootParamSeg
+_BootParamSeg   dw      ?
 
 ;
 ; start end end of HMA area

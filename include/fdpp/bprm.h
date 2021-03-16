@@ -7,8 +7,7 @@
 
 struct _bprm {
   /* keep plt at the beginning to not add offsets in plt.S (aka asm_offsets) */
-  uint16_t PltOff;
-  uint16_t PltSeg;
+  far_t Plt;
   uint16_t InitEnvSeg;          /* initial env seg                      */
   uint8_t ShellDrive;           /* drive num to start shell from        */
   uint8_t DeviceDrive;          /* drive num to load DEVICE= from       */

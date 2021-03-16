@@ -849,14 +849,23 @@ const char *FdppKernelMapName(void)
     return _S(KRNL_MAP_NAME);
 }
 
-const void *FdppKernelLoad(const char *dname, uint16_t seg, int *len)
+struct krnl_hndl {
+    void *elf;
+    const void *start;
+};
+
+void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss)
 {
+    struct fdpp_bss_list *bl;
     void *start, *end;
+    void *bstart, *bend;
+    void *ibstart, *ibend;
     char *kname;
     void *handle;
+    struct krnl_hndl *h;
 
     asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
-    handle = elf_open(kname, seg);
+    handle = elf_open(kname);
     if (!handle) {
         fdloudprintf("failed to open %s\n", kname);
         free(kname);
@@ -869,10 +878,42 @@ const void *FdppKernelLoad(const char *dname, uint16_t seg, int *len)
     end = elf_getsym(handle, "__InitTextEnd");
     if (!end)
         goto err_close;
+    bstart = elf_getsym(handle, "__bss_start");
+    if (!bstart)
+        goto err_close;
+    bend = elf_getsym(handle, "__bss_end");
+    if (!bend)
+        goto err_close;
+    ibstart = elf_getsym(handle, "__ibss_start");
+    if (!ibstart)
+        goto err_close;
+    ibend = elf_getsym(handle, "__ibss_end");
+    if (!ibend)
+        goto err_close;
     *len = (uintptr_t)end - (uintptr_t)start;
-    return start;
+
+    bl = (struct fdpp_bss_list *)malloc(sizeof(*bl) +
+            sizeof(struct fdpp_bss_ent) * 2);
+    bl->num = 2;
+    bl->ent[0].off = (uintptr_t)bstart - (uintptr_t)start;
+    bl->ent[0].len = (uintptr_t)bend - (uintptr_t)bstart;
+    bl->ent[1].off = (uintptr_t)ibstart - (uintptr_t)start;
+    bl->ent[1].len = (uintptr_t)ibend - (uintptr_t)ibstart;
+    *bss = bl;
+
+    h = (struct krnl_hndl *)malloc(sizeof(*h));
+    h->elf = handle;
+    h->start = start;
+    return h;
 
 err_close:
     elf_close(handle);
     return NULL;
+}
+
+const void *FdppKernelReloc(void *handle, uint16_t seg)
+{
+    struct krnl_hndl *h = (struct krnl_hndl *)handle;
+    elf_reloc(h->elf, seg);
+    return h->start;
 }

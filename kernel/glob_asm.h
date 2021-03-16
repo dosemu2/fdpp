@@ -149,3 +149,5 @@ __ASM_FUNC(cpm_entry) SEMIC
 __ASM_ARRI_F(const char, os_release) SEMIC
 __ASM_NEAR(const char, ___os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC
+__ASM(UWORD, BootParamSeg) SEMIC
+__ASM(UBYTE, BootParamVer) SEMIC

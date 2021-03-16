@@ -50,7 +50,7 @@ static void elf_dl(char *addr, uint16_t seg)
         memcpy(&addr[reloc_tab[i]-1], &seg, sizeof(seg));
 }
 
-void *elf_open(const char *name, uint16_t seg)
+void *elf_open(const char *name)
 {
     Elf         *elf;
     Elf_Scn     *scn = NULL;
@@ -96,8 +96,6 @@ void *elf_open(const char *name, uint16_t seg)
     if (!scn)
         goto err;
 
-    elf_dl(addr, seg);
-
     ret = malloc(sizeof(*ret));
     ret->addr = addr;
     ret->mapsize = mapsize;
@@ -112,6 +110,13 @@ err:
 err2:
     munmap(addr, mapsize);
     return NULL;
+}
+
+void elf_reloc(void *arg, uint16_t seg)
+{
+    struct elfstate *state = arg;
+
+    elf_dl(state->addr, seg);
 }
 
 void elf_close(void *arg)
