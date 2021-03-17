@@ -133,11 +133,14 @@ VOID ASMCFUNC FreeDOSmain(void)
 #ifndef FDPP
   CheckContinueBootFromHarddisk();
 #endif
-  /* initialize all internal variables, process CONFIG.SYS, load drivers, etc */
-  init_kernel();
 
+  /* move kernel to high conventional RAM */
+  MoveKernel(FP_SEG(lpTop));
+  lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
   /* display copyright info and kernel emulation status */
   signon();
+  /* initialize all internal variables, process CONFIG.SYS, load drivers, etc */
+  init_kernel();
 
 #ifdef DEBUG
   /* Non-portable message kludge alert!   */
@@ -323,10 +326,6 @@ STATIC void init_kernel(void)
 
   /* Init oem hook - returns memory size in KB    */
   ram_top = init_oem();
-
-  /* move kernel to high conventional RAM */
-  MoveKernel(FP_SEG(lpTop));
-  lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
 
   /* install DOS API and other interrupt service routines, basic kernel functionality works */
   setup_int_vectors();
