@@ -70,9 +70,7 @@ struct fdpp_api {
 };
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
 
-const char *FdppDataDir(void);
 const char *FdppLibDir(void);
-const char *FdppKernelName(void);
 const char *FdppVersionString(void);
 const char *FdppKernelMapName(void);
 

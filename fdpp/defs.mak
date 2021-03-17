@@ -10,7 +10,6 @@ XCPU=186
 XFAT=32
 
 PREFIX ?= /usr/local
-DATADIR ?= $(PREFIX)/share
 LIBDIR ?= $(PREFIX)/lib
 INCLUDEDIR ?= $(PREFIX)/include
 PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig

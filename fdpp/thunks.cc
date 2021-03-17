@@ -824,19 +824,9 @@ void thunk_fmemset(far_t d, int ch, size_t n)
 
 #define __S(x) #x
 #define _S(x) __S(x)
-const char *FdppDataDir(void)
-{
-    return _S(FDPPDATADIR);
-}
-
 const char *FdppLibDir(void)
 {
     return _S(FDPPLIBDIR);
-}
-
-const char *FdppKernelName(void)
-{
-    return _S(KRNL_NAME);
 }
 
 const char *FdppVersionString(void)

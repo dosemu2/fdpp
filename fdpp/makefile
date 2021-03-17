@@ -28,9 +28,8 @@ GIT_DESCRIBE := $(shell git describe)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
 CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir) \
-    -DFDPPDATADIR=$(DATADIR)/fdpp -DFDPPLIBDIR=$(LIBDIR)/fdpp \
-    -DKRNL_NAME=$(TARGET).sys -DKRNL_ELFNAME=$(TARGET).elf \
-    -DKRNL_MAP_NAME=$(TARGET).map \
+    -DFDPPLIBDIR=$(LIBDIR)/fdpp \
+    -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: $(GIT_DESCRIBE)]"
 NASMFLAGS += -i$(SRC) -f elf32
 
@@ -50,7 +49,7 @@ PPOBJS = $(PPASMS:.S=.o)
 
 #               *Explicit Rules*
 
-ALL = $(FDPPLIB) $(TARGET).sys $(GEN_EXT)
+ALL = $(FDPPLIB) $(TARGET).elf $(TARGET).map $(GEN_EXT)
 
 all: $(ALL)
 
@@ -67,18 +66,12 @@ $(TARGET).elf: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 		sed 's/$$/,/' > rel.h
 
 
-$(TARGET).sys: $(TARGET).elf
-	$(OBJCOPY) -O binary $^ $@
-	chmod -x $@
-
-.PRECIOUS: $(TARGET).elf
-
 clean:
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
-		$(TARGET).sys kernel.sym *.pc
+		*.pc
 
 #               *Individual File Dependencies*
 #apisupt.o:	$(SRC)apisupt.asm $(SRC)segs.inc
@@ -218,7 +211,7 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	fi
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
 
-install: $(FDPPLIB) $(TARGET).sys $(TARGET).elf $(TARGET).map $(GEN_EXT)
+install: $(ALL)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
 	install $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
 	install -m 0644 $(TARGET).elf $(DESTDIR)$(LIBDIR)/fdpp
@@ -227,14 +220,11 @@ install: $(FDPPLIB) $(TARGET).sys $(TARGET).elf $(TARGET).map $(GEN_EXT)
 	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
 	install -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
-	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
-	install -m 0644 $(TARGET).sys $(DESTDIR)$(DATADIR)/fdpp
 
 uninstall:
 	rm -rf $(DESTDIR)$(LIBDIR)/fdpp
 	rm -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
 	rm -rf $(DESTDIR)$(PREFIX)/include/fdpp
-	rm -rf $(DESTDIR)$(DATADIR)/fdpp
 
 $(TGZ):
 	cd $(TOP) && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
