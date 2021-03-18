@@ -1,5 +1,7 @@
 ## 1.3
 
+In this release we switched to ELF format. The binary kernel format
+was dropped.
 Implemented run-time relinking to fix the regressions from switching
 to Tiny model that happened in 1.1. Unfortunately many programs expect
 the DOS internal areas (like LoL and SDA) at the fixed locations
@@ -18,8 +20,7 @@ Other than that, quite a few developments happened:
 - revert mft work-around introduced in 1.2, as our run-time relinking
   solves that regression in a much better way.
 - fix reading of large (>512 bytes) config.sys files
-- implement ELF loader for real-mode kernel
-- hack to make the kernel relocatable
+- compatibility fixes (Indy3 now works)
 
 ## 1.2
 
