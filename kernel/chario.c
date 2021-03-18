@@ -304,41 +304,47 @@ long cooked_read(struct dhdr FAR **pdev, size_t n, char FAR *bp)
   return xfer;
 }
 
+
+STATIC unsigned do_read_char_dev(__DOSFAR(struct dhdr) *pdev, BOOL check_break)
+{
+  unsigned c;
+
+  if (!*pdev)
+    return 0;
+  FOREVER
+  {
+    if (ctrl_break_pressed())
+    {
+      c = CTL_C;
+      break;
+    }
+    if (!Busy(pdev))
+    {
+      c = CharIO(pdev, 0, C_INPUT);
+      break;
+    }
+    if (check_break && *pdev != syscon)
+      check_handle_break(&syscon);
+    /* the idle int is only safe if we're using the character stack */
+    if (user_r->AH < 0xd)
+      DosIdle_int();
+  }
+
+  return c;
+}
+
 STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
                                        __DOSFAR(struct dhdr) *pdev,
                                        BOOL check_break)
 {
-  unsigned c;
-
-  if (*pdev)
-  {
-    FOREVER
-    {
-      if (ctrl_break_pressed())
-      {
-        c = CTL_C;
-        break;
-      }
-      if (!Busy(pdev))
-      {
-        c = CharIO(pdev, 0, C_INPUT);
-        break;
-      }
-      if (check_break && *pdev != syscon)
-        check_handle_break(&syscon);
-      /* the idle int is only safe if we're using the character stack */
-      if (user_r->AH < 0xd)
-        DosIdle_int();
-    }
-  }
-  else
-    DosRWSft(sft_in, 1, MK_FAR_SCP(c), XFR_READ);
-
+  unsigned c = do_read_char_dev(pdev, check_break);
+  if (!c)
+    return 0;
   /* check for break or stop on sft_in, echo to sft_out */
   if (check_break && (c == CTL_C || c == CTL_S))
   {
     if (c == CTL_S)
-      c = read_char_sft_dev(sft_in, sft_out, pdev, FALSE);
+      c = do_read_char_dev(pdev, FALSE);
     if (c == CTL_C)
       handle_break(pdev, sft_out);
     /* DOS oddity: if you press ^S somekey ^C then ^C does not break */
@@ -393,6 +399,8 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
       c = (unsigned)read_char_check_break(sft_in, sft_out) << 8;
     switch (c)
     {
+      case 0:
+        return;
       case LF:
         /* show LF if it's not the first character. Never store it */
         if (!first)
