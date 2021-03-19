@@ -72,7 +72,7 @@ UWORD DaysFromYearMonthDay(UWORD Year, UWORD Month, UWORD DayOfMonth)
 /* common - call the clock driver */
 STATIC void ExecuteClockDriverRequest(BYTE command)
 {
-  BinaryCharIO(&_clock_, sizeof(struct ClockRecord), &ClkRecord, command);
+  BinaryCharIO(_clock_, sizeof(struct ClockRecord), &ClkRecord, command);
 }
 
 void DosGetTime(struct dostime *dt)

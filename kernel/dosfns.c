@@ -195,7 +195,7 @@ DWORD DosReadSftExt(int sft_idx, size_t n, void FAR *bp, BOOL allow_echo,
     /* Now handle raw and cooked modes      */
     if (s->sft_flags & SFT_FBINARY)
     {
-      DWORD rc = BinaryCharIO(&dev, n, bp, C_INPUT);
+      DWORD rc = BinaryCharIO(dev, n, bp, C_INPUT);
       return rc;
     }
     else
@@ -211,7 +211,7 @@ DWORD DosReadSftExt(int sft_idx, size_t n, void FAR *bp, BOOL allow_echo,
       if (s->sft_flags & SFT_FCONIN && allow_echo)
         rc = read_line_handle(sft_idx, n, bp, check_break);
       else
-        rc = cooked_read(&dev, n, bp, check_break);
+        rc = cooked_read(dev, n, bp, check_break);
       if (*(char FAR *)bp == CTL_Z)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
@@ -285,7 +285,7 @@ DWORD DosWriteSftUnchecked(int sft_idx, size_t n, __XFAR(void)bp)
     /* Now handle raw and cooked modes      */
     if (s->sft_flags & SFT_FBINARY)
     {
-      DWORD rc = BinaryCharIO(&dev, n, bp, C_OUTPUT);
+      DWORD rc = BinaryCharIO(dev, n, bp, C_OUTPUT);
       if (rc > 0 && (s->sft_flags & SFT_FCONOUT))
       {
         size_t cnt = (size_t)rc;
@@ -305,7 +305,7 @@ DWORD DosWriteSftUnchecked(int sft_idx, size_t n, __XFAR(void)bp)
       if (s->sft_flags & SFT_FNUL)
         return n;
       else
-        return cooked_write(&dev, n, bp);
+        return cooked_write(dev, n, bp);
     }
   }
 
@@ -540,7 +540,7 @@ STATIC int DeviceOpenSft(struct dhdr FAR *dhp, sft FAR *sftp)
      * then issue an Open request to the driver
      */
     struct dhdr FAR *dev = sftp->sft_dev;
-    if (BinaryCharIO(&dev, 0, MK_FP(0x0000, 0x0000), C_OPEN) != SUCCESS)
+    if (BinaryCharIO(dev, 0, MK_FP(0x0000, 0x0000), C_OPEN) != SUCCESS)
       return DE_ACCESS;
   }
   return SUCCESS;
@@ -792,7 +792,7 @@ COUNT DosCloseSft(int sft_idx, BOOL commitonly)
        * then issue a Close request to the driver
        */
       struct dhdr FAR *dev = sftp->sft_dev;
-      if (BinaryCharIO(&dev, 0, MK_FP(0x0000, 0x0000), C_CLOSE) != SUCCESS)
+      if (BinaryCharIO(dev, 0, MK_FP(0x0000, 0x0000), C_CLOSE) != SUCCESS)
         return DE_INVLDHNDL;
     }
     /* now just drop the count if a device */

@@ -51,12 +51,12 @@ unsigned char ctrl_break_pressed(void)
   return CB_FLG & CB_MSK;
 }
 
-unsigned char check_handle_break(__DOSFAR(struct dhdr) *pdev)
+unsigned char check_handle_break(struct dhdr FAR *pdev)
 {
   unsigned char c = CTL_C;
   if (!ctrl_break_pressed())
-    c = (unsigned char)ndread(&syscon);
-  if (c != CTL_C && *pdev != syscon)
+    c = (unsigned char)ndread(syscon);
+  if (c != CTL_C && pdev != syscon)
     c = (unsigned char)ndread(pdev);
   if (c == CTL_C)
     handle_break(pdev);
@@ -74,7 +74,7 @@ unsigned char check_handle_break(__DOSFAR(struct dhdr) *pdev)
  *       5) invoke INT-23 and never come back
  */
 
-void handle_break(__DOSFAR(struct dhdr) *pdev)
+void handle_break(struct dhdr FAR *pdev)
 {
   /* XXX: was *buf = "^C\r\n" but const doesn't propagate to DosRWSft() */
   char buf[] = "^C\r\n";
