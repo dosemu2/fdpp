@@ -259,7 +259,10 @@ UBYTE FcbReadWrite(xfcb FAR * lpXfcb, UCOUNT recno, int mode)
     return FCB_ERR_NODATA;
 
   /* Do the read                                                  */
-  nTransfer = DosRWSft(lpFcb->fcb_sftno, size, dta, mode & ~XFR_FCB_RANDOM);
+  if ((mode & ~XFR_FCB_RANDOM) == XFR_READ)
+    nTransfer = DosReadSft(lpFcb->fcb_sftno, size, dta);
+  else
+    nTransfer = DosWriteSft(lpFcb->fcb_sftno, size, dta);
   if (nTransfer < 0)
     CritErrCode = -(WORD)nTransfer;
 

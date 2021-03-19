@@ -153,7 +153,7 @@ sft FAR *get_sft(UCOUNT hndl)
   return idx_to_sft(get_sft_idx(hndl));
 }
 
-long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
+DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void)bp)
 {
   /* Get the SFT block that contains the SFT      */
   sft FAR *s = idx_to_sft(sft_idx);
@@ -163,13 +163,10 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
     return DE_INVLDHNDL;
   }
   /* If for read and write-only or for write and read-only then exit */
-  if((mode == XFR_READ && (s->sft_mode & O_WRONLY)) ||
-     (mode == XFR_WRITE && (s->sft_mode & O_ACCMODE) == O_RDONLY))
+  if (s->sft_mode & O_WRONLY)
   {
     return DE_ACCESS;
   }
-  if (mode == XFR_FORCE_WRITE)
-    mode = XFR_WRITE;
 
 /*
  *   Do remote first or return error.
@@ -177,14 +174,14 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
  */
   if (s->sft_flags & SFT_FSHARED)
   {
-    long XferCount;
+    DWORD XferCount;
     VOID FAR *save_dta;
 
     save_dta = dta;
     lpCurSft = s;
     current_filepos = s->sft_posit;     /* needed for MSCDEX */
     dta = bp;
-    XferCount = remote_rw(mode == XFR_READ ? REM_READ : REM_WRITE, s, n);
+    XferCount = remote_rw(REM_READ, s, n);
     dta = save_dta;
     return XferCount;
   }
@@ -197,22 +194,13 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
     /* Now handle raw and cooked modes      */
     if (s->sft_flags & SFT_FBINARY)
     {
-      long rc = BinaryCharIO(&dev, n, bp,
-                             mode == XFR_READ ? C_INPUT : C_OUTPUT);
-      if (mode == XFR_WRITE && rc > 0 && (s->sft_flags & SFT_FCONOUT))
-      {
-        size_t cnt = (size_t)rc;
-        const char FAR *p = bp;
-        while (cnt--)
-          update_scr_pos(*p++, 1);
-      }
+      DWORD rc = BinaryCharIO(&dev, n, bp, C_INPUT);
       return rc;
     }
-
+    else
     /* cooked mode */
-    if (mode==XFR_READ)
     {
-      long rc;
+      DWORD rc;
 
       /* Test for eof and exit                */
       /* immediately if it is                 */
@@ -227,7 +215,75 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
     }
+  }
+
+  /* a block transfer                           */
+  /* /// Added for SHARE - Ron Cemer */
+  if (IsShareInstalled(FALSE) && (s->sft_shroff >= 0))
+  {
+    int rc = share_access_check(s->sft_shroff, s->sft_posit,
+                                 (UDWORD)n, s->sft_dcb->dpb_device,
+                                 0x3f);
+    if (rc != SUCCESS)
+      return rc;
+  }
+  /* /// End of additions for SHARE - Ron Cemer */
+  return rwblock(sft_idx, bp, n, XFR_READ);
+}
+
+DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
+{
+  /* Get the SFT block that contains the SFT      */
+  sft FAR *s = idx_to_sft(sft_idx);
+
+  if (FP_OFF(s) == (UWORD) - 1)
+  {
+    return DE_INVLDHNDL;
+  }
+  /* If for read and write-only or for write and read-only then exit */
+  if ((s->sft_mode & O_ACCMODE) == O_RDONLY)
+  {
+    return DE_ACCESS;
+  }
+
+/*
+ *   Do remote first or return error.
+ *   must have been opened from remote.
+ */
+  if (s->sft_flags & SFT_FSHARED)
+  {
+    DWORD XferCount;
+    VOID FAR *save_dta;
+
+    save_dta = dta;
+    lpCurSft = s;
+    current_filepos = s->sft_posit;     /* needed for MSCDEX */
+    dta = bp;
+    XferCount = remote_rw(REM_WRITE, s, n);
+    dta = save_dta;
+    return XferCount;
+  }
+
+  /* Do a device transfer if device                   */
+  if (s->sft_flags & SFT_FDEVICE)
+  {
+    struct dhdr FAR *dev = s->sft_dev;
+
+    /* Now handle raw and cooked modes      */
+    if (s->sft_flags & SFT_FBINARY)
+    {
+      DWORD rc = BinaryCharIO(&dev, n, bp, C_OUTPUT);
+      if (rc > 0 && (s->sft_flags & SFT_FCONOUT))
+      {
+        size_t cnt = (size_t)rc;
+        const char FAR *p = bp;
+        while (cnt--)
+          update_scr_pos(*p++, 1);
+      }
+      return rc;
+    }
     else
+    /* cooked mode */
     {
       /* reset EOF state (set to no EOF)      */
       s->sft_flags |= SFT_FEOF;
@@ -246,12 +302,12 @@ long DosRWSft(int sft_idx, size_t n, __XFAR(void)bp, int mode)
   {
     int rc = share_access_check(s->sft_shroff, s->sft_posit,
                                  (UDWORD)n, s->sft_dcb->dpb_device,
-                                 mode == XFR_READ ? 0x3f : 0x40);
+                                 0x40);
     if (rc != SUCCESS)
       return rc;
   }
   /* /// End of additions for SHARE - Ron Cemer */
-  return rwblock(sft_idx, bp, n, mode);
+  return rwblock(sft_idx, bp, n, XFR_WRITE);
 }
 
 static COUNT SftSeek2(int sft_idx, LONG new_pos, unsigned mode, UDWORD * p_result);

@@ -544,7 +544,7 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
     SftSeek(fd, 0, 0);
     /* read everything, but at most 64K - sizeof(PSP)             */
     /* lpproj: some device drivers (not exe) are larger than 0xff00bytes... */
-    DosRWSft(fd, (mode == OVERLAY) ? 0xfffeU : 0xff00U, sp, XFR_READ);
+    DosReadSft(fd, (mode == OVERLAY) ? 0xfffeU : 0xff00U, sp);
     DosCloseSft(fd, FALSE);
   }
 
@@ -791,7 +791,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
     {
       if (exe_size < CHUNK/16)
         toRead = exe_size*16;
-      nBytesRead = (WORD)DosRWSft(fd, toRead, MK_FP(sp, 0), XFR_READ);
+      nBytesRead = (WORD)DosReadSft(fd, toRead, MK_FP(sp, 0));
       if (nBytesRead < toRead || exe_size <= CHUNK/16)
         break;
       sp += CHUNK/16;
@@ -807,7 +807,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
     SftSeek(fd, ExeHeader.exRelocTable, 0);
     for (i = 0; i < ExeHeader.exRelocItems; i++)
     {
-      if (DosRWSft(fd, sizeof(reloc), MK_FAR_SCP(reloc), XFR_READ) != sizeof(reloc))
+      if (DosReadSft(fd, sizeof(reloc), MK_FAR_SCP(reloc)) != sizeof(reloc))
       {
         if (mode != OVERLAY)
         {
@@ -880,7 +880,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   }
 
   exe_header FAR *eh = ExeHeader_p;
-  rc = (WORD)DosRWSft(fd, sizeof(exe_header), eh, XFR_READ);
+  rc = (WORD)DosReadSft(fd, sizeof(exe_header), eh);
 
   if (rc == sizeof(exe_header) &&
       (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))

@@ -84,7 +84,7 @@ void handle_break(__DOSFAR(struct dhdr) *pdev, int sft_out)
   if (sft_out == -1)
     cooked_write(pdev, 4, buf);
   else
-    DosRWSft(sft_out, 4, buf, XFR_FORCE_WRITE);
+    DosWriteSft(sft_out, 4, buf);
   if (!ErrorMode)               /* within int21_handler, InDOS is not incremented */
     if (InDOS)
       --InDOS;                  /* fail-safe */

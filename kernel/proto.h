@@ -86,10 +86,11 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode);
 /*COUNT DosRead(COUNT hndl, UCOUNT n,__FAR(BYTE) bp,__FAR(COUNT) err); */
 void BinarySftIO(int sft_idx, void *bp, int mode);
 #define BinaryIO(hndl, bp, mode) BinarySftIO(get_sft_idx(hndl), bp, mode)
-long DosRWSft(int sft_idx, size_t n, __XFAR(void) bp, int mode);
-#define DosRead(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_READ)
-#define DosWrite(hndl, n, bp) DosRWSft(get_sft_idx(hndl), n, bp, XFR_WRITE)
-#define DosTruncate(hndl) DosRWSft(get_sft_idx(hndl), 0, NULL, XFR_WRITE)
+DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void) bp);
+DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void) bp);
+#define DosRead(hndl, n, bp) DosReadSft(get_sft_idx(hndl), n, bp)
+#define DosWrite(hndl, n, bp) DosWriteSft(get_sft_idx(hndl), n, bp)
+#define DosTruncate(hndl) DosWriteSft(get_sft_idx(hndl), 0, NULL)
 ULONG DosSeek(unsigned hndl, LONG new_pos, COUNT mode, COUNT *rc);
 long DosOpen(__FAR(char) fname, unsigned flags, unsigned attrib);
 COUNT CloneHandle(unsigned hndl);
