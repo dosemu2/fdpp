@@ -285,13 +285,14 @@ STATIC void destr_bs(int sft_idx)
 
 /* READ FUNCTIONS */
 
-long cooked_read(struct dhdr FAR **pdev, size_t n, char FAR *bp)
+long cooked_read(struct dhdr FAR **pdev, size_t n, char FAR *bp,
+    BOOL check_break)
 {
   unsigned xfer = 0;
   int c;
   while(n--)
   {
-    c = raw_get_char(pdev, TRUE);
+    c = raw_get_char(pdev, check_break);
     if (c < 0)
       return c;
     if (c == 256)
@@ -364,18 +365,13 @@ unsigned char read_char(int sft_in, int sft_out, BOOL check_break)
   return read_char_sft_dev(sft_in, sft_out, &dev, check_break);
 }
 
-STATIC unsigned char read_char_check_break(int sft_in, int sft_out)
-{
-  return read_char(sft_in, sft_out, TRUE);
-}
-
 unsigned char read_char_stdin(BOOL check_break)
 {
   return read_char(get_sft_idx(STDIN), get_sft_idx(STDOUT), check_break);
 }
 
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
-void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
+void read_line(int sft_in, int sft_out, kbd0a FAR *kp, BOOL check_break)
 {
   unsigned c;
   unsigned cu_pos = scr_pos;
@@ -394,9 +390,9 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
   {
     unsigned new_pos = stored_size;
 
-    c = read_char_check_break(sft_in, sft_out);
+    c = read_char(sft_in, sft_out, check_break);
     if (c == 0)
-      c = (unsigned)read_char_check_break(sft_in, sft_out) << 8;
+      c = (unsigned)read_char(sft_in, sft_out, check_break) << 8;
     switch (c)
     {
       case 0:
@@ -423,11 +419,11 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
       case F4:
         /* insert/delete up to character c */
         {
-          unsigned char c2 = read_char_check_break(sft_in, sft_out);
+          unsigned char c2 = read_char(sft_in, sft_out, check_break);
           new_pos = stored_pos;
           if (c2 == 0)
           {
-            read_char_check_break(sft_in, sft_out);
+            read_char(sft_in, sft_out, check_break);
           }
           else
           {
@@ -533,7 +529,7 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp)
 }
 
 /* called by handle func READ (int21/ah=3f) */
-size_t read_line_handle(int sft_idx, size_t n, char FAR * bp)
+size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
 {
   size_t chars_left;
 
@@ -545,7 +541,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp)
       kb_buf.kb_count = 0;
       kb_buf.kb_size = LINEBUFSIZECON;
     }
-    read_line(sft_idx, sft_idx, (kbd0a FAR *)&kb_buf);
+    read_line(sft_idx, sft_idx, (kbd0a FAR *)&kb_buf, check_break);
     kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)

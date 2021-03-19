@@ -153,7 +153,8 @@ sft FAR *get_sft(UCOUNT hndl)
   return idx_to_sft(get_sft_idx(hndl));
 }
 
-DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void)bp)
+DWORD DosReadSftExt(int sft_idx, size_t n, __XFAR(void)bp, BOOL allow_echo,
+    BOOL check_break)
 {
   /* Get the SFT block that contains the SFT      */
   sft FAR *s = idx_to_sft(sft_idx);
@@ -207,10 +208,10 @@ DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void)bp)
       if (!(s->sft_flags & SFT_FEOF))
         return 0;
 
-      if (s->sft_flags & SFT_FCONIN)
-        rc = read_line_handle(sft_idx, n, bp);
+      if (s->sft_flags & SFT_FCONIN && allow_echo)
+        rc = read_line_handle(sft_idx, n, bp, check_break);
       else
-        rc = cooked_read(&dev, n, bp);
+        rc = cooked_read(&dev, n, bp, check_break);
       if (*(char FAR *)bp == CTL_Z)
         s->sft_flags &= ~SFT_FEOF;
       return rc;
@@ -229,6 +230,11 @@ DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void)bp)
   }
   /* /// End of additions for SHARE - Ron Cemer */
   return rwblock(sft_idx, bp, n, XFR_READ);
+}
+
+DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void)bp)
+{
+  return DosReadSftExt(sft_idx, n, bp, TRUE, TRUE);
 }
 
 DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)

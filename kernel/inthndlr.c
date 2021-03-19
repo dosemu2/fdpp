@@ -538,7 +538,7 @@ dispatch:
       /* Buffered Keyboard Input                                      */
     case 0x0a:
   DOS_0A:
-      read_line(get_sft_idx(STDIN), get_sft_idx(STDOUT), FP_DS_DX);
+      read_line(get_sft_idx(STDIN), get_sft_idx(STDOUT), FP_DS_DX, TRUE);
       break;
 
       /* Check Stdin Status                                           */

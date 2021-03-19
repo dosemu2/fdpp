@@ -67,9 +67,10 @@ void con_flush(__DOSFAR(struct dhdr)*pdev);
 void con_flush_stdin(void);
 unsigned char read_char(int sft_in, int sft_out, BOOL check_break);
 unsigned char read_char_stdin(BOOL check_break);
-long cooked_read(__FAR(struct dhdr)*pdev, size_t n,__FAR(char)bp);
-void read_line(int sft_in, int sft_out, __FAR(kbd0a)kp);
-size_t read_line_handle(int sft_idx, size_t n,__FAR(char) bp);
+long cooked_read(__FAR(struct dhdr)*pdev, size_t n,__FAR(char)bp,
+    BOOL check_break);
+void read_line(int sft_in, int sft_out, __FAR(kbd0a)kp, BOOL check_break);
+size_t read_line_handle(int sft_idx, size_t n,__FAR(char) bp, BOOL check_break);
 void write_char(int c, int sft_idx);
 void write_char_stdout(int c);
 void update_scr_pos(unsigned char c, unsigned char count);
@@ -86,6 +87,8 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode);
 /*COUNT DosRead(COUNT hndl, UCOUNT n,__FAR(BYTE) bp,__FAR(COUNT) err); */
 void BinarySftIO(int sft_idx, void *bp, int mode);
 #define BinaryIO(hndl, bp, mode) BinarySftIO(get_sft_idx(hndl), bp, mode)
+DWORD DosReadSftExt(int sft_idx, size_t n, __XFAR(void)bp, BOOL allow_echo,
+    BOOL check_break);
 DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void) bp);
 DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void) bp);
 #define DosRead(hndl, n, bp) DosReadSft(get_sft_idx(hndl), n, bp)
