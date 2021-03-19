@@ -481,7 +481,7 @@ dispatch:
     case 0x03:
     {
       int sft_idx = get_sft_idx(STDAUX);
-      lr.AL = read_char(sft_idx, sft_idx, TRUE);
+      lr.AL = read_char(sft_idx, TRUE);
       break;
     }
 
@@ -538,7 +538,7 @@ dispatch:
       /* Buffered Keyboard Input                                      */
     case 0x0a:
   DOS_0A:
-      read_line(get_sft_idx(STDIN), get_sft_idx(STDOUT), FP_DS_DX, TRUE);
+      read_line(get_sft_idx(STDIN), FP_DS_DX, TRUE);
       break;
 
       /* Check Stdin Status                                           */

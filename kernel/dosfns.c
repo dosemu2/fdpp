@@ -237,6 +237,18 @@ DWORD DosReadSft(int sft_idx, size_t n, void FAR *bp)
   return DosReadSftExt(sft_idx, n, bp, TRUE, TRUE);
 }
 
+unsigned char read_char(int sft_in, BOOL check_break)
+{
+  unsigned char c;
+  DWORD rc = DosReadSftExt(sft_in, 1, MK_FAR_SCP(c), FALSE, check_break);
+  return (rc == 1 ? c : 0);
+}
+
+unsigned char read_char_stdin(BOOL check_break)
+{
+  return read_char(get_sft_idx(STDIN), check_break);
+}
+
 DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
 {
   /* Get the SFT block that contains the SFT      */

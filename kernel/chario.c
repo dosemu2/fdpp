@@ -349,7 +349,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
     if (c == CTL_C)
       handle_break(pdev, sft_out);
     /* DOS oddity: if you press ^S somekey ^C then ^C does not break */
-    c = read_char(sft_in, sft_out, FALSE);
+    c = do_read_char_dev(pdev, FALSE);
   }
   return c;
 }
@@ -359,25 +359,15 @@ STATIC int raw_get_char(__DOSFAR(struct dhdr) *pdev, BOOL check_break)
   return read_char_sft_dev(-1, -1, pdev, check_break);
 }
 
-unsigned char read_char(int sft_in, int sft_out, BOOL check_break)
-{
-  struct dhdr FAR *dev = sft_to_dev(idx_to_sft(sft_in));
-  return read_char_sft_dev(sft_in, sft_out, &dev, check_break);
-}
-
-unsigned char read_char_stdin(BOOL check_break)
-{
-  return read_char(get_sft_idx(STDIN), get_sft_idx(STDOUT), check_break);
-}
-
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
-void read_line(int sft_in, int sft_out, kbd0a FAR *kp, BOOL check_break)
+void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
 {
   unsigned c;
   unsigned cu_pos = scr_pos;
   unsigned count = 0, stored_pos = 0;
   unsigned size = kp->kb_size, stored_size = kp->kb_count;
   BOOL insert = FALSE, first = TRUE;
+  int sft_out = sft_in;
 
   if (size == 0)
     return;
@@ -390,9 +380,9 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp, BOOL check_break)
   {
     unsigned new_pos = stored_size;
 
-    c = read_char(sft_in, sft_out, check_break);
+    c = read_char(sft_in, check_break);
     if (c == 0)
-      c = (unsigned)read_char(sft_in, sft_out, check_break) << 8;
+      c = (unsigned)read_char(sft_in, check_break) << 8;
     switch (c)
     {
       case 0:
@@ -419,11 +409,11 @@ void read_line(int sft_in, int sft_out, kbd0a FAR *kp, BOOL check_break)
       case F4:
         /* insert/delete up to character c */
         {
-          unsigned char c2 = read_char(sft_in, sft_out, check_break);
+          unsigned char c2 = read_char(sft_in, check_break);
           new_pos = stored_pos;
           if (c2 == 0)
           {
-            read_char(sft_in, sft_out, check_break);
+            read_char(sft_in, check_break);
           }
           else
           {
@@ -541,7 +531,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
       kb_buf.kb_count = 0;
       kb_buf.kb_size = LINEBUFSIZECON;
     }
-    read_line(sft_idx, sft_idx, (kbd0a FAR *)&kb_buf, check_break);
+    read_line(sft_idx, (kbd0a FAR *)&kb_buf, check_break);
     kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)
