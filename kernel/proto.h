@@ -87,9 +87,9 @@ COUNT SftSeek(int sft_idx, LONG new_pos, unsigned mode);
 /*COUNT DosRead(COUNT hndl, UCOUNT n,__FAR(BYTE) bp,__FAR(COUNT) err); */
 void BinarySftIO(int sft_idx, void *bp, int mode);
 #define BinaryIO(hndl, bp, mode) BinarySftIO(get_sft_idx(hndl), bp, mode)
-DWORD DosReadSftExt(int sft_idx, size_t n, __XFAR(void)bp, BOOL allow_echo,
+DWORD DosReadSftExt(int sft_idx, size_t n, __FAR(void)bp, BOOL allow_echo,
     BOOL check_break);
-DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void) bp);
+DWORD DosReadSft(int sft_idx, size_t n, __FAR(void) bp);
 DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void) bp);
 #define DosRead(hndl, n, bp) DosReadSft(get_sft_idx(hndl), n, bp)
 #define DosWrite(hndl, n, bp) DosWriteSft(get_sft_idx(hndl), n, bp)

@@ -153,7 +153,7 @@ sft FAR *get_sft(UCOUNT hndl)
   return idx_to_sft(get_sft_idx(hndl));
 }
 
-DWORD DosReadSftExt(int sft_idx, size_t n, __XFAR(void)bp, BOOL allow_echo,
+DWORD DosReadSftExt(int sft_idx, size_t n, void FAR *bp, BOOL allow_echo,
     BOOL check_break)
 {
   /* Get the SFT block that contains the SFT      */
@@ -232,7 +232,7 @@ DWORD DosReadSftExt(int sft_idx, size_t n, __XFAR(void)bp, BOOL allow_echo,
   return rwblock(sft_idx, bp, n, XFR_READ);
 }
 
-DWORD DosReadSft(int sft_idx, size_t n, __XFAR(void)bp)
+DWORD DosReadSft(int sft_idx, size_t n, void FAR *bp)
 {
   return DosReadSftExt(sft_idx, n, bp, TRUE, TRUE);
 }
