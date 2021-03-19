@@ -249,7 +249,7 @@ unsigned char read_char_stdin(BOOL check_break)
   return read_char(get_sft_idx(STDIN), check_break);
 }
 
-DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
+DWORD DosWriteSftUnchecked(int sft_idx, size_t n, __XFAR(void)bp)
 {
   /* Get the SFT block that contains the SFT      */
   sft FAR *s = idx_to_sft(sft_idx);
@@ -257,11 +257,6 @@ DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
   if (FP_OFF(s) == (UWORD) - 1)
   {
     return DE_INVLDHNDL;
-  }
-  /* If for read and write-only or for write and read-only then exit */
-  if ((s->sft_mode & O_ACCMODE) == O_RDONLY)
-  {
-    return DE_ACCESS;
   }
 
 /*
@@ -326,6 +321,17 @@ DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
   }
   /* /// End of additions for SHARE - Ron Cemer */
   return rwblock(sft_idx, bp, n, XFR_WRITE);
+}
+
+DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
+{
+  sft FAR *s = idx_to_sft(sft_idx);
+  /* If for read and write-only or for write and read-only then exit */
+  if ((s->sft_mode & O_ACCMODE) == O_RDONLY)
+  {
+    return DE_ACCESS;
+  }
+  return DosWriteSftUnchecked(sft_idx, n, bp);
 }
 
 static COUNT SftSeek2(int sft_idx, LONG new_pos, unsigned mode, UDWORD * p_result);

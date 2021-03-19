@@ -91,6 +91,7 @@ DWORD DosReadSftExt(int sft_idx, size_t n, __FAR(void)bp, BOOL allow_echo,
     BOOL check_break);
 DWORD DosReadSft(int sft_idx, size_t n, __FAR(void) bp);
 DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void) bp);
+DWORD DosWriteSftUnchecked(int sft_idx, size_t n, __XFAR(void)bp);
 #define DosRead(hndl, n, bp) DosReadSft(get_sft_idx(hndl), n, bp)
 #define DosWrite(hndl, n, bp) DosWriteSft(get_sft_idx(hndl), n, bp)
 #define DosTruncate(hndl) DosWriteSft(get_sft_idx(hndl), 0, NULL)

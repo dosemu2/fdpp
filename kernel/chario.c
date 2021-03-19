@@ -236,7 +236,7 @@ long cooked_write(__DOSFAR(struct dhdr) *pdev, size_t n, __XFAR(const char)bp)
 void write_char(int c, int sft_idx)
 {
   unsigned char ch = (unsigned char)c;
-  DosWriteSft(sft_idx, 1, MK_FAR_SCP(ch));
+  DosWriteSftUnchecked(sft_idx, 1, MK_FAR_SCP(ch));
 }
 
 void write_char_stdout(int c)
