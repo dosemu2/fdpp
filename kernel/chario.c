@@ -358,8 +358,15 @@ STATIC int raw_get_char(__DOSFAR(struct dhdr) *pdev, BOOL check_break)
   return read_char_sft_dev(pdev, check_break);
 }
 
+static unsigned char dev_read_char(int sft_in, BOOL check_break)
+{
+  struct dhdr FAR *dev = sft_to_dev(idx_to_sft(sft_in));
+  return read_char_sft_dev(&dev, check_break);
+}
+
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
-void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
+static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
+    unsigned char (*do_read_char)(int, BOOL))
 {
   unsigned c;
   unsigned cu_pos = scr_pos;
@@ -379,9 +386,9 @@ void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
   {
     unsigned new_pos = stored_size;
 
-    c = read_char(sft_in, check_break);
+    c = do_read_char(sft_in, check_break);
     if (c == 0)
-      c = (unsigned)read_char(sft_in, check_break) << 8;
+      c = (unsigned)do_read_char(sft_in, check_break) << 8;
     switch (c)
     {
       case 0:
@@ -408,11 +415,11 @@ void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
       case F4:
         /* insert/delete up to character c */
         {
-          unsigned char c2 = read_char(sft_in, check_break);
+          unsigned char c2 = do_read_char(sft_in, check_break);
           new_pos = stored_pos;
           if (c2 == 0)
           {
-            read_char(sft_in, check_break);
+            do_read_char(sft_in, check_break);
           }
           else
           {
@@ -517,6 +524,11 @@ void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
   kp->kb_count = count - 1;
 }
 
+void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
+{
+  do_read_line(sft_in, kp, check_break, read_char);
+}
+
 /* called by handle func READ (int21/ah=3f) */
 size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
 {
@@ -530,7 +542,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
       kb_buf.kb_count = 0;
       kb_buf.kb_size = LINEBUFSIZECON;
     }
-    read_line(sft_idx, (kbd0a FAR *)&kb_buf, check_break);
+    do_read_line(sft_idx, (kbd0a FAR *)&kb_buf, check_break, dev_read_char);
     kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)
