@@ -56,7 +56,7 @@ all: $(ALL)
 # actually dep on rel.h
 elf.o: $(TARGET).elf
 
-$(TARGET).elf: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
+$(TARGET).%: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	$(LINK) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
 	chmod -x $@
