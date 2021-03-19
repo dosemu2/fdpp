@@ -52,7 +52,7 @@ void AllocateHMASpace (size_t lowbuffer, size_t highbuffer);
 /* break.c */
 unsigned char ctrl_break_pressed(void);
 unsigned char check_handle_break(__DOSFAR(struct dhdr)*pdev);
-void handle_break(__DOSFAR(struct dhdr)*pdev, int sft_out);
+void handle_break(__DOSFAR(struct dhdr)*pdev);
 #ifdef __WATCOMC__
 #pragma aux handle_break aborts;
 #endif

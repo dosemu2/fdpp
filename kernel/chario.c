@@ -334,9 +334,8 @@ STATIC unsigned do_read_char_dev(__DOSFAR(struct dhdr) *pdev, BOOL check_break)
   return c;
 }
 
-STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
-                                       __DOSFAR(struct dhdr) *pdev,
-                                       BOOL check_break)
+STATIC unsigned read_char_sft_dev(__DOSFAR(struct dhdr) *pdev,
+                                  BOOL check_break)
 {
   unsigned c = do_read_char_dev(pdev, check_break);
   if (!c)
@@ -347,7 +346,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
     if (c == CTL_S)
       c = do_read_char_dev(pdev, FALSE);
     if (c == CTL_C)
-      handle_break(pdev, sft_out);
+      handle_break(pdev);
     /* DOS oddity: if you press ^S somekey ^C then ^C does not break */
     c = do_read_char_dev(pdev, FALSE);
   }
@@ -356,7 +355,7 @@ STATIC unsigned read_char_sft_dev(int sft_in, int sft_out,
 
 STATIC int raw_get_char(__DOSFAR(struct dhdr) *pdev, BOOL check_break)
 {
-  return read_char_sft_dev(-1, -1, pdev, check_break);
+  return read_char_sft_dev(pdev, check_break);
 }
 
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */

@@ -59,7 +59,7 @@ unsigned char check_handle_break(__DOSFAR(struct dhdr) *pdev)
   if (c != CTL_C && *pdev != syscon)
     c = (unsigned char)ndread(pdev);
   if (c == CTL_C)
-    handle_break(pdev, -1);
+    handle_break(pdev);
   return c;
 }
 
@@ -74,17 +74,14 @@ unsigned char check_handle_break(__DOSFAR(struct dhdr) *pdev)
  *       5) invoke INT-23 and never come back
  */
 
-void handle_break(__DOSFAR(struct dhdr) *pdev, int sft_out)
+void handle_break(__DOSFAR(struct dhdr) *pdev)
 {
   /* XXX: was *buf = "^C\r\n" but const doesn't propagate to DosRWSft() */
   char buf[] = "^C\r\n";
 
   CB_FLG &= ~CB_MSK;            /* reset the ^Break flag */
   con_flush(pdev);
-  if (sft_out == -1)
-    cooked_write(pdev, 4, buf);
-  else
-    DosWriteSft(sft_out, 4, buf);
+  cooked_write(pdev, 4, buf);
   if (!ErrorMode)               /* within int21_handler, InDOS is not incremented */
     if (InDOS)
       --InDOS;                  /* fail-safe */
