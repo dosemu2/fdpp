@@ -55,7 +55,18 @@ all: $(ALL)
 
 elf.o: rel.h
 
-$(TARGET).%: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
+# New makes have a way to avoid parallel invocation with the use of &:
+# On old make you would write "%.elf %.map :" which is a bit silly
+# given the names are fixed. Also $(TARGET).% won't work that way at all:
+# you need to explicitly list all files that are created simultaneously,
+# and yet use pattern in all of them.
+DEPS_OF_ELF = $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
+need = 4.3
+ifneq ($(filter $(need),$(firstword $(sort $(MAKE_VERSION) $(need)))),)
+$(TARGET).elf $(TARGET).map &: $(DEPS_OF_ELF)
+else
+%.elf %.map : $(DEPS_OF_ELF)
+endif
 	$(LINK) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
 	chmod -x $@
