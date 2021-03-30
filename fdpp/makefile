@@ -53,17 +53,21 @@ ALL = $(FDPPLIB) $(TARGET).elf $(TARGET).map $(GEN_EXT)
 
 all: $(ALL)
 
-# actually dep on rel.h
-elf.o: $(TARGET).elf
+elf.o: rel.h
 
 $(TARGET).%: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	$(LINK) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
 	chmod -x $@
-	$(LINK) -melf_i386 -static --build-id=sha1 -o $@.tmp \
+
+$(TARGET).elf.tmp: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
+	$(LINK) -melf_i386 -static --build-id=sha1 -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0
-	cmp -l $@ $@.tmp | grep "140   0" | sed 's/^ //' | cut -d " " -f 1 | \
-		sed 's/$$/,/' > rel.h
+	chmod -x $@
+
+rel.h: $(TARGET).elf $(TARGET).elf.tmp
+	cmp -l $^ | grep "140   0" | sed 's/^ //' | cut -d " " -f 1 | \
+		sed 's/$$/,/' > $@
 
 
 clean:
@@ -96,7 +100,7 @@ PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
 _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
     farhlp_sta.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
-GEN_HEADERS = thunk_calls.h thunk_asms.h
+GEN_HEADERS = thunk_calls.h thunk_asms.h rel.h
 GEN_HEADERS_FD = glob_asmdefs.h
 GEN_ASMS = plt.asm cdata.asm
 # dont change file order in GEN_TMP as it matches the gen script
