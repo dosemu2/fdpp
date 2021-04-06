@@ -28,7 +28,7 @@ GIT_DESCRIBE := $(shell git describe)
 .LOW_RESOLUTION_TIME: $(GIT_REV)
 
 CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir) \
-    -DFDPPLIBDIR=$(LIBDIR)/fdpp \
+    -DFDPPKRNLDIR=$(DATADIR)/fdpp \
     -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: $(GIT_DESCRIBE)]"
 NASMFLAGS += -i$(SRC) -f elf32
@@ -229,8 +229,9 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 install: $(ALL)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
 	install $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
-	install -m 0644 $(TARGET).elf $(DESTDIR)$(LIBDIR)/fdpp
-	install -m 0644 $(TARGET).map $(DESTDIR)$(LIBDIR)/fdpp
+	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
+	install -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
+	install -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
 	mkdir -p $(DESTDIR)$(PKGCONFIGDIR)
 	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
@@ -238,6 +239,7 @@ install: $(ALL)
 
 uninstall:
 	rm -rf $(DESTDIR)$(LIBDIR)/fdpp
+	rm -rf $(DESTDIR)$(DATADIR)/fdpp
 	rm -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
 	rm -rf $(DESTDIR)$(PREFIX)/include/fdpp
 

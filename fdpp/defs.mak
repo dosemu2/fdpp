@@ -11,6 +11,7 @@ XFAT=32
 
 PREFIX ?= /usr/local
 LIBDIR ?= $(PREFIX)/lib
+DATADIR ?= $(PREFIX)/share
 INCLUDEDIR ?= $(PREFIX)/include
 PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
 
