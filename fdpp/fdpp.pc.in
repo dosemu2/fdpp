@@ -7,5 +7,5 @@ fdppincdir=${includedir}/fdpp
 Name: fdpp
 Description: 64-bit DOS
 Version: @VERSION@
-Libs: -Wl,-rpath,${fdpplibdir} -L${fdpplibdir} -lfdpp
+Libs: -Wl,-rpath,@LIBDIR@/fdpp -L${fdpplibdir} -lfdpp
 Cflags: -I${includedir}
