@@ -13,4 +13,4 @@ lex.yy.c: $(srcdir)/thunk_gen.l
 	lex $^
 
 clean:
-	$(RM) *.tab.* lex.yy.c thunk_gen
+	rm -f *.tab.* lex.yy.c thunk_gen
