@@ -3,7 +3,11 @@
 #
 
 CC = clang++
+ifeq ($(CXX),)
 CL = clang++
+else
+CL = $(CXX)
+endif
 CLC = clang
 NASM = nasm
 LINK = ld

@@ -82,7 +82,7 @@ rel.h: $(TARGET).elf $(TARGET).elf.tmp
 
 
 clean:
-	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
+	+cd parsers && MAKEFLAGS= $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
