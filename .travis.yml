@@ -2,6 +2,8 @@ language: c
 
 dist:  focal
 
+if: type = cron
+
 before_install:
   - ./ci_prereq.sh
 
