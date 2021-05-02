@@ -5,7 +5,7 @@
 Name: {{{ git_dir_name }}}
 Version: {{{ git_dir_version }}}
 Release: 1%{?dist}
-Summary: 64-bit DOS
+Summary: 64-bit DOS core
 
 Group: System/Emulator
 
@@ -34,7 +34,7 @@ Requires: libstdc++
 Requires: elfutils-libelf
 
 %description
-fdpp is a 64-bit DOS.
+fdpp is a 64-bit DOS core.
 It is based on a FreeDOS kernel ported to modern C++.
 
 %prep

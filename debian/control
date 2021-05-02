@@ -24,6 +24,6 @@ Homepage: https://github.com/dosemu2/fdpp
 Package: fdpp
 Architecture: i386 amd64
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Description: 64-bit DOS
- fdpp is a 64-bit DOS.
+Description: 64-bit DOS core
+ fdpp is a 64-bit DOS core.
  It is based on a FreeDOS kernel ported to modern C++.
