@@ -12,7 +12,7 @@ Group: System/Emulator
 License: GPL-3.0+
 URL: https://github.com/dosemu2/fdpp
 VCS: {{{ git_dir_vcs }}}
-Source: {{{ git_dir_archive }}}
+Source0: {{{ git_dir_archive }}}
 
 BuildRequires: make
 BuildRequires: bison
@@ -29,9 +29,6 @@ BuildRequires: autoconf
 BuildRequires: git
 # diffutils are only needed for reloc hack, remove!
 BuildRequires: diffutils
-
-Requires: libstdc++
-Requires: elfutils-libelf
 
 %description
 fdpp is a 64-bit DOS core.
