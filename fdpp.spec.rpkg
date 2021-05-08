@@ -50,13 +50,10 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir} install
 
 %files
 %defattr(-,root,root)
-%{_libdir}/fdpp/libfdpp.so
+%{_libdir}/fdpp
 %{_libdir}/pkgconfig/fdpp.pc
-%{_includedir}/fdpp/thunks.h
-%{_includedir}/fdpp/memtype.h
-%{_includedir}/fdpp/bprm.h
-%{_datadir}/fdpp/fdppkrnl.elf
-%{_datadir}/fdpp/fdppkrnl.map
+%{_includedir}/fdpp
+%{_datadir}/fdpp
 
 %changelog
 {{{ git_dir_changelog }}}
