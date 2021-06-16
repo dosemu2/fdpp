@@ -474,6 +474,8 @@ STATIC VOID signon()
   "MSC"
 #elif defined(__WATCOMC__)
   "WATCOMC"
+#elif defined(__clang__)
+  "clang"
 #elif defined(__GNUC__)
   "GNUC"
 #else
