@@ -452,11 +452,8 @@ _winPatchTable: ; returns offsets to various internal variables
 _firstsftt:
                 dd -1                   ; link to next
                 dw 5                    ; count
-%if __NASM_MAJOR__ > 2 || __NASM_MINOR__ >= 15
-                times 5 db 59 dup 0     ; 5 sft entries, 59 bytes each
-%else
-                times 5 resb 59         ; this gives warning
-%endif
+                times 5*59 db 0         ; reserve space for the 5 sft entries
+                db 0                    ; pad byte so next value on even boundary
 
 ; Some references seem to indicate that this data should start at 01fbh in
 ; order to maintain 100% MS-DOS compatibility.
@@ -531,7 +528,7 @@ _CritPatch      dw      0               ;-11 zero list of patched critical
                 dw      0               ;    DOS puts 0d0ch here but some
                 dw      0               ;    progs really write to that addr.
                 dw      0               ; patch list terminator
-                db      90h             ;-01 - unknown
+                db      90h             ;-01 - unused, NOP pad byte
 _internal_data:              ; <-- Address returned by INT21/5D06
 _ErrorMode      db      0               ; 00 - Critical Error Flag
 _InDOS          db      0               ; 01 - Indos Flag
