@@ -1006,7 +1006,7 @@ STATIC int Read1LBASector(struct DriveParamS *driveParam, unsigned drive,
     16, 0, 0, 0, NULL, 0, 0
   };
 
-  static struct _bios_LBA_address_packet FAR *f_dap;
+  struct _bios_LBA_address_packet FAR *f_dap = NULL;
   struct CHS chs;
   iregs regs = {};
   int num_retries;
