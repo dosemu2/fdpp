@@ -409,9 +409,6 @@ _version_flags  db      0
                 extern  _os_release
 ____os_release  dw      _os_release
 
-                global  _BootParamVer
-_BootParamVer   db      0
-
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced
 _winInstanced    dw 0 ; set to 1 on WinInit broadcast, 0 on WinExit broadcast
@@ -773,6 +770,8 @@ __InitTextEnd:                      ; and c version
                 times 10h db 0      ; guard space for next sym
 
 segment IB
+                global  _BootParamVer
+_BootParamVer   db      0
                 global  _BootParamSeg
 _BootParamSeg   dw      0
 

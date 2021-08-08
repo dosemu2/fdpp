@@ -106,6 +106,13 @@ VOID ASMCFUNC FreeDOSmain(void)
   setDS(FP_SEG(&DATASTART));
   setES(FP_SEG(&DATASTART));
 
+  /* back up bprm before DynInit(), as Dyn can overwrite .ibss that
+   * holds relevant variables */
+  if (BootParamVer != BPRM_VER)
+    fpanic("Wrong boot param version %i, need %i", (UBYTE)BootParamVer,
+        BPRM_VER);
+  fmemcpy_n(&bprm, MK_FP(BootParamSeg, 0), sizeof(struct _bprm));
+
 #ifdef FDPP
   objhlp_reset();
   run_ctors();
@@ -125,10 +132,6 @@ VOID ASMCFUNC FreeDOSmain(void)
   if (drv >= 0x80)
     drv = (LoL->_BootDrive & ~0x80) + 3; /* HDD */
   LoL->_BootDrive = drv;
-
-  if (BootParamVer != BPRM_VER)
-    fpanic("Wrong boot param version %i, need %i", LoL->_BootParamVer, BPRM_VER);
-  fmemcpy_n(&bprm, MK_FP(BootParamSeg, 0), sizeof(struct _bprm));
 
 #ifndef FDPP
   CheckContinueBootFromHarddisk();
