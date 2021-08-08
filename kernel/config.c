@@ -415,7 +415,10 @@ void PreConfig2(void)
      and allocation starts after the kernel.
    */
 
-  base_seg = LoL->_first_mcb = FP_SEG(AlignParagraph((BYTE FAR *) DynLast() + 0x0f));
+  base_seg = FP_SEG(AlignParagraph((BYTE FAR *) DynLast() + 0x0f));
+  if (base_seg > FP_SEG(lpTop))
+    base_seg = DOS_PSP + (sizeof(psp) >> 4);
+  LoL->_first_mcb = base_seg;
 
   if (Config.ebda2move)
   {
