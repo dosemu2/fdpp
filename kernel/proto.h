@@ -517,7 +517,7 @@ VOID ASMFUNC FAR CharMapSrvc(VOID);
 UWORD ASMPASCAL INITTEXT init_call_intr(WORD nr, iregs * rp);
 UWORD ASMPASCAL call_intr(WORD nr, __FAR(iregs) rp);
 VOID ASMPASCAL call_intr_func(__FAR(VOID) ptr, __FAR(iregs) rp);
-UWORD ASMPASCAL INITTEXT init_DosRead(WORD fd, void *buf, UWORD count);
+DWORD ASMPASCAL INITTEXT init_DosRead(WORD fd, void *buf, UWORD count);
 WORD ASMPASCAL INITTEXT init_DosOpen(const char *pathname, WORD flags);
 WORD ASMPASCAL INITTEXT init_exists(const char *pathname);
 WORD ASMPASCAL INITTEXT close(WORD fd);

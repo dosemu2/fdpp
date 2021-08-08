@@ -289,7 +289,7 @@ CLOSE:
         mov ah, 3eh
         jmp short common_int21
 
-;; UCOUNT init_DosRead(int fd, void *buf, UCOUNT count);
+;; DWORD init_DosRead(int fd, void *buf, UCOUNT count);
     global INIT_DOSREAD
 INIT_DOSREAD:
         pop ax         ; ret address
@@ -298,7 +298,13 @@ INIT_DOSREAD:
         pop bx         ; fd
         push ax        ; ret address
         mov ah, 3fh
-        jmp short common_int21
+        int 21h
+        mov dx,0
+        jnc read_ret
+        mov ax,-1
+        mov dx,-1
+read_ret:
+        ret
 
 ;; int dup2(int oldfd, int newfd);
     global DUP2

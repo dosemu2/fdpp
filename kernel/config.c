@@ -1055,11 +1055,16 @@ VOID DoConfig(int nPass)
 
     for (pLine = szLine;;)
     {
-      if (read(nFileDesc, pLine, 1) == 0)
-      {
+      switch (read(nFileDesc, pLine, 1)) {
+      case -1:
+        _printf("error reading config file\n");
+      /* no break */
+      case 0:
         bEof = TRUE;
         break;
       }
+      if (bEof)
+        break;
 
       if (pLine >= szLine + sizeof(szLine) - 3)
       {
