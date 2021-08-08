@@ -314,9 +314,12 @@ void MoveKernel(UWORD NewKernelSegment)
   UWORD len;
   UWORD offs = 0;
   struct RelocationTable FAR *rp;
+  BOOL initial = 0;
 
-  if (CurrentKernelSegment == 0)
+  if (CurrentKernelSegment == 0) {
     CurrentKernelSegment = FP_SEG(_HMATextEnd);
+    initial = 1;
+  }
 
   if (CurrentKernelSegment == 0xffff)
     return;
@@ -336,8 +339,7 @@ void MoveKernel(UWORD NewKernelSegment)
     offs = HMAOFFSET;
   }
 
-  if (NewKernelSegment < CurrentKernelSegment ||
-      NewKernelSegment == 0xffff)
+  if (!initial)
     fmemcpy(HMADest, HMASource, len);
   /* else it's the very first relocation: handled by kernel.asm */
 
