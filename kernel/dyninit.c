@@ -49,10 +49,12 @@ extern struct DynS FAR ASM Dyn;
 #endif
 STATIC struct DynS FAR *Dynp;
 STATIC BSS(unsigned, Allocated, 0);
+STATIC BSS(unsigned, MaxSize, 0);
 
-void DynInit(void FAR *ptr)
+void DynInit(void FAR *ptr, UWORD max_size)
 {
   Dynp = ptr;
+  MaxSize = max_size;
 }
 
 far_t DynAlloc(const char *what, unsigned num, unsigned size)
@@ -64,7 +66,7 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
   UNREFERENCED_PARAMETER(what);
 #endif
 
-  if ((ULONG) total + Allocated > 0xffff)
+  if ((ULONG) total + Allocated > MaxSize)
   {
     char buf[256];
     _snprintf(buf, sizeof(buf), "Dyn %u", (ULONG) total + Allocated);

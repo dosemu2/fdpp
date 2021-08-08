@@ -12,7 +12,7 @@
 #ifndef DYNDATA_H
 #define DYNDATA_H
 
-void DynInit(__FAR(void) ptr);
+void DynInit(__FAR(void) ptr, UWORD max_size);
 far_t DynAlloc(const char *what, unsigned num, unsigned size);
 far_t DynLast(void);
 void DynFree(void *ptr);

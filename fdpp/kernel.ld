@@ -62,6 +62,9 @@ SECTIONS
 		*(IB)
 		__ibss_end = .;
 	}
+    .iend (NOLOAD) : {
+		*(IB_E)
+	}
 
     /* We do not DISCARD any sections. But we still need to list them
      * explicitly to prevent linker from trying to put some _before_ our

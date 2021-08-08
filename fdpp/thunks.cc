@@ -853,6 +853,7 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss)
     char *kname;
     void *handle;
     struct krnl_hndl *h;
+    int i;
 
     asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
     handle = elf_open(kname);
@@ -884,11 +885,18 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss)
 
     bl = (struct fdpp_bss_list *)malloc(sizeof(*bl) +
             sizeof(struct fdpp_bss_ent) * 2);
-    bl->num = 2;
-    bl->ent[0].off = (uintptr_t)bstart - (uintptr_t)start;
-    bl->ent[0].len = (uintptr_t)bend - (uintptr_t)bstart;
-    bl->ent[1].off = (uintptr_t)ibstart - (uintptr_t)start;
-    bl->ent[1].len = (uintptr_t)ibend - (uintptr_t)ibstart;
+    i = 0;
+    if (bend != bstart) {
+        bl->ent[i].off = (uintptr_t)bstart - (uintptr_t)start;
+        bl->ent[i].len = (uintptr_t)bend - (uintptr_t)bstart;
+        i++;
+    }
+    if (ibend != ibstart) {
+        bl->ent[i].off = (uintptr_t)ibstart - (uintptr_t)start;
+        bl->ent[i].len = (uintptr_t)ibend - (uintptr_t)ibstart;
+        i++;
+    }
+    bl->num = i;
     *bss = bl;
 
     h = (struct krnl_hndl *)malloc(sizeof(*h));

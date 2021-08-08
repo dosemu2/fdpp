@@ -17,6 +17,7 @@
  */
 
 #include "thunks_priv.h"
+#include "bprm.h"
 %include "segs.inc"
 
 %define _SEG(s) TGROUP
@@ -156,9 +157,10 @@ plt_init:
     mov bp, sp
 
     ; copy plt entry
-    mov es, [_BootParamSeg]
-    mov ax, [es:0]
-    mov bx, [es:2]
+    mov ax, FDPP_BS_SEG
+    mov es, ax
+    mov ax, [es:FDPP_BS_OFF+FDPP_PLT_OFFSET]
+    mov bx, [es:FDPP_BS_OFF+FDPP_PLT_OFFSET+2]
     mov [fdpp_plt], ax
     mov [fdpp_plt + 2], bx
 

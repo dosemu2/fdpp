@@ -81,6 +81,10 @@ VOID ASMCFUNC FreeDOSmain(void)
 {
   unsigned char drv;
   UWORD relo;
+  void FAR *dyn;
+  UWORD dyn_len;
+  UWORD FAR *BootParamVer;
+  struct _bprm FAR *b;
 
 #ifdef _MSC_VER
   extern FAR prn_dev;
@@ -106,19 +110,26 @@ VOID ASMCFUNC FreeDOSmain(void)
   setDS(FP_SEG(&DATASTART));
   setES(FP_SEG(&DATASTART));
 
-  /* back up bprm before DynInit(), as Dyn can overwrite .ibss that
-   * holds relevant variables */
-  if (BootParamVer != BPRM_VER)
-    fpanic("Wrong boot param version %i, need %i", (UBYTE)BootParamVer,
+  BootParamVer = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_VER_OFFSET);
+  if (*BootParamVer != BPRM_VER)
+    fpanic("Wrong boot param version %i, need %i", *BootParamVer,
         BPRM_VER);
-  fmemcpy_n(&bprm, MK_FP(BootParamSeg, 0), sizeof(struct _bprm));
+  b = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_OFFSET);
+  if (!b->BprmLen || b->BprmLen > sizeof(bprm))
+    fpanic("Boot param table corrupted");
+  fmemcpy_n(&bprm, b, b->BprmLen);
 
 #ifdef FDPP
   objhlp_reset();
   run_ctors();
 #endif
 
-  DynInit(MK_FP(FP_SEG(LoL), FP_OFF(&Dyn)));
+  dyn = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
+  if (bprm.HeapSize)
+    dyn_len = bprm.HeapSize + (InitEnd - dyn);
+  else
+    dyn_len = 0xffff;
+  DynInit(dyn, dyn_len);
 
 #ifdef FDPP
 #define DOSOBJ_POOL 512

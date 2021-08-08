@@ -96,6 +96,7 @@ __ASM_ARRI_F(BYTE, _HMATextStart) SEMIC          /* first byte of HMAable CODE a
 __ASM_ARRI_F(BYTE, _HMATextEnd) SEMIC
 __ASM_ARRI_F(BYTE, _InitTextStart) SEMIC     /* first available byte of ram          */
 __ASM_ARRI_F(BYTE, _InitTextEnd) SEMIC
+__ASM_ARRI_F(BYTE, InitEnd) SEMIC
 //__ASM(BYTE FAR, ReturnAnyDosVersionExpected) SEMIC
 __ASM(BYTE FAR, HaltCpuWhileIdle) SEMIC
 __ASM(unsigned char FAR, kbdType) SEMIC
@@ -149,5 +150,3 @@ __ASM_FUNC(cpm_entry) SEMIC
 __ASM_ARRI_F(const char, os_release) SEMIC
 __ASM_NEAR(const char, ___os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC
-__ASM(UWORD, BootParamSeg) SEMIC
-__ASM(UBYTE, BootParamVer) SEMIC

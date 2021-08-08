@@ -134,8 +134,6 @@ kernel_start:
 %endif
                 mov     ds,[cs:_INIT_DGROUP]
                 mov     byte [_BootDrive],bl ; tell where we came from
-                mov     word [_BootParamSeg],ax ; bprm seg
-                mov     byte [_BootParamVer],bh ; bprm version
                 int     12h             ; move stack to higher memory
                 mov     cl,6
                 shl     ax,cl           ; convert kb to para
@@ -769,11 +767,9 @@ segment INIT_TEXT_END
 __InitTextEnd:                      ; and c version
                 times 10h db 0      ; guard space for next sym
 
-segment IB
-                global  _BootParamVer
-_BootParamVer   db      0
-                global  _BootParamSeg
-_BootParamSeg   dw      0
+segment IB_E
+                global _InitEnd
+_InitEnd:
 
 ;
 ; start end end of HMA area
