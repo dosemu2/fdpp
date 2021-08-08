@@ -2424,8 +2424,8 @@ STATIC void config_init_buffers(int wantedbuffers)
   LoL->_deblock_buf = DiskTransferBuffer;
   LoL->_firstbuf = pbuffer;
 
-  DebugPrintf(("init_buffers (size %zu) at", sizeof(struct buffer)));
-  DebugPrintf((" (%P)", GET_FP32(LoL->_firstbuf)));
+  DebugPrintf(("init_buffers (size %zu) at (%P)\n", sizeof(struct buffer),
+      GET_FP32(LoL->_firstbuf)));
 
   buffers--;
   pbuffer->b_prev = FP_OFF(pbuffer + buffers);
