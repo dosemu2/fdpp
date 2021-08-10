@@ -66,7 +66,7 @@ configstart:
 DLASortByDriveNo            db 0        ; sort disks by drive order
 InitDiskShowDriveAssignment db 1        ;
 SkipConfigSeconds           db 2        ;
-ForceLBA                    db 0        ;
+ForceLBA                    db 1        ;
 GlobalEnableLBAsupport      db 1        ;
 BootHarddiskSeconds         db 0        ;
 
