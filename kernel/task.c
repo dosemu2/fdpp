@@ -63,7 +63,7 @@ static BYTE *RcsId =
  #endif
 #endif
 
-STATIC UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count);
+STATIC DWORD res_read(UWORD fd, void FAR *buf, UCOUNT count);
 
 #define CHUNK 32256
 #define MAXENV 32768u
@@ -981,7 +981,7 @@ COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, __XFAR(const char) filename)
     return 0;
 }
 
-STATIC UCOUNT res_read(UWORD fd, void FAR *buf, UCOUNT count)
+STATIC DWORD res_read(UWORD fd, void FAR *buf, UCOUNT count)
 {
     iregs regs = {};
     regs.c.x = count;
