@@ -416,8 +416,10 @@ void PreConfig2(void)
    */
 
   base_seg = FP_SEG(AlignParagraph((BYTE FAR *) DynLast() + 0x0f));
-  if (base_seg > FP_SEG(lpTop))
+  if (base_seg > FP_SEG(lpTop)) {
+    LoL->_version_flags |= 8;   // running in ROM
     base_seg = DOS_PSP + (sizeof(psp) >> 4);
+  }
   LoL->_first_mcb = base_seg;
 
   if (Config.ebda2move)
