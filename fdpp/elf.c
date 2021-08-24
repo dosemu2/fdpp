@@ -16,6 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -67,15 +68,23 @@ void *elf_open(const char *name)
     elf_version(EV_CURRENT);
 
     fd = open(name, O_RDONLY);
+    if (fd == -1) {
+        perror("open()");
+        return NULL;
+    }
     fstat(fd, &st);
     mapsize = (st.st_size + getpagesize() - 1) & ~(getpagesize() - 1);
     addr = mmap(NULL, mapsize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
     close(fd);
-    if (addr == MAP_FAILED)
-      return NULL;
+    if (addr == MAP_FAILED) {
+        perror("mmap()");
+        return NULL;
+    }
     elf = elf_memory(addr, st.st_size);
-    if (!elf)
+    if (!elf) {
+        fprintf(stderr, "elf_memory() failed\n");
         goto err2;
+    }
 
     for (i = 0, load_offs = 0; gelf_getphdr(elf, i, &phdr); i++) {
         if (phdr.p_type != PT_LOAD)
@@ -83,8 +92,10 @@ void *elf_open(const char *name)
         load_offs = phdr.p_offset;
         break;
     }
-    if (!load_offs)
+    if (!load_offs) {
+        fprintf(stderr, "elf: not found PT_LOAD\n");
         goto err;
+    }
 
     while ((scn = elf_nextscn(elf, scn)) != NULL) {
         gelf_getshdr(scn, &shdr);
@@ -93,8 +104,10 @@ void *elf_open(const char *name)
             break;
         }
     }
-    if (!scn)
+    if (!scn) {
+        fprintf(stderr, "elf: not found SHT_SYMTAB\n");
         goto err;
+    }
 
     ret = malloc(sizeof(*ret));
     ret->addr = addr;
