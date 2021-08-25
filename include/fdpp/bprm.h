@@ -15,11 +15,13 @@ struct _bprm {
   uint8_t CfgDrive;             /* drive num to load fdppconf.sys from  */
   uint32_t DriveMask;           /* letters of masked drive are skipped  */
   uint16_t HeapSize;            /* heap for initial allocations         */
+  uint16_t HeapSeg;             /* heap segment or 0 if after kernel    */
 };
 
 #endif
 
-#define BPRM_VER 4
+#define BPRM_VER 5
+#define BPRM_MIN_VER 4
 
 #define FDPP_BS_SEG 0x1fe0
 #define FDPP_BS_OFF 0x7c00

@@ -383,7 +383,8 @@ void PreConfig(void)
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
   sp = (struct sfttbl FAR *)
-      DynAlloc("sft", 1, sizeof(sftheader) + (16-5) * sizeof(sft));
+      /* win31 doesn't seem to like SFTs in 0xfxxx space */
+      DynAllocLow("sft", 1, sizeof(sftheader) + (16-5) * sizeof(sft));
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = 16-5;
   LoL->_sfthead->sftt_next = sp;
@@ -415,12 +416,10 @@ void PreConfig2(void)
      and allocation starts after the kernel.
    */
 
-  base_seg = FP_SEG(AlignParagraph((BYTE FAR *) DynLast() + 0x0f));
-  if (base_seg > FP_SEG(lpTop)) {
-    LoL->_version_flags |= 8;   // running in ROM
-    base_seg = DOS_PSP + (sizeof(psp) >> 4);
-  }
+  base_seg = FP_SEG(AlignParagraph((BYTE FAR *) DynLast()));
   LoL->_first_mcb = base_seg;
+  if (bprm.HeapSize && !bprm.HeapSeg)
+    LoL->_version_flags |= 8;   // running in ROM
 
   if (Config.ebda2move)
   {

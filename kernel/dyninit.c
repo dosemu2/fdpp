@@ -42,34 +42,79 @@ additionally:
 #include "dyndata.h"
 #include "debug.h"
 
-#ifndef __TURBOC__
-#include "init-dat.h"
-#else
-extern struct DynS FAR ASM Dyn;
-#endif
-STATIC struct DynS FAR *Dynp;
-STATIC BSS(unsigned, Allocated, 0);
-STATIC BSS(unsigned, MaxSize, 0);
+enum { HEAP_FAR, HEAP_NEAR, HEAP_LOW, HEAP_MAX };
+struct HeapS {
+    struct DynS FAR *Dynp;
+    int Allocated;
+    int MaxSize;
+};
+STATIC struct HeapS *HeapMap[HEAP_MAX];
+enum { H_DYN, H_OTHER, HEAPS };
+STATIC struct HeapS Heap[HEAPS];
 
-void DynInit(void FAR *ptr, UWORD max_size)
+void DynInit(void)
 {
-  Dynp = ptr;
-  MaxSize = max_size;
+  void FAR *dyn = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
+  int i;
+
+  for (i = 0; i < HEAPS; i++) {
+    Heap[i].Dynp = NULL;
+    Heap[i].Allocated = 0;
+    Heap[i].MaxSize = 0;
+  }
+  Heap[H_DYN].Dynp = dyn;
+  HeapMap[HEAP_NEAR] = &Heap[H_DYN];
+
+  if (!bprm.HeapSize && !bprm.HeapSeg) {
+    /* legacy layout, Dyn only */
+    Heap[H_DYN].MaxSize = 0x10000;
+    for (i = 0; i < HEAP_MAX; i++)
+      HeapMap[i] = &Heap[H_DYN];
+    return;
+  }
+  if (!bprm.HeapSize && bprm.HeapSeg) {
+    /* kernel in UMA, heap low, Dyn small */
+    Heap[H_DYN].MaxSize = InitEnd - dyn;
+    Heap[H_OTHER].Dynp = MK_FP(bprm.HeapSeg, 0);
+    Heap[H_OTHER].MaxSize = 0x10000;
+    HeapMap[HEAP_FAR] = &Heap[H_OTHER];
+    HeapMap[HEAP_LOW] = &Heap[H_OTHER];
+    return;
+  }
+  if (bprm.HeapSize && !bprm.HeapSeg) {
+    /* contig layout in UMA */
+    Heap[H_DYN].MaxSize = bprm.HeapSize + (InitEnd - dyn);
+    HeapMap[HEAP_FAR] = &Heap[H_DYN];
+    Heap[H_OTHER].Dynp = MK_FP(DOS_PSP + (sizeof(psp) >> 4), 0);
+    Heap[H_OTHER].MaxSize = 0x10000;
+    HeapMap[HEAP_LOW] = &Heap[H_OTHER];
+    return;
+  }
+  if (bprm.HeapSize && bprm.HeapSeg) {
+    /* kernel low, heap in UMA */
+    Heap[H_DYN].MaxSize = 0x10000;
+    HeapMap[HEAP_LOW] = &Heap[H_DYN];
+    Heap[H_OTHER].Dynp = MK_FP(bprm.HeapSeg, 0);
+    Heap[H_OTHER].MaxSize = bprm.HeapSize;
+    HeapMap[HEAP_FAR] = &Heap[H_OTHER];
+    return;
+  }
 }
 
-far_t DynAlloc(const char *what, unsigned num, unsigned size)
+static far_t DoAlloc(const char *what, unsigned num, unsigned size, int heap)
 {
   void FAR *now;
   unsigned total = num * size;
+  struct HeapS *h = HeapMap[heap];
 
 #ifndef DEBUG
   UNREFERENCED_PARAMETER(what);
 #endif
 
-  if ((ULONG) total + Allocated > MaxSize)
+  if ((ULONG) total + h->Allocated > h->MaxSize)
   {
     char buf[256];
-    _snprintf(buf, sizeof(buf), "Dyn %u", (ULONG) total + Allocated);
+    _snprintf(buf, sizeof(buf), "Dyn %u", (ULONG) total + h->Allocated);
     panic(buf);
   }
 
@@ -80,23 +125,34 @@ far_t DynAlloc(const char *what, unsigned num, unsigned size)
                Allocated + total));
 #endif
 
-  now = (void FAR *)&Dynp->Buffer[Allocated];
+  now = (void FAR *)&h->Dynp->Buffer[h->Allocated];
   fmemset(now, 0, total);
 
-  Allocated += total;
+  h->Allocated += total;
 
   return GET_FAR(now);
 }
 
-void DynFree(void *ptr)
+far_t DynAlloc(const char *what, unsigned num, unsigned size)
 {
-  Allocated = (char *)ptr - (char *)Dynp->Buffer;
+  return DoAlloc(what, num, size, HEAP_FAR);
+}
+
+far_t DynAllocNear(const char *what, unsigned num, unsigned size)
+{
+  return DoAlloc(what, num, size, HEAP_NEAR);
+}
+
+far_t DynAllocLow(const char *what, unsigned num, unsigned size)
+{
+  return DoAlloc(what, num, size, HEAP_LOW);
 }
 
 far_t DynLast()
 {
+  struct HeapS *h = HeapMap[HEAP_LOW];
   DebugPrintf(("dynamic data end at %P\n",
-               GET_FP32(Dynp->Buffer + Allocated)));
+               GET_FP32(h->Dynp->Buffer + h->Allocated)));
 
-  return GET_FAR(Dynp->Buffer + Allocated);
+  return GET_FAR(h->Dynp->Buffer + h->Allocated);
 }
