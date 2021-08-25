@@ -192,8 +192,8 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
 
-plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h
-	cpp -I $(SRC) -I $(TOP)/include/fdpp -P $< >$@ || (rm -f $@ ; false)
+plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h $(srcdir)/makefile
+	cpp -I $(SRC) -I $(TOP)/include/fdpp -DFDPP -P $< >$@ || (rm -f $@ ; false)
 
 cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
 	cpp -P $(CPPFLAGS) $< | sed 's/" "/","/g' >$@

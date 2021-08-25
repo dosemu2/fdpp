@@ -52,5 +52,4 @@ CPPFLAGS += -DWITHFAT32
 NASMFLAGS += -DWITHFAT32
 endif
 
-NASMFLAGS := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU)
-LOADSEG = 0x60
+NASMFLAGS := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU) -DFDPP
