@@ -352,6 +352,7 @@ BSS(BYTE, HMAState, 0);
 void PreConfig(void)
 {
   struct sfttbl FAR *sp;
+  struct sfttbl FAR *sp2;
 
   /* Initialize the base memory pointers                          */
 
@@ -383,11 +384,20 @@ void PreConfig(void)
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
   sp = (struct sfttbl FAR *)
-      /* win31 doesn't seem to like SFTs in 0xfxxx space */
-      DynAllocLow("sft", 1, sizeof(sftheader) + (16-5) * sizeof(sft));
+      /* first 5 SFTs are in kernel and can be low or high.
+       * Even if they are high, win31 insists on SFTs from 6 to 8
+       * being low, or it won't start. Weird that they don't check
+       * all 8 SFTs. */
+      DynAllocLow("sft", 1, sizeof(sftheader) + 3 * sizeof(sft));
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
-  sp->sftt_count = 16-5;
+  sp->sftt_count = 3;
   LoL->_sfthead->sftt_next = sp;
+  /* add 8 more for CHAIN= and alike */
+  sp2 = (struct sfttbl FAR *)
+      DynAlloc("sft", 1, sizeof(sftheader) + 8 * sizeof(sft));
+  sp2->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  sp2->sftt_count = 8;
+  sp->sftt_next = sp2;
 
 #ifdef DEBUG
 /*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
@@ -480,8 +490,9 @@ void PostConfig(void)
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
-  sp = LoL->_sfthead->sftt_next;
-  sp = sp->sftt_next = (sfttbl FAR *)
+  for (sp = LoL->_sfthead; sp != (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+      sp = sp->sftt_next);
+  sp = (sfttbl FAR *)
     /* have initial 16 sfts in kernel */
     KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 16) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
