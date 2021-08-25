@@ -16,6 +16,9 @@ struct _bprm {
   uint32_t DriveMask;           /* letters of masked drive are skipped  */
   uint16_t HeapSize;            /* heap for initial allocations         */
   uint16_t HeapSeg;             /* heap segment or 0 if after kernel    */
+#define FDPP_FL_ALT_LAYOUT  1   /* alter heap layout in some weird ways */
+#define FDPP_FL_ALT_LAYOUT2 2   /* alter heap layout in some weird ways */
+  uint16_t Flags;
 };
 
 #endif
