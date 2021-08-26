@@ -454,6 +454,7 @@ void PreConfig2(void)
 void PostConfig(void)
 {
   sfttbl FAR *sp;
+  sfttbl FAR *sp2;
 
   /* We could just have loaded FDXMS or HIMEM */
   if (HMAState == HMA_REQ && MoveKernelToHMA())
@@ -490,14 +491,16 @@ void PostConfig(void)
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
   /* LoL->FCBp = KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
-  for (sp = LoL->_sfthead; sp != (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  for (sp = LoL->_sfthead;
+      sp->sftt_next != (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
       sp = sp->sftt_next);
-  sp = (sfttbl FAR *)
+  sp2 = (sfttbl FAR *)
     /* have initial 16 sfts in kernel */
     KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 16) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
-  sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
-  sp->sftt_count = Config.cfgFiles - 16;
+  sp2->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+  sp2->sftt_count = Config.cfgFiles - 16;
+  sp->sftt_next = sp2;
 
   old_CDSp = LoL->_CDSp;
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
