@@ -123,8 +123,14 @@ VOID ASMCFUNC FreeDOSmain(void)
   fmemcpy_n(&bprm, b, b->BprmLen);
   if (*BootParamVer != BPRM_VER) {
     /* compatibility fixups */
-    if (*BootParamVer == 4)
-      bprm.HeapSize = 0;
+    switch (*BootParamVer) {
+    case 5:
+      if (!bprm.Flags) {
+        bprm.Flags = FDPP_FL_KERNEL_HIGH | FDPP_FL_HEAP_HIGH;
+        bprm.HeapSeg = DOS_PSP + (sizeof(psp) >> 4);
+      }
+      break;
+    }
   }
 
 #ifdef FDPP

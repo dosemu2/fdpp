@@ -65,52 +65,29 @@ void DynInit(void)
   Heap[H_DYN].Dynp = dyn;
   HeapMap[HEAP_NEAR] = &Heap[H_DYN];
 
-  if (!bprm.HeapSize && !bprm.HeapSeg) {
-    if (!(bprm.Flags & FDPP_FL_ALT_LAYOUT)) {
-      /* legacy layout, Dyn only */
-      Heap[H_DYN].MaxSize = 0x10000;
-      for (i = 0; i < HEAP_MAX; i++)
-        HeapMap[i] = &Heap[H_DYN];
-    } else {
-      int la = bprm.Flags & FDPP_FL_ALT_LAYOUT2;
-      /* kernel in UMA */
-      Heap[H_DYN].MaxSize = InitEnd - dyn;
-      Heap[H_OTHER].Dynp = MK_FP(DOS_PSP + (sizeof(psp) >> 4), 0);
-      Heap[H_OTHER].MaxSize = 0x10000;
-      HeapMap[HEAP_FAR] = &Heap[la ? H_DYN : H_OTHER];
-      HeapMap[HEAP_LOW] = &Heap[H_OTHER];
-    }
-    return;
-  }
-  if (!bprm.HeapSize && bprm.HeapSeg) {
-    /* kernel in UMA, heap low, Dyn small */
-    Heap[H_DYN].MaxSize = InitEnd - dyn;
+#define KERNEL_HIGH() (bprm.Flags & FDPP_FL_KERNEL_HIGH)
+#define HEAP_HIGH() (bprm.Flags & FDPP_FL_HEAP_HIGH)
+
+  if (!KERNEL_HIGH() && !HEAP_HIGH()) {
+    /* legacy layout, Dyn only */
+    Heap[H_DYN].MaxSize = 0x10000;
+    for (i = 0; i < HEAP_MAX; i++)
+      HeapMap[i] = &Heap[H_DYN];
+  } else if (KERNEL_HIGH()) {
+    ___assert(bprm.HeapSeg >= DOS_PSP + (sizeof(psp) >> 4));
+    Heap[H_DYN].MaxSize = bprm.HeapSize + (InitEnd - dyn);
     Heap[H_OTHER].Dynp = MK_FP(bprm.HeapSeg, 0);
     Heap[H_OTHER].MaxSize = 0x10000;
-    if (!(bprm.Flags & FDPP_FL_ALT_LAYOUT2))
-      HeapMap[HEAP_FAR] = &Heap[H_OTHER];
-    else
-      HeapMap[HEAP_FAR] = &Heap[H_DYN];
+    HeapMap[HEAP_FAR] = &Heap[HEAP_HIGH() ? H_DYN : H_OTHER];
     HeapMap[HEAP_LOW] = &Heap[H_OTHER];
-    return;
-  }
-  if (bprm.HeapSize && !bprm.HeapSeg) {
-    /* contig layout in UMA */
-    Heap[H_DYN].MaxSize = bprm.HeapSize + (InitEnd - dyn);
-    HeapMap[HEAP_FAR] = &Heap[H_DYN];
-    Heap[H_OTHER].Dynp = MK_FP(DOS_PSP + (sizeof(psp) >> 4), 0);
-    Heap[H_OTHER].MaxSize = 0x10000;
-    HeapMap[HEAP_LOW] = &Heap[H_OTHER];
-    return;
-  }
-  if (bprm.HeapSize && bprm.HeapSeg) {
+  } else {
     /* kernel low, heap in UMA */
+    ___assert(bprm.HeapSeg && bprm.HeapSize);
     Heap[H_DYN].MaxSize = 0x10000;
-    HeapMap[HEAP_LOW] = &Heap[H_DYN];
     Heap[H_OTHER].Dynp = MK_FP(bprm.HeapSeg, 0);
     Heap[H_OTHER].MaxSize = bprm.HeapSize;
     HeapMap[HEAP_FAR] = &Heap[H_OTHER];
-    return;
+    HeapMap[HEAP_LOW] = &Heap[H_DYN];
   }
 }
 
