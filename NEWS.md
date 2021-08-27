@@ -1,3 +1,13 @@
+## 1.4
+
+Most of work went into making the kernel fully relocatable.
+This required writing the new heap manager and updating the boot protocol.
+
+- It is now possible to run fdpp directly from UMB, leaving entire
+low mem free for your programs.
+- Lots of build infrastructure work was done for buildroot integration.
+- LBA support resurrected and enabled by default.
+
 ## 1.3
 
 In this release we switched to ELF format. The binary kernel format
