@@ -30,7 +30,9 @@ typedef struct mempool {
 } smpool;
 
 void *smalloc(struct mempool *mp, size_t size);
-void smfree(struct mempool *mp, void *ptr);
+void *smalloc_fixed(struct mempool *mp, void *ptr, size_t size);
+int smfree(struct mempool *mp, void *ptr);
+void *smalloc_aligned(struct mempool *mp, size_t align, size_t size);
 void *smrealloc(struct mempool *mp, void *ptr, size_t size);
 int sminit(struct mempool *mp, void *start, size_t size);
 int sminit_com(struct mempool *mp, void *start, size_t size,
@@ -43,10 +45,10 @@ size_t smget_largest_free_area(struct mempool *mp);
 int smget_area_size(struct mempool *mp, void *ptr);
 void *smget_base_addr(struct mempool *mp);
 void smregister_error_notifier(struct mempool *mp,
-    void (*func)(int prio, const char *fmt, ...) FORMAT(printf, 2, 3));
+  void (*func)(int prio, const char *fmt, ...) FORMAT(printf, 2, 3));
 void smregister_default_error_notifier(
-    void (*func)(int prio, const char *fmt, ...)
-    FORMAT(printf, 2, 3));
+	void (*func)(int prio, const char *fmt, ...)
+	FORMAT(printf, 2, 3));
 void smdump(struct mempool *mp);
 
 #endif
