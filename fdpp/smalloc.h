@@ -29,9 +29,6 @@ typedef struct mempool {
   void (*smerr)(int prio, const char *fmt, ...) FORMAT(printf, 2, 3);
 } smpool;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void *smalloc(struct mempool *mp, size_t size);
 void smfree(struct mempool *mp, void *ptr);
 void *smrealloc(struct mempool *mp, void *ptr, size_t size);
@@ -51,8 +48,5 @@ void smregister_default_error_notifier(
     void (*func)(int prio, const char *fmt, ...)
     FORMAT(printf, 2, 3));
 void smdump(struct mempool *mp);
-#ifdef __cplusplus
-}
-#endif
 
 #endif

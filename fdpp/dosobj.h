@@ -21,9 +21,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void dosobj_init(far_t fa, int size);
 void dosobj_reinit(far_t fa, int size);
 far_t mk_dosobj(const void *data, UWORD len);
@@ -33,8 +30,5 @@ void rm_dosobj(far_t fa);
 void dosobj_dump(void);
 
 uint16_t dosobj_seg(void);
-#ifdef __cplusplus
-}
-#endif
 
 #endif

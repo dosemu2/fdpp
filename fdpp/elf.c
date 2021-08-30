@@ -44,7 +44,7 @@ static void elf_dl(char *addr, uint16_t seg)
     const int reloc_tab[] = {
         #include "rel.h"
     };
-    int i;
+    size_t i;
 #define _countof(array) (sizeof(array) / sizeof(array[0]))
 
     for (i = 0; i < _countof(reloc_tab); i++)
@@ -74,7 +74,8 @@ void *elf_open(const char *name)
     }
     fstat(fd, &st);
     mapsize = (st.st_size + getpagesize() - 1) & ~(getpagesize() - 1);
-    addr = mmap(NULL, mapsize, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+    addr = (char *)mmap(NULL, mapsize, PROT_READ | PROT_WRITE, MAP_PRIVATE,
+        fd, 0);
     close(fd);
     if (addr == MAP_FAILED) {
         perror("mmap()");
@@ -109,7 +110,7 @@ void *elf_open(const char *name)
         goto err;
     }
 
-    ret = malloc(sizeof(*ret));
+    ret = (struct elfstate *)malloc(sizeof(*ret));
     ret->addr = addr;
     ret->mapsize = mapsize;
     ret->elf = elf;
@@ -127,14 +128,14 @@ err2:
 
 void elf_reloc(void *arg, uint16_t seg)
 {
-    struct elfstate *state = arg;
+    struct elfstate *state = (struct elfstate *)arg;
 
     elf_dl(state->addr, seg);
 }
 
 void elf_close(void *arg)
 {
-    struct elfstate *state = arg;
+    struct elfstate *state = (struct elfstate *)arg;
 
     elf_end(state->elf);
     munmap(state->addr, state->mapsize);
@@ -142,7 +143,7 @@ void elf_close(void *arg)
 
 void *elf_getsym(void *arg, const char *name)
 {
-    struct elfstate *state = arg;
+    struct elfstate *state = (struct elfstate *)arg;
     Elf_Data *data;
     int count, i;
 

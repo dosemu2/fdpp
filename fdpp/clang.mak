@@ -8,7 +8,7 @@ CL = clang++
 else
 CL = $(CXX)
 endif
-CLC = clang
+CLC = $(CL)
 NASM = nasm
 LINK = ld
 
@@ -26,12 +26,12 @@ USE_UBSAN ?= 0
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS = $(IFLAGS)
 WFLAGS = -Wall
-WCFLAGS = $(WFLAGS) -Wmissing-prototypes
+WCFLAGS = $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
 endif
 ifeq ($(EXTRA_DEBUG),1)
-DBGFLAGS += -fdebug-macro -O0 -DFDPP_DEBUG -DEXTRA_DEBUG
+DBGFLAGS += -O0 -DFDPP_DEBUG -DEXTRA_DEBUG
 NASMFLAGS += -DEXTRA_DEBUG
 else
 DBGFLAGS += -O2
