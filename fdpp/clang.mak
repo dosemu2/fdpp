@@ -24,7 +24,7 @@ DEBUG_MSGS ?= 1
 USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
-CPPFLAGS = $(IFLAGS)
+CPPFLAGS = $(IFLAGS) -DFDPP
 WFLAGS = -Wall
 WCFLAGS = $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)

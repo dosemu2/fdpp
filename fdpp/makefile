@@ -10,8 +10,8 @@ include $(srcdir)/defs.mak
 include $(srcdir)/clang.mak
 
 TOP = $(abspath $(srcdir)/..)
-HDR=$(TOP)/hdr/
-SRC=$(TOP)/kernel/
+HDR=$(TOP)/hdr
+SRC=$(TOP)/kernel
 FDPPLIB = libfdpp.so
 RELVER =
 MAJ = 1.3
@@ -89,24 +89,24 @@ clean:
 		*.pc
 
 #               *Individual File Dependencies*
-#apisupt.o:	$(SRC)apisupt.asm $(SRC)segs.inc
-console.o:	$(SRC)console.asm $(SRC)io.inc
-cpu.o:	$(SRC)cpu.asm  $(SRC)segs.inc
-dosidle.o:	$(SRC)dosidle.asm $(SRC)segs.inc
-entry.o:	$(SRC)entry.asm   $(SRC)segs.inc $(HDR)stacks.inc
-execrh.o:	$(SRC)execrh.asm  $(SRC)segs.inc
-int2f.o:	$(SRC)int2f.asm   $(SRC)segs.inc $(HDR)stacks.inc
-intr.o:	$(SRC)intr.asm    $(SRC)segs.inc
-io.o:		$(SRC)io.asm	    $(SRC)segs.inc $(HDR)stacks.inc
-irqstack.o:   $(SRC)irqstack.asm $(SRC)segs.inc
-kernel.o:	$(SRC)kernel.asm  $(SRC)segs.inc
-nls_hc.o:	$(SRC)nls_hc.asm  $(SRC)segs.inc
-nlssupt.o:	$(SRC)nlssupt.asm $(SRC)segs.inc $(HDR)stacks.inc
-printer.o:	$(SRC)printer.asm $(SRC)io.inc
-procsupt.o:	$(SRC)procsupt.asm $(SRC)segs.inc $(HDR)stacks.inc
-serial.o:	$(SRC)serial.asm  $(SRC)io.inc
+#apisupt.o:	$(SRC)/apisupt.asm $(SRC)/segs.inc
+console.o:	$(SRC)/console.asm $(SRC)/io.inc
+cpu.o:	$(SRC)/cpu.asm  $(SRC)/segs.inc
+dosidle.o:	$(SRC)/dosidle.asm $(SRC)/segs.inc
+entry.o:	$(SRC)/entry.asm   $(SRC)/segs.inc $(HDR)/stacks.inc
+execrh.o:	$(SRC)/execrh.asm  $(SRC)/segs.inc
+int2f.o:	$(SRC)/int2f.asm   $(SRC)/segs.inc $(HDR)/stacks.inc
+intr.o:	$(SRC)/intr.asm    $(SRC)/segs.inc
+io.o:		$(SRC)/io.asm	    $(SRC)/segs.inc $(HDR)/stacks.inc
+irqstack.o:   $(SRC)/irqstack.asm $(SRC)/segs.inc
+kernel.o:	$(SRC)/kernel.asm  $(SRC)/segs.inc
+nls_hc.o:	$(SRC)/nls_hc.asm  $(SRC)/segs.inc
+nlssupt.o:	$(SRC)/nlssupt.asm $(SRC)/segs.inc $(HDR)/stacks.inc
+printer.o:	$(SRC)/printer.asm $(SRC)/io.inc
+procsupt.o:	$(SRC)/procsupt.asm $(SRC)/segs.inc $(HDR)/stacks.inc
+serial.o:	$(SRC)/serial.asm  $(SRC)/io.inc
 
-HDRS = $(wildcard $(HDR)*.h) $(wildcard $(SRC)*.h)
+HDRS = $(wildcard $(HDR)/*.h) $(wildcard $(SRC)/*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
 _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
     farhlp_sta.h
@@ -117,8 +117,8 @@ GEN_ASMS = plt.asm cdata.asm
 # dont change file order in GEN_TMP as it matches the gen script
 GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
 GEN_CC = $(CFILES:.c=.cc)
-INITHEADERS = $(SRC)init-mod.h $(SRC)init-dat.h
-HEADERS=$(HDRS) $(SRC)globals.h $(SRC)proto.h $(INITHEADERS) $(PPHDRS)
+INITHEADERS = $(SRC)/init-mod.h $(SRC)/init-dat.h
+HEADERS=$(HDRS) $(SRC)/globals.h $(SRC)/proto.h $(INITHEADERS) $(PPHDRS)
 
 CFILES = blockio.c \
     break.c \
@@ -174,36 +174,36 @@ $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(OBJS): %.o: $(SRC)%.asm makefile
+$(OBJS): %.o: $(SRC)/%.asm makefile
 	$(NASM) $(NASMFLAGS) -o $@ $<
 
-$(DOBJS): %.o: $(SRC)drivers/%.asm makefile
+$(DOBJS): %.o: $(SRC)/drivers/%.asm makefile
 	$(NASM) $(NASMFLAGS) -o $@ $<
 
 $(PPOBJS): %.o: %.asm makefile
 	$(NASM) $(NASMFLAGS) -o $@ $<
 
-$(GEN_CC): %.cc: $(SRC)%.c makefile
+$(GEN_CC): %.cc: $(SRC)/%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CL) -o $@ $^ $(LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)segs.inc
+plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h $(srcdir)/makefile
-	cpp -I $(SRC) -I $(TOP)/include/fdpp -DFDPP -P $< >$@ || (rm -f $@ ; false)
+	cpp $(CPPFLAGS) -P $< >$@ || (rm -f $@ ; false)
 
 cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
-	cpp -P $(CPPFLAGS) $< | sed 's/" "/","/g' >$@
+	cpp $(CPPFLAGS) -P $< | sed 's/" "/","/g' >$@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)
 pos = $(words $(call _pos,$1,$2))
 pars = srcdir=$(srcdir)/parsers \
 	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@
-$(filter %.tmp,$(GEN_TMP)): $(SRC)proto.h
+$(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
 	$(pars)
 plt.inc: thunk_calls.tmp
 	$(pars)
