@@ -44,7 +44,7 @@ DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
 CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
-CLCFLAGS = -c -fpic $(IFLAGS) $(WCFLAGS) $(DBGFLAGS)
+CLCFLAGS = -c -fpic $(IFLAGS) $(WCFLAGS) $(DBGFLAGS) -xc++
 LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
 
 ifeq ($(XFAT),32)

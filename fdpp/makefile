@@ -31,7 +31,7 @@ CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir) \
     -DFDPPKRNLDIR=$(DATADIR)/fdpp \
     -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
     -DKERNEL_VERSION="$(VERSION) [GIT: $(GIT_DESCRIBE)]"
-NASMFLAGS += -i$(SRC) -f elf32
+NASMFLAGS += -i$(SRC)/ -f elf32
 
 # *List Macros*
 # Only 8 files per definition; this is limitation of DOS batch
