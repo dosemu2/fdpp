@@ -6,7 +6,7 @@ define mdir
 	    mkdir $(1) 2>/dev/null ; \
 	    ln -s $(srcdir)/$(1)/makefile $(1)/makefile ; \
 	fi
-	cd $(1) && $(MAKE) -R srcdir=$(srcdir)/$(1) $(2)
+	cd $(1) && $(MAKE) srcdir=$(srcdir)/$(1) $(2)
 endef
 
 all:

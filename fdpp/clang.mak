@@ -3,6 +3,9 @@
 #
 
 CC = clang++
+# Override builtin CXX.
+# The assignment below is ignored if CXX was set via cmd line.
+CXX=
 ifeq ($(CXX),)
 CL = clang++
 else
