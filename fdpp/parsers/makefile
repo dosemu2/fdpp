@@ -4,7 +4,7 @@ srcdir ?= $(CURDIR)
 include $(srcdir)/../clang.mak
 
 thunk_gen: lex.yy.c thunk_gen.tab.c
-	$(CLC) -g -o $@ $^
+	clang -g -o $@ $^
 
 thunk_gen.tab.c: $(srcdir)/thunk_gen.y
 	bison -d $^
