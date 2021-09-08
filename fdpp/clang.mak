@@ -31,20 +31,21 @@ ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
 endif
 ifeq ($(EXTRA_DEBUG),1)
-DBGFLAGS += -O0 -DFDPP_DEBUG -DEXTRA_DEBUG
+DBGFLAGS += -O0
+CPPFLAGS += -DFDPP_DEBUG -DEXTRA_DEBUG
 NASMFLAGS += -DEXTRA_DEBUG
 else
 DBGFLAGS += -O2
 endif
 ifeq ($(DEBUG_MSGS),1)
-DBGFLAGS += -DDEBUG
+CPPFLAGS += -DDEBUG
 endif
 ifeq ($(USE_UBSAN),1)
 DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
 endif
 
 CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
-CLCFLAGS = -c -fpic $(IFLAGS) $(WCFLAGS) $(DBGFLAGS) -xc++
+CLCFLAGS = -c -fpic $(WCFLAGS) $(DBGFLAGS) -xc++
 LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
 
 ifeq ($(XFAT),32)
