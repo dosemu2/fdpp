@@ -602,6 +602,7 @@ VOID return_user(void)
 
   p = MK_FP(cu_psp, 0);
 
+#if 0
   /* Alpha Waves game creates many PSPs, then resizes to 0 and terminates
    * them all). It expects no PSP-associated resources are freed in the
    * process. */
@@ -624,6 +625,7 @@ VOID return_user(void)
     do_ret_user(p->ps_stack, getvec(0x22));
     return;
   }
+#endif
 
   parent = p->ps_parent;
   vec22 = p->ps_isv22;
