@@ -253,8 +253,6 @@ void new_psp(seg para, seg cur_psp)
   /* parent psp segment set to 0 (see RBIL int21/ah=26)   */
   p->ps_parent = 0;
 #endif
-  /* default system version for int21/ah=30               */
-  p->ps_retdosver = (os_setver_minor << 8) + os_setver_major;
 }
 
 void child_psp(seg para, seg cur_psp, int psize)
