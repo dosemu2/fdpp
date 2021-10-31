@@ -230,12 +230,9 @@ STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pat
   return SUCCESS;
 }
 
-/* The following code is 8086 dependant                         */
-void new_psp(seg para, seg cur_psp)
+static void copy_psp(psp FAR *p, psp FAR *q)
 {
-  psp FAR *p = MK_FP(para, 0);
-
-  fmemcpy(p, MK_FP(cur_psp, 0), sizeof(psp));
+  fmemcpy(p, q, sizeof(psp));
 
   /* some progs (Alpha Waves game) create new psp from
    * the corrupted one. So restore also the sig. */
@@ -246,6 +243,31 @@ void new_psp(seg para, seg cur_psp)
   p->ps_isv23 = getvec(0x23);
   /* critical error address                               */
   p->ps_isv24 = getvec(0x24);
+}
+
+void new_psp(seg para, seg cur_psp)
+{
+  psp FAR *p = MK_FP(para, 0);
+  psp FAR *q = MK_FP(cur_psp, 0);
+  int i;
+
+  copy_psp(p, q);
+
+  /* open file table pointer                              */
+  p->ps_filetab = p->ps_files;
+  /* maximum open files                                   */
+  p->ps_maxfiles = 20;
+  fmemset(p->ps_files, 0xff, 20);
+  /* clone the file table -- without incrementing use cnt */
+  for (i = 0; i < 20; i++)
+    p->ps_files[i] = q->ps_filetab[i];
+  /* DR-DOS says:
+   *   we do not update file handle use unlike Int21/55
+   * Unfortunately in this case Alpha Waves would hang on exit,
+   * and it does so even on DR-DOS itself!
+   * My best guess is that we need to at least increment the stdio fds. */
+  for (i = 0; i < 3; i++)
+    CloneHandle(i);
   /* RBIL is wrong on zeroing parent_psp, and in fact some
    * progs (Alpha Waves game, https://github.com/stsp/fdpp/issues/112)
    * won't work if its zeroed. */
@@ -261,7 +283,7 @@ void child_psp(seg para, seg cur_psp, int psize)
   psp FAR *q = MK_FP(cur_psp, 0);
   int i;
 
-  new_psp(para, cur_psp);
+  copy_psp(p, q);
 
   /* Now for parent-child relationships                   */
   /* parent psp segment                                   */
@@ -600,30 +622,12 @@ VOID return_user(void)
 
   p = MK_FP(cu_psp, 0);
 
-#if 0
-  /* Alpha Waves game creates many PSPs, then resizes to 0 and terminates
-   * them all). It expects no PSP-associated resources are freed in the
-   * process. */
-#if 0
-  /* if resize to 0 means free (it does not in DOS), we'd need that code */
-  mcb = MK_FP(cu_psp - 1, 0);
-  if ((cu_psp != DOS_PSP && mcb->m_psp == FREE_PSP) || p->ps_exit != PSP_SIG)
-#else
   if (p->ps_exit != PSP_SIG)
-#endif
   {
 #ifdef DEBUG
     DebugPrintf(("return_user: terminating bad PSP, sig %x\n", p->ps_exit));
 #endif
-    ___assert(!tsr);    // 0x31 fixes up PSP and size
-#if 0
-    if (mcb->m_psp != FREE_PSP)
-#endif
-    FreeProcessMem(cu_psp);
-    do_ret_user(p->ps_stack, getvec(0x22));
-    return;
   }
-#endif
 
   parent = p->ps_parent;
   vec22 = p->ps_isv22;
