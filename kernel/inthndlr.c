@@ -384,7 +384,7 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
   COUNT rc;
   long lrc;
   lregs lr; /* 8 local registers (ax, bx, cx, dx, si, di, ds, es) */
-  psp FAR *psp = MK_FP(cu_psp, 0);
+  psp FAR *_psp = MK_FP(cu_psp, 0);
 
 #define FP_DS_DX ({ void FAR *_fp = MK_FP(lr.DS, lr.DX); \
     if (!_fp) \
@@ -400,7 +400,7 @@ VOID ASMCFUNC int21_service(iregs FAR * r)
 #define CLEAR_CARRY_FLAG()  r->FLAGS &= ~FLG_CARRY
 #define SET_CARRY_FLAG()    r->FLAGS |= FLG_CARRY
 
-  psp->ps_stack = (BYTE FAR *) r;
+  _psp->ps_stack = (BYTE FAR *) r;
 
   fmemcpy_n(&lr, r, sizeof(lregs) - 4);
   lr.DS = r->DS;
@@ -739,7 +739,7 @@ dispatch:
           lr.BH = version_flags;
       else
           lr.BH = OEM_ID;
-      lr.AX = psp->ps_retdosver;
+      lr.AX = _psp->ps_retdosver;
       lr.BL = REVISION_SEQ;
       lr.CX = 0; /* do not set this to a serial number!
                     32RTM won't like non-zero values   */
@@ -775,13 +775,9 @@ dispatch:
       /* Keep Program (Terminate and stay resident) */
     case 0x31:
       DosMemChange(cu_psp, lr.DX < 6 ? 6 : lr.DX, 0);
-      if (psp->ps_exit != PSP_SIG)
+      if (_psp->ps_exit != PSP_SIG)
       {
-        /* fix for Alpha Waves game: next MCB (before resize)
-         * could be at the beginning of PSP, corrupting it.
-         * Need to restore it now, after resize. */
-        DebugPrintf(("0x31: fixing corrupted PSP\n"));
-        psp->ps_exit = PSP_SIG;
+        DebugPrintf(("0x31: corrupted PSP\n"));
       }
       return_code = lr.AL | 0x300;
       tsr = TRUE;
@@ -1552,12 +1548,12 @@ dispatch:
           sft FAR *s;
           unsigned char idx;
 
-          if (r->BX >= psp->ps_maxfiles)
+          if (r->BX >= _psp->ps_maxfiles)
           {
             rc = DE_INVLDHNDL;
             goto error_exit;
           }
-          idx = psp->ps_filetab[r->BX];
+          idx = _psp->ps_filetab[r->BX];
           s = idx_to_sft(idx);
           if (s == (sft FAR *)-1)
           {
