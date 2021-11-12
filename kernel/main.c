@@ -308,13 +308,17 @@ STATIC void setup_int_vectors(void)
 //      { 0x2a, FP_OFF(int2a_handler) },
       { 0x2f, FP_OFF(int2f_handler) }
     };
+  unsigned char intvec_table[] = { 0x10, 0x13, 0x15, 0x19, 0x1B };
   struct vec *pvec;
   struct lowvec FAR *plvec;
   void FAR *old_vec;
   int i;
 
-  for (plvec = intvec_table; plvec < intvec_table + 5; plvec++)
-    plvec->isv = getvec(plvec->intno);
+  plvec = MK_FP(0x70, 0x100);
+  for (i = 0; i < sizeof(intvec_table); i++) {
+    plvec[i].intno = intvec_table[i];
+    plvec[i].isv = getvec(intvec_table[i]);
+  }
 
   old_vec = getvec(0x21);
   if (old_vec)

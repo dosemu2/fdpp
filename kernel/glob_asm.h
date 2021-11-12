@@ -101,7 +101,6 @@ __ASM_ARRI_F(BYTE, InitEnd) SEMIC
 __ASM(BYTE FAR, HaltCpuWhileIdle) SEMIC
 __ASM(unsigned char FAR, kbdType) SEMIC
 __ASM(struct _nlsCountryInfoHardcoded FAR, nlsCountryInfoHardcoded) SEMIC
-__ASM_ARR(struct lowvec, intvec_table, 5) SEMIC
 /* floppy parameter table, at 70:xxxx */
 __ASM_ARR(unsigned char, int1e_table, INT1E_TABLE_SIZE) SEMIC
 __ASM(struct DynS FAR, Dyn) SEMIC

@@ -95,10 +95,6 @@ irq_0e:         irqshare        2
 irq_0f:         irqshare        2
 retf2:          retf
 
-                ; align to 100h to align _LOWTEXT for interrupt vectors
-                ; in kernel.asm
-                times (100h - ($ - stack_size)) db 0
-
 segment _IO_TEXT
 
 general_irq_service:
