@@ -945,14 +945,6 @@ FAIL            equ     03h
 _int24_handler: mov     al,FAIL
                 iret
 
-;
-; this makes some things easier
-;
-
-segment _LOWTEXT
-                global _TEXT_DGROUP
-_TEXT_DGROUP dw DGROUP
-
 segment INIT_TEXT
                 global _INIT_DGROUP
 _INIT_DGROUP dw DGROUP

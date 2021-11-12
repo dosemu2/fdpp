@@ -42,8 +42,6 @@
                 extern   blk_driver
                 extern   clk_driver
 
-                extern   _TEXT_DGROUP
-
 ;---------------------------------------------------
 ;
 ; Device entry points
@@ -383,7 +381,8 @@ DiskIntrEntry:
                 push    ds
                 push    bx
                 mov     bp,sp
-                mov	ds,[cs:_TEXT_DGROUP]
+                push    word DGROUP
+                pop     ds
                 cld
                 call    word [cs:si+1]
                 pop     cx
@@ -404,7 +403,8 @@ AsmType:        mov     al,[bx+unit]
                 xchg    di,ax
 
                 les     di,[bx+trans]
-                mov     ds,[cs:_TEXT_DGROUP]
+                push    word DGROUP
+                pop     ds
                 cld
                 jmp     word [cs:si+1]
 
@@ -538,7 +538,8 @@ clk_and_blk_common:
                 pushf                                   ; put flags in cx
                 pop     cx
                 cli                                     ; no interrupts
-                mov     ss,[cs:_TEXT_DGROUP]
+                push    word DGROUP
+                pop     ss
                 mov     sp,[cs:bx]
 
                 push    cx
@@ -557,8 +558,8 @@ clk_and_blk_common:
                 push    es
                 Protect386Registers
 
-                mov     ds,[cs:_TEXT_DGROUP]        ;
-
+                push    word DGROUP
+                pop     ds
 
                 push    word [cs:_ReqPktPtr+2]
                 push    word [cs:_ReqPktPtr]
