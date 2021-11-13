@@ -1322,6 +1322,7 @@ STATIC void ReadAllPartitionTables(void)
   _nddt nddt;
   iregs regs = {};
 
+#if 0
   /* quick adjustment of diskette parameter table */
 //  fmemcpy(int1e_table, *(char FAR * FAR *)MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);
   /* FDPP: wrong parse of the above */
@@ -1333,7 +1334,7 @@ STATIC void ReadAllPartitionTables(void)
     int1e_table[4] = 9;
   /* and adjust int1e */
   setvec(0x1e, (intvec)int1e_table);
-
+#endif
   /* Setup media info and BPBs arrays for floppies */
   make_ddt(&nddt, 0, 0, 0);
   nUnits++;

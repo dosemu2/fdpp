@@ -249,11 +249,6 @@ no_nul_read:
                 pop     es
                 retf
 
-segment _LOWTEXT
-                ; floppy parameter table
-                global _int1e_table
-_int1e_table:   times 0eh db 0
-
 ;************************************************************
 ; KERNEL FIXED DATA AREA
 ;************************************************************
