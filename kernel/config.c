@@ -1187,7 +1187,11 @@ VOID DoConfig(int nPass)
     else
     {
       if (SkipLine(pLineStart))   /* F5/F8/?/! processing */
+      {
+        if (pEntry->func == CfgSwitches)
+          singleStep = FALSE;
         continue;
+      }
     }
 
     if ((pEntry->func != CfgMenu) && (pEntry->func != CfgMenuEsc))
@@ -1621,15 +1625,20 @@ STATIC VOID CfgSwitches(char * pLine)
           kbdType = 0; /* force conv keyb */
         break;
       case 'N':
-        InitKernelConfig.SkipConfigSeconds = -1;
+        if (commands[0].pass == 0)
+          InitKernelConfig.SkipConfigSeconds = -1;
         break;
       case 'Y':
-        singleStep = 1;
+        if (commands[0].pass == 0)
+          singleStep = 1;
         break;
       case 'F':
-        InitKernelConfig.SkipConfigSeconds = 0;
+        if (commands[0].pass == 0)
+          InitKernelConfig.SkipConfigSeconds = 0;
         break;
       case 'E': /* /E[[:]nnnn]  Set the desired EBDA amount to move in bytes */
+        if (commands[0].pass == 0)
+          break;
         {       /* Note that if there is no EBDA, this will have no effect */
           COUNT n = 0;
           if (*++pLine == ':')
