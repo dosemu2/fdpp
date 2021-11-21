@@ -906,10 +906,29 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   return rc;
 }
 
+STATIC CommandTail FAR *ParseCmdLine(BYTE FAR *endp)
+{
+  CommandTail FAR *tail;
+  BYTE FAR *tailp;
+  BYTE *p;
+  /* if there are no parameters, point to end without "\r\n" */
+  if((tailp = fstrchr(Shell,'\t')) == NULL &&
+       (tailp = fstrchr(Shell, ' ')) == NULL)
+    tailp = endp - 2;
+  /* shift tail to right by 2 to make room for '\0', ctCount */
+  for (p = endp - 1; p >= tailp; p--)
+    *(p + 2) = *p;
+  /* terminate name and tail */
+  *tailp =  *(endp + 2) = '\0';
+  /* ctCount: just past '\0' do not count the "\r\n" */
+  tail = tailp + 1;
+  tail->ctCount = endp - tailp - 2;
+  return tail;
+}
+
 /* start process 0 (the shell) */
 VOID ASMCFUNC P_0(struct config FAR *Config)
 {
-  BYTE FAR *tailp;
   BYTE FAR *endp;
   COUNT rd;
   exec_blk FAR *exb = TempExeBlock_p;
@@ -930,23 +949,12 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   /* join name and tail */
   fstrcpy(Shell + strlen(Shell), _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInitTail));
   endp =  Shell + strlen(Shell);
+  exb->exec.cmd_line = ParseCmdLine(endp);
+  _printf("Process 0 starting: %s%s", GET_PTR(Shell),
+      exb->exec.cmd_line->ctBuffer);
 
   for ( ; ; )   /* endless shell load loop - reboot or shut down to exit it! */
   {
-    BYTE *p;
-    /* if there are no parameters, point to end without "\r\n" */
-    if((tailp = fstrchr(Shell,'\t')) == NULL &&
-       (tailp = fstrchr(Shell, ' ')) == NULL)
-        tailp = endp - 2;
-    /* shift tail to right by 2 to make room for '\0', ctCount */
-    for (p = endp - 1; p >= tailp; p--)
-      *(p + 2) = *p;
-    /* terminate name and tail */
-    *tailp =  *(endp + 2) = '\0';
-    /* ctCount: just past '\0' do not count the "\r\n" */
-    exb->exec.cmd_line = tailp + 1;
-    exb->exec.cmd_line->ctCount = endp - tailp - 2;
-    _printf("Process 0 starting: %s%s", GET_PTR(Shell), GET_PTR(tailp + 2));
     err = res_DosExec(mode, exb, Shell);
     if (!err)
     {
@@ -957,7 +965,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     }
     put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
     put_string(Shell);
-    put_string(tailp + 2);
+    put_string(exb->exec.cmd_line->ctBuffer);
     put_string(" Enter the full shell command line: ");
     rd = res_read(STDIN, Shell, NAMEMAX);
     if (rd <= 0)
@@ -967,6 +975,7 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
       break;
     endp = Shell + rd;
     *endp = '\0';                             /* terminate string for strchr */
+    exb->exec.cmd_line = ParseCmdLine(endp);
   }
   panic("Unable to start shell");
 }
