@@ -874,7 +874,8 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   if ((mode & 0x7f) > 3 || (mode & 0x7f) == 2)
     return DE_INVLDFMT;
 
-  fmemcpy_n(TempExeBlock_p, ep, sizeof(exec_blk));
+  if (TempExeBlock_p != ep)
+    fmemcpy_n(TempExeBlock_p, ep, sizeof(exec_blk) - 8);
   /* If file not found - free ram and return error        */
 
   if (IsDevice(lp) ||        /* we don't want to execute C:>NUL */
@@ -899,7 +900,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   DosCloseSft(fd, FALSE);
 
 
-  if (mode == LOAD && rc == SUCCESS)
+  if (mode == LOAD && rc == SUCCESS && ep != TempExeBlock_p)
     fmemcpy(ep, TempExeBlock_p, sizeof(exec_blk));
 
   return rc;
@@ -911,14 +912,14 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   BYTE FAR *tailp;
   BYTE FAR *endp;
   COUNT rd;
-  exec_blk exb;
+  exec_blk FAR *exb = TempExeBlock_p;
   WORD err;
   BYTE off = 0;
   UBYTE mode = Config->cfgP_0_startmode;
 
   /* build exec block and save all parameters here as init part will vanish! */
-  exb.exec.fcb_1 = exb.exec.fcb_2 = (fcb FAR *)-1L;
-  exb.exec.env_seg = 0;
+  exb->exec.fcb_1 = exb->exec.fcb_2 = (fcb FAR *)-1L;
+  exb->exec.env_seg = 0;
   if ((bprm.ShellDrive & 0x80) && Config->cfgInit[1] != ':')
   {
     memcpy(Shell, "C:\\", 3);
@@ -943,10 +944,10 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
     /* terminate name and tail */
     *tailp =  *(endp + 2) = '\0';
     /* ctCount: just past '\0' do not count the "\r\n" */
-    exb.exec.cmd_line = tailp + 1;
-    exb.exec.cmd_line->ctCount = endp - tailp - 2;
+    exb->exec.cmd_line = tailp + 1;
+    exb->exec.cmd_line->ctCount = endp - tailp - 2;
     _printf("Process 0 starting: %s%s", GET_PTR(Shell), GET_PTR(tailp + 2));
-    err = res_DosExec(mode, MK_FAR_SCP(exb), Shell);
+    err = res_DosExec(mode, exb, Shell);
     if (!err)
     {
       _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
