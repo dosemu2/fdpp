@@ -148,3 +148,6 @@ __ASM_FUNC(cpm_entry) SEMIC
 __ASM_ARRI_F(const char, os_release) SEMIC
 __ASM_NEAR(const char, ___os_release) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC
+__ASM(UBYTE, p0_exec_mode) SEMIC
+__ASM_FAR(const char, p0_cmdline_p) SEMIC
+__ASM_FAR(exec_blk, p0_execblk_p) SEMIC

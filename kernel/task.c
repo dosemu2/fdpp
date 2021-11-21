@@ -930,11 +930,8 @@ STATIC CommandTail FAR *ParseCmdLine(BYTE FAR *endp)
 VOID ASMCFUNC P_0(struct config FAR *Config)
 {
   BYTE FAR *endp;
-  COUNT rd;
   exec_blk FAR *exb = TempExeBlock_p;
-  WORD err;
   BYTE off = 0;
-  UBYTE mode = Config->cfgP_0_startmode;
 
   /* build exec block and save all parameters here as init part will vanish! */
   exb->exec.fcb_1 = exb->exec.fcb_2 = (fcb FAR *)-1L;
@@ -953,31 +950,38 @@ VOID ASMCFUNC P_0(struct config FAR *Config)
   _printf("Process 0 starting: %s%s", GET_PTR(Shell),
       exb->exec.cmd_line->ctBuffer);
 
-  for ( ; ; )   /* endless shell load loop - reboot or shut down to exit it! */
-  {
-    err = res_DosExec(mode, exb, Shell);
-    if (!err)
-    {
-      _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
-      con_flush_stdin();
-      read_char_stdin(1);
-      fdexit(0);
-    }
-    put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
-    put_string(Shell);
-    put_string(exb->exec.cmd_line->ctBuffer);
-    put_string(" Enter the full shell command line: ");
-    rd = res_read(STDIN, Shell, NAMEMAX);
-    if (rd <= 0)
-      break;
-    /* handle EOT, EOF */
-    if (Shell[0] == '\x4' || Shell[0] == '\x1a')
-      break;
-    endp = Shell + rd;
-    *endp = '\0';                             /* terminate string for strchr */
-    exb->exec.cmd_line = ParseCmdLine(endp);
-  }
-  panic("Unable to start shell");
+  p0_exec_mode = Config->cfgP_0_startmode;
+  p0_cmdline_p = Shell;
+  p0_execblk_p = exb;
+}
+
+VOID ASMCFUNC P_0_exit(void)
+{
+  _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
+  con_flush_stdin();
+  read_char_stdin(1);
+  fdexit(0);
+}
+
+VOID ASMCFUNC P_0_bad(void)
+{
+  BYTE FAR *endp;
+  COUNT rd;
+  exec_blk FAR *exb = TempExeBlock_p;
+
+  put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
+  put_string(Shell);
+  put_string(exb->exec.cmd_line->ctBuffer);
+  put_string(" Enter the full shell command line: ");
+  rd = res_read(STDIN, Shell, NAMEMAX);
+  if (rd <= 0 || Shell[0] == '\xd')
+    fdexit(1);
+  /* handle EOT, EOF */
+  if (Shell[0] == '\x4' || Shell[0] == '\x1a')
+    panic("Unable to start shell");
+  endp = Shell + rd;
+  *endp = '\0';                             /* terminate string for strchr */
+  exb->exec.cmd_line = ParseCmdLine(endp);
 }
 
 COUNT res_DosExec(COUNT mode, exec_blk FAR * ep, __XFAR(const char) filename)

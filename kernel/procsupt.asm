@@ -284,7 +284,7 @@ _spawn_int23:
 ;                ret
 ;_disable        endp
 
-        extern _p_0_tos,_P_0
+        extern _p_0_tos,_P_0,_P_0_bad,_P_0_exit
 
 ; prepare to call process 0 (the shell) from P_0() in C
 
@@ -301,4 +301,33 @@ reloc_call_call_p_0:
         sti
         push dx         ; pass parameter 0 onto the new stack
         push ax
-        call _P_0       ; no return, allow parameter fetch from C
+        call _P_0
+        add sp, 4
+
+.L_2:
+        mov al, [_p0_exec_mode]
+
+        mov bx, [_p0_execblk_p]
+        mov es, [_p0_execblk_p + 2]
+
+        mov dx, [_p0_cmdline_p]
+        mov ds, [_p0_cmdline_p + 2] ; ds assigned last
+
+        mov ah, 4bh
+        int 21h
+        mov ds,[cs:_DGROUP_]
+        jc .L_1
+        call _P_0_exit
+        jmp .L_2
+
+.L_1:
+        call _P_0_bad
+        jmp .L_2
+
+segment _DATA
+    global _p0_cmdline_p
+_p0_cmdline_p dd 0
+    global _p0_execblk_p
+_p0_execblk_p dd 0
+    global _p0_exec_mode
+_p0_exec_mode db 0

@@ -436,6 +436,8 @@ struct int25regs;
 VOID ASMCFUNC SEGM(HMA_TEXT) int2526_handler(WORD mode,__FAR(struct int25regs) r);
 struct config;
 VOID ASMCFUNC SEGM(HMA_TEXT) P_0(__FAR(struct config)Config);
+VOID ASMCFUNC SEGM(HMA_TEXT) P_0_exit(void);
+VOID ASMCFUNC SEGM(HMA_TEXT) P_0_bad(void);
 struct int2f12regs;
 VOID ASMCFUNC SEGM(HMA_TEXT) int2F_12_handler(__FAR(struct int2f12regs) r);
 VOID ASMCFUNC SEGM(HMA_TEXT) int2F_08_handler(__FAR(iregs) regs);
