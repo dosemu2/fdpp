@@ -13,6 +13,7 @@ Build-Depends:
     nasm,
     lld | lld-8,
     binutils,
+    coreutils,
     libstdc++-dev,
     libelf-dev,
     autoconf,
