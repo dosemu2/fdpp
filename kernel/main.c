@@ -314,10 +314,15 @@ STATIC void setup_int_vectors(void)
   void FAR *old_vec;
   int i;
 
-  plvec = MK_FP(0x70, 0x100);
-  for (i = 0; i < sizeof(intvec_table); i++) {
-    plvec[i].intno = intvec_table[i];
-    plvec[i].isv = getvec(intvec_table[i]);
+  if (_CS >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
+    plvec = MK_FP(0x70, 0x100);
+    for (i = 0; i < sizeof(intvec_table); i++) {
+      plvec[i].intno = intvec_table[i];
+      plvec[i].isv = getvec(intvec_table[i]);
+    }
+  } else {
+    fdloudprintf("Load at seg 0x%x, 0x%x is not supported\n", _CS,
+        bprm.HeapSeg);
   }
 
   old_vec = getvec(0x21);
