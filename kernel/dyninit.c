@@ -74,7 +74,8 @@ void DynInit(void)
     for (i = 0; i < HEAP_MAX; i++)
       HeapMap[i] = &Heap[H_DYN];
   } else if (KERNEL_HIGH()) {
-    ___assert(bprm.HeapSeg >= DOS_PSP + (sizeof(psp) >> 4));
+    ___assert(bprm.HeapSeg < DOS_PSP ||
+        bprm.HeapSeg >= DOS_PSP + (sizeof(psp) >> 4));
     Heap[H_DYN].MaxSize = bprm.HeapSize + (InitEnd - dyn);
     Heap[H_OTHER].Dynp = MK_FP(bprm.HeapSeg, 0);
     Heap[H_OTHER].MaxSize = 0x10000;

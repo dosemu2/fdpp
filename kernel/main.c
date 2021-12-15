@@ -73,6 +73,8 @@ __segment DosTextSeg = 0;
 
 #endif
 
+UWORD DOS_PSP;
+
 ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
 struct _bprm bprm;
 #define TEXT_SIZE (_InitTextEnd - _HMATextStart)
@@ -89,6 +91,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   DosDataSeg = (__segment) & DATASTART;
   DosTextSeg = (__segment) & prn_dev;
 #endif
+  DOS_PSP = _CS;
   /* back up kernel code to the top of ram */
   lpTop = MK_FP(_SS - (TEXT_SIZE + 15) / 16, 0);
   fmemcpy(lpTop, _HMATextStart, TEXT_SIZE);
