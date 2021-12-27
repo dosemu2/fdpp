@@ -14,7 +14,7 @@ Build-Depends:
     lld | lld-8,
     binutils,
     coreutils,
-    libstdc++-dev,
+    libstdc++-10-dev,
     libelf-dev,
     autoconf,
     git,
