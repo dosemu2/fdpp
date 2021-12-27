@@ -49,9 +49,18 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir} install
 %files
 %defattr(-,root,root)
 %{_libdir}/fdpp
+%{_datadir}/fdpp
+
+%package devel
+Summary: fdpp development headers
+Requires: fdpp
+%description devel
+This package contains headers for fdpp usage.
+
+%files devel
+%defattr(-,root,root)
 %{_libdir}/pkgconfig/fdpp.pc
 %{_includedir}/fdpp
-%{_datadir}/fdpp
 
 %changelog
 {{{ git_dir_changelog }}}
