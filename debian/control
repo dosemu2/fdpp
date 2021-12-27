@@ -1,5 +1,5 @@
 Source: fdpp
-Section: contrib/otherosfs
+Section: otherosfs
 Priority: optional
 Maintainer: Stas Sergeev <stsp@users.sourceforge.net>
 Standards-Version: 3.9.7
@@ -24,7 +24,16 @@ Homepage: https://github.com/dosemu2/fdpp
 
 Package: fdpp
 Architecture: i386 amd64
+Section: otherosfs
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: 64-bit DOS core
  fdpp is a 64-bit DOS core.
  It is based on a FreeDOS kernel ported to modern C++.
+
+Package: fdpp-dev
+Architecture: i386 amd64
+Section: libdevel
+Priority: optional
+Depends: fdpp (= ${binary:Version}), ${misc:Depends}
+Description: fdpp development headers
+ This package contains headers for fdpp usage.
