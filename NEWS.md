@@ -1,3 +1,12 @@
+## 1.5
+
+Maintenance release. Regression fixes, build changes etc.
+
+- Initial PSP things moved to UMB.
+- Fixed regressions with win31 install and others.
+- Fixes to SWITCHES= and DOS= parsing.
+- Split to normal and dev/devel packages.
+
 ## 1.4
 
 Most of work went into making the kernel fully relocatable.
