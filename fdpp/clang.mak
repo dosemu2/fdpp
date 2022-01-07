@@ -24,6 +24,7 @@ TARGET=fdppkrnl
 DEBUG_MODE ?= 1
 EXTRA_DEBUG ?= 0
 DEBUG_MSGS ?= 1
+USE_ASAN ?= 0
 USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
@@ -42,6 +43,9 @@ DBGFLAGS += -O2
 endif
 ifeq ($(DEBUG_MSGS),1)
 CPPFLAGS += -DDEBUG
+endif
+ifeq ($(USE_ASAN),1)
+DBGFLAGS += -fsanitize=address
 endif
 ifeq ($(USE_UBSAN),1)
 DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
