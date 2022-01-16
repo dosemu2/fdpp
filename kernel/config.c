@@ -1827,9 +1827,16 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
 
   if ((fd = open(filename, 0)) < 0)
   {
-    if (filenam == NULL)
-      return !LoadCountryInfoHardCoded(ctryCode);
-    _printf("%s not found\n", filename);
+    if (filenam == NULL) {
+      rc = !LoadCountryInfoHardCoded(ctryCode);
+      if (rc) {
+        nlsPackageHardcoded.cntry = ctryCode;
+        if (codePage)
+          nlsPackageHardcoded.cp = codePage;
+      }
+    } else {
+      _printf("%s not found\n", filename);
+    }
     return rc;
   }
   if (read(fd, &header, sizeof(header)) != sizeof(header))
