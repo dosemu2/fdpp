@@ -611,7 +611,7 @@ struct _nlsCountryInfoHardcoded {
   short TableSize;
 
   struct CountrySpecificInfo C;
-};
+} PACKED;
 
 #ifdef DEBUG
         /* Enable debugging of NLS part */
