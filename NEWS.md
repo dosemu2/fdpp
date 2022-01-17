@@ -1,3 +1,10 @@
+## 1.6
+
+Resurrected built-in COUNTRY support. You can now do:
+COUNTRY=07,866
+without specifying the path to country.sys.
+dosemu2 is using that feature now, so the new release is due.
+
 ## 1.5
 
 Maintenance release. Regression fixes, build changes etc.
