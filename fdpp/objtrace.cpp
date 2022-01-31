@@ -65,8 +65,8 @@ void objtrace_mark()
 
 void objtrace_gc(far_t f)
 {
-    assert(gc.idx > 0);
-    if (gc.mark)
+    /* !gc.idx can happen on global ctors */
+    if (gc.idx && gc.mark)
         gc.list.push_front(f);
     else
         rm_dosobj(f);
