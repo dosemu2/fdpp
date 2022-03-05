@@ -87,6 +87,16 @@ STATIC int CharIO(struct dhdr FAR *pdev, unsigned char ch, unsigned command)
   return ch;
 }
 
+STATIC int CharIOfd(UCOUNT fd, unsigned char ch, unsigned command)
+{
+  int sft_idx = get_sft_idx(fd);
+  sft FAR *s = idx_to_sft(sft_idx);
+
+  if (!s || !(s->sft_flags & SFT_FDEVICE) || !s->sft_dev)
+    return -1;
+  return CharIO(s->sft_dev, ch, command);
+}
+
 /* STATE FUNCTIONS */
 
 STATIC void CharCmd(struct dhdr FAR *pdev, unsigned command)
@@ -217,7 +227,7 @@ long cooked_write(struct dhdr FAR *pdev, size_t n, __XFAR(const char)bp)
       fast_counter++;
       fast_counter &= 0x9f;
       if (PrinterEcho)
-        DosWrite(STDPRN, 1, MK_FAR_SCP(c));
+        CharIOfd(STDPRN, c, C_OUTPUT);
       if (fast_counter & 0x80)
         fast_put_char(c);
       else
