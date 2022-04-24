@@ -1251,8 +1251,10 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrib)
 
   if (IsShareInstalled(TRUE))
   {
+    UWORD mode;
     /* SHARE refuses to change attrs if file is opened */
-    if (share_open_check(PriPathName))
+    if (share_is_file_open(PriPathName, &mode) &&
+        ((mode >> 8) != 0 /* SHARE_COMPAT */))
       return DE_ACCESS;
   }
   return dos_setfattr(PriPathName, attrib);

@@ -472,7 +472,6 @@ UWORD ASMPASCAL floppy_change(UWORD);
            AX. */
 WORD share_open_file(__FAR(const char) filename, WORD openmode, WORD sharemode,
     BOOL rdonly, __FAR(struct dhdr) lpDevice, UWORD ax);
-BOOL share_open_check(__FAR(const char) filename);
 
         /* DOS calls this to record the fact that it has successfully
            closed a file, or the fact that the open for this file failed. */

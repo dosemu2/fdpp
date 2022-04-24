@@ -301,18 +301,6 @@ WORD share_open_file
 	return do_open_check(fileno, rdonly, lpDevice, ax);
 }
 
-
-BOOL share_open_check
-	(const char FAR *filename)/* FAR  pointer to fully qualified filename */
-{
-	int i;
-	for (i = 0; i < file_table_size; i++) {
-		if (fnmatches(filename, file_table[i].filename))
-			return 1;
-	}
-	return 0;
-}
-
 	/* DOS calls this to record the fact that it has successfully
 	   closed a file, or the fact that the open for this file failed. */
 void share_close_file(WORD fileno) {		/* file_table entry number */
