@@ -503,7 +503,7 @@ WORD share_lock_unlock(WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       
            Returns:
              1 if open
              0 if not */
-WORD share_is_file_open(__FAR(const char) filename);
+WORD share_is_file_open(__FAR(const char) filename, UWORD *mode);
 
 WORD ASMFUNC share_criterr(WORD flags, WORD err, __FAR(struct dhdr) lpDevice, UWORD ax);
 

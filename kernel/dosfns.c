@@ -1271,6 +1271,7 @@ UBYTE DosSelectDrv(UBYTE drv)
 COUNT DosDelete(const char FAR * path, int attrib)
 {
   COUNT result;
+  UWORD mode = 0;
 
   result = truename(path, PriPathName, CDS_MODE_CHECK_DEV_PATH);
   if (result < SUCCESS)
@@ -1284,7 +1285,8 @@ COUNT DosDelete(const char FAR * path, int attrib)
   if (result & IS_DEVICE)
     return DE_FILENOTFND;
 
-  if (IsShareInstalled(TRUE) && share_is_file_open(PriPathName))
+  if (IsShareInstalled(TRUE) && share_is_file_open(PriPathName, &mode) &&
+      ((mode >> 8) != 0 /* SHARE_COMPAT */))
     return DE_ACCESS;
 
   return dos_delete(PriPathName, attrib);
@@ -1299,7 +1301,7 @@ COUNT DosRenameTrue(const char FAR * path1, const char FAR * path2, int attrib)
   if (FP_OFF(current_ldt) == 0xFFFF || (current_ldt->cdsFlags & CDSNETWDRV))
     return network_redirector(REM_RENAME);
 
-  if (IsShareInstalled(TRUE) && share_is_file_open(path1))
+  if (IsShareInstalled(TRUE) && share_is_file_open(path1, NULL))
     return DE_ACCESS;
 
   return dos_rename(path1, path2, attrib);

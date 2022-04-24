@@ -441,13 +441,17 @@ WORD share_lock_unlock(
 	}
 }
 
-WORD share_is_file_open(const char FAR * filename)
+WORD share_is_file_open(const char FAR * filename, UWORD *mode)
 {
 	int i;
 
 	for (i = 0; i < file_table_size; i++) {
-		if (fnmatches(filename, file_table[i].filename))
+		file_t *f = &file_table[i];
+		if (fnmatches(filename, f->filename)) {
+			if (mode)
+				*mode = (f->sharemode << 8) | f->openmode;
 			return 1;
+		}
 	}
 	return 0;
 }
