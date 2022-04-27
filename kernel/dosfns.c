@@ -1296,6 +1296,8 @@ COUNT DosDelete(const char FAR * path, int attrib)
 
 COUNT DosRenameTrue(const char FAR * path1, const char FAR * path2, int attrib)
 {
+  UWORD mode, psp;
+
   if (path1[0] != path2[0])
   {
     return DE_DEVICE; /* not same device */
@@ -1303,7 +1305,8 @@ COUNT DosRenameTrue(const char FAR * path1, const char FAR * path2, int attrib)
   if (FP_OFF(current_ldt) == 0xFFFF || (current_ldt->cdsFlags & CDSNETWDRV))
     return network_redirector(REM_RENAME);
 
-  if (IsShareInstalled(TRUE) && share_is_file_open(path1, NULL, NULL))
+  if (IsShareInstalled(TRUE) && share_is_file_open(path1, &mode, &psp) &&
+      (((mode >> 8) != 0 /* SHARE_COMPAT */) || psp != cu_psp))
     return DE_ACCESS;
 
   return dos_rename(path1, path2, attrib);
