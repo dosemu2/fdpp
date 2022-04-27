@@ -470,7 +470,8 @@ UWORD ASMPASCAL floppy_change(UWORD);
            error.  If < 0 is returned, it is the negated error return
            code, so DOS simply negates this value and returns it in
            AX. */
-WORD share_open_file(__FAR(const char) filename, WORD openmode, WORD sharemode,
+WORD share_open_file(__FAR(const char) filename, UWORD psp,
+    WORD openmode, WORD sharemode,
     BOOL rdonly, __FAR(struct dhdr) lpDevice, UWORD ax);
 
         /* DOS calls this to record the fact that it has successfully
@@ -502,7 +503,7 @@ WORD share_lock_unlock(WORD fileno, UDWORD ofs, UDWORD len, WORD unlock);       
            Returns:
              1 if open
              0 if not */
-WORD share_is_file_open(__FAR(const char) filename, UWORD *mode);
+WORD share_is_file_open(__FAR(const char) filename, UWORD *mode, UWORD *psp);
 
 WORD ASMFUNC share_criterr(WORD flags, WORD err, __FAR(struct dhdr) lpDevice, UWORD ax);
 

@@ -664,7 +664,7 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
     if (!cdsp || !cdsp->cdsDpb)
       return DE_ACCESS;
     if ((sftp->sft_shroff =
-         share_open_file(PriPathName,
+         share_open_file(PriPathName, cu_psp,
                           flags & 0x03, (flags >> 4) & 0x07,
                           !!(attrib & D_RDONLY),
                           cdsp->cdsDpb->dpb_device, 0x3d)) < 0)
@@ -1251,10 +1251,10 @@ COUNT DosSetFattr(const char FAR * name, UWORD attrib)
 
   if (IsShareInstalled(TRUE))
   {
-    UWORD mode;
+    UWORD mode, psp;
     /* SHARE refuses to change attrs if file is opened */
-    if (share_is_file_open(PriPathName, &mode) &&
-        ((mode >> 8) != 0 /* SHARE_COMPAT */))
+    if (share_is_file_open(PriPathName, &mode, &psp) &&
+        (((mode >> 8) != 0 /* SHARE_COMPAT */) || psp != cu_psp))
       return DE_ACCESS;
   }
   return dos_setfattr(PriPathName, attrib);
@@ -1273,7 +1273,7 @@ UBYTE DosSelectDrv(UBYTE drv)
 COUNT DosDelete(const char FAR * path, int attrib)
 {
   COUNT result;
-  UWORD mode = 0;
+  UWORD mode, psp;
 
   result = truename(path, PriPathName, CDS_MODE_CHECK_DEV_PATH);
   if (result < SUCCESS)
@@ -1287,8 +1287,8 @@ COUNT DosDelete(const char FAR * path, int attrib)
   if (result & IS_DEVICE)
     return DE_FILENOTFND;
 
-  if (IsShareInstalled(TRUE) && share_is_file_open(PriPathName, &mode) &&
-      ((mode >> 8) != 0 /* SHARE_COMPAT */))
+  if (IsShareInstalled(TRUE) && share_is_file_open(PriPathName, &mode, &psp) &&
+      (((mode >> 8) != 0 /* SHARE_COMPAT */) || psp != cu_psp))
     return DE_ACCESS;
 
   return dos_delete(PriPathName, attrib);
@@ -1303,7 +1303,7 @@ COUNT DosRenameTrue(const char FAR * path1, const char FAR * path2, int attrib)
   if (FP_OFF(current_ldt) == 0xFFFF || (current_ldt->cdsFlags & CDSNETWDRV))
     return network_redirector(REM_RENAME);
 
-  if (IsShareInstalled(TRUE) && share_is_file_open(path1, NULL))
+  if (IsShareInstalled(TRUE) && share_is_file_open(path1, NULL, NULL))
     return DE_ACCESS;
 
   return dos_rename(path1, path2, attrib);

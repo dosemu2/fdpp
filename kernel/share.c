@@ -103,6 +103,7 @@ static open_action_exception_t open_exceptions[] = {
 	/* One of these exists for each instance of an open file. */
 typedef struct _file_t {
 	char filename[128];		/* fully-qualified filename; "\0" if unused */
+	unsigned short psp;		/* PSP of process which opened this file */
 	unsigned char openmode;	/* 0=read-only, 1=write-only, 2=read-write */
 	unsigned char sharemode;/* SHARE_COMPAT, etc... */
 	unsigned char first_openmode;	/* openmode of first open */
@@ -253,6 +254,7 @@ static WORD do_open_check(
 	   AX. */
 WORD share_open_file
 	(const char FAR *filename,/* FAR  pointer to fully qualified filename */
+	 UWORD psp,/* psp segment address of owner process */
 	 WORD openmode,		/* 0=read-only, 1=write-only, 2=read-write */
 	 WORD sharemode,	/* SHARE_COMPAT, etc... */
 	 BOOL rdonly,
@@ -294,6 +296,7 @@ WORD share_open_file
 	for (i = 0; i < sizeof(fptr->filename); i++) {
 		if ((fptr->filename[i] = filename[i]) == '\0') break;
 	}
+	fptr->psp = psp;
 	fptr->openmode = (unsigned char)openmode;
 	fptr->sharemode = (unsigned char)sharemode;
 		/* Do the sharing check and return fileno if
@@ -429,7 +432,7 @@ WORD share_lock_unlock(
 	}
 }
 
-WORD share_is_file_open(const char FAR * filename, UWORD *mode)
+WORD share_is_file_open(const char FAR * filename, UWORD *mode, UWORD *psp)
 {
 	int i;
 
@@ -438,6 +441,8 @@ WORD share_is_file_open(const char FAR * filename, UWORD *mode)
 		if (fnmatches(filename, f->filename)) {
 			if (mode)
 				*mode = (f->sharemode << 8) | f->openmode;
+			if (psp)
+				*psp = f->psp;
 			return 1;
 		}
 	}
