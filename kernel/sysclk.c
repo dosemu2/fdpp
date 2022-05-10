@@ -153,7 +153,7 @@ WORD ASMCFUNC FAR clk_driver(rqptr rp)
         bcd_minutes = ByteToBcd(clk.clkMinutes);
         bcd_hours = ByteToBcd(clk.clkHours);
         bcd_seconds = ByteToBcd(clk.clkSeconds);
-        WriteATClock(bcd_days, bcd_hours, bcd_minutes, bcd_seconds);
+        WriteATClock(MK_FAR_SCP(bcd_days), bcd_hours, bcd_minutes, bcd_seconds);
       }
       return S_DONE;
 

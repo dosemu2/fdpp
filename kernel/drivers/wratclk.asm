@@ -54,10 +54,10 @@ WRITEATCLOCK:
                 mov     ah,3
                 int     1ah
                 mov     bx,word [bp+10]     ;bcdDays
-                mov     dx,word [bx]
-                mov     cx,word [bx+2]
+                mov     es,word [bp+12]     ;SEG bcdDays
+                mov     dx,word [es:bx]
+                mov     cx,word [es:bx+2]
                 mov     ah,5
                 int     1ah
                 pop     bp
-                ret     8
-
+                ret     10

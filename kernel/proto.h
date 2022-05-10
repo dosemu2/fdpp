@@ -510,7 +510,7 @@ WORD ASMFUNC share_criterr(WORD flags, WORD err, __FAR(struct dhdr) lpDevice, UW
 DWORD ASMPASCAL call_nls(UWORD,__FAR(VOID), UWORD, UWORD, UWORD, UWORD);
 
 ULONG ASMPASCAL ReadPCClock(VOID);
-VOID ASMPASCAL WriteATClock(BYTE [4], BYTE, BYTE, BYTE);
+VOID ASMPASCAL WriteATClock(__FAR(BYTE), BYTE, BYTE, BYTE);
 VOID ASMPASCAL WritePCClock(ULONG);
 
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);
