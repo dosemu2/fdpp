@@ -139,6 +139,7 @@ void elf_close(void *arg)
 
     elf_end(state->elf);
     munmap(state->addr, state->mapsize);
+    free(state);
 }
 
 void *elf_getsym(void *arg, const char *name)

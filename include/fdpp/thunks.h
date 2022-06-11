@@ -86,6 +86,7 @@ struct fdpp_bss_list {
 
 void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss);
 const void *FdppKernelReloc(void *handle, uint16_t seg);
+void FdppKernelFree(void *handle);
 
 #ifdef __cplusplus
 }

@@ -915,3 +915,11 @@ const void *FdppKernelReloc(void *handle, uint16_t seg)
     elf_reloc(h->elf, seg);
     return h->start;
 }
+
+void FdppKernelFree(void *handle)
+{
+    struct krnl_hndl *h = (struct krnl_hndl *)handle;
+
+    elf_close(h->elf);
+    free(h);
+}
