@@ -48,7 +48,7 @@ ifeq ($(USE_ASAN),1)
 DBGFLAGS += -fsanitize=address
 endif
 ifeq ($(USE_UBSAN),1)
-DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment
+DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment,function,vptr
 endif
 
 CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
