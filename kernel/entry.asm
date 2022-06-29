@@ -283,9 +283,9 @@ int21_reentry:
                 mov     ds,dx
                 ; in fdpp DS is not set to _DataStart but SS should be
                 mov     di,_DataStart
-                mov     si,di
-                shr     si,4
-                add     dx,si
+                shr     di,4
+                add     dx,di
+                shl     di,4         ; para-aligned now
 
                 cmp     ah,25h
                 je      int21_user
