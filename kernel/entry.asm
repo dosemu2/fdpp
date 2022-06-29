@@ -51,6 +51,7 @@ segment HMA_TEXT
                 extern   _Int21AX
 
                 extern  _DGROUP_
+                extern  _DataStart
 
                 global  reloc_call_cpm_entry
                 global  reloc_call_int20_handler
@@ -280,6 +281,11 @@ int21_reentry:
                 Protect386Registers
                 mov     dx,[cs:_DGROUP_]
                 mov     ds,dx
+                ; in fdpp DS is not set to _DataStart but SS should be
+                mov     di,_DataStart
+                mov     si,di
+                shr     si,4
+                add     dx,si
 
                 cmp     ah,25h
                 je      int21_user
@@ -311,7 +317,7 @@ int21_user:
 ; CX=STACK
 ; SI=userSS
 ; BX=userSP
-
+; DI - stack relocation offset (fdpp)
 
 int21_1:
                 mov si,ss   ; save user stack, to be retored later
@@ -344,7 +350,7 @@ int21_1:
 
 int21_onerrorstack:
                 mov     cx,_error_tos
-
+                sub     cx,di
 
                 cli
                 mov     ss,dx
@@ -360,6 +366,7 @@ int21_onerrorstack:
 
 int21_2:        inc     byte [_InDOS]
                 mov     cx,_char_api_tos
+                sub     cx,di
                 or      ah,ah
                 jz      int21_3
                 cmp     ah,0ch
@@ -368,6 +375,7 @@ int21_2:        inc     byte [_InDOS]
 int21_3:
                 call    dos_crit_sect
                 mov     cx,_disk_api_tos
+                sub     cx,di
 
 int21_normalentry:
                 cmp     byte [_InDOS],1
