@@ -217,7 +217,8 @@ STATIC void PSPInit(void)
 
   /* CP/M-like entry point - call far to special entry    */
   p->ps_farcall = 0x9a;
-  p->ps_reentry = MK_FP(0, 0x30 * 4);
+  /* The address is 0:c0 (in IVT) and MS-DOS codes it as f01d:fef0 */
+  p->ps_reentry = MK_FP(0xf01d, 0xfe30 + 0x30 * 4);
   /* unix style call - 0xcd 0x21 0xcb (int 21, retf)      */
   p->ps_unix[0] = 0xcd;
   p->ps_unix[1] = 0x21;
