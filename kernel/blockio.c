@@ -482,36 +482,3 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
 /* End of change */
 
 }
-
-/*
-       this removes any (additionally allocated) buffers
-       from the HMA buffer chain, because they get allocated to the 'user'
-*/
-
-void AllocateHMASpace (size_t lowbuffer, size_t highbuffer)
-{
-  REG struct buffer FAR *bp = firstbuf;
-  int n;
-
-  if (FP_SEG(bp) != 0xffff)
-    return;
-
-  n = LoL_nbuffers;
-  do
-  {
-    /* check if buffer intersects with requested area                  */
-    if (FP_OFF(bp) < highbuffer && FP_OFF(bp+1) > lowbuffer)
-    {
-      flush1(bp);
-      /* unlink bp from buffer chain */
-
-      b_prev(bp)->b_next = bp->b_next;
-      b_next(bp)->b_prev = bp->b_prev;
-      if (FP_OFF(bp) == FP_OFF(firstbuf))
-        firstbuf = b_next(bp);
-      LoL_nbuffers--;
-    }
-    bp = b_next(bp);
-  }
-  while (--n);
-}

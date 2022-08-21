@@ -42,5 +42,5 @@ struct config {     /* Configuration variables */
   BYTE cfgStacksHigh;
   UWORD cfgStackSize;        /* stacks size for each stack */
   UBYTE cfgP_0_startmode;    /* load command.com high or not */
-  unsigned ebda2move;        /* value for switches=/E:nnnn */
+  UWORD ebda2move;           /* value for switches=/E:nnnn */
 };

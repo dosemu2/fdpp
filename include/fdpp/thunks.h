@@ -23,7 +23,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#define FDPP_API_VER 30
+#define FDPP_API_VER 31
 
 #ifndef FDPP
 struct fdpp_far_s {

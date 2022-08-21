@@ -47,7 +47,8 @@ BOOL DeleteBlockInBufferCache(ULONG blknolow, ULONG blknohigh, COUNT dsk, int mo
 UWORD dskxfer(COUNT dsk, ULONG blkno,__FAR(VOID) buf, UWORD numblocks,
               COUNT mode);
 /* *** End of change */
-void AllocateHMASpace (size_t lowbuffer, size_t highbuffer);
+UWORD HMAquery(UWORD *bytesAvail);
+UWORD HMAalloc(UWORD bytesToAllocate);
 
 /* break.c */
 unsigned char ctrl_break_pressed(void);

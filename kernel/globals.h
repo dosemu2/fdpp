@@ -201,7 +201,6 @@ struct lowvec {
 } PACKED;
 
 enum {LOC_CONV=0, LOC_HMA=1};
-extern __FAR(char) firstAvailableBuf;
 
 struct _FcbSearchBuffer {
   COUNT nDrive;

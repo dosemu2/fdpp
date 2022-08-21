@@ -87,8 +87,8 @@ intvec getvec(unsigned char intno);
 #define NFCBS           16      /* number of fcbs               */
 #define NSTACKS         8       /* number of stacks             */
 #define STACKSIZE       256     /* default stacksize            */
-#define NLAST           16       /* last drive                   */
-#define NUMBUFF         20      /* Number of track buffers at INIT time     */
+#define NLAST           16      /* last drive                   */
+#define NUMBUFF         3       /* Number of track buffers at INIT time     */
                                         /* -- must be at least 3        */
 #define MAX_HARD_DRIVE  8
 #define NDEV            26      /* up to Z:                     */
@@ -117,7 +117,6 @@ extern __FAR(UBYTE) InitDiskTransferBuffer;
 
 /* inithma.c */
 int MoveKernelToHMA(void);
-__FAR(VOID) HMAalloc(UCOUNT bytesToAllocate);
 
 /* initoem.c */
 unsigned init_oem(void);
@@ -138,7 +137,7 @@ int VA_CDECL init_sprintf(char * buff, CONST char * fmt, ...);
 /* initclk.c */
 extern void Init_clk_driver(void);
 
-extern UWORD HMAFree;            /* first byte in HMA not yet used      */
+extern UDWORD HMAFree;            /* first byte in HMA not yet used      */
 
 extern UWORD CurrentKernelSegment;
 extern WORD days[2][13];

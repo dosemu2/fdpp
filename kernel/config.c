@@ -416,6 +416,17 @@ void PreConfig(void)
 /* Do second pass initialization: near allocation and MCBs              */
 void PreConfig2(void)
 {
+  void FAR *p;
+  unsigned short kernel_seg;
+
+  p = (void FAR *)DynAlloc("kernel", 1, _HMATextEnd - _HMATextStart + 0xf);
+  kernel_seg = FP_SEG(p);
+  kernel_seg += FP_OFF(p) >> 4;
+  if (FP_OFF(p) & 0xf)
+    kernel_seg++;
+  DebugPrintf(("moving text to %x\n", kernel_seg));
+  MoveKernel(kernel_seg);
+
   /* initialize NEAR allocated things */
 
   /* Initialize the base memory pointers from last time.          */
@@ -485,7 +496,7 @@ void PostConfig(void)
   /* dsk.c avoids DMA transfer buffer in UMB */
   DiskTransferBuffer = InitDiskTransferBuffer;
 #endif
-  config_init_buffers(Config.cfgBuffers);
+//  config_init_buffers(Config.cfgBuffers);
 
 /* LoL->_sfthead = (sfttbl FAR *)&basesft; */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
@@ -539,6 +550,7 @@ VOID configDone(VOID)
     fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
   }
 
+#if 0
   if (HMAState != HMA_DONE)
   {
     mcb FAR *p;
@@ -560,6 +572,7 @@ VOID configDone(VOID)
 
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
+#endif
 #if 0
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");
@@ -1424,17 +1437,19 @@ char *GetStringArg(char * pLine, char * pszString)
 
 STATIC void Config_Buffers(char * pLine)
 {
+  // fdpp doesn't need too many buffers, disable
+#if 0
   COUNT nBuffers;
 
   /* Get the argument                                             */
   if (GetNumArg(pLine, &nBuffers))
     Config.cfgBuffers = nBuffers;
+#endif
 }
 
 STATIC void CfgBuffersHigh(char * pLine)
 {
   Config_Buffers(pLine);
-  _printf("Note: BUFFERS will be in HMA or low RAM, not in UMB\n");
 }
 
 /**
@@ -2435,43 +2450,24 @@ STATIC char strcaseequal(const char * d, const char * s)
 STATIC void config_init_buffers(int wantedbuffers)
 {
   struct buffer FAR *pbuffer;
-  int buffers = 0;
+  int buffers;
+  size_t bytes;
 
-  /* fill HMA with buffers if BUFFERS count >=0 and DOS in HMA        */
   if (wantedbuffers < 0)
     wantedbuffers = -wantedbuffers;
-  else if (HMAState == HMA_DONE)
-    buffers = (0xfff0 - HMAFree) / sizeof(struct buffer);
-
-  if (wantedbuffers < 6)         /* min 6 buffers                     */
-    wantedbuffers = 6;
+  if (wantedbuffers < 3)         /* min 3 buffers                     */
+    wantedbuffers = 3;
   if (wantedbuffers > 99)        /* max 99 buffers                    */
   {
     _printf("BUFFERS=%u not supported, reducing to 99\n", wantedbuffers);
     wantedbuffers = 99;
   }
-  if (wantedbuffers > buffers)   /* more specified than available -> get em */
-    buffers = wantedbuffers;
+  buffers = wantedbuffers;
 
   LoL->nbuffers = buffers;
   LoL->inforecptr = &LoL->_firstbuf;
-  {
-    size_t bytes = sizeof(struct buffer) * buffers;
-    pbuffer = HMAalloc(bytes);
-
-    if (pbuffer == NULL)
-    {
-      pbuffer = KernelAlloc(bytes, 'B', 0);
-      if (HMAState == HMA_DONE)
-        firstAvailableBuf = MK_FP(0xffff, HMAFree);
-    }
-    else
-    {
-      LoL->_bufloc = LOC_HMA;
-      /* space in HMA beyond requested buffers available as user space */
-      firstAvailableBuf = pbuffer + wantedbuffers;
-    }
-  }
+  bytes = sizeof(struct buffer) * buffers;
+  pbuffer = (struct buffer FAR *)DynAlloc("buffers", 1, bytes);
   LoL->_deblock_buf = DiskTransferBuffer;
   LoL->_firstbuf = pbuffer;
 

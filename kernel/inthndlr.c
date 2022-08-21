@@ -43,7 +43,6 @@ STATIC bTraceNext = FALSE;
 #endif
 
 BYTE ReturnAnyDosVersionExpected;
-char FAR *firstAvailableBuf;
 
 #if 0                           /* Very suspicious, passing structure by value??
                                    Deactivated -- 2000/06/16 ska */
@@ -1810,23 +1809,22 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
 
   if (r.AH == 0x4a)
   {
-    size_t size = 0, offs = 0xffff;
+    UWORD offs, avail;
 
-    r.ES = offs;
-    if (FP_SEG(firstAvailableBuf) == offs) /* HMA present? */
+    r.ES = 0xffff;
+    offs = HMAquery(&avail);
+    switch (r.AL)
     {
-      offs = FP_OFF(firstAvailableBuf);
-      size = ~offs;                        /* BX for query HMA   */
-      if (r.AL == 0x02)                    /* allocate HMA space */
-      {
-        if (r.BX < size)
-          size = r.BX;
-        AllocateHMASpace(offs, offs+size);
-        firstAvailableBuf += size;
-      }
+    case 1:
+      r.DI = offs;
+      r.BX = avail;
+      break;
+    case 2:
+      if (r.BX > avail)
+        r.BX = avail;
+      r.DI = HMAalloc(r.BX);
+      break;
     }
-    r.DI = offs;
-    r.BX = size;
     return;
   }
 

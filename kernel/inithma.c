@@ -74,7 +74,7 @@ static BYTE *RcsId =
 
 BSS(BYTE, DosLoadedInHMA, FALSE);  /* set to TRUE if loaded HIGH          */
 BSS(BYTE, HMAclaimed, 0);          /* set to TRUE if claimed from HIMEM   */
-BSS(UWORD, HMAFree, 0);            /* first byte in HMA not yet used      */
+BSS(UDWORD, HMAFree, 0);           /* first byte in HMA not yet used      */
 
 STATIC void InstallVDISK(void);
 
@@ -215,7 +215,7 @@ int MoveKernelToHMA()
     return FALSE;
   }
 
-  MoveKernel(0xffff);
+//  MoveKernel(0xffff);
 
   {
     /* E) up to now, nothing really bad was done.
@@ -283,26 +283,38 @@ STATIC void InstallVDISK(void)
     only available if DOS=HIGH was successful
 */
 
-VOID FAR * HMAalloc(UCOUNT bytesToAllocate)
+UWORD HMAalloc(UWORD bytesToAllocate)
 {
-  VOID FAR *HMAptr;
+  UWORD HMAptr;
 
-  if (!DosLoadedInHMA)
-    return NULL;
+  if (!DosLoadedInHMA || !bytesToAllocate)
+    return 0xffff;
 
-  if (HMAFree > 0xfff0 - bytesToAllocate)
-    return NULL;
+  if (HMAFree > 0x10000 - bytesToAllocate)
+    return 0xffff;
 
-  HMAptr = MK_FP(0xffff, HMAFree);
+  HMAptr = HMAFree;
 
   /* align on 16 byte boundary */
   HMAFree = (HMAFree + bytesToAllocate + 0xf) & 0xfff0;
 
   /*_printf("HMA allocated %d byte at %x\n", bytesToAllocate, HMAptr); */
 
-  fmemset(HMAptr, 0, bytesToAllocate);
+  fmemset(MK_FP(0xffff, HMAptr), 0, bytesToAllocate);
 
   return HMAptr;
+}
+
+UWORD HMAquery(UWORD *bytesAvail)
+{
+  if (!DosLoadedInHMA || HMAFree > 0xffff)
+  {
+    *bytesAvail = 0;
+    return 0xffff;
+  }
+
+  *bytesAvail = 0x10000 - HMAFree;
+  return HMAFree;
 }
 
 DATA(UWORD, CurrentKernelSegment, 0);
@@ -317,7 +329,7 @@ void MoveKernel(UWORD NewKernelSegment)
   BOOL initial = 0;
 
   if (CurrentKernelSegment == 0) {
-    CurrentKernelSegment = FP_SEG(_HMATextEnd);
+    CurrentKernelSegment = FP_SEG(_HMATextStart);
     initial = 1;
   }
 
