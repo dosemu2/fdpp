@@ -56,7 +56,7 @@ extern UWORD DOS_PSP;
 
 #define MCB_SIZE(x)     ((((LONG)(x))<<4)+sizeof(mcb))
 
-typedef UWORD seg;
+typedef UDWORD seg;
 typedef UWORD offset;
 
 typedef struct _mcb {

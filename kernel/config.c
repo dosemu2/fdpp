@@ -236,8 +236,8 @@ STATIC char toupper(const char c);
 #include <ctype.h>
 #endif
 STATIC VOID _strupr(char *s);
-STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type);
-STATIC VOID mumcb_init(UCOUNT seg, UWORD size);
+STATIC VOID mcb_init(seg seg, UWORD size, BYTE type);
+STATIC VOID mumcb_init(seg seg, UWORD size);
 
 STATIC VOID Stacks(char * pLine);
 STATIC VOID StacksHigh(char * pLine);
@@ -632,7 +632,7 @@ STATIC seg prev_mcb(seg cur_mcb, seg start)
 STATIC void umb_init(void)
 {
   /* valgrind can't track initializers in asm, so init with 0 */
-  UWORD umb_seg = 0;
+  seg umb_seg = 0;
   UCOUNT umb_size = 0;
   seg umb_max;
   void FAR *xms_addr;
@@ -2396,7 +2396,7 @@ STATIC VOID _strupr(char *s)
 /* The following code is 8086 dependant                         */
 
 #if 1                           /* ifdef KERNEL */
-STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
+STATIC VOID mcb_init_copy(seg seg, UWORD size, mcb *near_mcb)
 {
   near_mcb->m_size = size;
   fd_prot_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_NORMAL);
@@ -2405,14 +2405,14 @@ STATIC VOID mcb_init_copy(UWORD seg, UWORD size, mcb *near_mcb)
   fd_prot_mem(MK_FP(seg, 0), sizeof(mcb), FD_MEM_READONLY);
 }
 
-STATIC VOID mcb_init(UCOUNT seg, UWORD size, BYTE type)
+STATIC VOID mcb_init(seg seg, UWORD size, BYTE type)
 {
   STATIC BSS(mcb, near_mcb, {0});
   near_mcb.m_type = type;
   mcb_init_copy(seg, size, &near_mcb);
 }
 
-STATIC VOID mumcb_init(UCOUNT seg, UWORD size)
+STATIC VOID mumcb_init(seg seg, UWORD size)
 {
   static mcb near_mcb = {
     MCB_NORMAL,

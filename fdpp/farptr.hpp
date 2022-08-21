@@ -67,7 +67,15 @@ static inline void store_far(int idx, far_s fptr)
     _store_far(idx, resolve_segoff(fptr), fptr);
 }
 
-#define _MK_S(s, o) (far_s){o, s}
+static inline far_s _MK_S(uint32_t s, uint16_t o)
+{
+    if (s > 0xffff) {
+        int delta = s - 0xffff;
+        o += delta << 4;
+        s = 0xffff;
+    }
+    return (far_s){o, (uint16_t)s};
+}
 
 #define _P(T1) std::is_pointer<T1>::value
 #define _C(T1) std::is_const<T1>::value
@@ -115,7 +123,7 @@ protected:
     }
 public:
     FarPtrBase() = default;
-    FarPtrBase(uint16_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
+    FarPtrBase(uint32_t s, uint16_t o) : ptr(_MK_S(s, o)) {}
     FarPtrBase(std::nullptr_t) : ptr(_MK_S(0, 0)) {}
     explicit FarPtrBase(const far_s& f) : ptr(f) {}
 
@@ -225,7 +233,7 @@ public:
     explicit FarPtr(const sh_obj& o) :
             FarPtrBase<T>(o->get_obj()), obj(o) {}
     FarPtr(const FarPtr<T>& f) = default;
-    FarPtr(uint16_t s, uint16_t o, bool nnull) :
+    FarPtr(uint32_t s, uint16_t o, bool nnull) :
             FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
 
     template<typename T0, typename T1 = T,
@@ -710,7 +718,7 @@ public:
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
 #define FP_OFF_OBJ(o, fp) ((fp).off(o))
 #define MK_FP(seg, ofs) ({ \
-    uint16_t _s = seg; \
+    uint32_t _s = seg; \
     uint16_t _o = ofs; \
     __FAR(void)(_s, _o); \
 })

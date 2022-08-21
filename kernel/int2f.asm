@@ -381,7 +381,7 @@ FLOPPY_CHANGE:
 
 segment INIT_TEXT
                 ; int ASMPASCAL UMB_get_largest(void FAR * driverAddress,
-                ;                UCOUNT * seg, UCOUNT * size);
+                ;                UDWORD * seg, UCOUNT * size);
                 global UMB_GET_LARGEST
 
 UMB_GET_LARGEST:
@@ -403,6 +403,8 @@ UMB_GET_LARGEST:
 
                 mov     ax,1000h        ; dx set with largest size
                 call    far [bp+8]      ; Call the driver
+                mov     si,0
+                adc     si,0
 
                 cmp     ax,1
                 jne     umbt_error
@@ -412,6 +414,7 @@ UMB_GET_LARGEST:
                 mov 	cx,bx           ; *seg = segment
                 mov 	bx, [bp+6]
                 mov 	[bx],cx
+                mov 	[bx+2],si
 
                 mov 	bx, [bp+4]      ; *size = size
                 mov 	[bx],dx

@@ -39,7 +39,8 @@ static BYTE *mainRcsId =
 */
 int SetJFTSize(UWORD nHandles)
 {
-  UWORD block, maxBlock, i;
+  seg block;
+  UWORD maxBlock, i;
   psp FAR *ppsp = MK_FP(cu_psp, 0);
   UBYTE FAR *newtab;
 

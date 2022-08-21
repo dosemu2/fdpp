@@ -1029,19 +1029,21 @@ dispatch:
       goto short_check;
 
       /* Allocate memory */
-    case 0x48:
-      if ((rc = DosMemAlloc(lr.BX, mem_access_mode, &lr.AX, &lr.BX)) < 0)
+    case 0x48: {
+      seg segm;
+      if ((rc = DosMemAlloc(lr.BX, mem_access_mode, &segm, &lr.BX)) < 0)
       {
         DosMemLargest(&lr.BX);
         if (DosMemCheck() != SUCCESS)
           panic("MCB chain corrupted");
         goto error_exit;
       }
-      lr.AX++;   /* DosMemAlloc() returns seg of MCB rather than data */
+      lr.AX = segm + 1; /* DosMemAlloc() returns seg of MCB rather than data */
 #if 0
       fd_mark_mem_np(MK_FP(lr.AX, 0), lr.BX * 16, FD_MEM_UNINITIALIZED);
 #endif
       break;
+    }
 
       /* Free memory */
     case 0x49:

@@ -141,7 +141,7 @@ STATIC UWORD SetverGetVersion(BYTE *table, const char FAR *name)
   return 0;
 }
 
-STATIC COUNT ChildEnv(exec_blk * exp, UWORD * pChildEnvSeg, const char FAR * pathname)
+STATIC COUNT ChildEnv(exec_blk * exp, seg * pChildEnvSeg, const char FAR * pathname)
 {
   BYTE FAR *pSrc;
   BYTE FAR *pDest;
@@ -494,8 +494,8 @@ STATIC int ExecMemAlloc(UWORD size, seg *para, UWORD *asize)
 
 STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)
 {
-  UWORD mem;
-  UWORD env, asize = 0;
+  seg mem, env;
+  UWORD asize = 0;
 
   {
     UWORD com_size;
@@ -590,7 +590,7 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
        while preserving the far call to 0:00c0 +
        copy in HMA at ffff:00d0 */
     p = MK_FP(mem, 0);
-    p->ps_reentry = MK_FP(0xc - asize, asize << 4);
+    p->ps_reentry = MK_FP(0x1000c - asize, asize << 4);
     asize <<= 4;
     asize += 0x10e;
     exp->exec.stack = MK_FP(mem, asize);
@@ -659,7 +659,8 @@ VOID return_user(void)
 
 STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode, COUNT fd)
 {
-  UWORD mem, env, start_seg, asize = 0;
+  seg mem, env, start_seg;
+  UWORD asize = 0;
   UWORD exe_size;
   {
     UWORD image_size;
