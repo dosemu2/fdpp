@@ -128,7 +128,6 @@ STATIC int EnabledA20(void)
 
 STATIC int EnableHMA(VOID)
 {
-
   _EnableA20();
 
   if (!EnabledA20())
@@ -156,7 +155,6 @@ STATIC int EnableHMA(VOID)
   HMAInitPrintf(("HMA success - leaving enabled\n"));
 
   return TRUE;
-
 }
 
 /*
@@ -169,14 +167,12 @@ STATIC int EnableHMA(VOID)
 #define HMAOFFSET  0x20
 #define HMASEGMENT 0xffff
 
-int MoveKernelToHMA()
+STATIC int ClaimHMA(void)
 {
   void FAR *xms_addr;
 
-  if (DosLoadedInHMA)
-  {
+  if (HMAclaimed)
     return TRUE;
-  }
 
   if ((xms_addr = DetectXMSDriver()) == NULL)
     return FALSE;
@@ -215,30 +211,24 @@ int MoveKernelToHMA()
     return FALSE;
   }
 
-//  MoveKernel(0xffff);
+  return TRUE;
+}
 
-  {
-    /* E) up to now, nothing really bad was done.
-       but now, we reuse the HMA area. bad things will happen
-
-       to find bugs early,
-       cause INT 3 on all accesses to this area
-     */
-
-    DosLoadedInHMA = TRUE;
-  }
-
+int MoveKernelToHMA(void)
+{
+  if (DosLoadedInHMA)
+    return TRUE;
+  if (!ClaimHMA())
+    return FALSE;
+  MoveKernel(0xffff);
   /*
     on finalize, will install a VDISK
   */
-
   InstallVDISK();
-
   /* report the fact we are running high through int 21, ax=3306 */
   LoL->_version_flags |= 0x10;
-
+  DosLoadedInHMA = TRUE;
   return TRUE;
-
 }
 
 /*
@@ -269,7 +259,7 @@ int MoveKernelToHMA()
 
 STATIC void InstallVDISK(void)
 {
-  if (!DosLoadedInHMA)
+  if (!HMAclaimed)
     return;
 
   n_fmemcpy(MK_FP(0xffff, 0x0010), &VDISK_BOOT_SEKTOR,
@@ -287,7 +277,7 @@ UWORD HMAalloc(UWORD bytesToAllocate)
 {
   UWORD HMAptr;
 
-  if (!DosLoadedInHMA || !bytesToAllocate)
+  if (!HMAclaimed || !bytesToAllocate)
     return 0xffff;
 
   if (HMAFree > 0x10000 - bytesToAllocate)
@@ -307,7 +297,7 @@ UWORD HMAalloc(UWORD bytesToAllocate)
 
 UWORD HMAquery(UWORD *bytesAvail)
 {
-  if (!DosLoadedInHMA || HMAFree > 0xffff)
+  if (!HMAclaimed || HMAFree > 0xffff)
   {
     *bytesAvail = 0;
     return 0xffff;
