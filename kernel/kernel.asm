@@ -916,6 +916,50 @@ _DISABLEA20:
     jmp short UsingXMSdriver
 
 ;
+; int call_XMScall( (WORD FAR (* driverAddress)(), WORD AX, WORD DX)
+;
+; this calls HIMEM.SYS
+;
+                global CALL_XMSCALL
+CALL_XMSCALL:
+            pop  bx         ; ret address
+            pop  di
+            pop  dx
+            pop  ax
+            pop  cx         ; driver address
+            pop  es
+
+            push di         ; ret address
+            push bx
+            push es         ; driver address ("jmp es:cx")
+            push cx
+            retf
+
+; void FAR *DetectXMSDriver(VOID)
+global DETECTXMSDRIVER
+DETECTXMSDRIVER:
+        mov ax, 4300h
+        int 2fh                 ; XMS installation check
+
+        cmp al, 80h
+        je detected
+        xor ax, ax
+        xor dx, dx
+        retf
+
+detected:
+        push es
+        push bx
+        mov ax, 4310h           ; XMS get driver address
+        int 2fh
+
+        mov ax, bx
+        mov dx, es
+        pop bx
+        pop es
+        retf
+
+;
 ; Default Int 24h handler -- always returns fail
 ; so we have not to relocate it (now)
 ;

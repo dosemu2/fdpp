@@ -193,49 +193,6 @@ INIT_CALL_INTR:
 		INTR 6,0
 		ret 4
 
-;
-; int init_call_XMScall( (WORD FAR * driverAddress)(), WORD AX, WORD DX)
-;
-; this calls HIMEM.SYS
-;
-                global INIT_CALL_XMSCALL
-INIT_CALL_XMSCALL:
-            pop  bx         ; ret address
-            pop  dx
-            pop  ax
-            pop  cx         ; driver address
-            pop  es
-
-            push cs         ; ret address
-            push bx
-            push es         ; driver address ("jmp es:cx")
-            push cx
-            retf
-
-; void FAR *DetectXMSDriver(VOID)
-global DETECTXMSDRIVER
-DETECTXMSDRIVER:
-        mov ax, 4300h
-        int 2fh                 ; XMS installation check
-
-        cmp al, 80h
-        je detected
-        xor ax, ax
-        xor dx, dx
-        ret
-
-detected:
-        push es
-        push bx
-        mov ax, 4310h           ; XMS get driver address
-        int 2fh
-
-        mov ax, bx
-        mov dx, es
-        pop bx
-        pop es
-        ret
-
 global KEYCHECK
 KEYCHECK:
         mov ah, 1

@@ -166,7 +166,7 @@ STATIC int ClaimHMA(void)
 
   if (HMAclaimed == 0 &&
       (HMAclaimed =
-       init_call_XMScall(xms_addr, 0x0100, 0xffff)) == 0)
+       call_XMScall(xms_addr, 0x0100, 0xffff)) == 0)
   {
     _printf("Can't reserve HMA area ??\n");
 
