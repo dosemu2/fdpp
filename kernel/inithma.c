@@ -27,42 +27,6 @@
 /* Cambridge, MA 02139, USA.                                    */
 /****************************************************************/
 
-/*
-    current status:
-
-    load FreeDOS high, if DOS=HIGH detected
-
-    suppress High Loading, if any SHIFT status detected (for debugging)
-
-    if no XMS driver (HIMEM,FDXMS,...) loaded, should work
-
-    cooperation with XMS drivers as follows:
-
-    copy HMA_TEXT segment up.
-
-    after each loaded DEVICE=SOMETHING.SYS, try to request the HMA
-    (XMS function 0x01).
-    if no XMS driver detected, during ONFIG.SYS processing,
-    create a dummy VDISK entry in high memory
-
-    this works with
-
-     FD FDXMS - no problems detected
-
-
-     MS HIMEM.SYS (from DOS 6.2, 9-30-93)
-
-        works if and only if
-
-            /TESTMEM:OFF
-
-        is given
-
-        otherwise HIMEM will TEST AND ZERO THE HIGH MEMORY+HMA.
-        so, in CONFIG.C, if "HIMEM.SYS" is detected, a "/TESTMEM:OFF"
-        parameter is forced.
-*/
-
 #include "portab.h"
 #include "globals.h"
 #include "init-mod.h"
@@ -75,8 +39,6 @@ static BYTE *RcsId =
 BSS(BYTE, DosLoadedInHMA, FALSE);  /* set to TRUE if loaded HIGH          */
 BSS(BYTE, HMAclaimed, 0);          /* set to TRUE if claimed from HIMEM   */
 BSS(UDWORD, HMAFree, 0);           /* first byte in HMA not yet used      */
-
-STATIC void InstallVDISK(void);
 
 #ifdef DEBUG
 #ifdef __TURBOC__
@@ -221,51 +183,10 @@ int MoveKernelToHMA(void)
   if (!ClaimHMA())
     return FALSE;
   MoveKernel(0xffff);
-  /*
-    on finalize, will install a VDISK
-  */
-  InstallVDISK();
   /* report the fact we are running high through int 21, ax=3306 */
   LoL->_version_flags |= 0x10;
   DosLoadedInHMA = TRUE;
   return TRUE;
-}
-
-/*
-    now protect against HIMEM/FDXMS/... by simulating a VDISK
-    FDXMS should detect us and not give HMA access to ohers
-    unfortunately this also disables HIMEM completely
-
-    so: we install this after all drivers have been loaded
-*/
-  static struct _S {               /* Boot-Sektor of a RAM-Disk */
-    UBYTE dummy1[3];            /* HIMEM.SYS uses 3, but FDXMS uses 2 */
-    char Name[5];
-    BYTE dummy2[3];
-    WORD BpS;
-    BYTE dummy3[6];
-    WORD Sektoren;
-    BYTE dummy4;
-  } VDISK_BOOT_SEKTOR = {
-    {
-    0xcf, ' ', ' '},
-    {
-    'V', 'D', 'I', 'S', 'K'},
-    {
-    ' ', ' ', ' '}, 512,
-    {
-    'F', 'D', 'O', 'S', ' ', ' '}, 128, /* 128*512 = 64K */
-  ' '};
-
-STATIC void InstallVDISK(void)
-{
-  if (!HMAclaimed)
-    return;
-
-  n_fmemcpy(MK_FP(0xffff, 0x0010), &VDISK_BOOT_SEKTOR,
-          sizeof(VDISK_BOOT_SEKTOR));
-
-  *(WORD FAR *) MK_FP(0xffff, 0x002e) = 1024 + 64;
 }
 
 /*
