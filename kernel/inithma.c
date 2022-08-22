@@ -198,6 +198,8 @@ UWORD HMAalloc(UWORD bytesToAllocate)
 {
   UWORD HMAptr;
 
+  if (!HMAclaimed)
+    ClaimHMA();
   if (!HMAclaimed || !bytesToAllocate)
     return 0xffff;
 
@@ -218,6 +220,8 @@ UWORD HMAalloc(UWORD bytesToAllocate)
 
 UWORD HMAquery(UWORD *bytesAvail)
 {
+  if (!HMAclaimed)
+    ClaimHMA();
   if (!HMAclaimed || HMAFree > 0xffff)
   {
     *bytesAvail = 0;
