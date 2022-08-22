@@ -823,13 +823,13 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       }
       if (mode == OVERLAY)
       {
-        spot = MK_FP(reloc[1] + mem, reloc[0]);
+        spot = MK_FP((reloc[1] + mem) & 0xffff, reloc[0]);
         *spot += exp->load.reloc;
       }
       else
       {
         /*      spot = MK_FP(reloc[1] + mem + 0x10, reloc[0]); */
-        spot = MK_FP(reloc[1] + start_seg, reloc[0]);
+        spot = MK_FP((reloc[1] + start_seg) & 0xffff, reloc[0]);
         *spot += start_seg;
       }
     }
@@ -851,9 +851,9 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
 
     fcbcode = patchPSP(mem - 1, env, exp, namep);
     exp->exec.stack =
-      MK_FP(ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
+      MK_FP((ExeHeader.exInitSS + start_seg) & 0xffff, ExeHeader.exInitSP);
     exp->exec.start_addr =
-      MK_FP(ExeHeader.exInitCS + start_seg, ExeHeader.exInitIP);
+      MK_FP((ExeHeader.exInitCS + start_seg) & 0xffff, ExeHeader.exInitIP);
 
     /* Transfer control to the executable                   */
     load_transfer(mem, exp, fcbcode, mode);

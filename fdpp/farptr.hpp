@@ -71,6 +71,8 @@ static inline far_s _MK_S(uint32_t s, uint16_t o)
 {
     if (s > 0xffff) {
         int delta = s - 0xffff;
+        if (delta > 1)
+            fdloudprintf("strange segment %x\n", s);
         o += delta << 4;
         s = 0xffff;
     }
