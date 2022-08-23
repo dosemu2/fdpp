@@ -540,7 +540,7 @@ WORD ASMPASCAL INITTEXT init_DosExec(WORD mode, exec_blk * ep, const char * lp);
 WORD ASMPASCAL INITTEXT init_setdrive(WORD drive);
 WORD ASMPASCAL INITTEXT init_switchar(WORD chr);
 //COUNT ASMPASCAL Umb_Test(void);
-COUNT ASMPASCAL INITTEXT UMB_get_largest(__FAR(void) driverAddress, seg * __seg, UCOUNT * size);
+COUNT ASMPASCAL INITTEXT UMB_get_largest(__FAR(void) driverAddress, UDWORD * __seg, UCOUNT * size);
 VOID ASMFUNC INITTEXT init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
 void ASMFUNC NORETURN spawn_int23(void);        /* procsupt.asm */
 /* kernel.asm */

@@ -45,7 +45,6 @@
 "short"		{ return WORD; }
 "UCOUNT"	{ return UWORD; }
 "UWORD"		{ return UWORD; }
-"seg"		{ return UDWORD; }
 "BYTE"		{ return BYTE; }
 "UBYTE"		{ return UBYTE; }
 "unsigned char"	{ return UBYTE; }
