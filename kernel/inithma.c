@@ -38,7 +38,7 @@ static BYTE *RcsId =
 
 BSS(BYTE, DosLoadedInHMA, FALSE);  /* set to TRUE if loaded HIGH          */
 BSS(BYTE, HMAclaimed, 0);          /* set to TRUE if claimed from HIMEM   */
-BSS(UDWORD, HMAFree, 0);           /* first byte in HMA not yet used      */
+BSS(UDWORD, HMAFree, 0x10);           /* first byte in HMA not yet used      */
 
 #ifdef DEBUG
 #ifdef __TURBOC__
@@ -264,13 +264,13 @@ void MoveKernel(UWORD NewKernelSegment)
     HMADest += HMAOFFSET;
     len -= HMAOFFSET;
     offs = HMAOFFSET;
+    HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0xfff0;
   }
 
   if (!initial)
     fmemcpy(HMADest, HMASource, len);
   /* else it's the very first relocation: handled by kernel.asm */
 
-  HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0xfff0;
   /* first free byte after HMA_TEXT on 16 byte boundary */
 
   if (NewKernelSegment == 0xffff)
