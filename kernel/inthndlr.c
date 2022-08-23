@@ -1822,6 +1822,8 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
       r.BX = avail;
       break;
     case 2:
+      /* align to para */
+      r.BX = (r.BX + 0xf) & 0xfff0;
       if (r.BX > avail)
         r.BX = avail;
       r.DI = HMAalloc(r.BX);
