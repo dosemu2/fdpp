@@ -807,7 +807,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
   {                             /* relocate the image for new segment                   */
     COUNT i;
     UWORD reloc[2];
-    seg FAR *spot;
+    UWORD FAR *spot;
 
     SftSeek(fd, ExeHeader.exRelocTable, 0);
     for (i = 0; i < ExeHeader.exRelocItems; i++)
