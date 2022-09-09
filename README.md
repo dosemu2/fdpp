@@ -77,11 +77,6 @@ library and a dynamic linker.
 Simply put, fdpp runs every DOS program we tried, so the
 compatibility level is supposed to be very high. Better
 than that of most other known DOS clones, including FreeDOS.<br/>
-OTOH fdpp removes some compatibility hacks that FreeDOS had.
-For example it doesn't play tricks with disabling A20 when
-returning to user code, so you may see "Packed file is corrupt"
-message on some old exe files. Using "loadfix" command avoids
-that problem.<br/>
 If you find some compatibility problems, please
 [report a bug](https://github.com/dosemu2/fdpp/issues).
 
