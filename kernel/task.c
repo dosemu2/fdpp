@@ -970,6 +970,10 @@ VOID ASMCFUNC P_0_bad(void)
   COUNT rd;
   exec_blk FAR *exb = TempExeBlock_p;
 
+  if (termNoComcom) {
+    fdloudprintf("Bad or missing Command Interpreter: %s\n", GET_PTR(Shell));
+    fdexit(1);
+  }
   put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */
   put_string(Shell);
   put_string(exb->exec.cmd_line->ctBuffer);

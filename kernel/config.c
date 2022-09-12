@@ -175,6 +175,7 @@ BSS(COUNT, nCurChain, 0);
 BSS(COUNT, nFileDesc, -1);
 
 BSS(BYTE, singleStep, FALSE);        /* F8 processing */
+BSS(BYTE, termNoComcom, FALSE);
 BSS(BYTE, SkipAllConfig, FALSE);     /* F5 processing */
 BSS(BYTE, askThisSingleCommand, FALSE);      /* ?device=  device?= */
 BSS(BYTE, DontAskThisSingleCommand, FALSE);  /* !files=            */
@@ -1662,6 +1663,10 @@ STATIC VOID CfgSwitches(char * pLine)
       case 'N':
         if (commands[0].pass == 0)
           InitKernelConfig.SkipConfigSeconds = -1;
+        break;
+      case 'T':
+        if (commands[0].pass == 0)
+          termNoComcom = 1;
         break;
       case 'Y':
         if (commands[0].pass == 0)

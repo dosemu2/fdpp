@@ -144,6 +144,7 @@ extern WORD days[2][13];
 extern __FAR(BYTE)lpTop;
 extern UWORD ram_top;               /* How much ram in Kbytes               */
 extern char singleStep;
+extern char termNoComcom;
 extern char SkipAllConfig;
 extern char master_env[128];
 
