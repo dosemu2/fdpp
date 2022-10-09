@@ -12,8 +12,7 @@ else
 CL = $(CXX)
 endif
 CLC = $(CL)
-NASM = nasm
-LINK = ld
+NASM ?= nasm
 
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line

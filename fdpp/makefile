@@ -67,12 +67,12 @@ $(TARGET).elf $(TARGET).map &: $(DEPS_OF_ELF)
 else
 %.elf %.map : $(DEPS_OF_ELF)
 endif
-	$(LINK) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
+	$(LD) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
 	chmod -x $@
 
 $(TARGET).elf.tmp: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
-	$(LINK) -melf_i386 -static --build-id=sha1 -o $@ \
+	$(LD) -melf_i386 -static --build-id=sha1 -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0
 	chmod -x $@
 
