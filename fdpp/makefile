@@ -154,7 +154,7 @@ CFILES = blockio.c \
 FDPP_CFILES = smalloc.c farhlp_sta.c elf.c
 FDPP_CCFILES = thunks.cc dosobj.cc
 CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp
-LIBS = -lelf
+LIBS = $(shell $(PKG_CONFIG) --libs libelf)
 
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)

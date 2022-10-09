@@ -19,6 +19,7 @@ Build-Depends:
     autoconf,
     git,
     diffutils,
+    pkg-config,
     debhelper (>= 9~)
 Homepage: https://github.com/dosemu2/fdpp
 

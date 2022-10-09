@@ -28,6 +28,7 @@ BuildRequires: libstdc++-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: autoconf
 BuildRequires: git
+BuildRequires: pkgconf-pkg-config
 # diffutils are only needed for reloc hack, remove!
 BuildRequires: diffutils
 

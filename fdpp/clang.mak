@@ -13,6 +13,7 @@ CL = $(CXX)
 endif
 CLC = $(CL)
 NASM ?= nasm
+PKG_CONFIG ?= pkg-config
 
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line
