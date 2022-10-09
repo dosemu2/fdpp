@@ -11,16 +11,18 @@ lex.yy.o: lex.yy.c thunk_gen.tab.h
 %.o: %.c
 	$(CLC) $(CLCFLAGS) -Wno-unused-function -o $@ $<
 
+# not sure why GNU make does not set BISON
+BISON ?= bison
 need = 4.3
 ifneq ($(filter $(need),$(firstword $(sort $(MAKE_VERSION) $(need)))),)
 thunk_gen.tab.c thunk_gen.tab.h &: $(srcdir)/thunk_gen.y
 else
 %.tab.c %.tab.h : $(srcdir)/%.y
 endif
-	bison -d $^
+	$(BISON) -d $^
 
 lex.yy.c: $(srcdir)/thunk_gen.l
-	lex $^
+	$(LEX) $^
 
 clean:
-	rm -f *.tab.* lex.yy.c *.o thunk_gen
+	$(RM) -f *.tab.* lex.yy.c *.o thunk_gen

@@ -193,10 +193,10 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h $(srcdir)/makefile
-	cpp $(CPPFLAGS) -P $< >$@ || (rm -f $@ ; false)
+	$(CPP) $(CPPFLAGS) -P $< >$@ || ($(RM) -f $@ ; false)
 
 cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
-	cpp $(CPPFLAGS) -P $< | sed 's/" "/","/g' >$@
+	$(CPP) $(CPPFLAGS) -P $< | sed 's/" "/","/g' >$@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)
@@ -211,11 +211,11 @@ plt_asmc.inc plt_asmp.inc: thunk_asms.tmp
 	$(pars)
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
-	parsers/thunk_gen <$< >$@ || (rm -f $@ ; false)
+	parsers/thunk_gen <$< >$@ || ($(RM) -f $@ ; false)
 
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
 	$(srcdir)/parsers/gen_thunks.sh $< $(srcdir)/parsers >$@ || \
-		(rm -f $@ ; false)
+		($(RM) -f $@ ; false)
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
@@ -226,22 +226,23 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 	fi
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
 
+INSTALL ?= install
 install: $(ALL)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
-	install $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
+	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
 	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
-	install -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
-	install -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
+	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
+	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
 	mkdir -p $(DESTDIR)$(PKGCONFIGDIR)
-	install -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
+	$(INSTALL) -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
-	install -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
+	$(INSTALL) -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
 
 uninstall:
-	rm -rf $(DESTDIR)$(LIBDIR)/fdpp
-	rm -rf $(DESTDIR)$(DATADIR)/fdpp
-	rm -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
-	rm -rf $(DESTDIR)$(PREFIX)/include/fdpp
+	$(RM) -rf $(DESTDIR)$(LIBDIR)/fdpp
+	$(RM) -rf $(DESTDIR)$(DATADIR)/fdpp
+	$(RM) -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
+	$(RM) -rf $(DESTDIR)$(PREFIX)/include/fdpp
 
 $(TGZ):
 	cd $(TOP) && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
