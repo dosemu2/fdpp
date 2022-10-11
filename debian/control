@@ -13,7 +13,6 @@ Build-Depends:
     nasm,
     lld,
     coreutils,
-    libstdc++-10-dev,
     libelf-dev,
     autoconf,
     git,
