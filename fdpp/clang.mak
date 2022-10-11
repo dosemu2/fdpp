@@ -2,16 +2,17 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
-CC = clang++
+CCACHE = $(shell which ccache)
+CC = $(CCACHE) clang++
 # Override builtin CXX.
 # The assignment below is ignored if CXX was set via cmd line.
 CXX=
 ifeq ($(CXX),)
-CL = clang++
+CL = $(CCACHE) clang++
 else
 CL = $(CXX)
 endif
-CC_FOR_BUILD = clang
+CC_FOR_BUILD = $(CCACHE) clang
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
 
