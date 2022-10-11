@@ -201,7 +201,7 @@ cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)
 pos = $(words $(call _pos,$1,$2))
-pars = srcdir=$(srcdir)/parsers \
+pars = srcdir=$(srcdir)/parsers CPP="$(CPP)" \
 	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@
 $(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
 	$(pars)

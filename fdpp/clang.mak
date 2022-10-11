@@ -13,6 +13,7 @@ else
 CL = $(CXX)
 endif
 CC_FOR_BUILD = $(CCACHE) clang
+CPP = $(CC_FOR_BUILD) -E
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
 
