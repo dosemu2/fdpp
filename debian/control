@@ -22,7 +22,7 @@ Build-Depends:
 Homepage: https://github.com/dosemu2/fdpp
 
 Package: fdpp
-Architecture: i386 amd64
+Architecture: i386 amd64 arm64
 Section: otherosfs
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: 64-bit DOS core
