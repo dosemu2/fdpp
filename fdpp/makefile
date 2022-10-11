@@ -67,12 +67,12 @@ $(TARGET).elf $(TARGET).map &: $(DEPS_OF_ELF)
 else
 %.elf %.map : $(DEPS_OF_ELF)
 endif
-	$(LD) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
+	$(CROSS_LD) -melf_i386 -static --build-id=sha1 -Map=$(TARGET).map -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
 	chmod -x $@
 
 $(TARGET).elf.tmp: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
-	$(LD) -melf_i386 -static --build-id=sha1 -o $@ \
+	$(CROSS_LD) -melf_i386 -static --build-id=sha1 -o $@ \
 		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0
 	chmod -x $@
 
@@ -187,7 +187,7 @@ $(GEN_CC): %.cc: $(SRC)/%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
-	$(CL) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc

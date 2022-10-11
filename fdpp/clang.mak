@@ -14,6 +14,9 @@ CL = $(CXX)
 endif
 CC_FOR_BUILD = $(CCACHE) clang
 CPP = $(CC_FOR_BUILD) -E
+LD = $(CL)
+# ld.lld can cross-compile while gnu ld not
+CROSS_LD = ld.lld
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
 
