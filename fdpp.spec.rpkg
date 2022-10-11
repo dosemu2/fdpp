@@ -22,7 +22,6 @@ BuildRequires: bash
 BuildRequires: clang
 BuildRequires: nasm
 BuildRequires: lld
-BuildRequires: binutils
 BuildRequires: coreutils
 BuildRequires: libstdc++-devel
 BuildRequires: elfutils-libelf-devel
