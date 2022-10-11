@@ -9,7 +9,7 @@ sudo apt install -y \
     clang \
     nasm \
     lld \
-    binutils \
+    pkgconf \
     autoconf \
     libelf-dev \
     git \
