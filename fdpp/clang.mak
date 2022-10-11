@@ -11,7 +11,7 @@ CL = clang++
 else
 CL = $(CXX)
 endif
-CLC = $(CL)
+CC_FOR_BUILD = clang
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
 
