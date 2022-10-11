@@ -58,21 +58,6 @@ static char *portab_hRcsId =
 /*                                                              */
 /****************************************************************/
 
-/* Types for `void *' pointers.  */
-#ifdef __x86_64__
-# ifndef __intptr_t_defined
-typedef long int                intptr_t;
-#  define __intptr_t_defined
-# endif
-typedef unsigned long int       uintptr_t;
-#else
-# ifndef __intptr_t_defined
-typedef int                     intptr_t;
-#  define __intptr_t_defined
-# endif
-typedef unsigned int            uintptr_t;
-#endif
-
 /*                                                              */
 /* Common byte, 16 bit and 32 bit types                         */
 /*                                                              */
