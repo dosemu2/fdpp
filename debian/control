@@ -30,7 +30,7 @@ Description: 64-bit DOS core
  It is based on a FreeDOS kernel ported to modern C++.
 
 Package: fdpp-dev
-Architecture: i386 amd64
+Architecture: i386 amd64 arm64
 Section: libdevel
 Priority: optional
 Depends: fdpp (= ${binary:Version}), ${misc:Depends}
