@@ -163,6 +163,12 @@ VOID ASMCFUNC FreeDOSmain(void)
   /* move kernel to high conventional RAM */
   MoveKernel(FP_SEG(lpTop));
   lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
+  if (bprm.Flags & FDPP_FL_HEAP_HMA)
+  {
+    far_t f = DynAlloc("kernel_hma", 1, _HMATextEnd - _HMATextStart);
+    ___assert(f.off == 0x10);  // need first allocation
+    MoveKernelToHMA();
+  }
   /* display copyright info and kernel emulation status */
   signon();
   /* initialize all internal variables, process CONFIG.SYS, load drivers, etc */

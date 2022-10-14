@@ -18,12 +18,13 @@ struct _bprm {
   uint16_t HeapSeg;             /* heap segment or 0 if after kernel    */
 #define FDPP_FL_KERNEL_HIGH 1
 #define FDPP_FL_HEAP_HIGH   2
+#define FDPP_FL_HEAP_HMA    4
   uint16_t Flags;
 };
 
 #endif
 
-#define BPRM_VER 6
+#define BPRM_VER 7
 #define BPRM_MIN_VER 4
 
 #define FDPP_BS_SEG 0x1fe0

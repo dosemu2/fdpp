@@ -420,13 +420,16 @@ void PreConfig2(void)
   void FAR *p;
   unsigned short kernel_seg;
 
-  p = (void FAR *)DynAlloc("kernel", 1, _HMATextEnd - _HMATextStart + 0xf);
-  kernel_seg = FP_SEG(p);
-  kernel_seg += FP_OFF(p) >> 4;
-  if (FP_OFF(p) & 0xf)
-    kernel_seg++;
-  DebugPrintf(("moving text to %x\n", kernel_seg));
-  MoveKernel(kernel_seg);
+  if (!(bprm.Flags & FDPP_FL_HEAP_HMA))
+  {
+    p = (void FAR *)DynAlloc("kernel", 1, _HMATextEnd - _HMATextStart + 0xf);
+    kernel_seg = FP_SEG(p);
+    kernel_seg += FP_OFF(p) >> 4;
+    if (FP_OFF(p) & 0xf)
+      kernel_seg++;
+    DebugPrintf(("moving text to %x\n", kernel_seg));
+    MoveKernel(kernel_seg);
+  }
 
   /* initialize NEAR allocated things */
 
@@ -442,6 +445,7 @@ void PreConfig2(void)
   LoL->_first_mcb = base_seg;
   if (bprm.HeapSize && !bprm.HeapSeg)
     LoL->_version_flags |= 8;   // running in ROM
+  HMAFree = DynLastHMA();
 
   if (Config.ebda2move)
   {
@@ -1581,7 +1585,8 @@ STATIC VOID Dosmem(char * pLine)
       pTmp += 3;
     } else if (memcmp(pTmp, "HIGH", 4) == 0)
     {
-      HMAState = HMA_REQ;
+      if (!(bprm.Flags & FDPP_FL_HEAP_HMA))
+        HMAState = HMA_REQ;
       pTmp += 4;
     } else {
       CfgFailure(pLine + (pTmp - szBuf));
