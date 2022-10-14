@@ -257,7 +257,7 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode);
 STATIC void umb_init(void);
 
 void HMAconfig(int finalize);
-STATIC void config_init_buffers(int anzBuffers);     /* from BLOCKIO.C */
+STATIC void config_init_buffers(int anzBuffers, int high);     /* from BLOCKIO.C */
 
 #define _EOF 0x1a
 
@@ -380,7 +380,7 @@ void PreConfig(void)
   strcpy(cfginittail, _cfgInitTail);
 
   DiskTransferBuffer = KernelAlloc(MAX_SEC_SIZE, 'B', 0);
-  config_init_buffers(Config.cfgBuffers);
+  config_init_buffers(Config.cfgBuffers, 0);
 
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', 0);
 
@@ -501,7 +501,7 @@ void PostConfig(void)
   /* dsk.c avoids DMA transfer buffer in UMB */
   DiskTransferBuffer = InitDiskTransferBuffer;
 #endif
-//  config_init_buffers(Config.cfgBuffers);
+  config_init_buffers(Config.cfgBuffers, Config.cfgDosDataUmb);
 
 /* LoL->_sfthead = (sfttbl FAR *)&basesft; */
   /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
@@ -2462,7 +2462,7 @@ STATIC char strcaseequal(const char * d, const char * s)
     that saves some relocation problems
 */
 
-STATIC void config_init_buffers(int wantedbuffers)
+STATIC void config_init_buffers(int wantedbuffers, int high)
 {
   struct buffer FAR *pbuffer;
   int buffers;
@@ -2482,7 +2482,7 @@ STATIC void config_init_buffers(int wantedbuffers)
   LoL->nbuffers = buffers;
   LoL->inforecptr = &LoL->_firstbuf;
   bytes = sizeof(struct buffer) * buffers;
-  pbuffer = (struct buffer FAR *)DynAlloc("buffers", 1, bytes);
+  pbuffer = KernelAlloc(bytes, 'B', high);
   LoL->_deblock_buf = DiskTransferBuffer;
   LoL->_firstbuf = pbuffer;
 
