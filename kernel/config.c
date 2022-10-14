@@ -2274,6 +2274,11 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
     lpTop = MK_FP(FP_SEG(lpTop) - nPara, FP_OFF(lpTop));
     p = AlignParagraph(lpTop);
   }
+  else if (mode && (bprm.Flags & FDPP_FL_HEAP_HMA))
+  {
+    UWORD off = HMAalloc(nBytes);
+    p = MK_FP(0xffff, off);
+  }
   else
   {
     p = KernelAllocPara(nPara, type, NULL, mode);
