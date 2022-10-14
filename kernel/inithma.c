@@ -209,7 +209,7 @@ UWORD HMAalloc(UWORD bytesToAllocate)
   HMAptr = HMAFree;
 
   /* align on 16 byte boundary */
-  HMAFree = (HMAFree + bytesToAllocate + 0xf) & 0xfff0;
+  HMAFree = (HMAFree + bytesToAllocate + 0xf) & 0x1fff0;
 
   /*_printf("HMA allocated %d byte at %x\n", bytesToAllocate, HMAptr); */
 
@@ -232,7 +232,7 @@ UWORD HMAquery(UWORD *bytesAvail)
   return HMAFree;
 }
 
-DATA(UWORD, CurrentKernelSegment, 0);
+static DATA(UWORD, CurrentKernelSegment, 0);
 
 void MoveKernel(UWORD NewKernelSegment)
 {
@@ -260,11 +260,12 @@ void MoveKernel(UWORD NewKernelSegment)
 
   if (NewKernelSegment == 0xffff)
   {
+    ___assert(HMAFree <= HMAOFFSET);
     HMASource += HMAOFFSET;
     HMADest += HMAOFFSET;
     len -= HMAOFFSET;
     offs = HMAOFFSET;
-    HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0xfff0;
+    HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0x1fff0;
   }
 
   if (!initial)
@@ -284,11 +285,11 @@ void MoveKernel(UWORD NewKernelSegment)
                  GET_FP32(HMASource), GET_FP32(HMADest), len));
 
   NewKernelSegment -= FP_OFF(_HMATextStart) >> 4;
-  offs += FP_OFF(_HMATextStart);
   for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)
   {
     *rp->jmpSegment = NewKernelSegment;
   }
-  RelocHook(CurrentKernelSegment, NewKernelSegment, offs, len);
+  RelocHook(CurrentKernelSegment, NewKernelSegment, FP_OFF(_HMATextStart),
+      len + offs);
   CurrentKernelSegment = NewKernelSegment;
 }

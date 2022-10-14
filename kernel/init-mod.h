@@ -139,7 +139,6 @@ extern void Init_clk_driver(void);
 
 extern UDWORD HMAFree;            /* first byte in HMA not yet used      */
 
-extern UWORD CurrentKernelSegment;
 extern WORD days[2][13];
 extern __FAR(BYTE)lpTop;
 extern UWORD ram_top;               /* How much ram in Kbytes               */
