@@ -50,14 +50,26 @@ void dosobj_init(far_t fa, int size)
     initialized = 1;
 }
 
-void dosobj_reinit(far_t fa, int size)
+static void do_free(void)
 {
-    void *ptr = resolve_segoff(fa);
     int leaked;
 
     assert(initialized);
     leaked = smdestroy(&pool);
     assert(!leaked);
+}
+
+void dosobj_free(void)
+{
+    do_free();
+    initialized = 0;
+}
+
+void dosobj_reinit(far_t fa, int size)
+{
+    void *ptr = resolve_segoff(fa);
+
+    do_free();
     sminit(&pool, ptr, size);
     base = fa;
 }
