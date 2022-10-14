@@ -248,7 +248,7 @@ void MoveKernel(UWORD NewKernelSegment)
     initial = 1;
   }
 
-  if (CurrentKernelSegment == 0xffff)
+  if (DosLoadedInHMA)
     return;
 
   ___assert(!(FP_OFF(_HMATextStart) & 0xf));
