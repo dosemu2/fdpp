@@ -163,3 +163,20 @@ UDWORD DynLastHMA(void)
   ___assert(!(FP_OFF(h->Dynp) & 0xf));
   return FP_OFF(h->Dynp) + ((h->Allocated + 0xf) & 0x1fff0);
 }
+
+seg DynLastSeg(void)
+{
+  struct HeapS *h = &Heap[H_DYN];
+  seg ret = FP_SEG(h->Dynp);
+
+  ___assert(!(FP_OFF(h->Dynp) & 0xf));
+  return ret + ((FP_OFF(h->Dynp) + ((h->Allocated + 0xf) & 0x1fff0)) >> 4);
+}
+
+UDWORD DynRemained(void)
+{
+  struct HeapS *h = &Heap[H_DYN];
+
+  ___assert(h->MaxSize >= h->Allocated);
+  return h->MaxSize - h->Allocated;
+}

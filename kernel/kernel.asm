@@ -730,6 +730,7 @@ _p_0_tos:
 
 segment DYN_DATA
 
+        align 10h
         global _Dyn
 _Dyn:
 

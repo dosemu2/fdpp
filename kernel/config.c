@@ -749,6 +749,25 @@ STATIC void umb_init(void)
       if (umb_seg > umb_max)
         umb_max = umb_seg;
     }
+    if ((bprm.Flags & FDPP_FL_HEAP_HMA) && FP_SEG(&Dyn) > umb_max)
+    {
+      /* create UMB at unused heap */
+      seg umb_prev = umb_max;
+      seg umb_next = umb_prev + para2far(umb_prev)->m_size;
+      UDWORD umb_size = DynRemained() >> 4;
+      /* append to prev */
+      mcb FAR *pp = para2far(umb_prev);
+      fd_prot_mem(pp, sizeof(*pp), FD_MEM_NORMAL);
+      pp->m_type = MCB_NORMAL;
+      pp->m_size--;
+      fd_prot_mem(pp, sizeof(*pp), FD_MEM_READONLY);
+       /* create link */
+      umb_seg = DynLastSeg();
+      mumcb_init(umb_next, umb_seg - umb_next - 1);
+      /* create UMB */
+      ___assert(umb_size > 2);
+      mcb_init(umb_seg, umb_size - 1, MCB_LAST);
+    }
     DebugPrintf(("UMB Allocation completed: start at 0x%x\n", umb_base_seg));
   }
 }

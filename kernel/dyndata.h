@@ -18,5 +18,7 @@ far_t DynAllocNear(const char *what, unsigned num, unsigned size);
 far_t DynAllocLow(const char *what, unsigned num, unsigned size);
 __FAR(void) DynLast(void);
 UDWORD DynLastHMA(void);
+seg DynLastSeg(void);
+UDWORD DynRemained(void);
 
 #endif
