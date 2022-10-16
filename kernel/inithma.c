@@ -260,12 +260,17 @@ void MoveKernel(UWORD NewKernelSegment)
 
   if (NewKernelSegment == 0xffff)
   {
-    ___assert(HMAFree <= HMAOFFSET);
+    UDWORD new_offs;
     HMASource += HMAOFFSET;
     HMADest += HMAOFFSET;
     len -= HMAOFFSET;
     offs = HMAOFFSET;
-    HMAFree = (FP_OFF(HMADest) + len + 0xf) & 0x1fff0;
+    new_offs = (FP_OFF(HMADest) + len + 0xf) & 0x1fff0;
+    if (HMAFree != new_offs)
+    {
+      ___assert(HMAFree <= HMAOFFSET);
+      HMAFree = new_offs;
+    }
   }
 
   if (!initial)

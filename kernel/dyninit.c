@@ -47,10 +47,18 @@ struct HeapS {
     struct DynS FAR *Dynp;
     UDWORD Allocated;
     UDWORD MaxSize;
+    void (*AllocHook)(struct HeapS *, unsigned);
 };
 STATIC struct HeapS *HeapMap[HEAP_MAX];
 enum { H_DYN, H_OTHER, H_HMA, HEAPS };
 STATIC struct HeapS Heap[HEAPS];
+
+static void HmaAllocHook(struct HeapS *h, unsigned size)
+{
+    UDWORD off = FP_OFF(h->Dynp) + h->Allocated;
+    ___assert(HMAFree == ((off + 0xf) & 0x1fff0));
+    HMAFree = (off + size + 0xf) & 0x1fff0;
+}
 
 void DynInit(void)
 {
@@ -67,6 +75,7 @@ void DynInit(void)
   HeapMap[HEAP_NEAR] = &Heap[H_DYN];
   Heap[H_HMA].Dynp = hma;
   Heap[H_HMA].MaxSize = 0x10000 - HMAFree;
+  Heap[H_HMA].AllocHook = HmaAllocHook;
 
 #define KERNEL_HIGH() (bprm.Flags & FDPP_FL_KERNEL_HIGH)
 #define HEAP_HIGH() (bprm.Flags & FDPP_FL_HEAP_HIGH)
@@ -125,6 +134,8 @@ static far_t DoAlloc(const char *what, unsigned num, unsigned size, int heap)
   /* do not memset, we may pre-allocate HMA with a20 still disabled */
 //  fmemset(now, 0, total);
 
+  if (h->AllocHook)
+    h->AllocHook(h, total);
   h->Allocated += total;
 
   return GET_FAR(now);
@@ -152,16 +163,6 @@ void FAR *DynLast(void)
                GET_FP32(h->Dynp->Buffer + h->Allocated)));
 
   return h->Dynp->Buffer + h->Allocated;
-}
-
-UDWORD DynLastHMA(void)
-{
-  struct HeapS *h = &Heap[H_HMA];
-  DebugPrintf(("dynamic HMA data end at %P\n",
-               GET_FP32(h->Dynp->Buffer + h->Allocated)));
-  /* HMA allocations para-aligned */
-  ___assert(!(FP_OFF(h->Dynp) & 0xf));
-  return FP_OFF(h->Dynp) + ((h->Allocated + 0xf) & 0x1fff0);
 }
 
 seg DynLastSeg(void)

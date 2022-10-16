@@ -165,7 +165,9 @@ VOID ASMCFUNC FreeDOSmain(void)
   lpTop = MK_FP(FP_SEG(lpTop) - 0xfff, 0xfff0);
   if (bprm.Flags & FDPP_FL_HEAP_HMA)
   {
-    far_t f = DynAlloc("kernel_hma", 1, _HMATextEnd - _HMATextStart);
+    /* First 0x20 bytes of kernel are skipped. Here we skip 0x10 bytes
+     * that would otherwise go beyond HMA. */
+    far_t f = DynAlloc("kernel_hma", 1, _HMATextEnd - (_HMATextStart + 0x10));
     ___assert(f.off == 0x10);  // need first allocation
     MoveKernelToHMA();
   }
