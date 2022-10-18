@@ -53,6 +53,12 @@ STATIC struct HeapS *HeapMap[HEAP_MAX];
 enum { H_DYN, H_OTHER, H_HMA, HEAPS };
 STATIC struct HeapS Heap[HEAPS];
 
+static void BasicAllocHook(struct HeapS *h, unsigned size)
+{
+  void FAR *now = (void FAR *)&h->Dynp->Buffer[h->Allocated];
+  fmemset(now, 0, size);
+}
+
 static void HmaAllocHook(struct HeapS *h, unsigned size)
 {
     UDWORD off = FP_OFF(h->Dynp) + h->Allocated;
@@ -70,6 +76,7 @@ void DynInit(void)
     Heap[i].Dynp = NULL;
     Heap[i].Allocated = 0;
     Heap[i].MaxSize = 0;
+    Heap[i].AllocHook = BasicAllocHook;
   }
   Heap[H_DYN].Dynp = dyn;
   HeapMap[HEAP_NEAR] = &Heap[H_DYN];
@@ -131,11 +138,8 @@ static far_t DoAlloc(const char *what, unsigned num, unsigned size, int heap)
 #endif
 
   now = (void FAR *)&h->Dynp->Buffer[h->Allocated];
-  /* do not memset, we may pre-allocate HMA with a20 still disabled */
-//  fmemset(now, 0, total);
 
-  if (h->AllocHook)
-    h->AllocHook(h, total);
+  h->AllocHook(h, total);
   h->Allocated += total;
 
   return GET_FAR(now);
