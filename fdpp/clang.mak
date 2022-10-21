@@ -2,6 +2,7 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
+LLD = $(shell which ld.lld)
 CCACHE = $(shell which ccache)
 CC = $(CCACHE) clang++
 # Override builtin CXX.
@@ -15,8 +16,12 @@ endif
 CC_FOR_BUILD = $(CCACHE) clang
 CPP = $(CC_FOR_BUILD) -E
 CC_LD = $(CL)
+ifneq ($(LLD),)
 # ld.lld can cross-compile while gnu ld not
-CROSS_LD = ld.lld
+CROSS_LD = $(LLD)
+else
+CROSS_LD = ld
+endif
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
 
