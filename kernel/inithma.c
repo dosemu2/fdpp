@@ -129,7 +129,7 @@ STATIC int EnableHMA(VOID)
 #define HMAOFFSET  0x20
 #define HMASEGMENT 0xffff
 
-STATIC int ClaimHMA(void)
+int ClaimHMA(void)
 {
   void FAR *xms_addr;
 
@@ -216,20 +216,6 @@ UWORD HMAalloc(UWORD bytesToAllocate)
   fmemset(MK_FP(0xffff, HMAptr), 0, bytesToAllocate);
 
   return HMAptr;
-}
-
-UWORD HMAquery(UWORD *bytesAvail)
-{
-  if (!HMAclaimed)
-    ClaimHMA();
-  if (!HMAclaimed || HMAFree > 0xffff)
-  {
-    *bytesAvail = 0;
-    return 0xffff;
-  }
-
-  *bytesAvail = 0x10000 - HMAFree;
-  return HMAFree;
 }
 
 static DATA(UWORD, CurrentKernelSegment, 0);

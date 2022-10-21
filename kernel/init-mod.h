@@ -72,7 +72,6 @@ extern struct _KernelConfig InitKernelConfig;
 #define LINESIZE KBD_MAXLENGTH
 
 /*inithma.c*/
-extern BYTE DosLoadedInHMA;
 void MoveKernel(UWORD NewKernelSegment);
 
 void setvec(unsigned char intno, intvec vector);
@@ -136,8 +135,6 @@ int VA_CDECL init_sprintf(char * buff, CONST char * fmt, ...);
 
 /* initclk.c */
 extern void Init_clk_driver(void);
-
-extern UDWORD HMAFree;            /* first byte in HMA not yet used      */
 
 extern WORD days[2][13];
 extern __FAR(BYTE)lpTop;

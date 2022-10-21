@@ -577,6 +577,10 @@ VOID configDone(VOID)
     DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
   }
 #endif
+
+  if (HMAState == HMA_DONE || (bprm.Flags & FDPP_FL_HEAP_HMA))
+    HMAInitFirstMcb(HMAFree);
+
 #if 0
   if (master_env[0] == '\0')   /* some shells panic on empty master env. */
     strcpy(master_env, "PATH=.");

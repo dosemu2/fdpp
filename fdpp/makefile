@@ -130,6 +130,7 @@ CFILES = blockio.c \
     fatfs.c \
     fattab.c \
     fcbfns.c \
+    hmamgr.c \
     inthndlr.c \
     ioctl.c \
     memmgr.c \

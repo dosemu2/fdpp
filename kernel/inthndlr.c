@@ -1814,20 +1814,86 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
     UWORD offs, avail;
 
     r.ES = 0xffff;
-    offs = HMAquery(&avail);
     switch (r.AL)
     {
     case 1:
+      if (!HMAclaimed)
+      {
+        rc = DE_NOMEM;
+        break;
+      }
+      rc = DosHMAQuery(&offs, &avail);
+      if (rc < SUCCESS)
+        break;
       r.DI = offs;
       r.BX = avail;
       break;
     case 2:
+      if (!HMAclaimed)
+      {
+        rc = DE_NOMEM;
+        break;
+      }
+      rc = DosHMAQuery(&offs, &avail);
+      if (rc < SUCCESS)
+        break;
       /* align to para */
       r.BX = (r.BX + 0xf) & 0xfff0;
       if (r.BX > avail)
         r.BX = avail;
-      r.DI = HMAalloc(r.BX);
+      rc = DosHMAAlloc(r.BX, &r.DI);
       break;
+    case 3:
+      if (!HMAclaimed)
+      {
+        if (!ClaimHMA())
+        {
+          rc = DE_NOMEM;
+          break;
+        }
+        HMAInitFirstMcb(0x10);
+      }
+      switch (r.DL)
+      {
+        case 0:  // alloc
+          /* align to para */
+          r.BX = (r.BX + 0xf) & 0xfff0;
+          rc = DosHMAAlloc(r.BX, &r.DI);
+          break;
+        case 1:  // resize
+          /* align to para */
+          r.BX = (r.BX + 0xf) & 0xfff0;
+          rc = DosHMAChange(r.DI, r.BX);
+          break;
+        case 2:  // free
+          rc = DosHMAFree(r.DI);
+          break;
+        default:
+          rc = DE_INVLDFUNC;
+          break;
+      }
+      break;
+    case 4:
+      if (!HMAclaimed)
+      {
+        if (!ClaimHMA())
+        {
+          rc = DE_NOMEM;
+          break;
+        }
+        HMAInitFirstMcb(0x10);
+      }
+      r.AX = 0;
+      r.ES = 0xffff;
+      r.DI = 0x10;
+      rc = SUCCESS;
+      break;
+    }
+
+    if (rc < SUCCESS)
+    {
+      r.DI = 0xffff;
+      r.BX = 0;
     }
     return;
   }

@@ -47,7 +47,6 @@ BOOL DeleteBlockInBufferCache(ULONG blknolow, ULONG blknohigh, COUNT dsk, int mo
 UWORD dskxfer(COUNT dsk, ULONG blkno,__FAR(VOID) buf, UWORD numblocks,
               COUNT mode);
 /* *** End of change */
-UWORD HMAquery(UWORD *bytesAvail);
 UWORD HMAalloc(UWORD bytesToAllocate);
 
 /* break.c */
@@ -248,6 +247,16 @@ COUNT DosGetLargestBlock(UWORD * block);
 VOID show_chain(void);
 void DosUmbLink(unsigned n);
 VOID mcb_print(__FAR(mcb) mcbp);
+
+COUNT DosHMAQuery(UWORD *off, UWORD *avail);
+COUNT DosHMAAlloc(UWORD size, UWORD *off);
+COUNT DosHMAFree(UWORD off);
+COUNT DosHMAChange(UWORD para, UWORD size);
+COUNT DosHMACheck(void);
+COUNT FreeProcessHMA(UWORD ps);
+void HMAInitFirstMcb(UWORD off);
+
+int ClaimHMA(void);
 
 /* lfnapi.c */
 COUNT lfn_allocate_inode(VOID);

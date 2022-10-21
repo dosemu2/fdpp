@@ -460,7 +460,7 @@ COUNT DosMemCheck(void)
     pprev = p;
     p = nxtMCB(p);
   }
-  return SUCCESS;
+  return DosHMACheck();
 }
 
 COUNT FreeProcessMem(UWORD ps)
@@ -487,6 +487,7 @@ COUNT FreeProcessMem(UWORD ps)
   }
 
   DosUmbLink(oldumbstate);
+  FreeProcessHMA(ps);
 
   return SUCCESS;
 }

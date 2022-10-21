@@ -160,8 +160,9 @@ typedef BYTE *UPMAP;
 extern COUNT *error_tos,        /* error stack                          */
   disk_api_tos,                 /* API handler stack - disk fns         */
   char_api_tos;                 /* API handler stack - char fns         */
-extern
-BYTE DosLoadedInHMA;            /* if InitHMA has moved DOS up          */
+extern BYTE DosLoadedInHMA;     /* if InitHMA has moved DOS up          */
+extern BYTE HMAclaimed;         /* if InitHMA was allocated             */
+extern UDWORD HMAFree;          /* first byte in HMA not yet used       */
 
 #ifdef DEBUG
 GLOBAL WORD bDumpRegs

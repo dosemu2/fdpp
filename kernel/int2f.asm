@@ -99,6 +99,10 @@ Int2f3:         cmp     ax,1680h                ; Win "release time slice"
                 je      IntDosCal               ; Dos Internal calls
                 cmp     ax,4a02h
                 je      IntDosCal               ; Dos Internal calls
+                cmp     ax,4a03h
+                je      IntDosCal               ; Dos Internal calls
+                cmp     ax,4a04h
+                je      IntDosCal               ; Dos Internal calls
 %ifdef WITHFAT32
                 cmp     ax,4a33h                ; Check DOS version 7
                 jne     Check4Share
