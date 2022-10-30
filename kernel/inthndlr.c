@@ -1568,6 +1568,7 @@ dispatch:
           r->DI = FP_OFF(s);
           r->flags |= FLG_CARRY;
           r->AH = 0x11;
+          r->AL |= 0x80;    /* redirector extension */
           call_intr(0x2f, r);
           /* restore corrupted regs */
           r->ES = lr.ES;
