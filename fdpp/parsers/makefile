@@ -1,5 +1,4 @@
 -include config.mak
-XCPU ?= 386
 srcdir ?= $(CURDIR)
 include $(srcdir)/../clang.mak
 
