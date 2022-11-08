@@ -9,6 +9,8 @@
 #include <string.h>
 #include <assert.h>
 
+#define PTR_SIZE 2
+
 #define YYDEBUG 1
 
 static void yyerror(const char* s);
@@ -169,10 +171,9 @@ static void fin_arg(int last)
 	break;
     }
     if (is_ptr) {
+	real_arg_size = PTR_SIZE;
 	if (is_far)
-	    real_arg_size = 4;
-	else
-	    real_arg_size = 2;
+	    real_arg_size *= 2;
     } else {
 	if (arg_size <= 0) {
 	    if (arg_size == 0 && arg_num)
@@ -235,8 +236,11 @@ input:		  input line NEWLINE
 
 line:		lnum rdecls fname lb args rb SEMIC
 			{
-			  if (is_rptr)
-			    rlen = (is_rfar ? 4 : 2);
+			  if (is_rptr) {
+			    rlen = PTR_SIZE;
+			    if (is_rfar)
+			      rlen *= 2;
+			  }
 			  switch (thunk_type) {
 			  case 0:
 			    if (!is_rvoid) {
