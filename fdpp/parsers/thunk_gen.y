@@ -234,6 +234,8 @@ input:		  input line NEWLINE
 
 line:		lnum rdecls fname lb args rb SEMIC
 			{
+			  if (is_rptr)
+			    rlen = (is_rfar ? 4 : 2);
 			  switch (thunk_type) {
 			  case 0:
 			    if (!is_rvoid) {
