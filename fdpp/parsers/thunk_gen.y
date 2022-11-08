@@ -140,14 +140,15 @@ static void fin_arg(int last)
     if (!is_ptr && is_void)
 	return;
     do_start_arg(0);
-    if (is_const)
-	strcat(abuf, "const ");
     switch (thunk_type) {
     case 0:
-	sprintf(abuf + strlen(abuf), "%i, %s, _SP)", arg_offs, atype);
+	sprintf(abuf + strlen(abuf), "%i, %s%s, _SP)", arg_offs,
+		is_const ? "const " : "", atype);
 	break;
     case 1:
     case 2:
+	if (is_const)
+	    strcat(abuf, "const ");
 	sprintf(abuf + strlen(abuf), "%s)", atype);
 	strcat(abuf, ", ");
 	do_start_arg(1);
