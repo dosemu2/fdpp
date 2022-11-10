@@ -274,6 +274,9 @@ static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
     UDWORD __d = *(UDWORD *)(ap + n); \
     FP_FROM_D(t, __d); \
 })
+#define _ARG_R(t) t
+#define _RET(r) r
+#define _RET_PTR(r) // unused
 
 static UDWORD FdppThunkCall(int fn, UBYTE *sp, enum DispStat *r_stat,
         int *r_len)
@@ -290,8 +293,9 @@ static UDWORD FdppThunkCall(int fn, UBYTE *sp, enum DispStat *r_stat,
     objtrace_leave(); \
     fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
 }
-#define _DISPATCH(r, f, ...) _DISP_CMN(f, { \
-    ret = fdpp_dispatch(&stat, f, ##__VA_ARGS__); \
+#define _DISPATCH(r, rv, rc, f, ...) _DISP_CMN(f, { \
+    rv _r = fdpp_dispatch(&stat, f, ##__VA_ARGS__); \
+    ret = rc(_r); \
     if (stat == DISP_OK) \
         rsz = (r); \
     else \

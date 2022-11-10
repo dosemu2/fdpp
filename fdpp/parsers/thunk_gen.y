@@ -236,20 +236,30 @@ input:		  input line NEWLINE
 
 line:		lnum rdecls fname lb args rb SEMIC
 			{
+			  const char *rt, *rv;
+
 			  if (is_rptr) {
+			    rt = "_RET_PTR";
+			    rv = "_ARG_RPTR";
 			    rlen = PTR_SIZE;
-			    if (is_rfar)
+			    if (is_rfar) {
 			      rlen *= 2;
+			      rt = "_RET_PTR_FAR";
+			      rv = "_ARG_RPTR_FAR";
+			    }
+			  } else {
+			    rt = "_RET";
+			    rv = "_ARG_R";
 			  }
 			  switch (thunk_type) {
 			  case 0:
 			    if (!is_rvoid) {
 			      if (abuf[0])
-			        printf("\tcase %i:\n\t\t_DISPATCH(%i, %s, %s);\n\t\tbreak;\n",
-				    $1, rlen, $3, abuf);
+			        printf("\tcase %i:\n\t\t_DISPATCH(%i, %s(%s), %s, %s, %s);\n\t\tbreak;\n",
+				    $1, rlen, rv, rtbuf, rt, $3, abuf);
 			      else
-			        printf("\tcase %i:\n\t\t_DISPATCH(%i, %s);\n\t\tbreak;\n",
-				    $1, rlen, $3);
+			        printf("\tcase %i:\n\t\t_DISPATCH(%i, %s(%s), %s, %s);\n\t\tbreak;\n",
+				    $1, rlen, rv, rtbuf, rt, $3);
 			    } else {
 			      if (abuf[0])
 			        printf("\tcase %i:\n\t\t_DISPATCH_v(%s, %s);\n\t\tbreak;\n",
