@@ -80,6 +80,7 @@ f_node_ptr dir_open(REG const char *dirname, BOOL split, f_node_ptr fnp)
            -- 2001/09/04 ska*/
 
   dir_init_fnode(fnp, 0);
+  fnp->f_dmp->dm_name_pat[0] = '\0';
   fnp->f_dmp->dm_entry = 0;
 
   dirname += 2;               /* Assume FAT style drive       */

@@ -280,7 +280,7 @@ BOOL dir_exists(char * path)
 
 BOOL fcbmatch(const char *fcbname1, const char *fcbname2)
 {
-  return memcmp(fcbname1, fcbname2, FNAME_SIZE + FEXT_SIZE) == 0;
+  return strncmp(fcbname1, fcbname2, FNAME_SIZE + FEXT_SIZE) == 0;
 }
 
 STATIC int find_in_dir(int attr_req, int attr_allow, f_node_ptr fnp)
