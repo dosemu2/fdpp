@@ -283,13 +283,8 @@ BOOL fcbmatch(const char *fcbname1, const char *fcbname2)
   return memcmp(fcbname1, fcbname2, FNAME_SIZE + FEXT_SIZE) == 0;
 }
 
-STATIC int find_fname(const char *path, int attr, f_node_ptr fnp)
+STATIC int find_in_dir(int attr, f_node_ptr fnp)
 {
-  /* check for leading backslash and open the directory given that */
-  /* contains the file given by path.                              */
-  if ((fnp = split_path(path, fnp)) == NULL)
-    return DE_PATHNOTFND;
-
   while (dir_read(fnp) == 1)
   {
     if (fcbmatch(fnp->f_dir.dir_name, fnp->f_dmp->dm_name_pat)
@@ -300,6 +295,16 @@ STATIC int find_fname(const char *path, int attr, f_node_ptr fnp)
     fnp->f_dmp->dm_entry++;
   }
   return DE_FILENOTFND;
+}
+
+STATIC int find_fname(const char *path, int attr, f_node_ptr fnp)
+{
+  /* check for leading backslash and open the directory given that */
+  /* contains the file given by path.                              */
+  if ((fnp = split_path(path, fnp)) == NULL)
+    return DE_PATHNOTFND;
+
+  return find_in_dir(attr, fnp);
 }
 
 /* Description.
