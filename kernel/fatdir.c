@@ -416,7 +416,7 @@ void ConvertName83ToNameSZ(char * destSZ, const char * srcFCBName)
     noExtension = TRUE;
   }
 
-  fmemcpy_n(destSZ, srcFCBName, FNAME_SIZE);
+  memcpy(destSZ, srcFCBName, FNAME_SIZE);
 
   srcFCBName += FNAME_SIZE;
 
@@ -438,7 +438,7 @@ void ConvertName83ToNameSZ(char * destSZ, const char * srcFCBName)
     if (loop >= 0)
     {
       *destSZ++ = '.';
-      fmemcpy_n(destSZ, srcFCBName, loop + 1);
+      memcpy(destSZ, srcFCBName, loop + 1);
       destSZ += loop + 1;
     }
   }
