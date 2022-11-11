@@ -283,12 +283,14 @@ BOOL fcbmatch(const char *fcbname1, const char *fcbname2)
   return memcmp(fcbname1, fcbname2, FNAME_SIZE + FEXT_SIZE) == 0;
 }
 
-STATIC int find_in_dir(int attr, f_node_ptr fnp)
+STATIC int find_in_dir(int attr_req, int attr_allow, f_node_ptr fnp)
 {
   while (dir_read(fnp) == 1)
   {
-    if (fcbmatch(fnp->f_dir.dir_name, fnp->f_dmp->dm_name_pat)
-        && (fnp->f_dir.dir_attrib & ~(D_RDONLY | D_ARCHIVE | attr)) == 0)
+    if ((fnp->f_dmp->dm_name_pat[0] == '\0'
+        || fcbmatch(fnp->f_dir.dir_name, fnp->f_dmp->dm_name_pat))
+        && ((fnp->f_dir.dir_attrib & attr_req) == attr_req)
+        && (fnp->f_dir.dir_attrib & ~(D_RDONLY | D_ARCHIVE | attr_allow)) == 0)
     {
       return SUCCESS;
     }
@@ -304,7 +306,7 @@ STATIC int find_fname(const char *path, int attr, f_node_ptr fnp)
   if ((fnp = split_path(path, fnp)) == NULL)
     return DE_PATHNOTFND;
 
-  return find_in_dir(attr, fnp);
+  return find_in_dir(0, attr, fnp);
 }
 
 /* Description.
