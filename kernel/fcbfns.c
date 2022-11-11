@@ -682,8 +682,8 @@ UBYTE FcbFindFirst(xfcb FAR * lpXfcb)
   /* Reconstruct the dirmatch structure from the fcb */
   Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
 
-  fmemcpy(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
-  DosUpFMem((BYTE FAR *) Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
+  fmemcpy_n(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
+  DosUpMem(Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
 
   Dmatch_ff.dm_attr_srch = wAttr;
   Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
