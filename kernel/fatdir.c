@@ -130,6 +130,7 @@ f_node_ptr dir_open(REG const char *dirname, BOOL split, f_node_ptr fnp)
       /* make certain we've moved off */
       /* root                         */
       dir_init_fnode(fnp, getdstart(fnp->f_dpb, &fnp->f_dir));
+      fnp->f_dmp->dm_name_pat[0] = '\0';
       fnp->f_dmp->dm_entry = 0;
     }
   }
