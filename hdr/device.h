@@ -487,6 +487,7 @@ typedef __DOSFAR(bpb) bpbptr;
 
 /* dsk.c */
 __FAR(ddt) getddt(int dev);
+COUNT writelabelBPB(char drive, const char *name);
 
 /* error.c */
 COUNT char_error(request * rq, __FAR(struct dhdr) lpDevice);
