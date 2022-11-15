@@ -48,7 +48,7 @@ VOID dir_init_fnode(f_node_ptr fnp, CLUSTER dirstart)
     fnp->f_dmp = &sda_tmp_dm_ren;
   fnp->f_offset = 0l;
   fnp->f_cluster_offset = 0;
-
+  fnp->d_flags = 0;
   /* root directory */
 #ifdef WITHFAT32
   if (dirstart == 0)
@@ -138,10 +138,37 @@ f_node_ptr dir_open(REG const char *dirname, BOOL split, f_node_ptr fnp)
 }
 
 /* swap internal and external delete flags */
-STATIC void swap_deleted(char *name)
+STATIC void swap_deleted_rd(f_node_ptr fnp)
 {
-  if (name[0] == DELETED || name[0] == EXT_DELETED)
-    name[0] ^= EXT_DELETED - DELETED; /* 0xe0 */
+  char *name = fnp->f_dir.dir_name;
+
+  if (name[0] == EXT_DELETED)
+    SET_RDELETED(fnp);
+  if (name[0] == SUBSTED_E5)
+    name[0] = EXT_DELETED;
+}
+
+STATIC BOOL swap_deleted_wr(f_node_ptr fnp)
+{
+  char *name = fnp->f_dir.dir_name;
+
+  if (name[0] == SUBSTED_E5)
+    return FALSE;
+  if (name[0] == EXT_DELETED)
+    name[0] = SUBSTED_E5;
+  if (DELETE_PEND(fnp))
+    name[0] = EXT_DELETED;
+  return TRUE;
+}
+
+STATIC void unswap_deleted_wr(f_node_ptr fnp)
+{
+  char *name = fnp->f_dir.dir_name;
+
+  if (DELETE_PEND(fnp))
+    SET_RDELETED(fnp);
+  if (name[0] == SUBSTED_E5)
+    name[0] = EXT_DELETED;
 }
 
 /* Description.
@@ -215,7 +242,7 @@ COUNT dir_read(REG f_node_ptr fnp)
   fnp->f_diridx = entry % (secsize / DIRENT_SIZE);
   getdirent(&bp->b_buffer[fnp->f_diridx * DIRENT_SIZE], &fnp->f_dir);
 
-  swap_deleted(fnp->f_dir.dir_name);
+  swap_deleted_rd(fnp);
 
   /* and for efficiency, stop when we hit the first       */
   /* unused entry.                                        */
@@ -251,7 +278,8 @@ BOOL dir_write_update(REG f_node_ptr fnp, BOOL update)
     _printf("DIR (dir_write)\n");
 #endif
 
-    swap_deleted(fnp->f_dir.dir_name);
+    if (!swap_deleted_wr(fnp))
+      return FALSE;
 
     vp = &bp->b_buffer[fnp->f_diridx * DIRENT_SIZE];
 
@@ -274,7 +302,7 @@ BOOL dir_write_update(REG f_node_ptr fnp, BOOL update)
       putdirent(&fnp->f_dir, vp);
     }
 
-    swap_deleted(fnp->f_dir.dir_name);
+    unswap_deleted_wr(fnp);
 
     bp->b_flag &= ~(BFR_DATA | BFR_FAT);
     bp->b_flag |= BFR_DIR | BFR_DIRTY | BFR_VALID;
@@ -357,7 +385,7 @@ COUNT dos_findnext(void)
   while (dir_read(fnp) == 1)
   {
     ++dmp->dm_entry;
-    if (fnp->f_dir.dir_name[0] != DELETED
+    if (!DELETED(fnp)
         && (fnp->f_dir.dir_attrib & D_LFN) != D_LFN)
     {
       if (fcmp_wild(dmp->dm_name_pat, fnp->f_dir.dir_name, FNAME_SIZE + FEXT_SIZE))

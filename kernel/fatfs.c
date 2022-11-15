@@ -287,7 +287,7 @@ STATIC int find_in_dir(int attr_req, int attr_allow, f_node_ptr fnp)
 {
   while (dir_read(fnp) == 1)
   {
-    if (fnp->f_dir.dir_name[0] != DELETED
+    if (!DELETED(fnp)
         && (fnp->f_dmp->dm_name_pat[0] == '\0'
         || fcbmatch(fnp->f_dir.dir_name, fnp->f_dmp->dm_name_pat))
         && ((fnp->f_dir.dir_attrib & attr_req) == attr_req)
@@ -332,7 +332,7 @@ STATIC COUNT remove_lfn_entries(f_node_ptr fnp)
       return DE_ACCESS;
     if (fnp->f_dir.dir_attrib != D_LFN)
       break;
-    fnp->f_dir.dir_name[0] = DELETED;
+    SET_DELETED(fnp);
     if (!dir_write(fnp)) return DE_ACCESS;
   }
   fnp->f_dmp->dm_entry = original_diroff;
@@ -425,7 +425,7 @@ STATIC COUNT delete_dir_entry(f_node_ptr fnp)
     return rc;
 
   wipe_out(fnp);
-  *(fnp->f_dir.dir_name) = DELETED;
+  SET_DELETED(fnp);
 
   /* The directory has been modified, so set the  */
   /* bit before closing it, allowing it to be     */
@@ -502,7 +502,7 @@ COUNT dos_rmdir(const char * path)
   while (dir_read(fnp) == 1)
   {
     /* If anything was found, exit with an error.   */
-    if (fnp->f_dir.dir_name[0] != DELETED && fnp->f_dir.dir_attrib != D_LFN)
+    if (!DELETED(fnp) && fnp->f_dir.dir_attrib != D_LFN)
       return DE_ACCESS;
     fnp->f_dmp->dm_entry++;
   }
@@ -567,7 +567,7 @@ COUNT dos_rename(const char * path1, const char * path2, int attrib)
     memcpy(&fnp2->f_dir, &fnp1->f_dir, sizeof(struct dirent));
 
     /* Ok, so we can delete this one. Save the file info.           */
-    *(fnp1->f_dir.dir_name) = DELETED;
+    SET_DELETED(fnp1);
 
     if (!dir_write(fnp1))
       return DE_ACCESS;
@@ -642,7 +642,7 @@ STATIC BOOL find_free(f_node_ptr fnp)
 
   while ((rc = dir_read(fnp)) == 1)
   {
-    if (fnp->f_dir.dir_name[0] == DELETED)
+    if (DELETED(fnp))
       return TRUE;
     fnp->f_dmp->dm_entry++;
   }
@@ -1757,7 +1757,7 @@ STATIC f_node_ptr sft_to_fnode(int fd)
   fnp->f_sft_idx = fd;
 
   fnp->f_flags = sftp->sft_flags;
-
+  fnp->d_flags = 0;
   fnp->f_dir.dir_attrib = sftp->sft_attrib;
   memcpy(fnp->f_dir.dir_name, sftp->sft_name, FNAME_SIZE + FEXT_SIZE);
   fnp->f_dir.dir_time = sftp->sft_time;

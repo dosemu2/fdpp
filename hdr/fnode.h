@@ -41,6 +41,7 @@ struct f_node {
   dmatch *f_dmp;                /* this file's dir match        */
 //  SYM_MEMB(f_node, struct dirent, f_dir);          /* this file's dir entry image  */
   struct dirent f_dir;          /* this file's dir entry image  */
+  UWORD d_flags;
 
   ULONG f_dirsector;            /* the sector containing dir entry*/
   UBYTE f_diridx;               /* offset/32 of dir entry in sec*/
