@@ -287,7 +287,8 @@ STATIC int find_in_dir(int attr_req, int attr_allow, f_node_ptr fnp)
 {
   while (dir_read(fnp) == 1)
   {
-    if ((fnp->f_dmp->dm_name_pat[0] == '\0'
+    if (fnp->f_dir.dir_name[0] != DELETED
+        && (fnp->f_dmp->dm_name_pat[0] == '\0'
         || fcbmatch(fnp->f_dir.dir_name, fnp->f_dmp->dm_name_pat))
         && ((fnp->f_dir.dir_attrib & attr_req) == attr_req)
         && (fnp->f_dir.dir_attrib & ~(D_RDONLY | D_ARCHIVE | attr_allow)) == 0)
