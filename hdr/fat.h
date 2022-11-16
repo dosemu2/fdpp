@@ -110,7 +110,7 @@ struct dirent {
   char dir_name[FNAME_SIZE + FEXT_SIZE];   /* Filename + extension in FCB format */
   UBYTE dir_attrib;             /* File Attribute               */
   UBYTE dir_case;               /* File case                    */
-  UBYTE dir_crtimems;           /* Milliseconds                 */
+  UBYTE dir_crtimems_or_fchar;  /* Create time (msecs) or first name char */
   UWORD dir_crtime;             /* Creation time                */
   UWORD dir_crdate;             /* Creation date                */
   UWORD dir_accdate;            /* Last access date             */

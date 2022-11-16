@@ -143,7 +143,20 @@ STATIC void swap_deleted_rd(f_node_ptr fnp)
   char *name = fnp->f_dir.dir_name;
 
   if (name[0] == EXT_DELETED)
+  {
+    char c;
+
     SET_RDELETED(fnp);
+    switch ((c = fnp->f_dir.dir_crtimems_or_fchar))
+    {
+      case EXT_DELETED:    // no undelete
+      case '\0':           // undelete w/o back-up char
+        break;
+      default:
+        name[0] = c;       // may be '\x5', then converted below
+        break;
+    }
+  }
   if (name[0] == SUBSTED_E5)
     name[0] = EXT_DELETED;
 }
@@ -157,7 +170,10 @@ STATIC BOOL swap_deleted_wr(f_node_ptr fnp)
   if (name[0] == EXT_DELETED)
     name[0] = SUBSTED_E5;
   if (DELETE_PEND(fnp))
+  {
+    fnp->f_dir.dir_crtimems_or_fchar = name[0];
     name[0] = EXT_DELETED;
+  }
   return TRUE;
 }
 
@@ -166,7 +182,10 @@ STATIC void unswap_deleted_wr(f_node_ptr fnp)
   char *name = fnp->f_dir.dir_name;
 
   if (DELETE_PEND(fnp))
+  {
     SET_RDELETED(fnp);
+    name[0] = fnp->f_dir.dir_crtimems_or_fchar;
+  }
   if (name[0] == SUBSTED_E5)
     name[0] = EXT_DELETED;
 }
