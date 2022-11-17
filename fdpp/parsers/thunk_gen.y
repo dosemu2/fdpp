@@ -178,7 +178,7 @@ static void fin_arg(int last)
 	if (arg_size <= 0) {
 	    if (arg_size == 0 && arg_num)
 		yyerror("parse error, void argument?");
-	    if (arg_num == -1 && !last)
+	    if (arg_size == -1 && !last)
 		yyerror("unknown argument size");
 	    return;
 	}
