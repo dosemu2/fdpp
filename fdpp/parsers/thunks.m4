@@ -21,7 +21,7 @@ m4_cond($2, 0, [dnl
     uint32_t _ret; \
 ])dnl
 foru(i, 1, $1, [dnl
-    _CNV(c[]i, at[]i, l[]i, i); \
+    _CNV(c[]i, t[]i, at[]i, l[]i, i); \
 ])dnl
 m4_if($1, 0,, [dnl
     struct { \
