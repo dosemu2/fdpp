@@ -54,8 +54,17 @@ static BYTE *fat_hRcsId =
 #define FEXT_SIZE               3
 
 /* FAT deleted flag                                                     */
-#define DELETED         '\x5'    /* if first char, delete file   */
+#define DFLG_DELETED      1      /* indicate the file is deleted */
+#define DFLG_DELETE_PEND  2      /* file deletion is pending     */
+#define SET_DELETED(fnp)  ((fnp)->d_flags |= DFLG_DELETE_PEND)
+#define SET_RDELETED(fnp) do { \
+    ((fnp)->d_flags |= DFLG_DELETED); \
+    ((fnp)->d_flags &= ~DFLG_DELETE_PEND); \
+} while (0)
+#define DELETED(fnp)      ((fnp)->d_flags & DFLG_DELETED)
+#define DELETE_PEND(fnp)  ((fnp)->d_flags & DFLG_DELETE_PEND)
 #define EXT_DELETED     '\xe5'   /* external deleted flag */
+#define SUBSTED_E5      '\x5'    /* replacement for E5 char */
 
 /* Test for 16 bit or 12 bit FAT                                        */
 #define SIZEOF_CLST16   2
@@ -101,7 +110,7 @@ struct dirent {
   char dir_name[FNAME_SIZE + FEXT_SIZE];   /* Filename + extension in FCB format */
   UBYTE dir_attrib;             /* File Attribute               */
   UBYTE dir_case;               /* File case                    */
-  UBYTE dir_crtimems;           /* Milliseconds                 */
+  UBYTE dir_crtimems_or_fchar;  /* Create time (msecs) or first name char */
   UWORD dir_crtime;             /* Creation time                */
   UWORD dir_crdate;             /* Creation date                */
   UWORD dir_accdate;            /* Last access date             */
