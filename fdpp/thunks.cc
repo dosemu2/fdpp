@@ -251,7 +251,7 @@ static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
     fdlogprintf("processed %i relocs\n", reloc);
 }
 
-static void FdppSetSymTab(struct vm86_regs *regs, struct fdpp_symtab *symtab)
+static void FdppSetSymTab(struct fdpp_symtab *symtab)
 {
     int err;
     struct far_s *thtab = (struct far_s *)resolve_segoff(symtab->symtab);
@@ -334,7 +334,7 @@ static int _FdppCall(struct vm86_regs *regs)
                     FDPP_KERNEL_VERSION, HI_BYTE(regs->eax));
             _fail();
         }
-        FdppSetSymTab(regs,
+        FdppSetSymTab(
                 (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esi)));
         break;
     case DL_CCALL:
