@@ -64,9 +64,9 @@ extern struct _KernelConfig InitKernelConfig;
 #define fstrlen     init_fstrlen
 #endif
 #endif
-#define open        init_DosOpen
-#define read        init_DosRead
-#define exists      init_exists
+#define _open        init_DosOpen
+#define _read        init_DosRead
+#define _exists      init_exists
 
 #undef LINESIZE
 #define LINESIZE KBD_MAXLENGTH

@@ -207,8 +207,8 @@ STATIC void InitializeAllBPBs(VOID)
   for (drive = 'C'; drive < 'A' + LoL->_nblkdev; drive++)
   {
     filename[0] = drive;
-    if ((fileno = open(filename, O_RDONLY)) >= 0)
-      close(fileno);
+    if ((fileno = _open(filename, O_RDONLY)) >= 0)
+      _close(fileno);
   }
 }
 
@@ -414,7 +414,7 @@ STATIC void init_kernel(void)
 
   /* Close all (device) files */
   for (i = 0; i < 20; i++)
-    close(i);
+    _close(i);
 
   /* and do final buffer allocation. */
   PostConfig();
@@ -428,7 +428,7 @@ STATIC void init_kernel(void)
 }
 
 #define safe_open(n, m) \
-  if (open(n, m) == -1) \
+  if (_open(n, m) == -1) \
     init_fatal("unable to open " n)
 
 STATIC VOID FsConfig(BOOL reinit)
@@ -487,13 +487,13 @@ STATIC VOID FsConfig(BOOL reinit)
   safe_open("CON", O_RDWR);
 
   /* 3 is /dev/aux                */
-  dup2(STDIN, STDAUX);
+  _dup2(STDIN, STDAUX);
 
   /* 0 is /dev/con (stdin)        */
-  dup2(STDOUT, STDIN);
+  _dup2(STDOUT, STDIN);
 
   /* 2 is /dev/con (stdin)        */
-  dup2(STDOUT, STDERR);
+  _dup2(STDOUT, STDERR);
 
   /* 4 is /dev/prn                                                */
   safe_open("PRN", O_WRONLY);

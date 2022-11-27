@@ -237,9 +237,9 @@ common_int21:
 common_no_error:
         ret
 
-;; int close(int fd);
-    global CLOSE
-CLOSE:
+;; int _close(int fd);
+    global _CLOSE
+_CLOSE:
         pop ax         ; ret address
         pop bx         ; fd
         push ax        ; ret address
@@ -263,9 +263,9 @@ INIT_DOSREAD:
 read_ret:
         ret
 
-;; int dup2(int oldfd, int newfd);
-    global DUP2
-DUP2:
+;; int _dup2(int oldfd, int newfd);
+    global _DUP2
+_DUP2:
         pop ax         ; ret address
         pop cx         ; newfd
         pop bx         ; oldfd
@@ -274,10 +274,10 @@ DUP2:
         jmp short common_int21
 
 ;
-; ULONG ASMPASCAL lseek(int fd, long position);
+; ULONG ASMPASCAL _lseek(int fd, long position);
 ;
-    global LSEEK
-LSEEK:
+    global _LSEEK
+_LSEEK:
         pop ax         ; ret address
         pop dx         ; position low
         pop cx         ; position high

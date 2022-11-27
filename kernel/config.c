@@ -1025,7 +1025,7 @@ VOID DoConfig(int nPass)
   {
     char buf[] = "c:\\fdppconf.sys";
     buf[0] += bprm.CfgDrive & ~0x80;
-    if ((nFileDesc = open(buf, 0)) >= 0)
+    if ((nFileDesc = _open(buf, 0)) >= 0)
     {
       DebugPrintf(("Reading FDPPCONF.SYS...\n"));
     }
@@ -1035,7 +1035,7 @@ VOID DoConfig(int nPass)
     }
   }
   if (nFileDesc < 0) {
-    if ((nFileDesc = open("fdconfig.sys", 0)) >= 0)
+    if ((nFileDesc = _open("fdconfig.sys", 0)) >= 0)
     {
       DebugPrintf(("Reading FDCONFIG.SYS...\n"));
     }
@@ -1045,7 +1045,7 @@ VOID DoConfig(int nPass)
     }
   }
   if (nFileDesc < 0) {
-    if ((nFileDesc = open("config.sys", 0)) >= 0)
+    if ((nFileDesc = _open("config.sys", 0)) >= 0)
     {
       DebugPrintf(("Reading CONFIG.SYS...\n"));
     }
@@ -1056,7 +1056,7 @@ VOID DoConfig(int nPass)
   }
   if (nFileDesc < 0 && default_drive > 2)
   {
-    if ((nFileDesc = open("c:\\fdconfig.sys", 0)) >= 0)
+    if ((nFileDesc = _open("c:\\fdconfig.sys", 0)) >= 0)
     {
       DebugPrintf(("Reading C:\\FDCONFIG.SYS...\n"));
     }
@@ -1067,7 +1067,7 @@ VOID DoConfig(int nPass)
   }
   if (nFileDesc < 0 && default_drive > 2)
   {
-    if ((nFileDesc = open("c:\\config.sys", 0)) >= 0)
+    if ((nFileDesc = _open("c:\\config.sys", 0)) >= 0)
     {
       DebugPrintf(("Reading C:\\CONFIG.SYS...\n"));
     }
@@ -1112,7 +1112,7 @@ VOID DoConfig(int nPass)
 
     for (pLine = szLine;;)
     {
-      switch (read(nFileDesc, pLine, 1)) {
+      switch (_read(nFileDesc, pLine, 1)) {
       case -1:
         _printf("error reading config file\n");
       /* no break */
@@ -1151,7 +1151,7 @@ VOID DoConfig(int nPass)
 
     if (bEof && nCurChain) {
       struct CfgFile *cfg = &cfgFile[--nCurChain];
-      close(nFileDesc);
+      _close(nFileDesc);
       bEof = FALSE;
       nFileDesc = cfg->nFileDesc;
       nCfgLine = cfg->nCfgLine;
@@ -1259,14 +1259,14 @@ VOID DoConfig(int nPass)
         continue;
       }
       strcpy(sfn, szBuf);
-      if (!exists(sfn))
+      if (!_exists(sfn))
         continue;
     }
 
     /* YES. DO IT */
     pEntry->func(pLine);
   }
-  close(nFileDesc);
+  _close(nFileDesc);
   nFileDesc = -1;
 
   if (nPass == 0)
@@ -1815,7 +1815,7 @@ static UWORD safe_read(WORD fd, void *buf, UWORD count)
     return 0;
   if (count > 256)
     return -1;
-  return read(fd, buf, count);
+  return _read(fd, buf, count);
 }
 
 /*      LoadCountryInfo():
@@ -1874,7 +1874,7 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
   const char *filename = filenam == NULL ? "\\COUNTRY.SYS" : filenam;
   BOOL rc = FALSE;
 
-  if ((fd = open(filename, 0)) < 0)
+  if ((fd = _open(filename, 0)) < 0)
   {
     if (filenam == NULL) {
       rc = !LoadCountryInfoHardCoded(ctryCode);
@@ -1888,7 +1888,7 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     }
     return rc;
   }
-  if (read(fd, &header, sizeof(header)) != sizeof(header))
+  if (_read(fd, &header, sizeof(header)) != sizeof(header))
   {
     _printf("Error reading %s\n", filename);
     goto ret;
@@ -1899,17 +1899,17 @@ err:
     _printf("%s has invalid format\n", filename);
     goto ret;
   }
-  if (lseek(fd, header.offset) == 0xffffffffL
-    || read(fd, &entries, sizeof(entries)) != sizeof(entries))
+  if (_lseek(fd, header.offset) == 0xffffffffL
+    || _read(fd, &entries, sizeof(entries)) != sizeof(entries))
     goto err;
   for (i = 0; i < entries; i++)
   {
-    if (read(fd, &entry, sizeof(entry)) != sizeof(entry) || entry.length != 12)
+    if (_read(fd, &entry, sizeof(entry)) != sizeof(entry) || entry.length != 12)
       goto err;
     if (entry.country != ctryCode || (entry.codepage != codePage && codePage))
       continue;
-    if (lseek(fd, entry.offset) == 0xffffffffL
-      || read(fd, &count, sizeof(count)) != sizeof(count)
+    if (_lseek(fd, entry.offset) == 0xffffffffL
+      || _read(fd, &count, sizeof(count)) != sizeof(count)
       || count > LENGTH(hdr)
       || safe_read(fd, &hdr, sizeof(struct subf_hdr) * count)
                       != sizeof(struct subf_hdr) * count)
@@ -1920,8 +1920,8 @@ err:
         goto err;
       if (hdr[i].id < 1 || hdr[i].id > 7 || hdr[i].id == 3)
         continue;
-      if (lseek(fd, hdr[i].offset) == 0xffffffffL
-       || read(fd, &subf_data, 10) != 10
+      if (_lseek(fd, hdr[i].offset) == 0xffffffffL
+       || _read(fd, &subf_data, 10) != 10
        || (memcmp(subf_data.signature, table[hdr[i].id].sig, 8) && (hdr[i].id !=4
        || memcmp(subf_data.signature, table[2].sig, 8)))  /* UCASE for FUCASE ^*/
        || safe_read(fd, subf_data.buffer, subf_data.length) != (unsigned)subf_data.length)
@@ -1965,7 +1965,7 @@ err:
   }
   _printf("could not find country info for country ID %u\n", ctryCode);
 ret:
-  close(fd);
+  _close(fd);
   return rc;
 }
 
@@ -3004,7 +3004,7 @@ STATIC VOID CmdChain(char * pLine)
     CfgFailure(pLine);
     return;
   }
-  if ((fd = open(pLine, 0)) < 0) {
+  if ((fd = _open(pLine, 0)) < 0) {
     CfgFailure(pLine);
     return;
   }
