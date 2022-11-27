@@ -25,9 +25,11 @@
 #include "objhlp.hpp"
 #include "ctors.hpp"
 
-template<typename T>
+template<typename T, int need_const = 0>
 class NearPtr_DO : public NearPtr<T, dosobj_seg> {
     using NearPtr<T, dosobj_seg>::NearPtr;
+    static_assert(need_const == 0 || std::is_const<T>::value,
+                  "should be const");
 };
 
 template <typename T>
@@ -204,4 +206,12 @@ public:
 #define MK_FAR_SZ_SCP(o, sz) FarPtr<_RC(o)>(FarObj<_R(o)>(o, sz, false, NM).get_obj())
 
 #define PTR_MEMB(t) NearPtr_DO<t>
-#define NEAR_PTR_DO(t) NearPtr_DO<t>
+#if 0
+/* This solution is the only one that works.
+ * But disable it since we don't want to depend on boost. */
+#include <boost/utility/identity_type.hpp>
+#define NEAR_PTR_DO(t, c) BOOST_IDENTITY_TYPE((NearPtr_DO<t, c>))
+#else
+/* Calling ctor here is a horribly dangerous hack. :( */
+#define NEAR_PTR_DO(t, c) decltype(NearPtr_DO<t, c>())
+#endif

@@ -422,8 +422,8 @@ int share_init(void);
 
 /* procsupt.asm */
 /* note that exec_user() is special and can't work w/o NORETURN */
-VOID ASMFUNC NORETURN exec_user(__FAR(exec_regs) erp);
-VOID ASMFUNC NORETURN ret_user(__FAR(iregs) irp);
+VOID ASMFUNC NORETURN exec_user(__FAR(const exec_regs) erp);
+VOID ASMFUNC NORETURN ret_user(__FAR(const iregs) irp);
 
 /* new by TE */
 
@@ -445,7 +445,7 @@ VOID ASMCFUNC SEGM(HMA_TEXT) int21_service(__FAR(iregs) r);
 struct int25regs;
 VOID ASMCFUNC SEGM(HMA_TEXT) int2526_handler(WORD mode,__FAR(struct int25regs) r);
 struct config;
-VOID ASMCFUNC SEGM(HMA_TEXT) P_0(__FAR(struct config)Config);
+VOID ASMCFUNC SEGM(HMA_TEXT) P_0(__FAR(const struct config)Config);
 VOID ASMCFUNC SEGM(HMA_TEXT) P_0_exit(void);
 VOID ASMCFUNC SEGM(HMA_TEXT) P_0_bad(void);
 struct int2f12regs;
@@ -553,4 +553,4 @@ COUNT ASMPASCAL INITTEXT UMB_get_largest(__FAR(void) driverAddress, UDWORD * __s
 VOID ASMFUNC INITTEXT init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
 void ASMFUNC NORETURN spawn_int23(void);        /* procsupt.asm */
 /* kernel.asm */
-VOID ASMFUNC FAR NORETURN call_p_0(__FAR(struct config)Config); /* P_0, actually */
+VOID ASMFUNC FAR NORETURN call_p_0(__FAR(const struct config)Config); /* P_0, actually */

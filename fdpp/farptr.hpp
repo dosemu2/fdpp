@@ -103,12 +103,15 @@ using WrpType = WrpTypeS<T, sym_store>;
         std::is_same<_RC(T0), char>::value || \
         std::is_same<_RC(T1), char>::value || \
         std::is_same<_RC(T0), unsigned char>::value || \
-        std::is_same<_RC(T1), unsigned char>::value) && \
+        std::is_same<_RC(T1), unsigned char>::value || \
+        std::is_same<_RC(T1), T0>::value) && \
         !std::is_same<T0, T1>::value && \
         (_C(T1) || !_C(T0)))
 
-template<typename T>
+template<typename T, int need_const = 0>
 class FarPtrBase {
+    static_assert(need_const == 0 || std::is_const<T>::value,
+                  "should be const");
 protected:
     far_s ptr;
 
@@ -116,6 +119,7 @@ protected:
     using wrp_type = typename WrpTypeS<T, st>::type;
     using wrp_type_s = wrp_type<sym_store>;
     using wrp_type_a = wrp_type<arr_store>;
+    using TheBase = FarPtrBase<T, need_const>;
 
     void do_adjust_far() {
         if (ptr.seg == 0xffff)
@@ -133,11 +137,11 @@ public:
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtrBase(const FarPtrBase<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
-    T* operator ->() {
+    T* operator ->() const {
         store_far(ARROW_STORE, get_far());
         return (T*)resolve_segoff_fd(ptr);
     }
-    operator T*() {
+    operator T*() const {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
         if (!ptr.seg && !ptr.off)
@@ -146,7 +150,7 @@ public:
         return (T*)resolve_segoff_fd(ptr);
     }
     template<typename T0>
-    explicit operator T0*() {
+    explicit operator T0*() const {
         if (!ptr.seg && !ptr.off)
             return NULL;
         return (T0*)resolve_segoff_fd(ptr);
@@ -158,43 +162,43 @@ public:
         return *s;
     }
     wrp_type_a& operator [](int idx) {
-        FarPtrBase<T>f = FarPtrBase<T>(*this + idx);
+        TheBase f = TheBase(*this + idx);
         wrp_type_a *s = new(f.get_buf()) wrp_type_a;
         _store_far(ARR_STORE, s, f.get_far());
         return *s;
     }
 
-    FarPtrBase<T> operator ++(int) {
-        FarPtrBase<T> f = *this;
+    TheBase operator ++(int) {
+        TheBase f = *this;
         ptr.off += sizeof(T);
         return f;
     }
-    FarPtrBase<T> operator --(int) {
-        FarPtrBase<T> f = *this;
+    TheBase operator --(int) {
+        TheBase f = *this;
         ptr.off -= sizeof(T);
         return f;
     }
-    FarPtrBase<T>& operator ++() {
+    TheBase& operator ++() {
         ptr.off += sizeof(T);
         return *this;
     }
-    FarPtrBase<T>& operator --() {
+    TheBase& operator --() {
         ptr.off -= sizeof(T);
         return *this;
     }
-    FarPtrBase<T>& operator +=(int inc) { ptr.off += inc * sizeof(T); return *this; }
-    FarPtrBase<T>& operator -=(int dec) { ptr.off -= dec * sizeof(T); return *this; }
-    FarPtrBase<T> operator +(int inc) { return FarPtrBase<T>(ptr.seg, ptr.off + inc * sizeof(T)); }
-    FarPtrBase<T> operator -(int dec) { return FarPtrBase<T>(ptr.seg, ptr.off - dec * sizeof(T)); }
-    bool operator == (std::nullptr_t) { return (!ptr.seg && !ptr.off); }
-    bool operator != (std::nullptr_t) { return (ptr.seg || ptr.off); }
+    TheBase& operator +=(int inc) { ptr.off += inc * sizeof(T); return *this; }
+    TheBase& operator -=(int dec) { ptr.off -= dec * sizeof(T); return *this; }
+    TheBase operator +(int inc) const { return TheBase(ptr.seg, ptr.off + inc * sizeof(T)); }
+    TheBase operator -(int dec) const { return TheBase(ptr.seg, ptr.off - dec * sizeof(T)); }
+    bool operator == (std::nullptr_t) const { return (!ptr.seg && !ptr.off); }
+    bool operator != (std::nullptr_t) const { return (ptr.seg || ptr.off); }
     uint16_t seg() const { return ptr.seg; }
     uint16_t off() const { return ptr.off; }
     uint32_t get_fp32() const { return ((ptr.seg << 16) | ptr.off); }
     far_s get_far() const { return ptr; }
     far_s& get_ref() { return ptr; }
-    T* get_ptr() { return (T*)resolve_segoff(ptr); }
-    void *get_buf() { return (void*)resolve_segoff(ptr); }
+    T* get_ptr() const { return (T*)resolve_segoff(ptr); }
+    void *get_buf() const { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
 };
 
@@ -218,7 +222,7 @@ template <typename T> class FarObj;
 #define _MK_FAR_CS(o) std::make_shared<FarObj<const char>>(o, strlen(o) + 1, true, NM)
 
 template<typename T>
-class FarPtr : public FarPtrBase<T>
+class FarPtr : public FarPtrBase<T, _C(T)>
 {
     typedef std::shared_ptr<ObjIf> sh_obj;
     sh_obj obj;
@@ -227,45 +231,46 @@ class FarPtr : public FarPtrBase<T>
 public:
     /* first, tell a few secret phrases to the compiler :) */
     template <typename> friend class FarPtr;
-    using FarPtrBase<T>::FarPtrBase;
+    using TheBase = typename FarPtrBase<T, _C(T)>::FarPtrBase::TheBase;
+    using FarPtrBase<T, _C(T)>::FarPtrBase;
     FarPtr() = default;
 
-    FarPtr(const FarPtrBase<T>& f) : FarPtrBase<T>(f) {}
-    explicit FarPtr(uint32_t f) : FarPtrBase<T>(f >> 16, f & 0xffff) {}
+    FarPtr(const TheBase& f) : TheBase(f) {}
+    explicit FarPtr(uint32_t f) : TheBase(f >> 16, f & 0xffff) {}
     explicit FarPtr(const sh_obj& o) :
-            FarPtrBase<T>(o->get_obj()), obj(o) {}
+            TheBase(o->get_obj()), obj(o) {}
     FarPtr(const FarPtr<T>& f) = default;
     FarPtr(uint32_t s, uint16_t o, bool nnull) :
-            FarPtrBase<T>(_MK_S(s, o)), nonnull(nnull) {}
+            TheBase(_MK_S(s, o)), nonnull(nnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
+    FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1, _C(T1)>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg_(), f._off_()),
+    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1, _C(T1)>(f._seg_(), f._off_()),
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
+    explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1, _C(T1)>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg_(), f._off_()),
+    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1, _C(T1)>(f._seg_(), f._off_()),
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
         _C(T0) == _C(T1)>::type* = nullptr>
-    operator FarPtrBase<T0>() const & {
-        return FarPtrBase<T0>(this->_seg_(), this->_off_());
+    operator FarPtrBase<T0, _C(T0)>() const & {
+        return FarPtrBase<T0, _C(T0)>(this->_seg_(), this->_off_());
     }
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
         _C(T0) == _C(T1)>::type* = nullptr>
-    operator FarPtrBase<T0>() && {
+    operator FarPtrBase<T0, _C(T0)>() && {
         ___assert(!obj);
-        return FarPtrBase<T0>(this->seg(), this->off());
+        return FarPtrBase<T0, _C(T0)>(this->seg(), this->off());
     }
 
     template<typename T0, typename T1 = T,
@@ -278,7 +283,7 @@ public:
         typename std::enable_if<!ALLOW_CNV(T1, T0)>::type* = nullptr>
     explicit operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }
 
-    using FarPtrBase<T>::operator ==;
+    using TheBase::operator ==;
     template <typename T0, typename T1 = T,
         typename std::enable_if<!std::is_void<T0>::value>::type* = nullptr,
         typename std::enable_if<std::is_void<T1>::value>::type* = nullptr>
@@ -518,8 +523,8 @@ class NearPtr {
 public:
     explicit NearPtr(uint16_t o) : _off(o) {}    // for farobj only
     NearPtr(std::nullptr_t) : _off(0) {}
-    explicit operator uint16_t () { return _off; }
-    operator T *() { return FarPtr<T>(SEG(), _off); }
+    explicit operator uint16_t () const { return _off; }
+    operator T *() const { return FarPtr<T>(SEG(), _off); }
     int operator - (const NearPtr<T, SEG>& n) const {
         return _off - n.off();
     }
@@ -543,7 +548,7 @@ public:
 template<typename T, int max_len = 0>
 class ArSymBase {
 protected:
-    FarPtrBase<T> sym;
+    FarPtrBase<T, _C(T)> sym;
 
     using wrp_type = typename WrpType<T>::type;
 public:
@@ -726,6 +731,15 @@ public:
 })
 #define MK_FP_N(seg, ofs) (__FAR(void)(seg, ofs, true))
 #define __DOSFAR(t) FarPtrBase<t>
+#if 0
+/* This solution is the only one that works.
+ * But disable it since we don't want to depend on boost. */
+#include <boost/utility/identity_type.hpp>
+#define NEAR_PTR_DO(t, c) BOOST_IDENTITY_TYPE((FarPtrBase<t, c>))
+#else
+/* Calling ctor here is a horribly dangerous hack. :( */
+#define __DOSFAR2(t, c) decltype(FarPtrBase<t, c>())
+#endif
 #define _MK_DOS_FP(t, s, o) __FAR(t)(MK_FP(s, o))
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()

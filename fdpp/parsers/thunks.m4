@@ -17,6 +17,7 @@ m4_define(THUNK,
 m4_if($2, 1, void, r) f(m4_if($1, 0, void, [foru(i, 1, $1,
 [t[]i a[]i[]m4_if($1, i,, [, ])])])) \
 { \
+    const uint32_t _flags = z; \
 m4_cond($2, 0, [dnl
     uint32_t _ret; \
 ])dnl
@@ -30,7 +31,7 @@ m4_if($1, 0,, [dnl
 ])dnl
 m4_if($2, 0, [dnl
     _ret = ], [dnl
-    ])__CALL(n, G_A($1), z); \
+    ])__CALL(n, G_A($1), _flags); \
 m4_cond(m4_eval($3==0&&$1>0), 1, [dnl
     __CSTK(sizeof(_args)); \
 ])dnl

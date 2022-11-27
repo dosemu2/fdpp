@@ -928,7 +928,7 @@ STATIC CommandTail FAR *ParseCmdLine(BYTE FAR *endp)
 }
 
 /* start process 0 (the shell) */
-VOID ASMCFUNC P_0(struct config FAR *Config)
+VOID ASMCFUNC P_0(const struct config FAR *Config)
 {
   BYTE FAR *endp;
   exec_blk FAR *exb = TempExeBlock_p;

@@ -576,8 +576,8 @@ void enable(void)
 #define __ARG_PTR(t) t *
 #define __ARG_PTR_FAR(t) __FAR(t)
 #define __ARG_A(t) t
-#define __ARG_PTR_A(t) NEAR_PTR_DO(t)
-#define __ARG_PTR_FAR_A(t) __DOSFAR(t)
+#define __ARG_PTR_A(t) NEAR_PTR_DO(t, !!(_flags & _TFLG_NORET))
+#define __ARG_PTR_FAR_A(t) __DOSFAR2(t, !!(_flags & _TFLG_NORET))
 #define __RET(t, v) v
 #define __RET_PTR(t, v) // unimplemented, will create syntax error
 #define __RET_PTR_FAR(t, v) FP_FROM_D(t, v)
