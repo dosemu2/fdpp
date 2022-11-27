@@ -619,6 +619,11 @@ CritErr05:
                 cli
                 mov     bp, [cs:_DGROUP_]
                 mov     ds,bp
+                push    di
+                mov     di, _DataStart
+                shr     di, 4
+                add     bp, di
+                pop     di
                 mov     ss,bp
                 mov     sp,[critical_sp]
                 pop     word [_user_r]
