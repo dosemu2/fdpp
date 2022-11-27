@@ -12,7 +12,6 @@ typedef struct far_s far_t;
 void do_abort(const char *file, int line);
 #define _fail() do_abort(__FILE__, __LINE__)
 #define ___assert(c) if (!(c)) _fail()
-void panic(const char * s);
 #define PRINTF(n) __attribute__((format(printf, n, n + 1)))
 void fpanic(const char * s, ...) PRINTF(1);
 void fdebug(const char * s, ...) PRINTF(1);

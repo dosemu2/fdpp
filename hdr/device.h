@@ -492,14 +492,6 @@ __FAR(ddt) getddt(int dev);
 COUNT char_error(request * rq, __FAR(struct dhdr) lpDevice);
 COUNT block_error(request * rq, COUNT nDrive, __FAR(struct dhdr) lpDevice, int mode);
 
-/* execrh.asm */
-#if defined(__WATCOMC__) && _M_IX86 >= 300
-WORD execrh(__FAR(request), __FAR(struct dhdr));
-#pragma aux execrh "^" parm reverse routine [] modify [ax bx cx dx es fs gs]
-#else
-WORD ASMPASCAL execrh(__FAR(request), __FAR(struct dhdr));
-#endif
-
 /*
  *      end of device.h
  */
