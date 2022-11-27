@@ -62,6 +62,7 @@ static BYTE *fat_hRcsId =
     ((fnp)->d_flags &= ~DFLG_DELETE_PEND); \
 } while (0)
 #define DELETED(fnp)      ((fnp)->d_flags & DFLG_DELETED)
+#define CLEAR_RDELETED(fnp) ((fnp)->d_flags &= ~DFLG_DELETED)
 #define DELETE_PEND(fnp)  ((fnp)->d_flags & DFLG_DELETE_PEND)
 #define EXT_DELETED     '\xe5'   /* external deleted flag */
 #define SUBSTED_E5      '\x5'    /* replacement for E5 char */

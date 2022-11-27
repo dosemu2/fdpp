@@ -157,6 +157,8 @@ STATIC void swap_deleted_rd(f_node_ptr fnp)
         break;
     }
   }
+  else
+    CLEAR_RDELETED(fnp);
   if (name[0] == SUBSTED_E5)
     name[0] = EXT_DELETED;
 }
@@ -186,6 +188,8 @@ STATIC void unswap_deleted_wr(f_node_ptr fnp)
     SET_RDELETED(fnp);
     name[0] = fnp->f_dir.dir_crtimems_or_fchar;
   }
+  else
+    CLEAR_RDELETED(fnp);
   if (name[0] == SUBSTED_E5)
     name[0] = EXT_DELETED;
 }
