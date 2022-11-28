@@ -108,10 +108,8 @@ using WrpType = WrpTypeS<T, sym_store>;
         !std::is_same<T0, T1>::value && \
         (_C(T1) || !_C(T0)))
 
-template<typename T, int need_const = 0>
+template<typename T>
 class FarPtrBase {
-    static_assert(need_const == 0 || std::is_const<T>::value,
-                  "should be const");
 protected:
     far_s ptr;
 
@@ -119,7 +117,7 @@ protected:
     using wrp_type = typename WrpTypeS<T, st>::type;
     using wrp_type_s = wrp_type<sym_store>;
     using wrp_type_a = wrp_type<arr_store>;
-    using TheBase = FarPtrBase<T, need_const>;
+    using TheBase = FarPtrBase<T>;
 
     void do_adjust_far() {
         if (ptr.seg == 0xffff)
@@ -222,7 +220,7 @@ template <typename T> class FarObj;
 #define _MK_FAR_CS(o) std::make_shared<FarObj<const char>>(o, strlen(o) + 1, true, NM)
 
 template<typename T>
-class FarPtr : public FarPtrBase<T, _C(T)>
+class FarPtr : public FarPtrBase<T>
 {
     typedef std::shared_ptr<ObjIf> sh_obj;
     sh_obj obj;
@@ -231,8 +229,8 @@ class FarPtr : public FarPtrBase<T, _C(T)>
 public:
     /* first, tell a few secret phrases to the compiler :) */
     template <typename> friend class FarPtr;
-    using TheBase = typename FarPtrBase<T, _C(T)>::FarPtrBase::TheBase;
-    using FarPtrBase<T, _C(T)>::FarPtrBase;
+    using TheBase = typename FarPtrBase<T>::FarPtrBase::TheBase;
+    using FarPtrBase<T>::FarPtrBase;
     FarPtr() = default;
 
     FarPtr(const TheBase& f) : TheBase(f) {}
@@ -245,32 +243,32 @@ public:
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1, _C(T1)>(f.seg(), f.off()) {}
+    FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
-    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1, _C(T1)>(f._seg_(), f._off_()),
+    FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg_(), f._off_()),
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1, _C(T1)>(f.seg(), f.off()) {}
+    explicit FarPtr(const FarPtrBase<T0>& f) : FarPtrBase<T1>(f.seg(), f.off()) {}
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T0, T1)>::type* = nullptr>
-    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1, _C(T1)>(f._seg_(), f._off_()),
+    explicit FarPtr(const FarPtr<T0>& f) : FarPtrBase<T1>(f._seg_(), f._off_()),
         obj(f.obj), nonnull(f.nonnull) {}
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
         _C(T0) == _C(T1)>::type* = nullptr>
-    operator FarPtrBase<T0, _C(T0)>() const & {
-        return FarPtrBase<T0, _C(T0)>(this->_seg_(), this->_off_());
+    operator FarPtrBase<T0>() const & {
+        return FarPtrBase<T0>(this->_seg_(), this->_off_());
     }
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
         _C(T0) == _C(T1)>::type* = nullptr>
-    operator FarPtrBase<T0, _C(T0)>() && {
+    operator FarPtrBase<T0>() && {
         ___assert(!obj);
-        return FarPtrBase<T0, _C(T0)>(this->seg(), this->off());
+        return FarPtrBase<T0>(this->seg(), this->off());
     }
 
     template<typename T0, typename T1 = T,
@@ -548,7 +546,7 @@ public:
 template<typename T, int max_len = 0>
 class ArSymBase {
 protected:
-    FarPtrBase<T, _C(T)> sym;
+    FarPtrBase<T> sym;
 
     using wrp_type = typename WrpType<T>::type;
 public:
@@ -731,15 +729,9 @@ public:
 })
 #define MK_FP_N(seg, ofs) (__FAR(void)(seg, ofs, true))
 #define __DOSFAR(t) FarPtrBase<t>
-#if 0
-/* This solution is the only one that works.
- * But disable it since we don't want to depend on boost. */
-#include <boost/utility/identity_type.hpp>
-#define NEAR_PTR_DO(t, c) BOOST_IDENTITY_TYPE((FarPtrBase<t, c>))
-#else
-/* Calling ctor here is a horribly dangerous hack. :( */
-#define __DOSFAR2(t, c) decltype(FarPtrBase<t, c>())
-#endif
+#define __DOSFAR2(t, c) \
+    static_assert(!c || std::is_const<t>::value, "should be const"); \
+    FarPtrBase<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)(MK_FP(s, o))
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
