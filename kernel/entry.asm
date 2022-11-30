@@ -405,9 +405,6 @@ int21_exit:     dec     byte [_InDOS]
 int21_exit_nodec:
                 pop bp      ; get back user stack
                 pop si
-
-                global  _int21_iret
-_int21_iret:
                 cli
                 mov     ss,si
                 RestoreSP

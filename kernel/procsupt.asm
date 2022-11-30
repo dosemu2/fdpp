@@ -73,12 +73,15 @@ _exec_user:
 
                 global  _ret_user
 _ret_user:
-                pop     ax		      ; return address (unused)
+                pop     ax      ; return address (unused)
 
-                pop     bp		      ; irp (user ss:sp)
-                pop	si
-                extern _int21_iret
-                jmp _int21_iret
+                pop     bp      ; irp (user ss:sp)
+                pop     si
+                cli
+                mov     ss,si
+                mov     sp,bp
+                POP$ALL
+                iret
 
 segment _LOWTEXT
 
