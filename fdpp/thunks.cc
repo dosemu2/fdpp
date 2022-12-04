@@ -434,7 +434,11 @@ void fdloudprintf(const char *format, ...)
 
 void cpu_relax(void)
 {
-    fdpp->cpu_relax();
+    int ret = fdpp->cpu_relax();
+    if (ret == -1) {
+        fdlogprintf("relax aborted\n");
+        fdpp_noret(PING_ABORT);
+    }
 }
 
 #define _TFLG_NONE 0

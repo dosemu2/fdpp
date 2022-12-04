@@ -23,7 +23,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#define FDPP_API_VER 31
+#define FDPP_API_VER 32
 
 #ifndef FDPP
 struct fdpp_far_s {
@@ -53,7 +53,7 @@ struct fdpp_api {
     void (*print)(int prio, const char *format, va_list ap);
     void (*debug)(const char *msg);
     void (*panic)(const char *msg);
-    void (*cpu_relax)(void);
+    int (*cpu_relax)(void);
     int (*ping)(void);
     int (*asm_call)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
