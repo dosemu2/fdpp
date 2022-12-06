@@ -368,7 +368,7 @@ static unsigned try_long_compat_remote_seek(sft FAR * s, LONG new_pos,
   regs.ds = FP_SEG_OBJ(&regs, ssp);
   regs.d.x = FP_OFF_OBJ(&regs, ssp);
   regs.c.x = mode;
-  regs.a.x = 0x1142;
+  regs.a.x = 0x1142 | 0x80;
   regs.flags |= FLG_CARRY;
   call_intr(0x2f, MK_FAR_SCP(regs));
   if (regs.flags & FLG_CARRY)
