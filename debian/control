@@ -11,7 +11,7 @@ Build-Depends:
     bash,
     clang,
     nasm,
-    lld (>= 13~) | binutils,
+    lld (>= 13~),
     coreutils,
     libelf-dev,
     autoconf,
