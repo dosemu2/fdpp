@@ -77,7 +77,7 @@ $(TARGET).elf.tmp: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	chmod -x $@
 
 rel.h: $(TARGET).elf $(TARGET).elf.tmp
-	cmp -l $^ | grep "140   0" | sed 's/^ //' | cut -d " " -f 1 | \
+	cmp -l $^ | grep "140   0" | sed 's/^ *//' | cut -d " " -f 1 | \
 		sed 's/$$/,/' > $@
 
 
