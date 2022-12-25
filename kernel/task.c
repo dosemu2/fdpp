@@ -444,12 +444,14 @@ STATIC int ExecMemLargest(UWORD *asize, UWORD threshold)
     mem_access_mode &= ~0x80;
     mem_access_mode |= 0x40;
     rc = DosMemLargest(asize);
-    mem_access_mode &= ~0x40;
+    if (rc != SUCCESS || *asize < threshold)
+    {
     /* less memory than the .COM/.EXE file has:
        try low memory first */
-    if (rc != SUCCESS || *asize < threshold)
+      mem_access_mode &= ~0x40;
       rc = DosMemLargest(asize);
-    mem_access_mode |= 0x80;
+      mem_access_mode |= 0x80;
+    }
   }
   else
     rc = DosMemLargest(asize);
