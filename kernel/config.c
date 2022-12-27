@@ -752,7 +752,6 @@ STATIC void umb_init(void)
       if (umb_seg > umb_max)
         umb_max = umb_seg;
     }
-#if 0
     if ((bprm.Flags & FDPP_FL_HEAP_HMA) && FP_SEG(&Dyn) > umb_max)
     {
       /* create UMB at unused heap */
@@ -772,7 +771,6 @@ STATIC void umb_init(void)
       ___assert(umb_size > 2);
       mcb_init(umb_seg, umb_size - 1, MCB_LAST);
     }
-#endif
     DebugPrintf(("UMB Allocation completed: start at 0x%x\n", umb_base_seg));
   }
 }
