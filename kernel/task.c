@@ -535,7 +535,7 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
         DosMemFree(env);
 
       DosUmbLink(0);       /* restore link state */
-      mem_access_mode = orig_mem_access;
+      mem_access_mode = orig_mem_access & 0x7f;
       mode &= 0x7f;
 
       if (rc != SUCCESS)
@@ -734,7 +734,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       if (rc != SUCCESS)
         DosMemFree(env);
 
-      mem_access_mode = orig_mem_access; /* restore old situation */
+      mem_access_mode = orig_mem_access & 0x7f; /* restore old situation */
       DosUmbLink(0);     /* restore link state */
       if (rc != SUCCESS)
         return rc;
