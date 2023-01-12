@@ -61,28 +61,7 @@ struct athunk {
     unsigned flags;
 };
 
-static union asm_thunks_u {
-  struct _thunks {
-#define __ASM(t, v) struct athunk __##v
-#define __ASM_FAR(t, v) struct athunk __##v
-#define __ASM_NEAR(t, v) struct athunk __##v
-#define __ASM_ARR(t, v, l) struct athunk __##v
-#define __ASM_ARRI(t, v) struct athunk __##v
-#define __ASM_ARRI_F(t, v) struct athunk __##v
-#define __ASM_FUNC(v) struct athunk __##v
-#define SEMIC ;
-#include <glob_asm.h>
-#undef __ASM
-#undef __ASM_FAR
-#undef __ASM_NEAR
-#undef __ASM_ARR
-#undef __ASM_ARRI
-#undef __ASM_ARRI_F
-#undef __ASM_FUNC
-#undef SEMIC
-  } thunks;
-  struct athunk arr[sizeof(struct _thunks) / sizeof(struct athunk)];
-} asm_thunks = {{
+static struct athunk asm_thunks[] = {
 #define _A(v) { __ASMREF(v), 0 }
 #define SEMIC ,
 #define __ASM(t, v) _A(__##v)
@@ -101,7 +80,9 @@ static union asm_thunks_u {
 #undef __ASM_ARRI_F
 #undef __ASM_FUNC
 #undef SEMIC
-}};
+};
+
+static const int num_athunks = _countof(asm_thunks);
 
 struct vm86_regs {
 /*
@@ -186,7 +167,7 @@ int is_dos_space(const void *ptr)
 static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 {
     int i;
-    int exp = _countof(asm_thunks.arr);
+    int exp = num_athunks;
 
     if (len != exp) {
         fdprintf("len=%i expected %i\n", len, exp);
@@ -195,7 +176,7 @@ static int FdppSetAsmThunks(struct far_s *ptrs, int len)
 
     farhlp_init(&sym_tab);
     for (i = 0; i < len; i++) {
-        *asm_thunks.arr[i].ptr = ptrs[i];
+        *asm_thunks[i].ptr = ptrs[i];
         /* there are conflicts, for example InitTextStart will collide
          * with the first sym. So use _replace. */
         store_far_replace(&sym_tab, resolve_segoff(ptrs[i]), ptrs[i]);
@@ -660,8 +641,8 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
     uint16_t delta = new_seg - old_seg;
     fdlogprintf("relocate %hx --> %hx:%hx, %x\n", old_seg, new_seg, offs, len);
     do_relocs(old_seg, start_p, end_p, delta);
-    for (i = 0; i < _countof(asm_thunks.arr); i++) {
-        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i].ptr);
+    for (i = 0; i < num_athunks; i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks[i].ptr);
         if (ptr >= start_p && ptr <= end_p) {
             int rm;
             far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
@@ -669,10 +650,10 @@ void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
                 miss++;
             else
                 ___assert(rm);
-            if (old_seg == asm_thunks.arr[i].ptr->seg)
-                asm_thunks.arr[i].ptr->seg += delta;
-            store_far_replace(&sym_tab, resolve_segoff(*asm_thunks.arr[i].ptr),
-                    *asm_thunks.arr[i].ptr);
+            if (old_seg == asm_thunks[i].ptr->seg)
+                asm_thunks[i].ptr->seg += delta;
+            store_far_replace(&sym_tab, resolve_segoff(*asm_thunks[i].ptr),
+                    *asm_thunks[i].ptr);
             reloc++;
         }
     }
@@ -693,8 +674,8 @@ void RelocSplitSeg(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
     uint8_t *end_p = (uint8_t *)so2lin(old_seg + (len >> 4), (len & 0xf) + offs);
     uint16_t delta = new_seg - old_seg;
 
-    for (i = 0; i < _countof(asm_thunks.arr); i++) {
-        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i].ptr);
+    for (i = 0; i < num_athunks; i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks[i].ptr);
         if (ptr >= start_p && ptr <= end_p) {
             int rm;
             far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
@@ -702,19 +683,19 @@ void RelocSplitSeg(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
                 miss++;
             else
                 ___assert(rm);
-            if (old_seg == asm_thunks.arr[i].ptr->seg) {
-                asm_thunks.arr[i].ptr->seg += delta;
-                assert(asm_thunks.arr[i].ptr->off >= delta * 16);
-                asm_thunks.arr[i].ptr->off -= delta * 16;
-                if (asm_thunks.arr[i].flags & THUNKF_DEEP) {
+            if (old_seg == asm_thunks[i].ptr->seg) {
+                asm_thunks[i].ptr->seg += delta;
+                assert(asm_thunks[i].ptr->off >= delta * 16);
+                asm_thunks[i].ptr->off -= delta * 16;
+                if (asm_thunks[i].flags & THUNKF_DEEP) {
                     uint16_t *ptr2 = (uint16_t *)ptr;
-                    ___assert(asm_thunks.arr[i].flags & THUNKF_SHORT);
+                    ___assert(asm_thunks[i].flags & THUNKF_SHORT);
                     if (*ptr2)
                         *ptr2 -= delta * 16;
                 }
             }
-            store_far_replace(&sym_tab, resolve_segoff(*asm_thunks.arr[i].ptr),
-                    *asm_thunks.arr[i].ptr);
+            store_far_replace(&sym_tab, resolve_segoff(*asm_thunks[i].ptr),
+                    *asm_thunks[i].ptr);
             reloc++;
         }
     }
@@ -730,8 +711,8 @@ void PurgeHook(void *ptr, UDWORD len)
     uint8_t *end_p = start_p + len;
     fdlogprintf("purge %p %x\n", ptr, len);
     do_relocs(0, start_p, end_p, 0);
-    for (i = 0; i < _countof(asm_thunks.arr); i++) {
-        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks.arr[i].ptr);
+    for (i = 0; i < num_athunks; i++) {
+        uint8_t *ptr = (uint8_t *)resolve_segoff(*asm_thunks[i].ptr);
         if (ptr >= start_p && ptr <= end_p) {
             int rm;
             far_t f = lookup_far_unref(&sym_tab, ptr, &rm);
@@ -739,7 +720,7 @@ void PurgeHook(void *ptr, UDWORD len)
                 miss++;
             else
                 ___assert(rm);
-            asm_thunks.arr[i].ptr->seg = asm_thunks.arr[i].ptr->off = 0;
+            asm_thunks[i].ptr->seg = asm_thunks[i].ptr->off = 0;
             reloc++;
         }
     }
