@@ -28,6 +28,7 @@
 #include "farhlp.hpp"
 #include "elf_priv.h"
 #include "thunks_c.h"
+#include "thunks_a.h"
 #include "thunks_priv.h"
 #include "thunks.h"
 
@@ -49,40 +50,6 @@ enum { ASM_OK, ASM_NORET, ASM_ABORT, PING_ABORT };
 
 typedef void (*FdppAsmCall_t)(struct vm86_regs *regs, uint16_t seg,
         uint16_t off, uint8_t *sp, uint8_t len);
-
-#define _E
-#include "glob_tmpl.h"
-#undef _E
-
-struct athunk {
-    struct far_s *ptr;
-#define THUNKF_SHORT 1
-#define THUNKF_DEEP 2
-    unsigned flags;
-};
-
-static struct athunk asm_thunks[] = {
-#define _A(v) { __ASMREF(v), 0 }
-#define SEMIC ,
-#define __ASM(t, v) _A(__##v)
-#define __ASM_FAR(t, v) _A(__##v)
-#define __ASM_NEAR(t, v) { __ASMREF(__##v), THUNKF_SHORT | THUNKF_DEEP }
-#define __ASM_ARR(t, v, l) _A(__##v)
-#define __ASM_ARRI(t, v) _A(__##v)
-#define __ASM_ARRI_F(t, v) _A(__##v)
-#define __ASM_FUNC(v) _A(__##v)
-#include <glob_asm.h>
-#undef __ASM
-#undef __ASM_FAR
-#undef __ASM_NEAR
-#undef __ASM_ARR
-#undef __ASM_ARRI
-#undef __ASM_ARRI_F
-#undef __ASM_FUNC
-#undef SEMIC
-};
-
-static const int num_athunks = _countof(asm_thunks);
 
 struct vm86_regs {
 /*
