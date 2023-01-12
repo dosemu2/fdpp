@@ -22,12 +22,12 @@
 #include <assert.h>
 #include "portab.h"
 #include "globals.h"
-#include "proto.h"
 
 #include "dispatch.hpp"
 #include "objtrace.hpp"
 #include "farhlp.hpp"
 #include "elf_priv.h"
+#include "thunks_c.h"
 #include "thunks_priv.h"
 #include "thunks.h"
 
@@ -266,57 +266,6 @@ static void FdppSetSymTab(struct fdpp_symtab *symtab)
     asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
     err = FdppSetAsmThunks(thtab, stab_len);
     ___assert(!err);
-}
-
-#define _ARG(n, t, ap) (*(t *)(ap + n))
-#define _ARG_PTR(n, t, ap) // unimplemented, will create syntax error
-#define _ARG_PTR_FAR(n, t, ap)  ({ \
-    UDWORD __d = *(UDWORD *)(ap + n); \
-    FP_FROM_D(t, __d); \
-})
-#define _ARG_R(t) t
-#define _RET(r) r
-#define _RET_PTR(r) // unused
-
-static UDWORD FdppThunkCall(int fn, UBYTE *sp, enum DispStat *r_stat,
-        int *r_len)
-{
-    UDWORD ret;
-    UBYTE rsz = 0;
-    enum DispStat stat;
-
-#define _SP sp
-#define _DISP_CMN(f, c) { \
-    fdlogprintf("dispatch " #f "\n"); \
-    objtrace_enter(); \
-    c; \
-    objtrace_leave(); \
-    fdlogprintf("dispatch " #f " done, %i\n", recur_cnt); \
-}
-#define _DISPATCH(r, rv, rc, f, ...) _DISP_CMN(f, { \
-    rv _r = fdpp_dispatch(&stat, f, ##__VA_ARGS__); \
-    ret = rc(_r); \
-    if (stat == DISP_OK) \
-        rsz = (r); \
-    else \
-        ___assert(ret != ASM_NORET); \
-})
-#define _DISPATCH_v(f, ...) _DISP_CMN(f, { \
-    ret = fdpp_dispatch_v(&stat, f, ##__VA_ARGS__); \
-})
-
-    switch (fn) {
-        #include <thunk_calls.h>
-
-        default:
-            fdprintf("unknown fn %i\n", fn);
-            _fail();
-            return 0;
-    }
-
-    *r_stat = stat;
-    *r_len = rsz;
-    return ret;
 }
 
 static int _FdppCall(struct vm86_regs *regs)
