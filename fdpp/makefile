@@ -168,8 +168,9 @@ $(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD) $(EXT_H)
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CLCFLAGS) -I . -o $@ $<
 
-thunks.o: $(EXT_H) $(GEN_HEADERS) $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h $(GIT_REV)
-$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
+thunks.o: $(EXT_H) $(GIT_REV)
+thunks_a.o: $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h
+$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(GEN_HEADERS) $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
