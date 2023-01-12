@@ -22,13 +22,14 @@
 #include <assert.h>
 #include "portab.h"
 #include "globals.h"
-
+#include "memtype.h"
 #include "dispatch.hpp"
 #include "objtrace.hpp"
 #include "farhlp.hpp"
 #include "elf_priv.h"
 #include "thunks_c.h"
 #include "thunks_a.h"
+#include "thunks_p.h"
 #include "thunks_priv.h"
 #include "thunks.h"
 
@@ -338,11 +339,6 @@ void cpu_relax(void)
     }
 }
 
-#define _TFLG_NONE 0
-#define _TFLG_FAR 1
-#define _TFLG_NORET 2
-#define _TFLG_INIT 4
-
 static void _call_wrp(FdppAsmCall_t call, struct vm86_regs *regs, 
         uint16_t seg, uint16_t off, uint8_t *sp, uint8_t len)
 {
@@ -414,7 +410,7 @@ static void asm_call_noret(struct vm86_regs *regs, uint16_t seg,
     fdpp_noret(ASM_NORET);
 }
 
-static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
+uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
 {
     uint32_t ret;
     FdppAsmCall_t call = ((flags & _TFLG_NORET) ? asm_call_noret : asm_call);
@@ -425,7 +421,7 @@ static uint32_t do_asm_call(int num, uint8_t *sp, uint8_t len, int flags)
     return ret;
 }
 
-static uint8_t *clean_stk(size_t len)
+uint8_t *clean_stk(size_t len)
 {
     uint8_t *ret = (uint8_t *)so2lin(s_regs.ss, LO_WORD(s_regs.esp));
     s_regs.esp += len;
@@ -472,39 +468,6 @@ void enable(void)
 {
     set_IF();
 }
-
-#define __ARG(t) t
-#define __ARG_PTR(t) t *
-#define __ARG_PTR_FAR(t) __FAR(t)
-#define __ARG_A(t) t
-#define __ARG_PTR_A(t) NEAR_PTR_DO(t, !!(_flags & _TFLG_NORET))
-#define __ARG_PTR_FAR_A(t) __DOSFAR2(t, !!(_flags & _TFLG_NORET))
-#define __RET(t, v) v
-#define __RET_PTR(t, v) // unimplemented, will create syntax error
-#define __RET_PTR_FAR(t, v) FP_FROM_D(t, v)
-#define __CALL(n, s, l, f) do_asm_call(n, s, l, f)
-#define __CSTK(l) clean_stk(l)
-
-#define __CNV_PTR_FAR(t, d, f, l, t0) t d = (f)
-#define __CNV_PTR(t, d, f, l, t0) \
-    _MK_FAR_SZ(__##d, f, sizeof(*f)); \
-    t d = __MK_NEAR2(__##d, t)
-#define __CNV_PTR_CCHAR(t, d, f, l, t0) \
-    _MK_FAR_STR(__##d, f); \
-    t d = __MK_NEAR(__##d)
-#define __CNV_PTR_ARR(t, d, f, l, t0) \
-    _MK_FAR_SZ(__##d, f, l); \
-    t d = __MK_NEAR(__##d)
-#define __CNV_PTR_VOID(t, d, f, l, t0) \
-    _MK_FAR_SZ(__##d, f, l); \
-    t d = __MK_NEAR(__##d)
-#define __CNV_SIMPLE(t, d, f, l, t0) t d = (f)
-
-#define _CNV(c, t, at, l, n) c(at, _a##n, a##n, l, t)
-#define _L_REF(nl) a##nl
-#define _L_IMM(n, l) (sizeof(*_L_REF(n)) * (l))
-
-#include <thunk_asms.h>
 
 UBYTE peekb(UWORD seg, UWORD ofs)
 {
