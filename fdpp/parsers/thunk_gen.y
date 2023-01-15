@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-#define PTR_SIZE 2
+#include "tg_params.h"
 
 #define YYDEBUG 1
 
@@ -239,7 +238,6 @@ static const char *get_flags(void)
     return buf;
 }
 
-static const int align = 2;
 #define AL(x) (((x) + (align - 1)) & ~(align - 1))
 static const char *al_s_type = (align == 2 ? "WORD" : "DWORD");
 static const char *al_u_type = (align == 2 ? "UWORD" : "UDWORD");
