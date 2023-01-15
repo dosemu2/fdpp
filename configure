@@ -1,7 +1,7 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 CWD=`pwd -P`
 if [ ! -f configure ]; then
-    ln -s "$SCRIPTPATH"/makefile makefile 2>/dev/null
+    ln -sf "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
     mkdir fdpp 2>/dev/null
     cd fdpp
@@ -9,4 +9,5 @@ if [ ! -f configure ]; then
     mkdir parsers 2>/dev/null
     cd parsers
     echo "srcdir = $SCRIPTPATH/fdpp/parsers" >config.mak
+    ln -sf "$SCRIPTPATH"/fdpp/parsers/makefile makefile
 fi
