@@ -195,7 +195,7 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h $(srcdir)/makefile
-	$(CPP) $(CPPFLAGS) -P $< >$@ || ($(RM) -f $@ ; false)
+	$(CPP) $(CPPFLAGS) -P $< >$@ || ($(RM) $@ ; false)
 
 cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
 	$(CPP) $(CPPFLAGS) -P $< | sed 's/" "/","/g' >$@
@@ -205,7 +205,7 @@ _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
 pos = $(words $(call _pos,$1,$2))
 pars = srcdir=$(srcdir)/parsers CPP="$(CPP)" \
 	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@ || \
-	($(RM) -f $@ ; false)
+	($(RM) $@ ; false)
 $(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
 	$(pars)
 plt.inc: thunk_calls.tmp
@@ -214,11 +214,11 @@ plt_asmc.inc plt_asmp.inc: thunk_asms.tmp
 	$(pars)
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
-	parsers/thunk_gen <$< >$@ || ($(RM) -f $@ ; false)
+	parsers/thunk_gen <$< >$@ || ($(RM) $@ ; false)
 
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
 	$(srcdir)/parsers/gen_thunks.sh $< $(srcdir)/parsers >$@ || \
-		($(RM) -f $@ ; false)
+		($(RM) $@ ; false)
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
