@@ -359,6 +359,8 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   dest[2] = '\\';
   if (result & IS_DEVICE)
   {
+    if (src[0] == '\\' || src[0] == '/')
+      src++;
     froot = get_root(src);
     if (froot == src || froot == src + 5)
     {
