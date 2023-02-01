@@ -186,10 +186,13 @@ long DosMkTmp(char FAR * pathname, UWORD attr)
 
 */
 
-#define PATH_ERROR() \
-      fstrchr(src, '/') == 0 && fstrchr(src, '\\') == 0 \
-        ? DE_FILENOTFND \
-        : DE_PATHNOTFND
+static COUNT path_error(const char *src)
+{
+  return strchr(src, '/') == 0 && strchr(src, '\\') == 0
+        ? DE_FILENOTFND
+        : DE_PATHNOTFND;
+}
+#define PATH_ERROR() path_error(src)
 #define PATHLEN 128
 
 
