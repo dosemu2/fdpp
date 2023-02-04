@@ -249,7 +249,8 @@ static const char *al_u_type = (align == 2 ? "UWORD" : "UDWORD");
 
 %token LB RB SEMIC COMMA ASTER NEWLINE STRING NUM
 %token ASMCFUNC ASMPASCAL FAR SEGM INITTEXT
-%token VOID WORD UWORD CHAR BYTE UBYTE DWORD UDWORD DOUBLE STRUCT UNION
+%token VOID WORD UWORD CHAR BYTE UBYTE DWORD UDWORD DOUBLE LDOUBLE FLOAT
+%token STRUCT UNION
 %token LBR RBR
 %token CONST
 %token NORETURN
@@ -403,8 +404,14 @@ rtype:		  VOID		{ rlen = 0;
 		| UDWORD	{ rlen = 4;
 				  strcpy(rtbuf, "UDWORD");
 				}
+		| FLOAT		{ rlen = 4;
+				  strcpy(rtbuf, "float");
+				}
 		| DOUBLE	{ rlen = 8;
 				  strcpy(rtbuf, "double");
+				}
+		| LDOUBLE	{ rlen = 12;
+				  strcpy(rtbuf, "long double");
 				}
 		| BYTE		{ rlen = 1;
 				  strcpy(rtbuf, "BYTE");
@@ -453,9 +460,19 @@ atype:		  VOID		{
 				  strcat(atype, "UDWORD");
 				  al_arg_size = AL(arg_size);
 				}
+		| FLOAT	{
+				  arg_size = 4;
+				  strcat(atype, "float");
+				  al_arg_size = AL(arg_size);
+				}
 		| DOUBLE	{
 				  arg_size = 8;
 				  strcat(atype, "double");
+				  al_arg_size = AL(arg_size);
+				}
+		| LDOUBLE	{
+				  arg_size = 12;
+				  strcat(atype, "long double");
 				  al_arg_size = AL(arg_size);
 				}
 		| BYTE		{

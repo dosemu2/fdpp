@@ -61,7 +61,9 @@
 "ULONG32"	{ return UDWORD; }
 "DWORD"		{ return DWORD; }
 "UDWORD"	{ return UDWORD; }
+"float"		{ return FLOAT; }
 "double"	{ return DOUBLE; }
+"long double"	{ return LDOUBLE; }
 "struct"	{ return STRUCT; }
 "union"		{ return UNION; }
 "const"		{ return CONST; }
