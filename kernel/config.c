@@ -1250,7 +1250,7 @@ VOID DoConfig(int nPass)
     {
       pLine++;
       GetStringArg(pLine, szBuf);
-      if (!*szBuf || strlen(szBuf) > 12)
+      if (!*szBuf)
       {
         CfgFailure(pLine);
         continue;
