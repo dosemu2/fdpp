@@ -1100,6 +1100,7 @@ VOID DoConfig(int nPass)
   {
     struct table *pEntry;
     pLineStart = szLine;
+    int lOff;
 
 #ifdef MEMDISK_ARGS
     if (!bEof)
@@ -1246,6 +1247,16 @@ VOID DoConfig(int nPass)
     }
     if ('=' == *pLine || pEntry->func == CfgMenu || pEntry->func == CfgMenuEsc)
       pLine = skipwh(pLine+1);
+
+    lOff = 0;
+    if ('@' == *pLine)
+      lOff++;
+    if ('%' == pLine[lOff + 0] && isnum(pLine[lOff + 1]))
+    {
+      unsigned char *xtra = MK_FP(bprm.XtraSeg, 0);
+      pLine[lOff + 0] = xtra[pLine[lOff + 1] - '0'] + 'A';
+      pLine[lOff + 1] = ':';
+    }
     if ('@' == *pLine)
     {
       pLine++;

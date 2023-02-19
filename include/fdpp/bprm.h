@@ -20,12 +20,19 @@ struct _bprm {
 #define FDPP_FL_HEAP_HIGH   2
 #define FDPP_FL_HEAP_HMA    4
   uint16_t Flags;
+  uint16_t BprmVersion;         /* same version as in VER_OFFSET        */
+  uint16_t XtraSeg;             /* segment of second bprm part          */
+};
+
+struct _bprm_xtra {
+  uint8_t BootDrvNum;
+  char filler[15];
 };
 
 #endif
 
-#define BPRM_VER 7
-#define BPRM_MIN_VER 4
+#define BPRM_VER 8
+#define BPRM_MIN_VER 8
 
 #define FDPP_BS_SEG 0x1fe0
 #define FDPP_BS_OFF 0x7c00
