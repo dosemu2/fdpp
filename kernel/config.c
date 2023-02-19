@@ -1248,7 +1248,6 @@ VOID DoConfig(int nPass)
       pLine = skipwh(pLine+1);
     if ('@' == *pLine)
     {
-      char sfn[13];
       pLine++;
       GetStringArg(pLine, szBuf);
       if (!*szBuf || strlen(szBuf) > 12)
@@ -1256,8 +1255,7 @@ VOID DoConfig(int nPass)
         CfgFailure(pLine);
         continue;
       }
-      strcpy(sfn, szBuf);
-      if (!_exists(sfn))
+      if (!_exists(szBuf))
         continue;
     }
 
