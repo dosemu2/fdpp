@@ -1736,7 +1736,6 @@ VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r)
     return;
   }
 
-#ifdef WITHFAT32
   {
     ddt *pddt = getddt(drv);
     bpb *pbpb = pddt ? &pddt->ddt_defbpb : NULL;
@@ -1747,7 +1746,6 @@ VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r)
       return;
     }
   }
-#endif
 
   nblks = r->cx;
   blkno = r->dx;

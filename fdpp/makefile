@@ -77,7 +77,7 @@ $(TARGET).elf.tmp: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 	chmod -x $@
 
 rel.h: $(TARGET).elf $(TARGET).elf.tmp
-	cmp -l $^ | grep "140   0" | sed 's/^ //' | cut -d " " -f 1 | \
+	cmp -l $^ | grep "140   0" | sed 's/^ *//' | cut -d " " -f 1 | \
 		sed 's/$$/,/' > $@
 
 
@@ -153,7 +153,7 @@ CFILES = blockio.c \
     share.c
 
 FDPP_CFILES = smalloc.c farhlp_sta.c elf.c
-FDPP_CCFILES = thunks.cc dosobj.cc
+FDPP_CCFILES = thunks.cc thunks_c.cc thunks_a.cc thunks_p.cc dosobj.cc
 CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp
 LIBS = $(shell $(PKG_CONFIG) --libs libelf)
 
@@ -168,8 +168,9 @@ $(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD) $(EXT_H)
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CLCFLAGS) -I . -o $@ $<
 
-thunks.o: $(EXT_H) $(GEN_HEADERS) $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h $(GIT_REV)
-$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(PPHDRS) $(srcdir)/makefile
+thunks.o: $(EXT_H) $(GIT_REV)
+thunks_a.o: $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h
+$(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(GEN_HEADERS) $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
@@ -194,7 +195,7 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h $(srcdir)/makefile
-	$(CPP) $(CPPFLAGS) -P $< >$@ || ($(RM) -f $@ ; false)
+	$(CPP) $(CPPFLAGS) -P $< >$@ || ($(RM) $@ ; false)
 
 cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
 	$(CPP) $(CPPFLAGS) -P $< | sed 's/" "/","/g' >$@
@@ -204,7 +205,7 @@ _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
 pos = $(words $(call _pos,$1,$2))
 pars = srcdir=$(srcdir)/parsers CPP="$(CPP)" \
 	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@ || \
-	($(RM) -f $@ ; false)
+	($(RM) $@ ; false)
 $(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
 	$(pars)
 plt.inc: thunk_calls.tmp
@@ -213,19 +214,16 @@ plt_asmc.inc plt_asmp.inc: thunk_asms.tmp
 	$(pars)
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
-	parsers/thunk_gen <$< >$@ || ($(RM) -f $@ ; false)
+	parsers/thunk_gen <$< >$@ || ($(RM) $@ ; false)
 
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
 	$(srcdir)/parsers/gen_thunks.sh $< $(srcdir)/parsers >$@ || \
-		($(RM) -f $@ ; false)
+		($(RM) $@ ; false)
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
 parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
-	if [ ! -f parsers/makefile ]; then \
-	    ln -s $(abspath $(srcdir))/parsers/makefile parsers/makefile ; \
-	fi
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
 
 INSTALL ?= install

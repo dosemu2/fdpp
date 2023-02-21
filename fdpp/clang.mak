@@ -2,8 +2,8 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
-LLD = $(shell which ld.lld)
-CCACHE = $(shell which ccache)
+LLD ?= $(shell which ld.lld)
+CCACHE ?= $(shell which ccache)
 CC = $(CCACHE) clang++
 # Override builtin CXX.
 # The assignment below is ignored if CXX was set via cmd line.
@@ -18,9 +18,9 @@ CPP = $(CC_FOR_BUILD) -E
 CC_LD = $(CL)
 ifneq ($(LLD),)
 # ld.lld can cross-compile while gnu ld not
-CROSS_LD = $(LLD)
+CROSS_LD ?= $(LLD)
 else
-CROSS_LD = ld
+CROSS_LD ?= ld
 endif
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
@@ -45,7 +45,7 @@ ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
 endif
 ifeq ($(EXTRA_DEBUG),1)
-DBGFLAGS += -O0
+DBGFLAGS += -O0 -fdebug-macro
 CPPFLAGS += -DFDPP_DEBUG -DEXTRA_DEBUG
 NASMFLAGS += -DEXTRA_DEBUG
 else

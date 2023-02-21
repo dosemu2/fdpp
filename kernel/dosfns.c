@@ -234,7 +234,7 @@ DWORD DosReadSftExt(int sft_idx, size_t n, void FAR *bp, BOOL allow_echo,
 
 DWORD DosReadSft(int sft_idx, size_t n, void FAR *bp)
 {
-  return DosReadSftExt(sft_idx, n, bp, TRUE, TRUE);
+  return DosReadSftExt(sft_idx, n, bp, TRUE, break_ena);
 }
 
 unsigned char read_char(int sft_in, BOOL check_break)

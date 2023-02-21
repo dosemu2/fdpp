@@ -331,8 +331,23 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
       c = CharIO(pdev, 0, C_INPUT);
       break;
     }
-    if (check_break && pdev != syscon)
-      check_handle_break(syscon);
+    if (pdev != syscon)
+    {
+      if (check_break)
+      {
+        check_handle_break(syscon);
+      }
+      else
+      {
+        unsigned char c1 = ndread(syscon);
+        if (c1 == CTL_C)
+        {
+          con_flush(syscon);
+          c = -1;  // EOF
+          break;
+        }
+      }
+    }
     /* the idle int is only safe if we're using the character stack */
     if (user_r->AH < 0xd)
       DosIdle_int();

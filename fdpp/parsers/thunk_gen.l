@@ -49,10 +49,23 @@
 "UBYTE"		{ return UBYTE; }
 "unsigned char"	{ return UBYTE; }
 "unsigned short"	{ return UWORD; }
+"int"		{ return DWORD; }
+"unsigned"	{ return UDWORD; }
+"unsigned int"	{ return UDWORD; }
+"long"		{ return DWORD; }
+"unsigned long"	{ return UDWORD; }
+"size_t"	{ return UDWORD; }
+"ssize_t"	{ return DWORD; }
+"uint32_t"	{ return UDWORD; }
 "ULONG"		{ return UDWORD; }
+"ULONG32"	{ return UDWORD; }
 "DWORD"		{ return DWORD; }
 "UDWORD"	{ return UDWORD; }
+"float"		{ return FLOAT; }
+"double"	{ return DOUBLE; }
+"long double"	{ return LDOUBLE; }
 "struct"	{ return STRUCT; }
+"union"		{ return UNION; }
 "const"		{ return CONST; }
 "NORETURN"	{ return NORETURN; }
 "/*".*"*/"	{ /* comments */ }

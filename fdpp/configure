@@ -1,9 +1,10 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 TOPDIR=`realpath "$SCRIPTPATH/.."`
 if [ ! -f configure ]; then
-    ln -s "$SCRIPTPATH"/makefile makefile 2>/dev/null
+    ln -sf "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
     mkdir parsers 2>/dev/null
     cd parsers
     echo "srcdir = $SCRIPTPATH/parsers" >config.mak
+    ln -sf "$SCRIPTPATH"/parsers/makefile makefile
 fi

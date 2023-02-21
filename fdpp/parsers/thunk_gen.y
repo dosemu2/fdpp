@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
-#define PTR_SIZE 2
+#include "tg_params.h"
 
 #define YYDEBUG 1
 
@@ -28,6 +27,7 @@ static int is_rptr;
 static int is_far;
 static int is_rfar;
 static int is_ffar;
+static int is_cbk;
 static int is_void;
 static int is_rvoid;
 static int is_const;
@@ -41,7 +41,7 @@ static char atype2[256];
 static char atype3[256];
 static char rtbuf[256];
 /* conversion types for flat pointers */
-enum { CVTYPE_OTHER, CVTYPE_VOID, CVTYPE_CHAR, CVTYPE_ARR };
+enum { CVTYPE_OTHER, CVTYPE_VOID, CVTYPE_CHAR, CVTYPE_ARR, CVTYPE_CHAR_ARR };
 static int cvtype;
 
 
@@ -49,6 +49,7 @@ static void beg_arg(void)
 {
     is_far = 0;
     is_ptr = 0;
+    is_cbk = 0;
     is_void = 0;
     is_const = 0;
     cvtype = CVTYPE_OTHER;
@@ -108,6 +109,16 @@ static void do_start_arg(int anum)
 		    else
 			strcat(abuf, "_CNV_PTR_CHAR, _L_UNIMP");
 		    break;
+		case CVTYPE_CHAR_ARR:
+		    if (is_const) {
+			if (arr_sz == -1)  // main() template
+			    strcat(abuf, "_CNV_PTR_CCHAR_ARR, _L_REF(1)");
+			else
+			    sprintf(abuf + strlen(abuf), "_CNV_PTR_CCHAR_ARR, "
+				    "_L_IMM(%i, %i)", arg_num + 1, arr_sz);
+		    } else
+			strcat(abuf, "_CNV_PTR_CHAR_ARR, _L_UNIMP");
+		    break;
 		case CVTYPE_ARR:
 		    sprintf(abuf + strlen(abuf), "_CNV_PTR_ARR, _L_IMM(%i, %i)",
 			    arg_num + 1, arr_sz);
@@ -118,6 +129,18 @@ static void do_start_arg(int anum)
 		}
 		break;
 	    }
+	}
+    } else if (is_cbk) {
+	switch (anum) {
+	case 0:
+	    strcat(abuf, "_ARG_CBK(");
+	    break;
+	case 1:
+	    strcat(abuf, "_ARG_CBK_A(");
+	    break;
+	case 2:
+	    strcat(abuf, "_CNV_CBK, _L_NONE");
+	    break;
 	}
     } else {
 	switch (anum) {
@@ -215,11 +238,19 @@ static const char *get_flags(void)
     return buf;
 }
 
+#define AL(x) (((x) + (align - 1)) & ~(align - 1))
+static const char *al_s_type = (align == 2 ? "WORD" : "DWORD");
+static const char *al_u_type = (align == 2 ? "UWORD" : "UDWORD");
+#define ATYPE3(s) \
+    if (al_arg_size > arg_size) \
+	strcat(atype3, al_##s##_type)
+
 %}
 
 %token LB RB SEMIC COMMA ASTER NEWLINE STRING NUM
 %token ASMCFUNC ASMPASCAL FAR SEGM INITTEXT
-%token VOID WORD UWORD CHAR BYTE UBYTE DWORD UDWORD STRUCT
+%token VOID WORD UWORD CHAR BYTE UBYTE DWORD UDWORD DOUBLE LDOUBLE FLOAT
+%token STRUCT UNION
 %token LBR RBR
 %token CONST
 %token NORETURN
@@ -234,7 +265,7 @@ input:		  input line NEWLINE
 		|
 ;
 
-line:		lnum rdecls fname lb args rb SEMIC
+line:		lnum rdecls fname lb args rb attrs SEMIC
 			{
 			  const char *rt, *rv;
 
@@ -315,6 +346,8 @@ sname:		STRING
 ;
 tname:		STRING
 ;
+cname:		STRING
+;
 
 rquals:		  FAR ASTER	{ is_rfar = 1; is_rptr = 1; }
 		| ASTER		{ is_rptr = 1; }
@@ -326,7 +359,8 @@ quals:		  FAR quals	{ is_far = 1; }
 		|
 ;
 
-arr:		  LBR num RBR	{ is_ptr = 1; cvtype = CVTYPE_ARR; arr_sz = $2; }
+arr:		  LBR num RBR	{ cvtype == CVTYPE_CHAR ? cvtype = CVTYPE_CHAR_ARR : CVTYPE_ARR; arr_sz = $2; }
+		| LBR RBR	{ cvtype == CVTYPE_CHAR ? cvtype = CVTYPE_CHAR_ARR : CVTYPE_ARR; arr_sz = -1; }
 ;
 
 fatr:		  ASMCFUNC
@@ -339,6 +373,13 @@ fatr:		  ASMCFUNC
 
 fatrs:		  fatr fatrs
 		| fatr
+;
+
+attr:		NORETURN	{ is_noret = 1; }
+;
+
+attrs:		attr attrs
+		|
 ;
 
 rq_fa:		  rquals fatrs
@@ -363,6 +404,15 @@ rtype:		  VOID		{ rlen = 0;
 		| UDWORD	{ rlen = 4;
 				  strcpy(rtbuf, "UDWORD");
 				}
+		| FLOAT		{ rlen = 4;
+				  strcpy(rtbuf, "float");
+				}
+		| DOUBLE	{ rlen = 8;
+				  strcpy(rtbuf, "double");
+				}
+		| LDOUBLE	{ rlen = 12;
+				  strcpy(rtbuf, "long double");
+				}
 		| BYTE		{ rlen = 1;
 				  strcpy(rtbuf, "BYTE");
 				}
@@ -378,51 +428,78 @@ atype:		  VOID		{
 				  arg_size = 0;
 				  cvtype = CVTYPE_VOID;
 				  strcat(atype, "VOID");
-				  al_arg_size = 0;
+				  al_arg_size = AL(arg_size);
 				  is_void = 1;
 				}
 		| CHAR		{
 				  arg_size = 1;
 				  cvtype = CVTYPE_CHAR;
 				  strcat(atype, "char");
-				  strcat(atype3, "WORD");
-				  al_arg_size = 2;
+				  al_arg_size = AL(arg_size);
+				  ATYPE3(s);
 				}
 		| WORD		{
 				  arg_size = 2;
 				  strcat(atype, "WORD");
-				  al_arg_size = 2;
+				  al_arg_size = AL(arg_size);
+				  ATYPE3(s);
 				}
 		| UWORD		{
 				  arg_size = 2;
 				  strcat(atype, "UWORD");
-				  al_arg_size = 2;
+				  al_arg_size = AL(arg_size);
+				  ATYPE3(u);
 				}
 		| DWORD		{
 				  arg_size = 4;
 				  strcat(atype, "DWORD");
-				  al_arg_size = 4;
+				  al_arg_size = AL(arg_size);
 				}
 		| UDWORD	{
 				  arg_size = 4;
 				  strcat(atype, "UDWORD");
-				  al_arg_size = 4;
+				  al_arg_size = AL(arg_size);
+				}
+		| FLOAT	{
+				  arg_size = 4;
+				  strcat(atype, "float");
+				  al_arg_size = AL(arg_size);
+				}
+		| DOUBLE	{
+				  arg_size = 8;
+				  strcat(atype, "double");
+				  al_arg_size = AL(arg_size);
+				}
+		| LDOUBLE	{
+				  arg_size = 12;
+				  strcat(atype, "long double");
+				  al_arg_size = AL(arg_size);
 				}
 		| BYTE		{
 				  arg_size = 1;
 				  strcat(atype, "BYTE");
-				  strcat(atype3, "WORD");
-				  al_arg_size = 2;
+				  al_arg_size = AL(arg_size);
+				  ATYPE3(s);
 				}
 		| UBYTE		{
 				  arg_size = 1;
 				  strcat(atype, "UBYTE");
-				  strcat(atype3, "UWORD");
-				  al_arg_size = 2;
+				  al_arg_size = AL(arg_size);
+				  ATYPE3(u);
+				}
+		| VOID LB ASTER cname RB LB VOID RB {
+				  arg_size = 4;
+				  is_cbk = 1;
+				  strcat(atype, "VOID");
+				  al_arg_size = AL(arg_size);
 				}
 		| STRUCT sname	{
 				  arg_size = -1;
 				  sprintf(atype + strlen(atype), "struct %s", $2);
+				}
+		| UNION sname	{
+				  arg_size = -1;
+				  sprintf(atype + strlen(atype), "union %s", $2);
 				}
 		| tname		{
 				  arg_size = -1;

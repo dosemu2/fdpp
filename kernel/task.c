@@ -444,12 +444,14 @@ STATIC int ExecMemLargest(UWORD *asize, UWORD threshold)
     mem_access_mode &= ~0x80;
     mem_access_mode |= 0x40;
     rc = DosMemLargest(asize);
-    mem_access_mode &= ~0x40;
+    if (rc != SUCCESS || *asize < threshold)
+    {
     /* less memory than the .COM/.EXE file has:
        try low memory first */
-    if (rc != SUCCESS || *asize < threshold)
+      mem_access_mode &= ~0x40;
       rc = DosMemLargest(asize);
-    mem_access_mode |= 0x80;
+      mem_access_mode |= 0x80;
+    }
   }
   else
     rc = DosMemLargest(asize);
@@ -532,10 +534,13 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       if (rc != SUCCESS)
         DosMemFree(env);
 
-      DosUmbLink(0);       /* restore link state */
-      mem_access_mode = orig_mem_access;
-      mode &= 0x7f;
-
+      /* comcom32 doesn't set mode, so reset also if mem_access_mode has UMA */
+      if ((mode | orig_mem_access) & 0x80)
+      {
+        DosUmbLink(0);       /* restore link state */
+        mem_access_mode = orig_mem_access & 0x7f;
+        mode &= 0x7f;
+      }
       if (rc != SUCCESS)
         return rc;
 
@@ -732,12 +737,15 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       if (rc != SUCCESS)
         DosMemFree(env);
 
-      mem_access_mode = orig_mem_access; /* restore old situation */
-      DosUmbLink(0);     /* restore link state */
+      /* comcom32 doesn't set mode, so reset also if mem_access_mode has UMA */
+      if ((mode | orig_mem_access) & 0x80)
+      {
+        mem_access_mode = orig_mem_access & 0x7f; /* restore old situation */
+        DosUmbLink(0);     /* restore link state */
+        mode &= 0x7f; /* forget about high loading from now on */
+      }
       if (rc != SUCCESS)
         return rc;
-
-      mode &= 0x7f; /* forget about high loading from now on */
 
 #ifdef DEBUG
       DebugPrintf(("DosExeLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem));

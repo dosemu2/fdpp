@@ -65,20 +65,17 @@ segment %3
 
 %macro asmcsym 2
 _%1_num dw %2
-_%1_ptr:
     extern _%1
     dw _%1, _SEG(_%1)
 %endmacro
 
 %macro asmpsym 2
 _%1_num dw %2
-_%1_ptr:
     extern %1
     dw %1, _SEG(%1)
 %endmacro
 
 %macro asmsym 1
-_%1_ptr:
     extern _%1
     dw _%1, _SEG(_%1)
 %endmacro
