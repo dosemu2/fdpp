@@ -1086,7 +1086,7 @@ VOID DoConfig(int nPass)
       return;
   }
 
-  nCfgLine = 0;  /* keep track of which line in file for errors   */
+  nCfgLine = 1;  /* keep track of which line in file for errors   */
 
   /* Read each line into the buffer and then parse the line,      */
   /* do the table lookup and execute the handler for that         */
@@ -2208,7 +2208,7 @@ STATIC VOID CfgFailure(char * pLine)
 
   /* suppress multiple printing of same unrecognized lines */
 
-  if (nCfgLine < sizeof(ErrorAlreadyPrinted)*8)
+  if (nCfgLine < sizeof(ErrorAlreadyPrinted)*8 && !nCurChain)
   {
     if (ErrorAlreadyPrinted[nCfgLine/8] & (1 << (nCfgLine%8)))
       return;
