@@ -536,7 +536,7 @@ void fpanic(const BYTE * s, ...)
     char buf[128];
     va_list l;
     va_start(l, s);
-    vsnprintf(buf, sizeof(buf), s, l);
+    _vsnprintf(buf, sizeof(buf), s, l);
     va_end(l);
     fdpp->panic(buf);
 }
@@ -546,7 +546,7 @@ void fdebug(const BYTE * s, ...)
     char buf[128];
     va_list l;
     va_start(l, s);
-    vsnprintf(buf, sizeof(buf), s, l);
+    _vsnprintf(buf, sizeof(buf), s, l);
     va_end(l);
     fdpp->debug(buf);
 }
