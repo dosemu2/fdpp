@@ -327,7 +327,7 @@ COUNT DosHMACheck(void)
       put_string("dos mem corrupt, FIRST_MCB=");
       put_unsigned(FIRST_MCB, 16, 4);
       hexd("\nprev ", pprev, 16);
-      hexd("notMZ", p, 16);
+      hexd("bad  ", p, 16);
       return MCBDESTRY2(pprev, p);
     }
 
