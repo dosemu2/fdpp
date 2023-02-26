@@ -1154,11 +1154,6 @@ VOID DoConfig(int nPass)
       bEof = FALSE;
       nFileDesc = cfg->nFileDesc;
       nCfgLine = cfg->nCfgLine;
-      if (!nCurChain)
-      {
-        pEntry = LookUp(commands, "CHAIN");
-        pEntry->pass++;  /* schedule for next pass */
-      }
       continue;
     }
 
@@ -1279,6 +1274,9 @@ VOID DoConfig(int nPass)
   if (nPass == 0)
   {
     DoMenu();
+  } else {
+    struct table *pEntry = LookUp(commands, "CHAIN");
+    pEntry->pass = nPass + 1;  /* schedule for next pass */
   }
 }
 
