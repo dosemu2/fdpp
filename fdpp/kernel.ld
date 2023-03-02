@@ -14,7 +14,11 @@ SECTIONS
     .ptext 0 : {
 		*(PSP)
     }
-
+    /* for build-id */
+    .note.gnu.build-id  : {
+		*(.note.gnu.build-id)
+	}
+    /* for solib */
     /* Target low data+text sections.  */
     .ltext : {
 		*(_IRQTEXT)
@@ -84,11 +88,7 @@ SECTIONS
     .rela.plt : {
 		*(.rela.plt)
 	}
-    /* for build-id */
-    .note.gnu.build-id  : {
-		*(.note.gnu.build-id)
-	}
-    /* for solib */
+   
     .dynsym         : {
 		*(.dynsym)
 	}
