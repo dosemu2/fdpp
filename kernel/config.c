@@ -1243,6 +1243,12 @@ VOID DoConfig(int nPass)
     if ('=' == *pLine || pEntry->func == CfgMenu || pEntry->func == CfgMenuEsc)
       pLine = skipwh(pLine+1);
 
+    if ('?' == pLine[0] && isnum(pLine[1]))
+    {
+      if (!(bprm.PredMask & (1 << (pLine[1] - '0'))))
+        continue;
+      pLine += 2;
+    }
     lOff = 0;
     if ('@' == *pLine)
       lOff++;

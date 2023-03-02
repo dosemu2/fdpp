@@ -22,6 +22,7 @@ struct _bprm {
   uint16_t Flags;
   uint16_t BprmVersion;         /* same version as in VER_OFFSET        */
   uint16_t XtraSeg;             /* segment of second bprm part          */
+  uint16_t PredMask;            /* predicates for ?x expression         */
 };
 
 struct _bprm_xtra {
@@ -31,7 +32,7 @@ struct _bprm_xtra {
 
 #endif
 
-#define BPRM_VER 8
+#define BPRM_VER 9
 #define BPRM_MIN_VER 8
 
 #define FDPP_BS_SEG 0x1fe0
