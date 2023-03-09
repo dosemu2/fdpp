@@ -18,6 +18,7 @@ BVER = $(shell echo BPRM_VER | cpp -include $(PPINC)/bprm.h - | tail -n 1)
 FDPPDEVL = libfdpp.so
 FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
 LDFLAGS += -Wl,-soname=$(FDPPLIB)
+TARGET=fdppkrnl.$(AVER).$(BVER)
 RELVER = 6
 MAJ = 1
 VERSION = $(MAJ).$(RELVER)
@@ -91,7 +92,7 @@ clean:
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
-		*.pc *.so
+		*.pc *.so *.elf
 
 #               *Individual File Dependencies*
 #apisupt.o:	$(SRC)/apisupt.asm $(SRC)/segs.inc

@@ -29,8 +29,6 @@ TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line
 TARGETOPT_XTRA = -Wno-format-invalid-specifier
 
-TARGET=fdppkrnl
-
 DEBUG_MODE ?= 1
 EXTRA_DEBUG ?= 0
 DEBUG_MSGS ?= 1
