@@ -1,2 +1,2 @@
-usr/lib/fdpp/*
+usr/lib/fdpp/*.so.*
 usr/share/fdpp/*

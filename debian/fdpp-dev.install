@@ -1,2 +1,3 @@
 usr/lib/*/pkgconfig/fdpp.pc
+usr/lib/fdpp/*.so
 usr/include/fdpp

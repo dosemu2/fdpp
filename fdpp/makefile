@@ -10,9 +10,14 @@ include $(srcdir)/defs.mak
 include $(srcdir)/clang.mak
 
 TOP = $(abspath $(srcdir)/..)
-HDR=$(TOP)/hdr
-SRC=$(TOP)/kernel
-FDPPLIB = libfdpp.so
+HDR = $(TOP)/hdr
+SRC = $(TOP)/kernel
+PPINC = $(TOP)/include/fdpp
+AVER = $(shell echo FDPP_API_VER | cpp -include $(PPINC)/thunks.h - | tail -n 1)
+BVER = $(shell echo BPRM_VER | cpp -include $(PPINC)/bprm.h - | tail -n 1)
+FDPPDEVL = libfdpp.so
+FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
+LDFLAGS += -Wl,-soname=$(FDPPLIB)
 RELVER = 6
 MAJ = 1
 VERSION = $(MAJ).$(RELVER)
@@ -86,7 +91,7 @@ clean:
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
-		*.pc
+		*.pc *.so
 
 #               *Individual File Dependencies*
 #apisupt.o:	$(SRC)/apisupt.asm $(SRC)/segs.inc
@@ -230,6 +235,7 @@ INSTALL ?= install
 install: $(ALL)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
 	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
+	$(LN) -s $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp/$(FDPPDEVL)
 	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
