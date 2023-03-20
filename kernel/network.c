@@ -137,3 +137,21 @@ BYTE remote_getfree(void FAR *cds, void *dst)
     udst[3] = regs.d.x;
     return SUCCESS;
 }
+
+BYTE remote_getfree_11a3(void FAR *cds, void *dst)
+{
+    UWORD *udst = (UWORD *)dst;
+    iregs regs = {};
+    regs.es = FP_SEG(cds);
+    regs.di = FP_OFF(cds);
+    regs.a.x = 0x11a3;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if (regs.flags & FLG_CARRY)
+        return -regs.a.x;
+    udst[0] = regs.a.x;
+    udst[1] = regs.b.x;
+    udst[2] = regs.c.x;
+    udst[3] = regs.d.x;
+    udst[4] = regs.si;
+    return SUCCESS;
+}
