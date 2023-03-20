@@ -852,7 +852,7 @@ UWORD DosGetFree(UBYTE drive, UWORD * navc, UWORD * bps, UWORD * nc)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, MK_FAR_SCP(rg)) != SUCCESS)
+    if (remote_getfree(cdsp, rg) != SUCCESS)
       return spc;
 
     /* for int21/ah=1c:
@@ -967,7 +967,7 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, MK_FAR_SCP(rg)) != SUCCESS)
+    if (remote_getfree(cdsp, rg) != SUCCESS)
       return DE_INVLDDRV;
 
     xfsp->xfs_clussize = rg[0];

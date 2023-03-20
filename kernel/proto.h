@@ -407,7 +407,7 @@ DWORD ASMPASCAL network_redirector_mx(UWORD cmd, __FAR(void)s, UWORD arg);
 BYTE remote_lock_unlock(__FAR(void) sft, BYTE unlock, __FAR(struct remote_lock_unlock) arg);
 BYTE remote_qualify_filename(__FAR(char) dst, __FAR(const char) src);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
-BYTE remote_getfree(__FAR(void) cds, __FAR(void) dst);
+BYTE remote_getfree(__FAR(void) cds, void *dst);
 UDWORD remote_lseek(__FAR(void) sft, DWORD new_pos);
 UWORD remote_getfattr(void);
 #define remote_setfattr(attr) (WORD)network_redirector_mx(REM_SETATTR, NULL, attr)

@@ -121,9 +121,9 @@ BYTE remote_qualify_filename(char FAR *dst, const char FAR *src)
     return SUCCESS;
 }
 
-BYTE remote_getfree(void FAR *cds, void FAR *dst)
+BYTE remote_getfree(void FAR *cds, void *dst)
 {
-    UWORD FAR *udst = dst;
+    UWORD *udst = (UWORD *)dst;
     iregs regs = {};
     regs.es = FP_SEG(cds);
     regs.di = FP_OFF(cds);
