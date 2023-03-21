@@ -944,7 +944,7 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
 {
   struct dpb FAR *dpbp;
   struct cds FAR *cdsp;
-  UCOUNT rg[4];
+  UCOUNT rg[5];
 
   /* ensure all fields known value - clear reserved bytes & set xfs_version.actual to 0 */
   fmemset(xfsp, 0, sizeof(struct xfreespace));
@@ -967,13 +967,44 @@ COUNT DosGetExtFree(BYTE FAR * DriveString, struct xfreespace FAR * xfsp)
 
   if (cdsp->cdsFlags & CDSNETWDRV)
   {
-    if (remote_getfree(cdsp, rg) != SUCCESS)
-      return DE_INVLDDRV;
+    /* Try redirector extension */
+    if (remote_getfree_11a3(cdsp, rg) != SUCCESS)
+    {
+      /* Fallback */
+      if (remote_getfree(cdsp, rg) != SUCCESS)
+        return DE_INVLDDRV;
 
-    xfsp->xfs_clussize = rg[0];
-    xfsp->xfs_totalclusters = rg[1];
-    xfsp->xfs_secsize = rg[2];
-    xfsp->xfs_freeclusters = rg[3];
+      xfsp->xfs_clussize = rg[0];
+      xfsp->xfs_totalclusters = rg[1];
+      xfsp->xfs_secsize = rg[2];
+      xfsp->xfs_freeclusters = rg[3];
+    }
+    else /* Supports extension */
+    {
+      UDWORD total, avail;
+      UDWORD bps, spc;
+
+      bps = rg[4];
+      spc = 1;
+      total = ((rg[0] << 16UL) | rg[1]);
+      avail = ((rg[2] << 16UL) | rg[3]);
+
+      while (total > 0x00ffffff && spc < 128) {
+        spc *= 2;
+        avail /= 2;
+        total /= 2;
+      }
+      while (total > 0x00ffffff && bps < 32768) {
+        bps *= 2;
+        avail /= 2;
+        total /= 2;
+      }
+
+      xfsp->xfs_secsize = bps;
+      xfsp->xfs_clussize = spc;
+      xfsp->xfs_totalclusters = total;
+      xfsp->xfs_freeclusters = avail;
+    }
   }
   else
   {
