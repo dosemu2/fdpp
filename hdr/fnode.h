@@ -38,7 +38,7 @@ static BYTE *fnode_hRcsId =
 struct f_node {
   UWORD f_flags;                /* file flags                   */
 
-  dmatch *f_dmp;                /* this file's dir match        */
+  __DOSFAR(dmatch) f_dmp;                /* this file's dir match        */
 //  SYM_MEMB(f_node, struct dirent, f_dir);          /* this file's dir entry image  */
   struct dirent f_dir;          /* this file's dir entry image  */
   UWORD d_flags;

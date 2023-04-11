@@ -56,9 +56,8 @@ STATIC const char FAR *GetNameField(const char FAR * lpFileName,
 #define TestCmnSeps(lpFileName) (*lpFileName && strchr(":;,=+ \t", *lpFileName) != NULL)
 #define TestFieldSeps(lpFileName) ((unsigned char)*lpFileName <= ' ' || strchr("/\\\"[]<>|.:;,=+\t", *lpFileName) != NULL)
 
-static dmatch _Dmatch_ff;
-static dmatch FAR * Dmatch_ff_p;
-#define Dmatch_ff (*Dmatch_ff_p)
+#define Dmatch_ff sda_tmp_dm
+#define Dmatch_ff_p &sda_tmp_dm
 
 UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 {
@@ -673,7 +672,6 @@ UBYTE FcbFindFirst(xfcb FAR * lpXfcb)
   /* First, move the dta to a local and change it around to match */
   /* our functions.                                               */
   lpDir = (BYTE FAR *)dta;
-  Dmatch_ff_p = MK_FAR(_Dmatch_ff);
   dta = Dmatch_ff_p;
 
   /* Next initialze local variables by moving them from the fcb   */
@@ -682,8 +680,8 @@ UBYTE FcbFindFirst(xfcb FAR * lpXfcb)
   /* Reconstruct the dirmatch structure from the fcb */
   Dmatch_ff.dm_drive = lpFcb->fcb_sftno;
 
-  fmemcpy_n(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
-  DosUpMem(Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
+  fmemcpy(Dmatch_ff.dm_name_pat, lpFcb->fcb_fname, FNAME_SIZE + FEXT_SIZE);
+  DosUpFMem((BYTE FAR *) Dmatch_ff.dm_name_pat, FNAME_SIZE + FEXT_SIZE);
 
   Dmatch_ff.dm_attr_srch = wAttr;
   Dmatch_ff.dm_entry = lpFcb->fcb_strtclst;
@@ -736,7 +734,6 @@ UBYTE FcbFindNext(xfcb FAR * lpXfcb)
   /* First, move the dta to a local and change it around to match */
   /* our functions.                                               */
   lpDir = (BYTE FAR *)dta;
-  Dmatch_ff_p = MK_FAR(_Dmatch_ff);
   dta = Dmatch_ff_p;
 
   /* Next initialze local variables by moving them from the fcb   */
