@@ -710,6 +710,9 @@ blk_stk_top:
                 times 128 dw 0
 clk_stk_top:
 
+                global _dmatch_ff
+_dmatch_ff      times 21 db 0
+
 ; Dynamic data:
 ; member of the DOS DATA GROUP
 ; and marks definitive end of all used data in kernel data segment

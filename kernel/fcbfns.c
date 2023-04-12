@@ -56,8 +56,8 @@ STATIC const char FAR *GetNameField(const char FAR * lpFileName,
 #define TestCmnSeps(lpFileName) (*lpFileName && strchr(":;,=+ \t", *lpFileName) != NULL)
 #define TestFieldSeps(lpFileName) ((unsigned char)*lpFileName <= ' ' || strchr("/\\\"[]<>|.:;,=+\t", *lpFileName) != NULL)
 
-#define Dmatch_ff sda_tmp_dm
-#define Dmatch_ff_p &sda_tmp_dm
+#define Dmatch_ff dmatch_ff
+#define Dmatch_ff_p &dmatch_ff
 
 UBYTE FAR *FatGetDrvData(UBYTE drive, UBYTE * pspc, UWORD * bps, UWORD * nc)
 {
