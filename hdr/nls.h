@@ -414,7 +414,8 @@ struct nlsPointer {             /* Information of DOS-65-0X is addressed
                                    of DOS-65 is called (Note: won't work for
                                    subfunctions 0, 1, 0x20, 0x21, 0x22, 0x23,
                                    0xA0, 0xA1,& 0xA2 */
-} PACKED;
+};
+ANNOTATE_SIZE(struct nlsPointer, 5);
 
 struct nlsPackage {             /* the contents of one chain item of the
                                    list of NLS packages */

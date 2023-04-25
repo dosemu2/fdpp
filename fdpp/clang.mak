@@ -37,7 +37,7 @@ USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS = $(IFLAGS) -DFDPP
-WFLAGS = -Wall -Wpacked
+WFLAGS = -Wall -Wpacked -Werror=packed-non-pod -Wno-unknown-warning-option
 WCFLAGS = $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
