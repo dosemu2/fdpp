@@ -106,7 +106,7 @@ typedef struct _xfcb {
   BYTE xfcb_resvrd[5];          /* Reserved                     */
   UBYTE xfcb_attrib;            /* Attribute                    */
   SYM_MEMB(_xfcb, fcb, xfcb_fcb);
-} PACKED xfcb;
+} xfcb;
 
 typedef struct _rfcb {
   UBYTE renDriveID;             /* drive no.                    */
