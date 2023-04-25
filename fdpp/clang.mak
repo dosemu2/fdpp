@@ -2,8 +2,8 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
-LLD ?= $(shell which ld.lld)
-CCACHE ?= $(shell which ccache)
+LLD ?= $(shell which ld.lld 2>/dev/null)
+CCACHE ?= $(shell which ccache 2>/dev/null)
 CC = $(CCACHE) clang++
 # Override builtin CXX.
 # The assignment below is ignored if CXX was set via cmd line.
