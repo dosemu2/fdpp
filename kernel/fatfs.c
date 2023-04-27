@@ -40,6 +40,7 @@ BYTE *RcsId = "$Id: fatfs.c 1632 2011-06-13 16:29:14Z bartoldeman $";
 STATIC f_node_ptr sft_to_fnode(int fd);
 STATIC void fnode_to_sft(f_node_ptr fnp);
 STATIC int find_fname(const char *path, int attr, f_node_ptr fnp);
+STATIC int find_in_dir(int attr_req, int attr_allow, f_node_ptr fnp);
     /* /// Added - Ron Cemer */
 STATIC int merge_file_changes(f_node_ptr fnp, int collect);
 STATIC BOOL find_free(f_node_ptr);
@@ -133,10 +134,48 @@ STATIC void init_direntry(struct dirent *dentry, unsigned attrib,
 int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
 {
   REG f_node_ptr fnp = sft_to_fnode(fd);
-  int status = find_fname(path, D_ALL | attrib, fnp);
+  int status;
+
+  /* Special handling for volume name (they can coexist with files/directories) */
+  if ((attrib & D_VOLID) &&
+      ((attrib & D_DIR) != D_DIR) && ((attrib & D_LFN) != D_LFN) &&
+      (flags & O_CREAT) && (flags & O_FCB))
+  {
+    int ret;
+    char rpath[16];
+    char *p;
+
+    /* Check to see if there are any other files in the root with VOLID set */
+    rpath[0] = path[0];
+    rpath[1] = ':';
+    rpath[2] = '\\';
+    rpath[3] = '\0';
+    fnp = dir_open(rpath, FALSE, fnp);
+    status = find_in_dir(D_VOLID, D_VOLID | D_RDONLY | D_ARCHIVE, fnp);
+    if (status == SUCCESS)
+      return DE_ACCESS;
+
+    /* Find the filename.ext component of the path. Note that MS-DOS 6.22 and
+     * DR-DOS 7.01 set the volume label (in the root) when a caller tries to
+     * create a file with VOLID set in a non root directory */
+    p = strrchr(path, '\\');
+    if (!p)
+      return DE_ACCESS;
+    strncpy(rpath + 3, p + 1, sizeof(rpath) - 3);
+
+    /* Create our new label */
+    ret = alloc_find_free(fnp, rpath);
+    if (ret != SUCCESS)
+      return ret;
+    status = S_CREATED;
+
+    writelabelBPB(rpath[0], rpath + 3);
+    goto doit;
+  }
 
   /* Check that we don't have a duplicate name, so if we  */
   /* find one, truncate it (O_CREAT).                     */
+  status = find_fname(path, D_ALL | attrib, fnp);
   if (status == SUCCESS)
   {
     unsigned char dir_attrib = fnp->f_dir.dir_attrib;
@@ -187,6 +226,8 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
     /* found error.                                          */
     return status;
   }
+
+doit:
 
   /* Now change to file                                   */
   fnp->f_sft_idx = fd;
@@ -241,7 +282,7 @@ COUNT dos_close(COUNT fd)
 }
 
 /*                                                                      */
-/* split a path into it's component directory and file name             */
+/* split a path into its component directory and file name              */
 /*                                                                      */
 f_node_ptr split_path(const char * path, f_node_ptr fnp)
 {
