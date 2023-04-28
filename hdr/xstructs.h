@@ -35,6 +35,7 @@ struct xfreespace {
   ULONG xfs_totalunits;         /* total allocation units                */
   UBYTE xfs_reserved[8];
 };
+ANNOTATE_SIZE(struct xfreespace, 0x2c);
 
 struct xdpbforformat {
   UWORD xdff_datasize;          /* size of this structure                */
@@ -80,5 +81,6 @@ struct xdpbforformat {
     } setget;
   } xdff_f;
 };
+ANNOTATE_SIZE(struct xdpbforformat, 0x18);
 
 COUNT DosGetExtFree(__FAR(BYTE) DriveString, __FAR(struct xfreespace) xfsp);

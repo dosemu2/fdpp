@@ -84,6 +84,7 @@ struct dpb {
   /* -1 if not known              */
 #endif
 } PACKED;
+ANNOTATE_SIZE(struct dpb, 0x3d);
 
 #define UNKNCLUSTER      0x0000 /* see RBIL INT 21/AH=52 entry */
 #define XUNKNCLSTFREE    0xffffffffl    /* unknown for DOS */
