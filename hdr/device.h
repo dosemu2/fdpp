@@ -383,8 +383,8 @@ typedef struct {
         __DOSFAR(struct gblkfv)_r_fv;
         __DOSFAR(struct Gioc_media)_r_gioc;
         __DOSFAR(struct Access_info)_r_ai;
-      } PACKED _r_par;                 /* Pointer to param. block from 440C/440D */
-    } PACKED _r_gen;
+      } _r_par;                 /* Pointer to param. block from 440C/440D */
+    } _r_gen;
   } PACKED _r_x;
 } PACKED request;
 ANNOTATE_SIZE(request, 30);

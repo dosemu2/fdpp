@@ -28,7 +28,7 @@
 template<typename T>
 class NearPtr_DO : public NearPtr<T, dosobj_seg> {
     using NearPtr<T, dosobj_seg>::NearPtr;
-} PACKED;
+};
 
 template <typename T>
 class FarObjBase {

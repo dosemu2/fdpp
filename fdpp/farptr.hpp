@@ -27,10 +27,6 @@
 #include "thunks_priv.h"
 #include "farhlp_sta.h"
 
-#ifndef PACKED
-#define PACKED __attribute__((packed))
-#endif
-
 /* for get_sym() */
 static const int sym_store[] = { SYM_STORE, STORE_MAX };
 static const int arr_store[] = { ARR_STORE, STORE_MAX };
@@ -202,7 +198,7 @@ public:
     T* get_ptr() const { return (T*)resolve_segoff(ptr); }
     void *get_buf() const { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
-} PACKED;
+};
 
 class ObjIf {
 public:
@@ -676,7 +672,7 @@ public:
         store_far(SYM_STORE, this->lookup_sym().get_far());
         return *this;
     }
-} PACKED;
+};
 
 template<typename T, typename P, int (*M)(void), int O = 0>
 class SymMemb2 : public MembBase<T, P, M, O> {
@@ -688,7 +684,7 @@ public:
     T& operator =(const T& f) { sym = f; return sym; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
     operator T &() { return sym; }
-} PACKED;
+};
 
 #undef _P
 #undef _C
