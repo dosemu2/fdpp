@@ -4,12 +4,12 @@
 
 LLD ?= $(shell which ld.lld 2>/dev/null)
 CCACHE ?= $(shell which ccache 2>/dev/null)
-CC = $(CCACHE) clang++
+CC = $(CCACHE) clang++ -fclang-abi-compat=15
 # Override builtin CXX.
 # The assignment below is ignored if CXX was set via cmd line.
 CXX=
 ifeq ($(CXX),)
-CL = $(CCACHE) clang++
+CL = $(CC)
 else
 CL = $(CXX)
 endif
