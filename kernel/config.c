@@ -507,7 +507,7 @@ void PostConfig(void)
   /* LoL->FCBp = KernelAlloc(sizeof(sftheader)
      + Config.cfgFiles * sizeof(sft)); */
   for (sp = LoL->_sfthead;
-      sp->sftt_next != (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+      !SFTTBL_END(sp->sftt_next);
       sp = sp->sftt_next);
   sp2 = (sfttbl FAR *)
     /* have initial 16 sfts in kernel */

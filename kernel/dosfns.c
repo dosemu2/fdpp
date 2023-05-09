@@ -110,7 +110,7 @@ int idx_to_sft_(int SftIndex)
     return -1;
 
   /* Get the SFT block that contains the SFT      */
-  for (sp = sfthead; sp != (sfttbl FAR *) - 1; sp = sp->sftt_next)
+  for (sp = sfthead; !SFTTBL_END(sp); sp = sp->sftt_next)
   {
     if (SftIndex < sp->sftt_count)
     {
@@ -457,7 +457,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
 
   *sft_idx = 0;
   /* Get the SFT block that contains the SFT      */
-  for (sp = sfthead; sp != (sfttbl FAR *) - 1; sp = sp->sftt_next)
+  for (sp = sfthead; !SFTTBL_END(sp); sp = sp->sftt_next)
   {
     REG COUNT i = sp->sftt_count;
     sft FAR *sfti = sp->sftt_table;

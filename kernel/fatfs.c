@@ -403,7 +403,7 @@ STATIC int merge_file_changes(f_node_ptr fnp, int collect)
     return SUCCESS;
 
   i = 0;
-  for (sp = sfthead; sp != (sfttbl FAR *) - 1; sp = sp->sftt_next)
+  for (sp = sfthead; !SFTTBL_END(sp); sp = sp->sftt_next)
   {
     for(j = sp->sftt_count, sftp = sp->sftt_table; --j >= 0; sftp++, i++)
     {

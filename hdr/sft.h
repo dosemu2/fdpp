@@ -104,6 +104,8 @@ typedef struct sfttbl {
   AR_MEMB(sfttbl, sft, sftt_table, SFTMAX);       /* The array of sft for block   */
 } PACKED sfttbl;
 
+#define SFTTBL_END(p) (FP_OFF(p) == 0xffff)
+
 /* defines for sft use                                                  */
 #define SFT_MASK        0x0060  /* splits device data           */
 
