@@ -711,7 +711,8 @@ blk_stk_top:
 clk_stk_top:
 
                 global _dmatch_ff
-_dmatch_ff      times 21 db 0
+_dmatch_ff      times 43 db 0
+                align 2
 
 ; Dynamic data:
 ; member of the DOS DATA GROUP

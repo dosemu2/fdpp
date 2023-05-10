@@ -52,3 +52,4 @@ typedef struct _dmatch {
   ULONG dm_size;                /* file size                    */
   AR_MEMB(_dmatch, BYTE, dm_name, FNAME_SIZE + FEXT_SIZE + 2);     /* file name    */
 } PACKED dmatch;
+ANNOTATE_SIZE(dmatch, 43);
