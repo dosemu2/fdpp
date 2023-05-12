@@ -43,7 +43,7 @@ struct cds {
                                never access == 0xFFFF */
       UWORD _cdsParam;
     } _cdsRedir;
-  } _cdsUnion;
+  } NONPOD_PACKED _cdsUnion;
 
   UWORD cdsStoreUData;
 

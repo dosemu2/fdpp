@@ -9,9 +9,9 @@ CLANG_VER := $(shell $(CC) -v 2>&1 | head -n 1 | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
 # below requires make-4.4, uncomment when it is widely available
 #CC += $(intcmp 15,$(CLANG_VER),-fclang-abi-compat=15)
-ifeq ($(CLANG_VER),16)
-CC += -fclang-abi-compat=15
-endif
+#ifeq ($(CLANG_VER),16)
+#CC += -fclang-abi-compat=15
+#endif
 
 # Override builtin CXX.
 # The assignment below is ignored if CXX was set via cmd line.
@@ -45,7 +45,10 @@ USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS = $(IFLAGS) -DFDPP
-WFLAGS = -Wall -Wpacked -Werror=packed-non-pod -Wno-unknown-warning-option
+WFLAGS = -Wall -Werror=packed-non-pod -Wno-unknown-warning-option
+ifneq ($(CLANG_VER),16)
+WFLAGS += -Wpacked
+endif
 WCFLAGS = $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
