@@ -43,9 +43,16 @@ void *smalloc(struct mempool *mp, size_t size);
 void *smalloc_fixed(struct mempool *mp, void *ptr, size_t size);
 int smfree(struct mempool *mp, void *ptr);
 void *smalloc_aligned(struct mempool *mp, size_t align, size_t size);
+void *smalloc_topdown(struct mempool *mp, size_t size);
+void *smalloc_aligned_topdown(struct mempool *mp, unsigned char *top,
+    size_t align, size_t size);
 void *smrealloc(struct mempool *mp, void *ptr, size_t size);
+void *smrealloc_aligned(struct mempool *mp, void *ptr, int align, size_t size);
 int sminit(struct mempool *mp, void *start, size_t size);
 int sminit_com(struct mempool *mp, void *start, size_t size,
+    int (*commit)(void *area, size_t size),
+    int (*uncommit)(void *area, size_t size));
+int sminit_comu(struct mempool *mp, void *start, size_t size,
     int (*commit)(void *area, size_t size),
     int (*uncommit)(void *area, size_t size));
 void smfree_all(struct mempool *mp);

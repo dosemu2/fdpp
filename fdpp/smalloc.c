@@ -29,8 +29,17 @@
 #include "smalloc.h"
 
 #define POOL_USED(p) (p->mn.used || p->mn.next)
-#ifndef min
-#define min(x, y) ((x) < (y) ? (x) : (y))
+#ifndef _min
+#define _min(x, y) ((x) < (y) ? (x) : (y))
+#endif
+#ifndef PAGE_SIZE
+#define PAGE_SIZE 4096
+#endif
+#ifndef PAGE_MASK
+#define PAGE_MASK (~(PAGE_SIZE-1))
+#endif
+#ifndef PAGE_ALIGN
+#define PAGE_ALIGN(addr) (((addr)+PAGE_SIZE-1)&PAGE_MASK)
 #endif
 
 static void smerror_dummy(int prio, const char *fmt, ...) FORMAT(printf, 2, 3);
@@ -99,11 +108,16 @@ static int get_oom_pr(struct mempool *mp, size_t size)
 
 static void sm_uncommit(struct mempool *mp, void *addr, size_t size)
 {
+    /* align address up and align down size */
+    uintptr_t a = (uintptr_t)addr;
+    uintptr_t aa = PAGE_ALIGN(a);
+    size_t aligned_size = (size - (aa - a)) & PAGE_MASK;
+    void *aligned_addr = (void *)aa;
     mp->avail += size;
     assert(mp->avail <= mp->size);
     if (!mp->uncommit)
       return;
-    mp->uncommit(addr, size);
+    mp->uncommit(aligned_addr, aligned_size);
 }
 
 static int __sm_commit(struct mempool *mp, void *addr, size_t size,
@@ -123,7 +137,12 @@ static int __sm_commit(struct mempool *mp, void *addr, size_t size,
 static int sm_commit(struct mempool *mp, void *addr, size_t size,
 	void *e_addr, size_t e_size)
 {
-    int ok = __sm_commit(mp, addr, size, e_addr, e_size);
+    /* align address down and align up size */
+    uintptr_t a = (uintptr_t)addr;
+    uintptr_t aa = a & PAGE_MASK;
+    size_t aligned_size = PAGE_ALIGN(size + (a - aa));
+    void *aligned_addr = (void *)aa;
+    int ok = __sm_commit(mp, aligned_addr, aligned_size, e_addr, e_size);
     if (ok) {
 	assert(mp->avail >= size);
 	mp->avail -= size;
@@ -214,25 +233,18 @@ static struct memnode *smfind_free_area(struct mempool *mp, size_t size)
   return NULL;
 }
 
-static struct memnode *sm_alloc_mn(struct mempool *mp, size_t size)
+static struct memnode *smfind_free_area_topdown(struct mempool *mp,
+    unsigned char *top, size_t size)
 {
   struct memnode *mn;
-  if (!size) {
-    smerror(mp, "SMALLOC: zero-sized allocation attempted\n");
-    return NULL;
+  struct memnode *mn1 = NULL;
+  for (mn = &mp->mn; mn; mn = mn->next) {
+    if (top && mn->mem_area + size > top)
+      break;
+    if (!mn->used && mn->size >= size)
+      mn1 = mn;
   }
-  if (!(mn = smfind_free_area(mp, size))) {
-    do_smerror(get_oom_pr(mp, size), mp,
-	    "SMALLOC: Out Of Memory on alloc, requested=%zu\n", size);
-    return NULL;
-  }
-  if (!sm_commit_simple(mp, mn->mem_area, size))
-    return NULL;
-  mn->used = 1;
-  mntruncate(mn, size);
-  assert(mn->size == size);
-  memset(mn->mem_area, 0, size);
-  return mn;
+  return mn1;
 }
 
 static struct memnode *sm_alloc_fixed(struct mempool *mp, void *ptr,
@@ -278,16 +290,19 @@ static struct memnode *sm_alloc_aligned(struct mempool *mp, size_t align,
   struct memnode *mn;
   int delta;
   uintptr_t iptr;
-  if (!size || align < 2) {
+  if (!size) {
     smerror(mp, "SMALLOC: zero-sized allocation attempted\n");
     return NULL;
   }
+  /* power of 2 align */
+  assert(__builtin_popcount(align) == 1);
   align--;
   if (!(mn = smfind_free_area(mp, size + align))) {
     do_smerror(get_oom_pr(mp, size), mp,
 	    "SMALLOC: Out Of Memory on alloc, requested=%zu\n", size);
     return NULL;
   }
+  /* insert small node to align the start */
   iptr = (uintptr_t)mn->mem_area;
   delta = ((iptr | align) - iptr + 1) & align;
   if (delta) {
@@ -302,6 +317,61 @@ static struct memnode *sm_alloc_aligned(struct mempool *mp, size_t align,
   assert(mn->size == size);
   memset(mn->mem_area, 0, size);
   return mn;
+}
+
+static struct memnode *sm_alloc_mn(struct mempool *mp, size_t size)
+{
+  return sm_alloc_aligned(mp, 1, size);
+}
+
+static struct memnode *sm_alloc_aligned_topdown(struct mempool *mp,
+    unsigned char *top, size_t align, size_t size)
+{
+  struct memnode *mn;
+  int delta;
+  uintptr_t iptr;
+  uintptr_t min_top;
+  uintptr_t iend;
+  if (!size) {
+    smerror(mp, "SMALLOC: zero-sized allocation attempted\n");
+    return NULL;
+  }
+  /* power of 2 align */
+  assert(__builtin_popcount(align) == 1);
+  align--;
+  if (!(mn = smfind_free_area_topdown(mp, top, size + align))) {
+    do_smerror(get_oom_pr(mp, size), mp,
+	    "SMALLOC: Out Of Memory on alloc, requested=%zu\n", size);
+    return NULL;
+  }
+  /* use top part of the found area */
+  min_top = (uintptr_t)mn->mem_area + mn->size;
+  if (top)
+    min_top = _min(min_top, (uintptr_t)top);
+  iptr = (min_top - size) & ~align;
+  iend = iptr + size;
+  delta = (uintptr_t)mn->mem_area + mn->size - iend;
+  if (delta)
+    mntruncate(mn, mn->size - delta);
+  assert(iptr >= (uintptr_t)mn->mem_area);
+  delta = iptr - (uintptr_t)mn->mem_area;
+  if (delta) {
+    mntruncate(mn, delta);
+    mn = mn->next;
+    assert(!mn->used && mn->size >= size);
+  }
+  if (!sm_commit_simple(mp, mn->mem_area, size))
+    return NULL;
+  mn->used = 1;
+  mntruncate(mn, size);
+  assert(mn->size == size);
+  memset(mn->mem_area, 0, size);
+  return mn;
+}
+
+static struct memnode *sm_alloc_topdown(struct mempool *mp, size_t size)
+{
+  return sm_alloc_aligned_topdown(mp, NULL, 1, size);
 }
 
 void *smalloc(struct mempool *mp, size_t size)
@@ -324,6 +394,24 @@ void *smalloc_fixed(struct mempool *mp, void *ptr, size_t size)
 void *smalloc_aligned(struct mempool *mp, size_t align, size_t size)
 {
   struct memnode *mn = sm_alloc_aligned(mp, align, size);
+  if (!mn)
+    return NULL;
+  assert(((uintptr_t)mn->mem_area & (align - 1)) == 0);
+  return mn->mem_area;
+}
+
+void *smalloc_topdown(struct mempool *mp, size_t size)
+{
+  struct memnode *mn = sm_alloc_topdown(mp, size);
+  if (!mn)
+    return NULL;
+  return mn->mem_area;
+}
+
+void *smalloc_aligned_topdown(struct mempool *mp, unsigned char *top,
+    size_t align, size_t size)
+{
+  struct memnode *mn = sm_alloc_aligned_topdown(mp, top, align, size);
   if (!mn)
     return NULL;
   assert(((uintptr_t)mn->mem_area & (align - 1)) == 0);
@@ -370,7 +458,7 @@ static struct memnode *sm_realloc_alloc_mn(struct mempool *mp,
   if (pmn && !pmn->used && pmn->size + mn->size +
 	(nmn->used ? 0 : nmn->size) >= size) {
     /* move to prev memnode */
-    size_t psize = min(size, pmn->size);
+    size_t psize = _min(size, pmn->size);
     if (!sm_commit_simple(mp, pmn->mem_area, psize))
       return NULL;
     if (size > pmn->size + mn->size) {
@@ -447,6 +535,56 @@ void *smrealloc(struct mempool *mp, void *ptr, size_t size)
   return mn->mem_area;
 }
 
+void *smrealloc_aligned(struct mempool *mp, void *ptr, int align, size_t size)
+{
+  struct memnode *mn, *pmn;
+  assert(__builtin_popcount(align) == 1);
+  if (!ptr)
+    return smalloc_aligned(mp, align, size);
+  if (!(mn = find_mn(mp, (unsigned char *)ptr, &pmn))) {
+    smerror(mp, "SMALLOC: bad pointer passed to smrealloc()\n");
+    return NULL;
+  }
+  if (!mn->used) {
+    smerror(mp, "SMALLOC: attempt to realloc the not allocated region\n");
+    return NULL;
+  }
+  if (size == 0) {
+    smfree(mp, ptr);
+    return NULL;
+  }
+  if (size == mn->size)
+    return ptr;
+  if ((uintptr_t)mn->mem_area & (align - 1)) {
+    smerror(mp, "SMALLOC: unaligned pointer passed to smrealloc_aligned()\n");
+    return NULL;
+  }
+  if (size < mn->size) {
+    /* shrink */
+    sm_uncommit(mp, mn->mem_area + size, mn->size - size);
+    mntruncate(mn, size);
+  } else {
+    /* grow */
+    struct memnode *nmn = mn->next;
+    if (nmn && !nmn->used && mn->size + nmn->size >= size) {
+      /* expand by shrinking next memnode */
+      if (!sm_commit_simple(mp, nmn->mem_area, size - mn->size))
+        return NULL;
+      memset(nmn->mem_area, 0, size - mn->size);
+      mntruncate(mn, size);
+    } else {
+      /* lazy impl */
+      struct memnode *new_mn = sm_alloc_aligned(mp, align, size);
+      if (!new_mn)
+        return NULL;
+      memcpy(new_mn->mem_area, mn->mem_area, mn->size);
+      smfree(mp, mn->mem_area);
+    }
+  }
+  assert(mn->size == size);
+  return mn->mem_area;
+}
+
 int sminit(struct mempool *mp, void *start, size_t size)
 {
   mp->size = size;
@@ -461,16 +599,30 @@ int sminit(struct mempool *mp, void *start, size_t size)
   return 0;
 }
 
-int sminit_com(struct mempool *mp, void *start, size_t size,
+static int do_sminit_com(struct mempool *mp, void *start, size_t size,
     int (*commit)(void *area, size_t size),
-    int (*uncommit)(void *area, size_t size))
+    int (*uncommit)(void *area, size_t size), int do_uncommit)
 {
   sminit(mp, start, size);
   mp->commit = commit;
   mp->uncommit = uncommit;
-  if (uncommit)
+  if (uncommit && do_uncommit)
     uncommit(start, size);
   return 0;
+}
+
+int sminit_com(struct mempool *mp, void *start, size_t size,
+    int (*commit)(void *area, size_t size),
+    int (*uncommit)(void *area, size_t size))
+{
+  return do_sminit_com(mp, start, size, commit, uncommit, 1);
+}
+
+int sminit_comu(struct mempool *mp, void *start, size_t size,
+    int (*commit)(void *area, size_t size),
+    int (*uncommit)(void *area, size_t size))
+{
+  return do_sminit_com(mp, start, size, commit, uncommit, 0);
 }
 
 void smfree_all(struct mempool *mp)
