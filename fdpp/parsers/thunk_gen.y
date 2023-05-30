@@ -23,6 +23,7 @@ static int arg_size;
 static int al_arg_size;
 static int arr_sz;
 static int is_ptr;
+static int is_arr;
 static int is_rptr;
 static int is_far;
 static int is_rfar;
@@ -49,6 +50,7 @@ static void beg_arg(void)
 {
     is_far = 0;
     is_ptr = 0;
+    is_arr = 0;
     is_cbk = 0;
     is_void = 0;
     is_const = 0;
@@ -167,8 +169,8 @@ static void fin_arg(int last)
     do_start_arg(0);
     switch (thunk_type) {
     case 0:
-	sprintf(abuf + strlen(abuf), "%i, %s%s, _SP)", arg_offs,
-		is_const ? "const " : "", atype);
+	sprintf(abuf + strlen(abuf), "%i, %s%s%s, _SP)", arg_offs,
+		is_const ? "const " : "", atype, is_arr ? " *" : "");
 	break;
     case 1:
     case 2:
@@ -359,8 +361,8 @@ quals:		  FAR quals	{ is_far = 1; }
 		|
 ;
 
-arr:		  LBR num RBR	{ cvtype == CVTYPE_CHAR ? cvtype = CVTYPE_CHAR_ARR : CVTYPE_ARR; arr_sz = $2; }
-		| LBR RBR	{ cvtype == CVTYPE_CHAR ? cvtype = CVTYPE_CHAR_ARR : CVTYPE_ARR; arr_sz = -1; }
+arr:		  LBR num RBR	{ cvtype == CVTYPE_CHAR ? cvtype = CVTYPE_CHAR_ARR : CVTYPE_ARR; is_arr = 1; arr_sz = $2; }
+		| LBR RBR	{ cvtype == CVTYPE_CHAR ? cvtype = CVTYPE_CHAR_ARR : CVTYPE_ARR; is_arr = 1; arr_sz = -1; }
 ;
 
 fatr:		  ASMCFUNC
