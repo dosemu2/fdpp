@@ -21,9 +21,6 @@
 
 #define FDPP_KERNEL_VERSION          4
 
-#define DL_SET_SYMTAB                0
-#define DL_CCALL                     1
-
 #ifndef __ASSEMBLER__
 
 void *resolve_segoff(struct far_s fa);

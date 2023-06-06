@@ -217,15 +217,10 @@ static void FdppSetSymTab(struct fdpp_symtab *symtab)
     ___assert(!err);
 }
 
-static int _FdppCall(struct vm86_regs *regs)
+int FdppCtrl(int idx, struct vm86_regs *regs)
 {
-    int len;
-    UDWORD res;
-    enum DispStat stat;
-
-    assert(fdpp);
-
-    switch (LO_BYTE(regs->ebx)) {
+#define DL_SET_SYMTAB 0
+    switch (idx) {
     case DL_SET_SYMTAB:
         if (HI_BYTE(regs->eax) != FDPP_KERNEL_VERSION) {
             fdloudprintf("\nfdpp version mismatch: expected %i, got %i\n",
@@ -234,33 +229,43 @@ static int _FdppCall(struct vm86_regs *regs)
         }
         FdppSetSymTab(
                 (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esi)));
+        return 0;
+    }
+    return -1;
+}
+
+static int _FdppCall(struct vm86_regs *regs)
+{
+    int len;
+    UDWORD res;
+    enum DispStat stat;
+
+    assert(fdpp);
+
+    s_regs = *regs;
+    res = FdppThunkCall(LO_WORD(regs->ecx),
+            (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &stat, &len);
+    *regs = s_regs;
+    if (stat == DISP_NORET)
+        return (res == ASM_NORET ? FDPP_RET_NORET : FDPP_RET_ABORT);
+    switch (len) {
+    case 0:
         break;
-    case DL_CCALL:
-        s_regs = *regs;
-        res = FdppThunkCall(LO_WORD(regs->ecx),
-                (UBYTE *)so2lin(regs->ss, LO_WORD(regs->edx)), &stat, &len);
-        *regs = s_regs;
-        if (stat == DISP_NORET)
-            return (res == ASM_NORET ? FDPP_RET_NORET : FDPP_RET_ABORT);
-        switch (len) {
-        case 0:
-            break;
-        case 1:
-            _AL(regs) = res;
-            break;
-        case 2:
-            _AX(regs) = res;
-            break;
-        case 4:
-            _AX(regs) = res & 0xffff;
-            _DX(regs) = res >> 16;
-            break;
-        default:
-            _fail();
-            break;
-        }
+    case 1:
+        _AL(regs) = res;
+        break;
+    case 2:
+        _AX(regs) = res;
+        break;
+    case 4:
+        _AX(regs) = res & 0xffff;
+        _DX(regs) = res >> 16;
+        break;
+    default:
+        _fail();
         break;
     }
+
     return FDPP_RET_OK;
 }
 

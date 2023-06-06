@@ -32,14 +32,14 @@ struct _bprm_xtra {
 
 #endif
 
-#define BPRM_VER 9
-#define BPRM_MIN_VER 8
+#define BPRM_VER 10
+#define BPRM_MIN_VER 10
 
 #define FDPP_BS_SEG 0x1fe0
 #define FDPP_BS_OFF 0x7c00
 
 #define FDPP_PLT_OFFSET 0x100
-#define FDPP_BPRM_VER_OFFSET 0x104
-#define FDPP_BPRM_OFFSET 0x106
+#define FDPP_BPRM_VER_OFFSET 0x110
+#define FDPP_BPRM_OFFSET 0x112
 
 #endif

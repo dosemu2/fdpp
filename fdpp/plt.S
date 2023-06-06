@@ -28,13 +28,11 @@ segment _BSS
 fdpp_plt dd 0
 
 %macro call_plt 0
-    push es
     push ds
     mov di, DGROUP
     mov ds, di
     call far [fdpp_plt]
     pop ds
-    pop es
 %endmacro
 
 %macro asmcfunc 4
@@ -42,8 +40,7 @@ segment %3
     global _%1
     _%1:
     mov al, 0 ; reserved
-    mov bh, 0 ; reserved
-    mov bl, DL_CCALL
+    mov bx, 0 ; reserved
     mov cx, %2
     mov dx, sp
     add dx, %4
@@ -163,8 +160,7 @@ plt_init:
 
     mov al, 0 ; reserved
     mov ah, FDPP_KERNEL_VERSION
-    mov bh, 0 ; reserved
-    mov bl, DL_SET_SYMTAB
+    mov bx, 0 ; reserved
     ; fill in struct fdpp_symtab
     push word IGROUP
     push word init_near_wrp           ; near_wrp[1]
@@ -178,7 +174,13 @@ plt_init:
     push word __asm_symtab_start      ; symtab
     ; fdpp_symtab filled
     mov si, sp
-    call_plt
+
+    push ds
+    mov di, DGROUP
+    mov ds, di
+    call far [es:FDPP_BS_OFF+FDPP_PLT_OFFSET+4]
+    pop ds
+
     mov sp, bp
     pop bp
     ret

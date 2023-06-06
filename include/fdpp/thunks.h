@@ -41,6 +41,7 @@ extern "C" {
 
 struct vm86_regs;
 int FdppCall(struct vm86_regs *regs);
+int FdppCtrl(int idx, struct vm86_regs *regs);
 
 enum { FDPP_PRINT_LOG, FDPP_PRINT_TERMINAL, FDPP_PRINT_SCREEN };
 enum { ASM_CALL_OK, ASM_CALL_ABORT };
