@@ -82,7 +82,7 @@ intvec getvec(unsigned char intno);
 
 #define GLOBAL extern
 #define NAMEMAX         MAX_CDSPATH     /* Maximum path for CDS         */
-#define NFILES          64      /* number of files in table     */
+#define NFILES          16      /* number of files in table     */
 #define NFCBS           16      /* number of fcbs               */
 #define NSTACKS         8       /* number of stacks             */
 #define STACKSIZE       256     /* default stacksize            */
