@@ -353,7 +353,6 @@ BSS(BYTE, HMAState, 0);
 void PreConfig(void)
 {
   struct sfttbl FAR *sp;
-  struct sfttbl FAR *sp2;
 
   /* Initialize the base memory pointers                          */
 
@@ -393,12 +392,16 @@ void PreConfig(void)
   sp->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
   sp->sftt_count = 3;
   LoL->_sfthead->sftt_next = sp;
-  /* add 8 more for CHAIN= and alike */
-  sp2 = (struct sfttbl FAR *)
-      DynAlloc("sft", 1, sizeof(sftheader) + 8 * sizeof(sft));
-  sp2->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
-  sp2->sftt_count = 8;
-  sp->sftt_next = sp2;
+  static_assert(NFILES >= 8, "wrong NFILES");
+  if (NFILES > 8)
+  {
+    /* add up to NFILES */
+    struct sfttbl FAR *sp2 = (struct sfttbl FAR *)
+      DynAlloc("sft", 1, sizeof(sftheader) + (NFILES - 8) * sizeof(sft));
+    sp2->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+    sp2->sftt_count = (NFILES - 8);
+    sp->sftt_next = sp2;
+  }
 
 #ifdef DEBUG
 /*  _printf(" FCB table 0x%P\n",GET_FP32(LoL->FCBp));*/
@@ -468,9 +471,6 @@ void PreConfig2(void)
 /* Also, run config.sys to load drivers.                                */
 void PostConfig(void)
 {
-  sfttbl FAR *sp;
-  sfttbl FAR *sp2;
-
   /* We could just have loaded FDXMS or HIMEM */
   if (HMAState == HMA_REQ && MoveKernelToHMA())
     HMAState = HMA_DONE;
@@ -502,20 +502,22 @@ void PostConfig(void)
 #endif
   config_init_buffers(Config.cfgBuffers, Config.cfgDosDataUmb);
 
-/* LoL->_sfthead = (sfttbl FAR *)&basesft; */
-  /* LoL->FCBp = (sfttbl FAR *)&FcbSft; */
-  /* LoL->FCBp = KernelAlloc(sizeof(sftheader)
-     + Config.cfgFiles * sizeof(sft)); */
-  for (sp = LoL->_sfthead;
+  if (Config.cfgFiles > NFILES)
+  {
+    sfttbl FAR *sp;
+    sfttbl FAR *sp2;
+
+    for (sp = LoL->_sfthead;
       !SFTTBL_END(sp->sftt_next);
       sp = sp->sftt_next);
-  sp2 = (sfttbl FAR *)
-    /* have initial 16 sfts in kernel */
-    KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - 16) * sizeof(sft), 'F',
+    sp2 = (sfttbl FAR *)
+      /* have initial NFILES sfts in kernel */
+      KernelAlloc(sizeof(sftheader) + (Config.cfgFiles - NFILES) * sizeof(sft), 'F',
                 Config.cfgFilesHigh);
-  sp2->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
-  sp2->sftt_count = Config.cfgFiles - 16;
-  sp->sftt_next = sp2;
+    sp2->sftt_next = (sfttbl FAR *)MK_FP((UWORD)-1, (UWORD)-1);
+    sp2->sftt_count = Config.cfgFiles - NFILES;
+    sp->sftt_next = sp2;
+  }
 
   old_CDSp = LoL->_CDSp;
   LoL->_CDSp = KernelAlloc(sizeof(struct cds) * LoL->_lastdrive, 'L', Config.cfgLastdriveHigh);
