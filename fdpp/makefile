@@ -161,7 +161,11 @@ CFILES = blockio.c \
 FDPP_CFILES = smalloc.c farhlp_sta.c elf.c
 FDPP_CCFILES = thunks.cc thunks_c.cc thunks_a.cc thunks_p.cc dosobj.cc
 CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp
-LIBS = $(shell $(PKG_CONFIG) --libs libelf)
+LIBELF := $(shell $(PKG_CONFIG) --libs libelf)
+ifeq ($(LIBELF),)
+$(error libelf not installed)
+endif
+LIBS += $(LIBELF)
 
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)
