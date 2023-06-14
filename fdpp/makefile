@@ -55,7 +55,7 @@ PPOBJS = $(PPASMS:.S=.o)
 
 #               *Explicit Rules*
 
-ALL = $(FDPPLIB) $(TARGET).elf $(TARGET).map $(GEN_EXT)
+ALL = $(FDPPLIB) $(FDPPDEVL) $(TARGET).elf $(TARGET).map $(GEN_EXT)
 
 all: $(ALL)
 
@@ -90,7 +90,7 @@ rel.h: $(TARGET).elf $(TARGET).elf.tmp
 clean:
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
-		*.o $(GEN_CC) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
+		*.o $(GEN_CC) $(FDPPDEVL) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
 		*.pc *.so *.elf
 
@@ -202,6 +202,9 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CC_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
+$(FDPPDEVL): $(FDPPLIB)
+	ln -sf $< $@
+
 plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h \
@@ -241,7 +244,7 @@ INSTALL ?= install
 install: $(ALL)
 	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
 	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
-	$(LN) -s $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp/$(FDPPDEVL)
+	cp -fP $(FDPPDEVL) $(DESTDIR)$(LIBDIR)/fdpp
 	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
