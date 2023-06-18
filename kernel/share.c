@@ -335,8 +335,8 @@ static WORD do_access_check(
 		if (   (lptr->used)
 			&& (!allow_same_fd || fileno != lptr->fileno)
 			&& (fnmatches(filename, file_table[lptr->fileno].filename))
-			&& (   ( (ofs>=lptr->start) && (ofs<lptr->end) )
-				|| ( (endofs>lptr->start) && (endofs<=lptr->end) )   )   ) {
+			&& (ofs < lptr->end)
+			&& (endofs > lptr->start) ) {
 			return -1;
 		}
 	}
