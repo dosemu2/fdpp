@@ -242,15 +242,15 @@ parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
 
 INSTALL ?= install
 install: $(ALL)
-	mkdir -p $(DESTDIR)$(LIBDIR)/fdpp
+	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/fdpp
 	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
 	cp -fP $(FDPPDEVL) $(DESTDIR)$(LIBDIR)/fdpp
-	mkdir -p $(DESTDIR)$(DATADIR)/fdpp
+	$(INSTALL) -d $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
-	mkdir -p $(DESTDIR)$(PKGCONFIGDIR)
+	$(INSTALL) -d $(DESTDIR)$(PKGCONFIGDIR)
 	$(INSTALL) -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
-	mkdir -p $(DESTDIR)$(PREFIX)/include/fdpp
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/include/fdpp
 	$(INSTALL) -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
 
 uninstall:
