@@ -19,12 +19,12 @@ gen_asms_tmp() {
 
 gen_plt_asmc() {
 	grep ASMFUNC $1 | \
-		sed -E 's/([0-9]+)[ \t]+([^ \t\(]+[ \t]+)+([^ \(]+) *\(.+/asmcsym \3, \1/'
+		sed -E 's/([0-9]+)[[:blank:]]+([^[:blank:]\(]+[[:blank:]]+)+([^ \(]+) *\(.+/asmcsym \3, \1/'
 }
 
 gen_plt_asmp() {
 	grep ASMPASCAL $1 | tr '[:lower:]' '[:upper:]' | \
-		sed -E 's/([0-9]+)[ \t]+([^ \t\(]+[ \t]+)+([^ \(]+) *\(.+/asmpsym \3, \1/'
+		sed -E 's/([0-9]+)[[:blank:]]+([^[:blank:]\(]+[[:blank:]]+)+([^ \(]+) *\(.+/asmpsym \3, \1/'
 }
 
 case "$1" in
