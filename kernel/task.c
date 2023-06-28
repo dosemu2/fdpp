@@ -888,7 +888,7 @@ COUNT DosExec(COUNT mode, exec_blk FAR * ep, const char FAR * lp)
   /* If file not found - free ram and return error        */
 
   if (IsDevice(lp) ||        /* we don't want to execute C:>NUL */
-      (fd = (short)DosOpenSft(lp, O_LEGACY | O_OPEN | O_RDONLY, 0)) < 0)
+      (fd = (short)DosOpenSft(lp, _O_LEGACY | _O_OPEN | _O_RDONLY, 0)) < 0)
   {
     return DE_FILENOTFND;
   }

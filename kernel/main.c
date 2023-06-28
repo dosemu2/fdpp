@@ -207,7 +207,7 @@ STATIC void InitializeAllBPBs(VOID)
   for (drive = 'C'; drive < 'A' + LoL->_nblkdev; drive++)
   {
     filename[0] = drive;
-    if ((fileno = _open(filename, O_RDONLY)) >= 0)
+    if ((fileno = _open(filename, _O_RDONLY)) >= 0)
       _close(fileno);
   }
 }
@@ -481,10 +481,10 @@ STATIC VOID FsConfig(BOOL reinit)
   /* a little bit of shuffling is necessary for compatibility */
 
   /* sft_idx=0 is /dev/aux                                        */
-  safe_open("AUX", O_RDWR);
+  safe_open("AUX", _O_RDWR);
 
   /* handle 1, sft_idx=1 is /dev/con (stdout) */
-  safe_open("CON", O_RDWR);
+  safe_open("CON", _O_RDWR);
 
   /* 3 is /dev/aux                */
   _dup2(STDIN, STDAUX);
@@ -496,7 +496,7 @@ STATIC VOID FsConfig(BOOL reinit)
   _dup2(STDOUT, STDERR);
 
   /* 4 is /dev/prn                                                */
-  safe_open("PRN", O_WRONLY);
+  safe_open("PRN", _O_WRONLY);
 
   /* Initialize the disk buffer management functions */
   /* init_call_init_buffers(); done from CONFIG.C   */

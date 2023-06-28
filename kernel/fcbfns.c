@@ -308,7 +308,7 @@ UBYTE FcbGetFileSize(xfcb FAR * lpXfcb)
   if (!lpFcb || IsDevice(SecPathName) || (recsiz == 0))
     return FCB_ERROR;
 
-  sft_idx = (short)DosOpenSft(SecPathName, O_LEGACY | O_RDONLY | O_OPEN, 0);
+  sft_idx = (short)DosOpenSft(SecPathName, _O_LEGACY | _O_RDONLY | _O_OPEN, 0);
   if (sft_idx >= 0)
   {
     ULONG fsize;
@@ -415,7 +415,7 @@ UBYTE FcbOpen(xfcb FAR * lpXfcb, unsigned flags)
 
   /* Build a traditional DOS file name                            */
   fcb FAR *lpFcb = CommonFcbInit(lpXfcb, SecPathName, &FcbDrive);
-  if ((flags & O_CREAT) && lpXfcb->xfcb_flag == 0xff)
+  if ((flags & _O_CREAT) && lpXfcb->xfcb_flag == 0xff)
     /* pass attribute without constraints (dangerous for directories) */
     attr = lpXfcb->xfcb_attrib;
 
@@ -427,7 +427,7 @@ UBYTE FcbOpen(xfcb FAR * lpXfcb, unsigned flags)
   }
 
   sftp = idx_to_sft(sft_idx);
-  sftp->sft_mode |= O_FCB;
+  sftp->sft_mode |= _O_FCB;
 
   lpFcb->fcb_sftno = sft_idx;
   lpFcb->fcb_cublock = 0;
@@ -658,7 +658,7 @@ VOID FcbCloseAll()
   sft FAR *sftp;
 
   for (idx = 0; (sftp = idx_to_sft(idx)) != (sft FAR *) - 1; idx++)
-    if ((sftp->sft_mode & O_FCB) && sftp->sft_psp == cu_psp)
+    if ((sftp->sft_mode & _O_FCB) && sftp->sft_psp == cu_psp)
       DosCloseSft(idx, FALSE);
 }
 

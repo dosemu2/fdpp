@@ -572,7 +572,7 @@ dispatch:
       break;
 
     case 0x0f:
-      lr.AL = FcbOpen(FP_DS_DX, O_FCB | O_LEGACY | O_OPEN | O_RDWR);
+      lr.AL = FcbOpen(FP_DS_DX, _O_FCB | _O_LEGACY | _O_OPEN | _O_RDWR);
       break;
 
     case 0x10:
@@ -602,7 +602,7 @@ dispatch:
       break;
 
     case 0x16:
-      lr.AL = FcbOpen(FP_DS_DX, O_FCB | O_LEGACY | O_CREAT | O_TRUNC | O_RDWR);
+      lr.AL = FcbOpen(FP_DS_DX, _O_FCB | _O_LEGACY | _O_CREAT | _O_TRUNC | _O_RDWR);
       break;
 
     case 0x17:
@@ -901,12 +901,12 @@ dispatch:
 
       /* Dos Create File                                              */
     case 0x3c:
-      lrc = DosOpen(FP_DS_DX, O_LEGACY | O_RDWR | O_CREAT | O_TRUNC, lr.CL);
+      lrc = DosOpen(FP_DS_DX, _O_LEGACY | _O_RDWR | _O_CREAT | _O_TRUNC, lr.CL);
       goto long_check;
 
       /* Dos Open                                                     */
     case 0x3d:
-      lrc = DosOpen(FP_DS_DX, O_LEGACY | O_OPEN | lr.AL, 0);
+      lrc = DosOpen(FP_DS_DX, _O_LEGACY | _O_OPEN | lr.AL, 0);
       goto long_check;
 
       /* Dos Close                                                    */
@@ -1248,7 +1248,7 @@ dispatch:
 
       /* Create New File */
     case 0x5b:
-      lrc = DosOpen(FP_DS_DX, O_LEGACY | O_RDWR | O_CREAT, lr.CX);
+      lrc = DosOpen(FP_DS_DX, _O_LEGACY | _O_RDWR | _O_CREAT, lr.CX);
       goto long_check;
 
 /* /// Added for SHARE.  - Ron Cemer */
@@ -1944,7 +1944,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
         /* default to don't retry, ie fail/abort/etc other than retry */
         r.FLAGS |= FLG_CARRY;
         /* from RBIL if SFT for FCB or compatibility mode without NOINHERIT call int24h */
-        if ((sftp->sft_mode & O_FCB) || !(sftp->sft_mode & (O_SHAREMASK | O_NOINHERIT)))
+        if ((sftp->sft_mode & _O_FCB) || !(sftp->sft_mode & (_O_SHAREMASK | _O_NOINHERIT)))
         {
           r.AL = CriticalError(0x38, /* ignore/retry/fail - ??? */
                                default_drive,
@@ -2161,7 +2161,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
     case 0x26:                 /* open file */
       r.FLAGS &= ~FLG_CARRY;
       CritErrCode = SUCCESS;
-      lrc = DosOpen(MK_FP(r.DS, r.DX), O_LEGACY | O_OPEN | r.CL, 0);
+      lrc = DosOpen(MK_FP(r.DS, r.DX), _O_LEGACY | _O_OPEN | r.CL, 0);
       goto long_check;
 
     case 0x27:                 /* close file */

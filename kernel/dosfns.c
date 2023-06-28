@@ -164,7 +164,7 @@ DWORD DosReadSftExt(int sft_idx, size_t n, void FAR *bp, BOOL allow_echo,
     return DE_INVLDHNDL;
   }
   /* If for read and write-only or for write and read-only then exit */
-  if (s->sft_mode & O_WRONLY)
+  if (s->sft_mode & _O_WRONLY)
   {
     return DE_ACCESS;
   }
@@ -327,7 +327,7 @@ DWORD DosWriteSft(int sft_idx, size_t n, __XFAR(void)bp)
 {
   sft FAR *s = idx_to_sft(sft_idx);
   /* If for read and write-only or for write and read-only then exit */
-  if ((s->sft_mode & O_ACCMODE) == O_RDONLY)
+  if ((s->sft_mode & _O_ACCMODE) == _O_RDONLY)
   {
     return DE_ACCESS;
   }
@@ -607,19 +607,19 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
   {
     int status;
     unsigned cmd;
-    if ((flags & (O_TRUNC | O_CREAT)) == O_CREAT)
+    if ((flags & (_O_TRUNC | _O_CREAT)) == _O_CREAT)
       attrib |= 0x100;
 
     lpCurSft = sftp;
     cmd = REM_CREATE;
-    if (!(flags & O_LEGACY))
+    if (!(flags & _O_LEGACY))
     {
       ext_open_mode = flags & 0x70ff;
       ext_open_attrib = attrib & 0xff;
-      ext_open_action = ((flags & 0x0300) >> 8) | ((flags & O_CREAT) >> 6);
+      ext_open_action = ((flags & 0x0300) >> 8) | ((flags & _O_CREAT) >> 6);
       cmd = REM_EXTOC;
     }
-    else if (!(flags & O_CREAT))
+    else if (!(flags & _O_CREAT))
     {
       cmd = REM_OPEN;
       attrib = (BYTE)flags;
@@ -648,12 +648,12 @@ long DosOpenSft(const char FAR * fname, unsigned flags, unsigned attrib)
 
   /* First test the flags to see if the user has passed a valid   */
   /* file mode...                                                 */
-  if ((flags & O_ACCMODE) > 2)
+  if ((flags & _O_ACCMODE) > 2)
     return DE_INVLDACC;
 
   /* NEVER EVER allow directories to be created */
   /* ... though FCBs are weird :) */
-  if (!(flags & O_FCB) &&
+  if (!(flags & _O_FCB) &&
       (attrib & ~(D_RDONLY | D_HIDDEN | D_SYSTEM | D_ARCHIVE | D_VOLID)))
     return DE_ACCESS;
 
@@ -718,7 +718,7 @@ COUNT CloneHandle(unsigned hndl)
   /* now get the system file table entry                          */
   sft FAR *sftp = get_sft(hndl);
 
-  if (sftp == (sft FAR *) -1 || (sftp->sft_mode & O_NOINHERIT))
+  if (sftp == (sft FAR *) -1 || (sftp->sft_mode & _O_NOINHERIT))
     return DE_INVLDHNDL;
 
   /* now that we have the system file table entry, get the fnode  */

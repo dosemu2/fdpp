@@ -99,7 +99,7 @@ long DosMkTmp(char FAR * pathname, UWORD attr)
         ptmp[i] -= (ptmp[i] < 'A' + 10) ? '0' - 'A' : 10;
 
     /* only create new file -- 2001/09/22 ska*/
-    rc = DosOpen(pathname, O_LEGACY | O_CREAT | O_RDWR, attr);
+    rc = DosOpen(pathname, _O_LEGACY | _O_CREAT | _O_RDWR, attr);
   } while (rc == DE_FILEEXISTS && loop++ < 0xfff);
 
   return rc;

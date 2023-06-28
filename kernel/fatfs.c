@@ -139,7 +139,7 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
   /* Special handling for volume name (they can coexist with files/directories) */
   if ((attrib & D_VOLID) &&
       ((attrib & D_DIR) != D_DIR) && ((attrib & D_LFN) != D_LFN) &&
-      (flags & O_CREAT) && (flags & O_FCB))
+      (flags & _O_CREAT) && (flags & _O_FCB))
   {
     int ret;
     char rpath[16];
@@ -174,12 +174,12 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
   }
 
   /* Check that we don't have a duplicate name, so if we  */
-  /* find one, truncate it (O_CREAT).                     */
+  /* find one, truncate it (_O_CREAT).                     */
   status = find_fname(path, D_ALL | attrib, fnp);
   if (status == SUCCESS)
   {
     unsigned char dir_attrib = fnp->f_dir.dir_attrib;
-    if (flags & O_TRUNC)
+    if (flags & _O_TRUNC)
     {
       /* The only permissable attribute is archive,   */
       /* check for any other bit set. If it is, give  */
@@ -194,17 +194,17 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
       wipe_out(fnp);
       status = S_REPLACED;
     }
-    else if (flags & O_OPEN)
+    else if (flags & _O_OPEN)
     {
       /* force r/o open for FCB if the file is read-only */
-      if ((flags & O_FCB) && (dir_attrib & D_RDONLY))
-        flags = (flags & ~3) | O_RDONLY;
+      if ((flags & _O_FCB) && (dir_attrib & D_RDONLY))
+        flags = (flags & ~3) | _O_RDONLY;
 
       /* Check permissions. -- JPP
          (do not allow to open volume labels/directories,
           and do not allow writing to r/o files) */
       if ((dir_attrib & (D_DIR | D_VOLID)) ||
-          ((dir_attrib & D_RDONLY) && ((flags & O_ACCMODE) != O_RDONLY)))
+          ((dir_attrib & D_RDONLY) && ((flags & _O_ACCMODE) != _O_RDONLY)))
         return DE_ACCESS;
       status = S_OPENED;
     }
@@ -213,7 +213,7 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
       return DE_FILEEXISTS;
     }
   }
-  else if (status == DE_FILENOTFND && (flags & O_CREAT))
+  else if (status == DE_FILENOTFND && (flags & _O_CREAT))
   {
     int ret = alloc_find_free(fnp, path);
     if (ret != SUCCESS)
@@ -426,7 +426,7 @@ STATIC int merge_file_changes(f_node_ptr fnp, int collect)
         {
           /* We're collecting file changes from any other
              SFT which refers to this file. */
-          if ((sftp->sft_mode & O_ACCMODE) != RDONLY)
+          if ((sftp->sft_mode & _O_ACCMODE) != RDONLY)
           {
             setdstart(fnp->f_dpb, &fnp->f_dir, sftp->sft_stclust);
             fnp->f_dir.dir_size = sftp->sft_size;
@@ -667,7 +667,7 @@ STATIC VOID wipe_out_clusters(struct dpb FAR * dpbp, CLUSTER st)
 }
 
 /* wipe out all FAT entries for create, delete, etc.            */
-/* called by delete_dir_entry and dos_open open in O_TRUNC mode */
+/* called by delete_dir_entry and dos_open open in _O_TRUNC mode */
 STATIC VOID wipe_out(f_node_ptr fnp)
 {
   /* if not already free and valid file, do it */

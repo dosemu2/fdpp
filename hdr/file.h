@@ -50,33 +50,33 @@ static BYTE *file_hRcsId =
 /* mode bits                                                    */
 #define O_VALIDMASK     0xfff3  /* valid open mask              */
 
-#define O_RDONLY        0x0000
-#define O_WRONLY        0x0001
-#define O_RDWR          0x0002
-#define O_ACCMODE       0x0003
+#define _O_RDONLY        0x0000
+#define _O_WRONLY        0x0001
+#define _O_RDWR          0x0002
+#define _O_ACCMODE       0x0003
 
 /* bits 2, 3 reserved */
 
 /* bits 4, 5, 6 sharing modes */
 /* see PC Mag Nov 15, 1988 "Networked Database" p234 by Frank J Derfler Jr */
-#define O_SHAREMASK     0x0070  /* mask to isolate shared bits  */
+#define _O_SHAREMASK     0x0070  /* mask to isolate shared bits  */
 
-#define O_COMPAT        0x0000  /* default, compatibility mode  */
-#define O_DENYALL       0x0010  /* sharing bits                 */
-#define O_DENYWRITE     0x0020  /*     "      "                 */
-#define O_DENYREAD      0x0030  /*     "      "                 */
-#define O_DENYNONE      0x0040  /*     "      "                 */
-#define O_NETFCB        0x0070  /* networked fcb                */
+#define _O_COMPAT        0x0000  /* default, compatibility mode  */
+#define _O_DENYALL       0x0010  /* sharing bits                 */
+#define _O_DENYWRITE     0x0020  /*     "      "                 */
+#define _O_DENYREAD      0x0030  /*     "      "                 */
+#define _O_DENYNONE      0x0040  /*     "      "                 */
+#define _O_NETFCB        0x0070  /* networked fcb                */
 
-#define O_NOINHERIT     0x0080
-#define O_OPEN          0x0100 /* not     */
-#define O_TRUNC         0x0200 /*    both */
-#define O_CREAT         0x0400
-#define O_LEGACY        0x0800
-#define O_LARGEFILE     0x1000
-#define O_NOCRIT        0x2000
-#define O_SYNC          0x4000
-#define O_FCB           0x8000
+#define _O_NOINHERIT     0x0080
+#define _O_OPEN          0x0100 /* not     */
+#define _O_TRUNC         0x0200 /*    both */
+#define _O_CREAT         0x0400
+#define _O_LEGACY        0x0800
+#define _O_LARGEFILE     0x1000
+#define _O_NOCRIT        0x2000
+#define _O_SYNC          0x4000
+#define _O_FCB           0x8000
 
 /* status for extended open */
 enum {S_OPENED = 1, S_CREATED = 2, S_REPLACED = 3};
