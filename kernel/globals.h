@@ -117,10 +117,6 @@ __FAR(struct dpb) GetDriveDPB(UBYTE drive, COUNT * rc);
 /* flag to update fcb_rndm field */
 #define XFR_FCB_RANDOM  4
 
-#define RDONLY          0
-#define WRONLY          1
-#define RDWR            2
-
 /* special ascii code equates                                           */
 #define SPCL            0x00
 #define CTL_C           0x03

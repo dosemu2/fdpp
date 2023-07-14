@@ -426,7 +426,7 @@ STATIC int merge_file_changes(f_node_ptr fnp, int collect)
         {
           /* We're collecting file changes from any other
              SFT which refers to this file. */
-          if ((sftp->sft_mode & _O_ACCMODE) != RDONLY)
+          if ((sftp->sft_mode & _O_ACCMODE) != _O_RDONLY)
           {
             setdstart(fnp->f_dpb, &fnp->f_dir, sftp->sft_stclust);
             fnp->f_dir.dir_size = sftp->sft_size;
