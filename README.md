@@ -127,13 +127,6 @@ was scrapped, and currently
 [something else](https://github.com/salvois/kernel)
 is being developed.
 
-### freedos-64 (inactive)
-[freedos-64](https://sourceforge.net/projects/dos64/)
-seems to be a project
-[planning](http://freedos.10956.n7.nabble.com/DOS-Development-Idea-td16159.html)
-to implement a 64bit kernel around the real-mode
-freedos kernel.
-
 ### NightKernel
 [NightKernel](https://github.com/mercury0x000d/NightKernel)
 is `A 32-bit drop-in replacement for the FreeDOS kernel`, as
