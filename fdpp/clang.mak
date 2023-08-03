@@ -28,6 +28,7 @@ ifneq ($(LLD),)
 # ld.lld can cross-compile while gnu ld not
 CROSS_LD ?= $(LLD)
 else
+$(warning lld not installed)
 CROSS_LD ?= ld
 endif
 NASM ?= nasm
