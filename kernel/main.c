@@ -301,26 +301,27 @@ STATIC void setup_int_vectors(void)
   {
     unsigned char intno;
     UWORD handleroff;
+    void * FAR *prev;
   } vectors[] =
     {
       /* all of these are in the DOS DS */
-      { 0x0, FP_OFF(int0_handler) },   /* zero divide */
-      { 0x1, FP_OFF(empty_handler) },  /* single step */
-      { 0x3, FP_OFF(empty_handler) },  /* debug breakpoint */
-      { 0x6, FP_OFF(int6_handler) },   /* invalid opcode */
-      { 0x0c, FP_OFF(int0c_handler) }, /* Stack Fault */
-      { 0x0d, FP_OFF(int0d_handler) }, /* GPF */
-      { 0x19, FP_OFF(int19_handler) },
-      { 0x20, FP_OFF(int20_handler) },
-      { 0x21, FP_OFF(int21_handler) },
-//      { 0x22, FP_OFF(int22_handler) },
-      { 0x24, FP_OFF(int24_handler) },
-      { 0x25, FP_OFF(low_int25_handler) },
-      { 0x26, FP_OFF(low_int26_handler) },
-      { 0x27, FP_OFF(int27_handler) },
-//      { 0x28, FP_OFF(int28_handler) },
-//      { 0x2a, FP_OFF(int2a_handler) },
-      { 0x2f, FP_OFF(int2f_handler) }
+      { 0x0, FP_OFF(int0_handler), NULL },   /* zero divide */
+      { 0x1, FP_OFF(empty_handler), NULL },  /* single step */
+      { 0x3, FP_OFF(empty_handler), NULL },  /* debug breakpoint */
+      { 0x6, FP_OFF(int6_handler), NULL },   /* invalid opcode */
+      { 0x0c, FP_OFF(int0c_handler), &prev_int0c_handler }, /* Stack Fault */
+      { 0x0d, FP_OFF(int0d_handler), &prev_int0d_handler }, /* GPF */
+      { 0x19, FP_OFF(int19_handler), NULL },
+      { 0x20, FP_OFF(int20_handler), NULL },
+      { 0x21, FP_OFF(int21_handler), &prev_int21_handler },
+//      { 0x22, FP_OFF(int22_handler), NULL },
+      { 0x24, FP_OFF(int24_handler), NULL },
+      { 0x25, FP_OFF(low_int25_handler), NULL },
+      { 0x26, FP_OFF(low_int26_handler), NULL },
+      { 0x27, FP_OFF(int27_handler), NULL },
+//      { 0x28, FP_OFF(int28_handler), NULL },
+//      { 0x2a, FP_OFF(int2a_handler), NULL },
+      { 0x2f, FP_OFF(int2f_handler), &prev_int2f_handler }
     };
   unsigned char intvec_table[] = { 0x10, 0x13, 0x15, 0x19, 0x1B };
   struct vec *pvec;
@@ -339,35 +340,22 @@ STATIC void setup_int_vectors(void)
         bprm.HeapSeg);
   }
 
-  old_vec = getvec(0x0c);
-  if (old_vec)
-    prev_int0c_handler = old_vec;
-  else
-    prev_int0c_handler = empty_handler;
-  old_vec = getvec(0x0d);
-  if (old_vec)
-    prev_int0d_handler = old_vec;
-  else
-    prev_int0d_handler = empty_handler;
-  old_vec = getvec(0x21);
-  if (old_vec)
-    prev_int21_handler = old_vec;
-  else
-    prev_int21_handler = empty_handler;
-  old_vec = getvec(0x2f);
-  if (old_vec)
-    prev_int2f_handler = old_vec;
-  else
-    prev_int2f_handler = empty_handler;
-
   for (i = 0x23; i <= 0x3f; i++) {
     old_vec = getvec(i);
     if (old_vec == NULL)
       setvec(i, empty_handler);
   }
   HaltCpuWhileIdle = 0;
-  for (pvec = vectors; pvec < vectors + (sizeof vectors/sizeof *pvec); pvec++)
+  for (pvec = vectors; pvec < vectors + (sizeof vectors/sizeof *pvec); pvec++) {
+    if (pvec->prev) {
+      old_vec = getvec(pvec->intno);
+      if (old_vec)
+        *pvec->prev = old_vec;
+      else
+        *pvec->prev = empty_handler;
+    }
     setvec(pvec->intno, (intvec)MK_FP(FP_SEG(empty_handler), pvec->handleroff));
+  }
   pokeb(0, 0x30 * 4, 0xea);
   pokel(0, 0x30 * 4 + 1, (ULONG)cpm_entry);
 
