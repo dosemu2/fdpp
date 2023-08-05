@@ -201,7 +201,23 @@ invalid_opcode_message db 0dh,0ah,'Invalid Opcode at ',0
 reloc_call_int6_handler:
 
                 mov si,invalid_opcode_message
-                jmp short zero_message_loop
+                jmp zero_message_loop
+
+ss_message db 0dh,0ah,'Stack Fault at ',0
+
+                global reloc_call_int0c_handler
+reloc_call_int0c_handler:
+
+                mov si,ss_message
+                jmp zero_message_loop
+
+gpf_message db 0dh,0ah,'General Protection Fault at ',0
+
+                global reloc_call_int0d_handler
+reloc_call_int0d_handler:
+
+                mov si,gpf_message
+                jmp zero_message_loop
 
                 global reloc_call_int19_handler
 reloc_call_int19_handler:
