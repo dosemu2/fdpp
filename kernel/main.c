@@ -339,6 +339,16 @@ STATIC void setup_int_vectors(void)
         bprm.HeapSeg);
   }
 
+  old_vec = getvec(0x0c);
+  if (old_vec)
+    prev_int0c_handler = old_vec;
+  else
+    prev_int0c_handler = empty_handler;
+  old_vec = getvec(0x0d);
+  if (old_vec)
+    prev_int0d_handler = old_vec;
+  else
+    prev_int0d_handler = empty_handler;
   old_vec = getvec(0x21);
   if (old_vec)
     prev_int21_handler = old_vec;

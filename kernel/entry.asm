@@ -207,17 +207,55 @@ ss_message db 0dh,0ah,'Stack Fault at ',0
 
                 global reloc_call_int0c_handler
 reloc_call_int0c_handler:
-
+                jmp hdlr0c
+                global  _prev_int0c_handler
+_prev_int0c_handler:
+                dd 0
+                dw 0x424B
+                db 0
+                jmp rst0c
+                times 7 db 0
+rst0c:
+                retf
+hdlr0c:
+                push ax
+                mov al, 0Bh			; request In-Service Register (ISR)
+                out 20h, al			; from primary PIC
+                in al, 20h			; read the ISR
+                test al, 1_0000b		; IRQ #4 occurred ?
+                pop ax
+                jnz @1				; yes, (likely) not an SS
                 mov si,ss_message
                 jmp zero_message_loop
+@1:
+                jmp far [cs:_prev_int0c_handler]
 
 gpf_message db 0dh,0ah,'General Protection Fault at ',0
 
                 global reloc_call_int0d_handler
 reloc_call_int0d_handler:
-
+                jmp hdlr0d
+                global  _prev_int0d_handler
+_prev_int0d_handler:
+                dd 0
+                dw 0x424B
+                db 0
+                jmp rst0d
+                times 7 db 0
+rst0d:
+                retf
+hdlr0d:
+                push ax
+                mov al, 0Bh			; request In-Service Register (ISR)
+                out 20h, al			; from primary PIC
+                in al, 20h			; read the ISR
+                test al, 10_0000b		; IRQ #5 occurred ?
+                pop ax
+                jnz @2				; yes, (likely) not a GPF
                 mov si,gpf_message
                 jmp zero_message_loop
+@2:
+                jmp far [cs:_prev_int0d_handler]
 
                 global reloc_call_int19_handler
 reloc_call_int19_handler:
