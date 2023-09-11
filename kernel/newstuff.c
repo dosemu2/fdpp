@@ -372,9 +372,9 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     {
       if (froot == src + 5)
       {
-        char *dest3 = dest + 3;
-        fmemcpy_n(dest3, src, 5);
-        DosUpMem(dest3, 5);
+        char FAR *dest3 = dest + 3;
+        fmemcpy(dest3, src, 5);
+        DosUpFMem(dest3, 5);
         if (dest[3] == '/') dest[3] = '\\';
         if (dest[7] == '/') dest[7] = '\\';
       }
