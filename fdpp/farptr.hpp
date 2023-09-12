@@ -27,7 +27,7 @@
 #include "thunks_priv.h"
 #include "farhlp_sta.h"
 
-#if !defined(__clang__) || (__clang_major__ >= 16)
+#if !defined(__clang__) || (__clang_major__ >= 16) || defined(__ANDROID__)
 #define NONPOD_PACKED __attribute__((packed))
 #define MAYBE_PACKED
 #else
