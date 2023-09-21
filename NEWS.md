@@ -1,3 +1,29 @@
+## 1.7
+
+A very important release, containing ~200 patches.
+
+- Portability work: ported to aarch64, including MacOS, Android.
+- Implemented HMA memory manager, and lots of work done on a more
+  aggressive HMA usage. Unfortunately dosemu2 disabled HMA support
+  by default in a mean time.
+- Lots of SHARE fixes.
+- Fixed nasty RTC bug (prehistoric2 had problems because of it)
+- Fixed stack switching on int21 calls (vlm now works)
+- Fixed stack switching on int24
+- Added a config.sys syntax for referencing drives created at run-time:
+  CHAIN=%0\userhook.sys can be used if the host platform supplies the
+  meaning of %0 (other digits are possible) at the right time.
+- Added a config.sys syntax for conditional loading:
+  device=?0c:\bin\nansi.sys can be used if the host platform supplies
+  the value of ?0 (other digits are possible) via boot protocol.
+- Fix to support multiple CHAIN directives
+- "Get extended free drive space" function can now use redirector
+  extensions to properly report space on much larger partitions.
+- Fixes to volume labels support.
+- Added handlers for GP and SS exceptions.
+- clang-16 support
+- Lots of bug fixes.
+
 ## 1.6
 
 Resurrected built-in COUNTRY support. You can now do:
