@@ -19,7 +19,7 @@ FDPPDEVL = libfdpp.so
 FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
 LDFLAGS += -Wl,-soname=$(FDPPLIB)
 TARGET=fdppkrnl.$(AVER).$(BVER)
-RELVER = 6
+RELVER = 7
 MAJ = 1
 VERSION = $(MAJ).$(RELVER)
 PKG = fdpp-$(VERSION)
