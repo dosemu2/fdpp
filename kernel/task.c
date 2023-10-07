@@ -968,7 +968,7 @@ VOID ASMCFUNC P_0_exit(void)
 {
   _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
   con_flush_stdin();
-  read_char_stdin(1);
+  read_char_stdin(0);
   fdexit(0);
 }
 
