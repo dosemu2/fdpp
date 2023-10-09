@@ -1,6 +1,6 @@
 /*
  *  FDPP - freedos port to modern C++
- *  Copyright (C) 2018  Stas Sergeev (stsp)
+ *  Copyright (C) 2018-2023  Stas Sergeev (stsp)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
 #include "thunks_priv.h"
 #include "bprm.h"
 %include "segs.inc"
-
-%define _SEG(s) TGROUP
 
 extern _BootParamSeg
 
@@ -59,23 +57,6 @@ segment %3
 %endmacro
 
 %include "plt.inc"
-
-%macro asmcsym 2
-    dw %2
-    extern _%1
-    dw _%1, _SEG(_%1)
-%endmacro
-
-%macro asmpsym 2
-    dw %2
-    extern %1
-    dw %1, _SEG(%1)
-%endmacro
-
-%macro asmsym 1
-    extern _%1
-    dw _%1, _SEG(_%1)
-%endmacro
 
 %macro nearwrp 0
     push bp
@@ -116,25 +97,6 @@ segment %3
     retf 2
 %endmacro
 
-segment INIT_TEXT
-
-__asm_callsymtab_start:
-%include "plt_asmc.inc"
-%include "plt_asmp.inc"
-__asm_callsymtab_end:
-
-#define __ASM(t, n) asmsym n
-#define __ASM_FAR(t, n) asmsym n
-#define __ASM_NEAR(t, n) asmsym n
-#define __ASM_ARR(t, n, l) asmsym n
-#define __ASM_ARRI(t, n) asmsym n
-#define __ASM_ARRI_F(t, n) asmsym n
-#define __ASM_FUNC(n) asmsym n
-#define SEMIC
-__asm_symtab_start:
-#include <glob_asm.h>
-__asm_symtab_end:
-
 segment HMA_TEXT
 
 near_wrp:
@@ -147,9 +109,6 @@ init_near_wrp:
 
     global plt_init
 plt_init:
-    push bp
-    mov bp, sp
-
     ; copy plt entry
     mov ax, FDPP_BS_SEG
     mov es, ax
@@ -157,30 +116,4 @@ plt_init:
     mov bx, [es:FDPP_BS_OFF+FDPP_PLT_OFFSET+2]
     mov [fdpp_plt], ax
     mov [fdpp_plt + 2], bx
-
-    mov al, 0 ; reserved
-    mov ah, FDPP_KERNEL_VERSION
-    mov bx, 0 ; reserved
-    ; fill in struct fdpp_symtab
-    push word IGROUP
-    push word init_near_wrp           ; near_wrp[1]
-    push word TGROUP
-    push word near_wrp                ; near_wrp[0]
-    push word __asm_callsymtab_end - __asm_callsymtab_start  ; calltab_len
-    push word IGROUP
-    push word __asm_callsymtab_start  ; calltab
-    push word __asm_symtab_end - __asm_symtab_start  ; symtab_len
-    push word IGROUP
-    push word __asm_symtab_start      ; symtab
-    ; fdpp_symtab filled
-    mov si, sp
-
-    push ds
-    mov di, DGROUP
-    mov ds, di
-    call far [es:FDPP_BS_OFF+FDPP_PLT_OFFSET+4]
-    pop ds
-
-    mov sp, bp
-    pop bp
     ret
