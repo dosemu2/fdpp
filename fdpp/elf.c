@@ -142,9 +142,8 @@ void elf_close(void *arg)
     free(state);
 }
 
-void *elf_getsym(void *arg, const char *name)
+static int do_getsymoff(struct elfstate *state, const char *name)
 {
-    struct elfstate *state = (struct elfstate *)arg;
     Elf_Data *data;
     int count, i;
 
@@ -156,8 +155,23 @@ void *elf_getsym(void *arg, const char *name)
         gelf_getsym(data, i, &sym);
         if (strcmp(elf_strptr(state->elf, state->symtab_shdr.sh_link,
                 sym.st_name), name) == 0)
-            return state->addr + state->load_offs + sym.st_value;
+            return sym.st_value;
     }
 
-    return NULL;
+    return -1;
+}
+
+void *elf_getsym(void *arg, const char *name)
+{
+    struct elfstate *state = (struct elfstate *)arg;
+    int off = do_getsymoff(state, name);
+    if (off == -1)
+        return NULL;
+    return state->addr + state->load_offs + off;
+}
+
+int elf_getsymoff(void *arg, const char *name)
+{
+    struct elfstate *state = (struct elfstate *)arg;
+    return do_getsymoff(state, name);
 }

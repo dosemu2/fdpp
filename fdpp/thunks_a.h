@@ -1,4 +1,5 @@
 struct athunk {
+    const char *name;
     struct far_s *ptr;
 #define THUNKF_SHORT 1
 #define THUNKF_DEEP 2

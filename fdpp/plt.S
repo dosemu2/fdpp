@@ -72,11 +72,6 @@ segment %3
     dw %1, _SEG(%1)
 %endmacro
 
-%macro asmsym 1
-    extern _%1
-    dw _%1, _SEG(_%1)
-%endmacro
-
 %macro nearwrp 0
     push bp
     mov bp, sp
@@ -123,18 +118,6 @@ __asm_callsymtab_start:
 %include "plt_asmp.inc"
 __asm_callsymtab_end:
 
-#define __ASM(t, n) asmsym n
-#define __ASM_FAR(t, n) asmsym n
-#define __ASM_NEAR(t, n) asmsym n
-#define __ASM_ARR(t, n, l) asmsym n
-#define __ASM_ARRI(t, n) asmsym n
-#define __ASM_ARRI_F(t, n) asmsym n
-#define __ASM_FUNC(n) asmsym n
-#define SEMIC
-__asm_symtab_start:
-#include <glob_asm.h>
-__asm_symtab_end:
-
 segment HMA_TEXT
 
 near_wrp:
@@ -169,9 +152,6 @@ plt_init:
     push word __asm_callsymtab_end - __asm_callsymtab_start  ; calltab_len
     push word IGROUP
     push word __asm_callsymtab_start  ; calltab
-    push word __asm_symtab_end - __asm_symtab_start  ; symtab_len
-    push word IGROUP
-    push word __asm_symtab_start      ; symtab
     ; fdpp_symtab filled
     mov si, sp
 

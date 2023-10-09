@@ -25,16 +25,19 @@
 #include "glob_tmpl.h"
 #undef _E
 
+#define __S(x) #x
+#define _S(x) __S(x)
+
 struct athunk asm_thunks[] = {
-#define _A(v) { __ASMREF(v), 0 }
+#define _A(v, w) { _S(v), __ASMREF(w), 0 }
 #define SEMIC ,
-#define __ASM(t, v) _A(__##v)
-#define __ASM_FAR(t, v) _A(__##v)
-#define __ASM_NEAR(t, v) { __ASMREF(__##v), THUNKF_SHORT | THUNKF_DEEP }
-#define __ASM_ARR(t, v, l) _A(__##v)
-#define __ASM_ARRI(t, v) _A(__##v)
-#define __ASM_ARRI_F(t, v) _A(__##v)
-#define __ASM_FUNC(v) _A(__##v)
+#define __ASM(t, v) _A(_##v, __##v)
+#define __ASM_FAR(t, v) _A(_##v, __##v)
+#define __ASM_NEAR(t, v) { _S(_##v), __ASMREF(__##v), THUNKF_SHORT | THUNKF_DEEP }
+#define __ASM_ARR(t, v, l) _A(_##v, __##v)
+#define __ASM_ARRI(t, v) _A(_##v, __##v)
+#define __ASM_ARRI_F(t, v) _A(_##v, __##v)
+#define __ASM_FUNC(v) _A(_##v, __##v)
 #include <glob_asm.h>
 #undef __ASM
 #undef __ASM_FAR

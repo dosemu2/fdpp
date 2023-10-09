@@ -132,30 +132,7 @@ int is_dos_space(const void *ptr)
     return fdpp->is_dos_space(ptr);
 }
 
-static int FdppSetAsmThunks(struct far_s *ptrs, int len)
-{
-    int i;
-    int exp = num_athunks;
-
-    if (len != exp) {
-        fdprintf("len=%i expected %i\n", len, exp);
-        return -1;
-    }
-
-    farhlp_init(&sym_tab);
-    for (i = 0; i < len; i++) {
-        *asm_thunks[i].ptr = ptrs[i];
-        /* there are conflicts, for example InitTextStart will collide
-         * with the first sym. So use _replace. */
-        store_far_replace(&sym_tab, resolve_segoff(ptrs[i]), ptrs[i]);
-    }
-
-    return 0;
-}
-
 struct fdpp_symtab {
-    struct far_s symtab;
-    uint16_t symtab_len;
     struct far_s calltab;
     uint16_t calltab_len;
     struct far_s near_wrp[2];
@@ -202,10 +179,6 @@ static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
 
 static void FdppSetSymTab(struct fdpp_symtab *symtab)
 {
-    int err;
-    struct far_s *thtab = (struct far_s *)resolve_segoff(symtab->symtab);
-    int stab_len = symtab->symtab_len / sizeof(struct far_s);
-
     free(near_wrp);
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
@@ -213,8 +186,6 @@ static void FdppSetSymTab(struct fdpp_symtab *symtab)
     asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
     memcpy(asm_tab, resolve_segoff(symtab->calltab), symtab->calltab_len);
     asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
-    err = FdppSetAsmThunks(thtab, stab_len);
-    ___assert(!err);
 }
 
 int FdppCtrl(int idx, struct vm86_regs *regs)
@@ -784,8 +755,21 @@ err_close:
 
 const void *FdppKernelReloc(void *handle, uint16_t seg)
 {
+    int i;
+    far_s f;
     struct krnl_hndl *h = (struct krnl_hndl *)handle;
     elf_reloc(h->elf, seg);
+
+    farhlp_init(&sym_tab);
+    f.seg = seg;
+    for (i = 0; i < num_athunks; i++) {
+        int off = elf_getsymoff(h->elf, asm_thunks[i].name);
+        assert(off != -1);
+        f.off = off;
+        *asm_thunks[i].ptr = f;
+        store_far_replace(&sym_tab, resolve_segoff(f), f);
+    }
+
     return h->start;
 }
 
