@@ -1,6 +1,6 @@
 /*
  *  FDPP - freedos port to modern C++
- *  Copyright (C) 2018  Stas Sergeev (stsp)
+ *  Copyright (C) 2018-2023  Stas Sergeev (stsp)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@ struct asm_dsc_s {
 struct asm_dsc_s *asm_tab;
 #define asm_tab_len num_cthunks
 static farhlp sym_tab;
-static struct far_s *near_wrp;
 #define num_wrps 2
+static struct far_s near_wrp[num_wrps];
 static int recur_cnt;
 
 enum { ASM_OK, ASM_NORET, ASM_ABORT, PING_ABORT };
@@ -131,10 +131,6 @@ int is_dos_space(const void *ptr)
     return fdpp->is_dos_space(ptr);
 }
 
-struct fdpp_symtab {
-    struct far_s near_wrp[2];
-};
-
 static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
         uint16_t delta)
 {
@@ -174,27 +170,9 @@ static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
     fdlogprintf("processed %i relocs\n", reloc);
 }
 
-static void FdppSetSymTab(struct fdpp_symtab *symtab)
-{
-    free(near_wrp);
-    near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
-    memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
-}
-
 int FdppCtrl(int idx, struct vm86_regs *regs)
 {
-#define DL_SET_SYMTAB 0
-    switch (idx) {
-    case DL_SET_SYMTAB:
-        if (HI_BYTE(regs->eax) != FDPP_KERNEL_VERSION) {
-            fdloudprintf("\nfdpp version mismatch: expected %i, got %i\n",
-                    FDPP_KERNEL_VERSION, HI_BYTE(regs->eax));
-            _fail();
-        }
-        FdppSetSymTab(
-                (struct fdpp_symtab *)so2lin(regs->ss, LO_WORD(regs->esi)));
-        return 0;
-    }
+    // so empty then???
     return -1;
 }
 
@@ -756,6 +734,11 @@ const void *FdppKernelReloc(void *handle, uint16_t seg)
         asm_tab[i].seg = seg;
         asm_tab[i].off = off;
     }
+
+    f.off = elf_getsymoff(h->elf, "near_wrp");
+    near_wrp[0] = f;
+    f.off = elf_getsymoff(h->elf, "init_near_wrp");
+    near_wrp[1] = f;
 
     return h->start;
 }

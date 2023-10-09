@@ -1,6 +1,6 @@
 /*
  *  FDPP - freedos port to modern C++
- *  Copyright (C) 2018  Stas Sergeev (stsp)
+ *  Copyright (C) 2018-2023  Stas Sergeev (stsp)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -109,9 +109,6 @@ init_near_wrp:
 
     global plt_init
 plt_init:
-    push bp
-    mov bp, sp
-
     ; copy plt entry
     mov ax, FDPP_BS_SEG
     mov es, ax
@@ -119,24 +116,4 @@ plt_init:
     mov bx, [es:FDPP_BS_OFF+FDPP_PLT_OFFSET+2]
     mov [fdpp_plt], ax
     mov [fdpp_plt + 2], bx
-
-    mov al, 0 ; reserved
-    mov ah, FDPP_KERNEL_VERSION
-    mov bx, 0 ; reserved
-    ; fill in struct fdpp_symtab
-    push word IGROUP
-    push word init_near_wrp           ; near_wrp[1]
-    push word TGROUP
-    push word near_wrp                ; near_wrp[0]
-    ; fdpp_symtab filled
-    mov si, sp
-
-    push ds
-    mov di, DGROUP
-    mov ds, di
-    call far [es:FDPP_BS_OFF+FDPP_PLT_OFFSET+4]
-    pop ds
-
-    mov sp, bp
-    pop bp
     ret
