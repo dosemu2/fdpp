@@ -36,12 +36,11 @@
 static struct fdpp_api *fdpp;
 
 struct asm_dsc_s {
-    UWORD num;
     UWORD off;
     UWORD seg;
 };
 struct asm_dsc_s *asm_tab;
-static int asm_tab_len;
+#define asm_tab_len num_cthunks
 static farhlp sym_tab;
 static struct far_s *near_wrp;
 #define num_wrps 2
@@ -133,8 +132,6 @@ int is_dos_space(const void *ptr)
 }
 
 struct fdpp_symtab {
-    struct far_s calltab;
-    uint16_t calltab_len;
     struct far_s near_wrp[2];
 };
 
@@ -182,10 +179,6 @@ static void FdppSetSymTab(struct fdpp_symtab *symtab)
     free(near_wrp);
     near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
-    free(asm_tab);
-    asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
-    memcpy(asm_tab, resolve_segoff(symtab->calltab), symtab->calltab_len);
-    asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
 }
 
 int FdppCtrl(int idx, struct vm86_regs *regs)
@@ -325,16 +318,8 @@ static void _call_wrp(FdppAsmCall_t call, struct vm86_regs *regs,
 static uint32_t _do_asm_call_far(int num, uint8_t *sp, uint8_t len,
         FdppAsmCall_t call)
 {
-    int i;
-
-    for (i = 0; i < asm_tab_len; i++) {
-        if (asm_tab[i].num == num) {
-            _call_wrp(call, &s_regs, asm_tab[i].seg, asm_tab[i].off, sp, len);
-            return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
-        }
-    }
-    ___assert(0);
-    return -1;
+    _call_wrp(call, &s_regs, asm_tab[num].seg, asm_tab[num].off, sp, len);
+    return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
 }
 
 static uint16_t find_wrp(int init, uint16_t seg)
@@ -346,21 +331,13 @@ static uint16_t find_wrp(int init, uint16_t seg)
 static uint32_t _do_asm_call(int num, int init, uint8_t *sp, uint8_t len,
         FdppAsmCall_t call)
 {
-    int i;
-
-    for (i = 0; i < asm_tab_len; i++) {
-        if (asm_tab[i].num == num) {
-            uint16_t wrp = find_wrp(init, asm_tab[i].seg);
-            LO_WORD(s_regs.eax) = asm_tab[i].off;
-            /* argpack should be aligned */
-            ___assert(!(len & 1));
-            LO_WORD(s_regs.ecx) = len >> 1;
-            _call_wrp(call, &s_regs, asm_tab[i].seg, wrp, sp, len);
-            return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
-        }
-    }
-    ___assert(0);
-    return -1;
+    uint16_t wrp = find_wrp(init, asm_tab[num].seg);
+    LO_WORD(s_regs.eax) = asm_tab[num].off;
+    /* argpack should be aligned */
+    ___assert(!(len & 1));
+    LO_WORD(s_regs.ecx) = len >> 1;
+    _call_wrp(call, &s_regs, asm_tab[num].seg, wrp, sp, len);
+    return (LO_WORD(s_regs.edx) << 16) | LO_WORD(s_regs.eax);
 }
 
 static void asm_call(struct vm86_regs *regs, uint16_t seg,
@@ -768,6 +745,16 @@ const void *FdppKernelReloc(void *handle, uint16_t seg)
         f.off = off;
         *asm_thunks[i].ptr = f;
         store_far_replace(&sym_tab, resolve_segoff(f), f);
+    }
+
+    asm_tab = (struct asm_dsc_s *)malloc(num_cthunks *
+               sizeof(struct asm_dsc_s *));
+    for (i = 0; i < num_cthunks; i++) {
+        int off = elf_getsymoff(h->elf, asm_cthunks[i].name);
+        assert(off != -1);
+        assert(asm_cthunks[i].name);
+        asm_tab[i].seg = seg;
+        asm_tab[i].off = off;
     }
 
     return h->start;

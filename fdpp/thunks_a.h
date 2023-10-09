@@ -8,3 +8,5 @@ struct athunk {
 
 extern struct athunk asm_thunks[];
 extern const int num_athunks;
+extern struct athunk asm_cthunks[];
+extern const int num_cthunks;

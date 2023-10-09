@@ -121,7 +121,7 @@ GEN_HEADERS = thunk_calls.h thunk_asms.h rel.h
 GEN_HEADERS_FD = glob_asmdefs.h
 GEN_ASMS = plt.asm cdata.asm
 # dont change file order in GEN_TMP as it matches the gen script
-GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.inc plt_asmp.inc
+GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.h plt_asmp.h
 GEN_CC = $(CFILES:.c=.cc)
 INITHEADERS = $(SRC)/init-mod.h $(SRC)/init-dat.h
 HEADERS=$(HDRS) $(SRC)/globals.h $(SRC)/proto.h $(INITHEADERS) $(PPHDRS)
@@ -179,7 +179,7 @@ $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CLCFLAGS) -I . -o $@ $<
 
 thunks.o: $(EXT_H) $(GIT_REV)
-thunks_a.o: $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h
+thunks_a.o: $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h plt_asmc.h plt_asmp.h
 $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(GEN_HEADERS) $(PPHDRS) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -o $@ $<
 
@@ -205,7 +205,7 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 $(FDPPDEVL): $(FDPPLIB)
 	ln -sf $< $@
 
-plt.o: plt.asm plt.inc plt_asmc.inc plt_asmp.inc $(SRC)/segs.inc
+plt.o: plt.asm plt.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h \
    $(srcdir)/thunks_priv.h $(srcdir)/makefile
@@ -224,7 +224,7 @@ $(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
 	$(pars)
 plt.inc: thunk_calls.tmp
 	$(pars)
-plt_asmc.inc plt_asmp.inc: thunk_asms.tmp
+plt_asmc.h plt_asmp.h: thunk_asms.tmp
 	$(pars)
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen

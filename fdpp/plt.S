@@ -20,8 +20,6 @@
 #include "bprm.h"
 %include "segs.inc"
 
-%define _SEG(s) TGROUP
-
 extern _BootParamSeg
 
 segment _BSS
@@ -59,18 +57,6 @@ segment %3
 %endmacro
 
 %include "plt.inc"
-
-%macro asmcsym 2
-    dw %2
-    extern _%1
-    dw _%1, _SEG(_%1)
-%endmacro
-
-%macro asmpsym 2
-    dw %2
-    extern %1
-    dw %1, _SEG(%1)
-%endmacro
 
 %macro nearwrp 0
     push bp
@@ -111,13 +97,6 @@ segment %3
     retf 2
 %endmacro
 
-segment INIT_TEXT
-
-__asm_callsymtab_start:
-%include "plt_asmc.inc"
-%include "plt_asmp.inc"
-__asm_callsymtab_end:
-
 segment HMA_TEXT
 
 near_wrp:
@@ -149,9 +128,6 @@ plt_init:
     push word init_near_wrp           ; near_wrp[1]
     push word TGROUP
     push word near_wrp                ; near_wrp[0]
-    push word __asm_callsymtab_end - __asm_callsymtab_start  ; calltab_len
-    push word IGROUP
-    push word __asm_callsymtab_start  ; calltab
     ; fdpp_symtab filled
     mov si, sp
 
