@@ -82,9 +82,12 @@ void handle_break(struct dhdr FAR *pdev)
   CB_FLG &= ~CB_MSK;            /* reset the ^Break flag */
   con_flush(pdev);
   cooked_write(pdev, 4, buf);
-  if (!ErrorMode)               /* within int21_handler, InDOS is not incremented */
+  if (!ErrorMode) {             /* within int21_handler, InDOS is not incremented */
     if (InDOS)
       --InDOS;                  /* fail-safe */
+    else
+      panic("Break not in DOS");
+  }
 
   spawn_int23();                /* invoke user INT-23 and never come back */
 }
