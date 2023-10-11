@@ -83,7 +83,6 @@ segment	_IRQTEXT	class(LCODE) exec
 segment	_LOWTEXT	class(LCODE) exec
 segment	_IO_TEXT	class(LCODE) exec
 segment	_IO_FIXED_DATA	class(LCODE) align=2
-segment	_TEXT		class(LCODE) exec
 segment	_FIXED_DATA	class(FDATA) align=16
 segment	_BSS		class(BSS) align=2
 segment _DATA           class(DATA) align=2
@@ -92,7 +91,6 @@ segment _DATAEND        class(DATA) align=1
 segment CONST		class(DATA) align=2
 segment CONST2		class(DATA) align=2
 ;for MSC
-segment	DCONST      	class(DCONST) align=2
 segment	DYN_DATA        class(DYN_DATA)
 segment	HMA_TEXT_START	class(CODE) align=16
 segment	HMA_TEXT	class(CODE) exec
@@ -111,12 +109,5 @@ segment IB_B            class(FAR_DATA) align=2
 segment I_BSS           class(FAR_DATA) align=2
 segment IB_E            class(FAR_DATA) align=2
 %else
-segment ID_B            class(ID)  align=16
-segment ID              class(ID)  align=2
-segment IDATA           class(ID)  align=2
-segment ID_E            class(ID)  align=2
-segment	IC      	class(IC)  align=2
-segment	IB_B      	class(IB)  align=2 nobits
-segment	IB      	class(IB)  align=2 nobits
-segment	IB_E      	class(IB)  align=2 nobits
+segment IB_E            class(IB)  align=2 nobits
 %endif
