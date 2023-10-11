@@ -643,7 +643,8 @@ struct krnl_hndl {
     const void *start;
 };
 
-void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss)
+void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
+                     uint32_t *_start)
 {
     struct fdpp_bss_list *bl;
     void *start, *end;
@@ -652,7 +653,7 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss)
     char *kname;
     void *handle;
     struct krnl_hndl *h;
-    int i;
+    int i, s;
 
     asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
     handle = elf_open(kname);
@@ -662,9 +663,11 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss)
         return NULL;
     }
     free(kname);
-    start = elf_getsym(handle, "_start");
-    if (!start)
+    start = elf_getloadaddr(handle);
+    s = elf_getsymoff(handle, "_start");
+    if (s == -1)
         goto err_close;
+    *_start = s;
     end = elf_getsym(handle, "__InitTextEnd");
     if (!end)
         goto err_close;

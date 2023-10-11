@@ -11,12 +11,12 @@ IGROUP = DOS_PSP;
 SECTIONS
   {
     /* Target PSP section.  */
-    .ptext 0 : {
+    .ptext SIZEOF_HEADERS : {
 		*(PSP)
     }
 
     /* Target low data+text sections.  */
-    .ltext : {
+    .ltext 0x200 : {
 		*(_IRQTEXT)
 		*(_LOWTEXT)
 		*(_IO_TEXT)
@@ -104,4 +104,5 @@ SECTIONS
     .gnu.hash       : {
 		*(.gnu.hash)
 	}
+    .interp : { *(.interp) }
   }

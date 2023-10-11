@@ -59,7 +59,7 @@ void *elf_open(const char *name)
     GElf_Phdr   phdr;
     int         fd;
     int         i;
-    uint32_t    load_offs;
+    int load_offs;
     struct stat st;
     char        *addr;
     size_t      mapsize;
@@ -87,13 +87,13 @@ void *elf_open(const char *name)
         goto err2;
     }
 
-    for (i = 0, load_offs = 0; gelf_getphdr(elf, i, &phdr); i++) {
+    for (i = 0, load_offs = -1; gelf_getphdr(elf, i, &phdr); i++) {
         if (phdr.p_type != PT_LOAD)
             continue;
         load_offs = phdr.p_offset;
         break;
     }
-    if (!load_offs) {
+    if (load_offs == -1) {
         fprintf(stderr, "elf: not found PT_LOAD\n");
         goto err;
     }
@@ -174,4 +174,10 @@ int elf_getsymoff(void *arg, const char *name)
 {
     struct elfstate *state = (struct elfstate *)arg;
     return do_getsymoff(state, name);
+}
+
+void *elf_getloadaddr(void *arg)
+{
+    struct elfstate *state = (struct elfstate *)arg;
+    return state->addr + state->load_offs;
 }

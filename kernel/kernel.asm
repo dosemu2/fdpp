@@ -108,8 +108,6 @@ realentry:                              ; execution continues here
                 pop ax
 %endif
                 jmp     IGROUP:kernel_start
-beyond_entry:   times   256-(beyond_entry-entry) db 0
-                                        ; scratch area for data (DOS_PSP)
 
 segment INIT_TEXT
 

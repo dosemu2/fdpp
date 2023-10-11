@@ -23,7 +23,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#define FDPP_API_VER 32
+#define FDPP_API_VER 33
 
 #ifndef FDPP
 struct fdpp_far_s {
@@ -85,7 +85,8 @@ struct fdpp_bss_list {
     struct fdpp_bss_ent ent[0];
 };
 
-void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss);
+void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
+                     uint32_t *_start);
 const void *FdppKernelReloc(void *handle, uint16_t seg);
 void FdppKernelFree(void *handle);
 
