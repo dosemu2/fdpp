@@ -74,5 +74,8 @@ ifeq ($(XFAT),32)
 CPPFLAGS += -DWITHFAT32
 NASMFLAGS += -DWITHFAT32
 endif
+ifeq ($(XCPU),386)
+CPPFLAGS += -DI386
+endif
 
 NASMFLAGS := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU) -DFDPP

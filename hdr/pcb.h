@@ -117,7 +117,11 @@ struct int2f12regs {
   UWORD ip, cs, flags;
   UWORD callerARG1;             /* used if called from INT2F/12 */
 };
+#ifdef I386
+ANNOTATE_SIZE_S(int2f12regs, 32);
+#else
 ANNOTATE_SIZE_S(int2f12regs, 26);
+#endif
 
 /* Process control block for task switching                             */
 typedef struct {
