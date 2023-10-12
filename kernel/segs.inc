@@ -66,12 +66,14 @@ group   I_GROUP         ID_B ID ID_E IC IDATA IB_B IB IB_E
 
 BITS 16
 ; groups are defined in the linker script kernel.ld
-extern PGROUP
-extern DGROUP
-extern LGROUP
-extern TGROUP
-extern IGROUP
-extern I_GROUP
+extern _PGROUP~
+extern _DGROUP~
+extern _LGROUP~
+extern _IGROUP~
+%define PGROUP seg _PGROUP~
+%define DGROUP seg _DGROUP~
+%define LGROUP seg _LGROUP~
+%define IGROUP seg _IGROUP~
 %define class(x)
 %define stack
 %define INITSTACKSIZE 512
