@@ -682,8 +682,9 @@ dispatch:
       /* case 0x25: handled above (re-entrant)                        */
 
       /* Dos Create New Psp                                           */
+      /* Needs to use CS, not cu_psp, or AlphaWaves doesn't work.     */
     case 0x26:
-      new_psp(lr.DX, cu_psp);
+      new_psp(lr.DX, r->cs);
       break;
 
       /* Read random record(s) using FCB */
