@@ -7,6 +7,10 @@ CCACHE ?= $(shell which ccache 2>/dev/null)
 CC = $(CCACHE) clang++
 CLANG_VER := $(shell $(CC) -v 2>&1 | head -n 1 | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
+FLEX = $(shell which flex 2>/dev/null)
+ifneq ($(FLEX),)
+LEX = $(FLEX)
+endif
 
 # Override builtin CXX.
 # The assignment below is ignored if CXX was set via cmd line.
