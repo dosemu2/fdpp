@@ -181,3 +181,9 @@ void *elf_getloadaddr(void *arg)
     struct elfstate *state = (struct elfstate *)arg;
     return state->addr + state->load_offs;
 }
+
+int elf_getloadoff(void *arg)
+{
+    struct elfstate *state = (struct elfstate *)arg;
+    return state->load_offs;
+}

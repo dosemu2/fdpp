@@ -711,11 +711,15 @@ err_close:
     return NULL;
 }
 
-const void *FdppKernelReloc(void *handle, uint16_t seg)
+const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg)
 {
     int i;
     far_s f;
     struct krnl_hndl *h = (struct krnl_hndl *)handle;
+    unsigned load_off = elf_getloadoff(h->elf);
+
+    assert(!(load_off & 0xf));
+    seg -= load_off >> 4;
     elf_reloc(h->elf, seg);
 
     farhlp_init(&sym_tab);
@@ -743,6 +747,7 @@ const void *FdppKernelReloc(void *handle, uint16_t seg)
     f.off = elf_getsymoff(h->elf, "init_near_wrp");
     near_wrp[1] = f;
 
+    *r_seg = seg;
     return h->start;
 }
 
