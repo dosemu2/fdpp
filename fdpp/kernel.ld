@@ -61,8 +61,6 @@ SECTIONS
 		__ibss_start = .;
 		*(IB)
 		__ibss_end = .;
-	}
-    .iend (NOLOAD) : {
 		*(IB_E)
 	}
 
