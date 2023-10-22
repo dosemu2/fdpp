@@ -584,4 +584,3 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
     inputptr = NULL;
   return n;
 }
-

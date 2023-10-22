@@ -1916,16 +1916,3 @@ done:
   fnp->f_offset = lastoffset;   /* has to be restored */
   return ret;
 }
-
-/*
- * TE 12 jun 2001 bugs corrected
- *      handles disk full (in a incompatible way :-( )
- *      allows use of last cluster
- *      prevents mkdir, if disk is full (was creating crosslinked dirs)
- *   bugs detected, but NOT corrected
- *      on disk full, MSDOS will NOT write any byte, simply return SUCCESS, 0 bytes
- *      FreeDOS will write all possible bytes, then close file(BUG)
- *
- * the dos_mkdir/extenddir (with getblock() instead of getblockOver) was a real
- * performance killer on large drives. (~0.5 sec /dos_mkdir) TE
- */

@@ -54,4 +54,3 @@ static BYTE *date_hRcsId =
 typedef UWORD date;
 
 #endif
-

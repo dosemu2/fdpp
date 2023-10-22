@@ -42,4 +42,3 @@ typedef struct _cct {
 //  AR_MEMB(_cct, char, ctBuffer, CTBUFFERSIZE);  /* the buffer itself            */
   char ctBuffer[CTBUFFERSIZE];  /* the buffer itself            */
 } CommandTail;
-

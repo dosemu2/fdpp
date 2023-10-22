@@ -54,4 +54,3 @@ typedef struct {
 
 #define MAGIC 0x5a4d
 #define OLD_MAGIC 0x4d5a
-

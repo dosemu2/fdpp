@@ -61,4 +61,3 @@ struct buffer {
 #define BFR_DIR         0x04    /* buffer is from dir area      */
 #define BFR_FAT         0x02    /* buffer is from fat area      */
 #define BFR_UNCACHE     0x01    /* buffer to be released ASAP   */
-

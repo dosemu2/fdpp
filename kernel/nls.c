@@ -709,4 +709,3 @@ UWORD ASMCFUNC syscall_MUX14(iregs FAR * regs)
   log(("NLS: MUX14(): Invalid function %x\n", regs->AL));
   return DE_INVLDFUNC;          /* no such function */
 }
-

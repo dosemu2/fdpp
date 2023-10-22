@@ -117,4 +117,3 @@ typedef struct _rfcb {
   AR_MEMB(_rfcb, BYTE, renNewExtent, 3);         /* New FileExtension            */
   BYTE renReserved2[9];
 } rfcb;
-

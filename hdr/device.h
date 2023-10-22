@@ -497,4 +497,3 @@ COUNT block_error(request * rq, COUNT nDrive, __FAR(struct dhdr) lpDevice, int m
 /*
  *      end of device.h
  */
-

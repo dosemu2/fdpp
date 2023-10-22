@@ -91,4 +91,3 @@ void handle_break(struct dhdr FAR *pdev)
 
   spawn_int23();                /* invoke user INT-23 and never come back */
 }
-

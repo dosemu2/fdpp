@@ -85,4 +85,3 @@ static BYTE *error_hRcsId =
 #define RETRY           1
 #define ABORT           2
 #define FAIL            3
-

@@ -44,4 +44,3 @@ struct ClockRecord {
   UBYTE clkHundredths;          /* residual hundredths of a second.     */
   UBYTE clkSeconds;             /* residual seconds.                    */
 };
-

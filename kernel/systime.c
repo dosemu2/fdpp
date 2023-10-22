@@ -173,4 +173,3 @@ int DosSetDate(const struct dosdate *dd)
     return char_error(&ClkReqHdr, (struct dhdr FAR *)_clock_);
   return SUCCESS;
 }
-

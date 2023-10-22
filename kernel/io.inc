@@ -56,5 +56,4 @@
 	extern	_IODone
 	extern	_IOCommandError
 	extern	GetUnitNum
-        extern  _ReqPktPtr
-
+	extern  _ReqPktPtr

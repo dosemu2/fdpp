@@ -160,4 +160,3 @@ void setdstart(__FAR(struct dpb) dpbp, struct dirent *dentry, CLUSTER value);
 #define DIR_SIZE        (FNAME_SIZE+FEXT_SIZE+17)
 
 #define DIRENT_SIZE     32
-

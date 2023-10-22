@@ -1140,10 +1140,3 @@ STATIC int LBA_Transfer(ddt FAR * pddt, UWORD mode, VOID FAR * buffer,
 
   return (error_code);
 }
-
-/*
- * Revision 1.17  2001/05/13           tomehlert
- * Added full support for LBA hard drives
- * initcode moved (mostly) to initdisk.c
- * lower interface partly redesigned
- */

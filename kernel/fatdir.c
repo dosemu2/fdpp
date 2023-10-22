@@ -532,4 +532,3 @@ const char *ConvertNameSZToName83(char *fcbname, const char *dirname)
   }
   return dirname;
 }
-

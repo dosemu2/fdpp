@@ -169,4 +169,3 @@ WORD ASMCFUNC FAR clk_driver(rqptr rp)
       return failure(E_FAILURE);        /* general failure */
   }
 }
-

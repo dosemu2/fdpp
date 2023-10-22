@@ -774,4 +774,3 @@ UBYTE FcbFindNext(xfcb FAR * lpXfcb)
   return FCB_SUCCESS;
 }
 #endif
-
