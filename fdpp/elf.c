@@ -28,8 +28,6 @@
 #include <gelf.h>
 #include "elf_priv.h"
 
-/* TODO: write proper d/l support! Get rid of the external reloc table! */
-
 struct elfstate {
     char *addr;
     size_t mapsize;
