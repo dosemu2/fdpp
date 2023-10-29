@@ -1,5 +1,6 @@
 #!/bin/sh
 
+sudo add-apt-repository ppa:stsp-0/nasm-segelf
 sudo apt update -q
 sudo apt install -y \
     bison \
@@ -7,8 +8,8 @@ sudo apt install -y \
     sed \
     bash \
     clang \
-    nasm \
-    lld \
+    nasm-segelf \
+    binutils \
     pkgconf \
     autoconf \
     libelf-dev \
