@@ -28,8 +28,6 @@ BuildRequires: elfutils-libelf-devel
 BuildRequires: autoconf
 BuildRequires: git
 BuildRequires: pkgconf-pkg-config
-# diffutils are only needed for reloc hack, remove!
-BuildRequires: diffutils
 
 %description
 fdpp is a 64-bit DOS core.
