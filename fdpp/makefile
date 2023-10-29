@@ -59,7 +59,16 @@ ALL = $(FDPPLIB) $(FDPPDEVL) $(TARGET).elf $(TARGET).map $(GEN_EXT)
 
 all: $(ALL)
 
-elf.o: rel.h
+want_loadaddr = 0
+ifeq ($(want_loadaddr),1)
+LA = --defsym=loadaddr=0xfa100
+else
+LA = --emit-relocs
+endif
+want_pie = 0
+ifeq ($(want_pie),1)
+PF = -pie
+endif
 
 # New makes have a way to avoid parallel invocation with the use of &:
 # On old make you would write "%.elf %.map :" which is a bit silly
@@ -74,18 +83,8 @@ else
 %.elf %.map : $(DEPS_OF_ELF)
 endif
 	$(CROSS_LD) -melf_i386 -static -Map=$(TARGET).map -o $@ \
-		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0x60
+		$(LA) $(PF) $(^:%.ld=-T%.ld)
 	chmod -x $@
-
-$(TARGET).elf.tmp: $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
-	$(CROSS_LD) -melf_i386 -static -o $@ \
-		$(^:%.ld=-T%.ld) --defsym=DOS_PSP=0
-	chmod -x $@
-
-rel.h: $(TARGET).elf $(TARGET).elf.tmp
-	cmp -l $^ | grep "140   0" | sed 's/^ *//' | cut -d " " -f 1 | \
-		sed 's/$$/,/' > $@
-
 
 clean:
 	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
@@ -117,7 +116,7 @@ PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
 _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
     farhlp_sta.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
-GEN_HEADERS = thunk_calls.h thunk_asms.h rel.h
+GEN_HEADERS = thunk_calls.h thunk_asms.h
 GEN_HEADERS_FD = glob_asmdefs.h
 GEN_ASMS = plt.asm cdata.asm
 # dont change file order in GEN_TMP as it matches the gen script

@@ -641,6 +641,7 @@ const char *FdppKernelMapName(void)
 struct krnl_hndl {
     void *elf;
     const void *start;
+    unsigned load_off;
 };
 
 void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
@@ -663,7 +664,7 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
         return NULL;
     }
     free(kname);
-    start = elf_getloadaddr(handle);
+    start = elf_getsym(handle, "_start");
     s = elf_getsymoff(handle, "_start");
     if (s == -1)
         goto err_close;
@@ -704,6 +705,7 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
     h = (struct krnl_hndl *)malloc(sizeof(*h));
     h->elf = handle;
     h->start = start;
+    h->load_off = s;
     return h;
 
 err_close:
@@ -716,10 +718,9 @@ const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg)
     int i;
     far_s f;
     struct krnl_hndl *h = (struct krnl_hndl *)handle;
-    unsigned load_off = elf_getloadoff(h->elf);
 
-    assert(!(load_off & 0xf));
-    seg -= load_off >> 4;
+    assert(!(h->load_off & 0xf));
+    seg -= h->load_off >> 4;
     elf_reloc(h->elf, seg);
 
     farhlp_init(&sym_tab);

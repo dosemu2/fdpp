@@ -1,22 +1,29 @@
 /* linker script for fdpp project */
 
-/* these GROUPs play the same role as GROUPS (segments) in OMF */
-/* TINY model, all segments are equal */
-PGROUP = DOS_PSP;
-LGROUP = DOS_PSP;
-DGROUP = DOS_PSP;
-TGROUP = DOS_PSP;
-IGROUP = DOS_PSP;
-
 SECTIONS
   {
+    _LOADADDR = DEFINED(loadaddr) ? loadaddr : .;
+    /* these GROUPs play the same role as GROUPS (segments) in OMF */
+    /* TINY model, all segments are equal */
+    _LGROUP = ABSOLUTE(.);
+    _DGROUP = ABSOLUTE(.);
+    _IGROUP = ABSOLUTE(.);
+    _LGROUP~ = . + _LOADADDR;
+    _DGROUP~ = . + _LOADADDR;
+    _IGROUP~ = . + _LOADADDR;
+
+    . = SIZEOF_HEADERS;
+    . = ALIGN(0x100);
     /* Target PSP section.  */
-    .ptext SIZEOF_HEADERS : {
+    .ptext : {
+		_PGROUP = ABSOLUTE(.);
+		_PGROUP~ = . + _LOADADDR;
 		*(PSP)
+		. = ALIGN(0x100);
     }
 
     /* Target low data+text sections.  */
-    .ltext 0x200 : {
+    .ltext : {
 		*(_IRQTEXT)
 		*(_LOWTEXT)
 		*(_IO_TEXT)

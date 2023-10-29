@@ -39,16 +39,99 @@ struct elfstate {
     uint32_t load_offs;
 };
 
-static void elf_dl(char *addr, uint16_t seg)
+static int do_getsym(struct elfstate *state, const char *name, GElf_Sym *r_sym)
 {
-    const int reloc_tab[] = {
-        #include "rel.h"
-    };
-    size_t i;
-#define _countof(array) (sizeof(array) / sizeof(array[0]))
+    Elf_Data *data;
+    int count, i;
 
-    for (i = 0; i < _countof(reloc_tab); i++)
-        memcpy(&addr[reloc_tab[i]-1], &seg, sizeof(seg));
+    data = elf_getdata(state->symtab_scn, NULL);
+    count = state->symtab_shdr.sh_size / state->symtab_shdr.sh_entsize;
+
+    for (i = 0; i < count; i++) {
+        GElf_Sym sym;
+        gelf_getsym(data, i, &sym);
+        if (strcmp(elf_strptr(state->elf, state->symtab_shdr.sh_link,
+                sym.st_name), name) == 0) {
+            *r_sym = sym;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
+static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
+                      GElf_Shdr *rel_shdr)
+{
+    Elf_Data *rel_data;
+    Elf_Data *st_data;
+    int rel_count, st_count, i;
+
+    rel_data = elf_getdata(rel_scn, NULL);
+    rel_count = rel_shdr->sh_size / rel_shdr->sh_entsize;
+    st_data = elf_getdata(state->symtab_scn, NULL);
+    st_count = state->symtab_shdr.sh_size / state->symtab_shdr.sh_entsize;
+
+    for (i = 0; i < rel_count; i++) {
+        uint16_t *val;
+        GElf_Rel rel;
+        GElf_Sym sym;
+        char *name, *name2, *p;
+        int rc;
+
+        gelf_getrel(rel_data, i, &rel);
+        /* look for R_386_SEG16 */
+        if (GELF_R_TYPE(rel.r_info) != R_386_16)
+            continue;
+        if (GELF_R_SYM(rel.r_info) >= st_count) {
+            fprintf(stderr, "bad reloc %lx %i %li off=%lx\n",
+                GELF_R_TYPE(rel.r_info), st_count,
+                GELF_R_SYM(rel.r_info), rel.r_offset);
+            return;
+        }
+        gelf_getsym(st_data, GELF_R_SYM(rel.r_info), &sym);
+#ifndef STT_RELC
+#define STT_RELC 8
+#endif
+        if (GELF_ST_TYPE(sym.st_info) != STT_RELC)
+            continue;
+
+        name = elf_strptr(state->elf, state->symtab_shdr.sh_link, sym.st_name);
+        /* make sure its a SEG16 reloc symbol */
+        if (strncmp(name, ">>:", 3) != 0 || !strstr(name, "04"))
+            continue;
+        p = strstr(name, ":s");
+        if (!p)
+            continue;
+        p = strchr(p + 1, ':');
+        if (!p)
+            continue;
+        name2 = strdup(p + 1);
+        p = strchr(name2, ':');
+        if (p)
+            *p = '\0';
+        rc = do_getsym(state, name2, &sym);
+        free(name2);
+        if (rc)
+            continue;
+
+        /* not relocating against abs symbol */
+        if (sym.st_shndx == SHN_ABS)
+            continue;
+        val = (uint16_t *)(state->addr + state->load_offs + rel.r_offset);
+        *val += seg;
+    }
+}
+
+static void elf_dl(struct elfstate *state, uint16_t seg)
+{
+    Elf_Scn *rel_scn = NULL;
+    while ((rel_scn = elf_nextscn(state->elf, rel_scn)) != NULL) {
+        GElf_Shdr rel_shdr;
+        gelf_getshdr(rel_scn, &rel_shdr);
+        if (rel_shdr.sh_type == SHT_REL)
+            do_elf_dl(state, seg, rel_scn, &rel_shdr);
+    }
 }
 
 void *elf_open(const char *name)
@@ -130,7 +213,7 @@ void elf_reloc(void *arg, uint16_t seg)
 {
     struct elfstate *state = (struct elfstate *)arg;
 
-    elf_dl(state->addr, seg);
+    elf_dl(state, seg);
 }
 
 void elf_close(void *arg)
@@ -144,21 +227,9 @@ void elf_close(void *arg)
 
 static int do_getsymoff(struct elfstate *state, const char *name)
 {
-    Elf_Data *data;
-    int count, i;
-
-    data = elf_getdata(state->symtab_scn, NULL);
-    count = state->symtab_shdr.sh_size / state->symtab_shdr.sh_entsize;
-
-    for (i = 0; i < count; i++) {
-        GElf_Sym sym;
-        gelf_getsym(data, i, &sym);
-        if (strcmp(elf_strptr(state->elf, state->symtab_shdr.sh_link,
-                sym.st_name), name) == 0)
-            return sym.st_value;
-    }
-
-    return -1;
+    GElf_Sym sym;
+    int err = do_getsym(state, name, &sym);
+    return (err ? -1 : sym.st_value);
 }
 
 void *elf_getsym(void *arg, const char *name)

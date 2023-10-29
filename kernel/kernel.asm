@@ -778,6 +778,8 @@ begin_hma:
 ; to minimize relocations
                 global _DGROUP_
 _DGROUP_        dw DGROUP
+                global _DOS_PSP
+_DOS_PSP        dw PGROUP
 
 %ifdef WATCOM
 ;               32 bit multiplication + division
