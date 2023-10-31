@@ -3,7 +3,7 @@
 #
 
 LD ?= ld
-LLD ?= $(shell which ld.lld 2>/dev/null)
+CROSS_LD ?= x86_64-linux-gnu-ld
 CCACHE ?= $(shell which ccache 2>/dev/null)
 CC = $(CCACHE) clang++
 CLANG_VER := $(shell $(CC) -v 2>&1 | head -n 1 | \
@@ -24,12 +24,6 @@ endif
 CC_FOR_BUILD = $(CCACHE) clang
 CPP = $(CC_FOR_BUILD) -E
 CC_LD = $(CL)
-ifeq ($(LD),)
-# ld.lld can cross-compile while gnu ld not
-CROSS_LD ?= $(LLD)
-else
-CROSS_LD ?= $(LD)
-endif
 NASM ?= nasm
 PKG_CONFIG ?= pkg-config
 
