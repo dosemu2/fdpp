@@ -1,4 +1,4 @@
-name: Build
+name: Build and test
 on:
   pull_request:
     types:
@@ -9,17 +9,30 @@ on:
       - synchronize
   push:
 
+env:
+  DIR_TEST_DOSEMU: test-dosemu
+  DIR_INSTALLED_FDPP: test-dosemu/installed-fdpp
+  USE_DOSEMU_BRANCH: devel
+
 jobs:
-  build:
+  Build_and_test:
+    name: Build and test
+
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: package install
+    - name: Package install
       run: ./ci_prereq.sh
 
-    - name: build
+    - name: Build
       run: ./ci_build.sh
+
+    - name: Set up test environment
+      run: ./ci_setup_test.sh
+
+    - name: Test
+      run: ./ci_test.sh
