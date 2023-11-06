@@ -10,4 +10,8 @@ if [ "x${CI}" = "xtrue" ] ; then
   git tag tmp -m "make git-describe happy"
 fi
 
-make clean all
+if [ -z "${DIR_INSTALLED_FDPP}" ] ; then
+   echo env var "DIR_INSTALLED_FDPP" is empty or missing
+   exit 1
+fi
+make clean all PREFIX=`pwd`/${DIR_INSTALLED_FDPP}
