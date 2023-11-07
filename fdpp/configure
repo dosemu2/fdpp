@@ -3,8 +3,8 @@ TOPDIR=`realpath "$SCRIPTPATH/.."`
 if [ ! -f configure ]; then
     ln -sf "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
-    mkdir parsers 2>/dev/null
-    cd parsers
-    echo "srcdir = $SCRIPTPATH/parsers" >config.mak
+    mkdir thunk_gen 2>/dev/null
+    cd thunk_gen
+    echo "srcdir = $SCRIPTPATH/thunk_gen" >config.mak
     ln -sf "$SCRIPTPATH"/thunk_gen/makefile makefile
 fi

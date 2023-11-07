@@ -88,7 +88,7 @@ endif
 	chmod -x $@
 
 clean:
-	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers clean
+	+cd thunk_gen && $(MAKE) srcdir=$(abspath $(srcdir))/thunk_gen clean
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPDEVL) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(GEN_HEADERS_FD) $(GEN_ASMS) \
@@ -227,13 +227,13 @@ plt.inc: thunk_calls.tmp
 plt_asmc.h plt_asmp.h: thunk_asms.tmp
 	$(pars)
 
-thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
-	parsers/thunk_gen $(TFLAGS) <$< >$@ || ($(RM) $@ ; false)
+thunk_calls.h: thunk_calls.tmp thunk_gen/thunk_gen
+	thunk_gen/thunk_gen $(TFLAGS) <$< >$@ || ($(RM) $@ ; false)
 
-thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
-	parsers/thunk_gen $(TFLAGS) 1 <$< | sort | uniq | autom4te -l m4sugar $(srcdir)/parsers/thunks.m4 - >$@_ \
+thunk_asms.h: thunk_asms.tmp thunk_gen/thunk_gen $(srcdir)/parsers/thunks.m4
+	thunk_gen/thunk_gen $(TFLAGS) 1 <$< | sort | uniq | autom4te -l m4sugar $(srcdir)/parsers/thunks.m4 - >$@_ \
 		|| ($(RM) $@_ ; false)
-	parsers/thunk_gen $(TFLAGS) 2 <$< >$@__ \
+	thunk_gen/thunk_gen $(TFLAGS) 2 <$< >$@__ \
 		|| ($(RM) $@__ ; false)
 	cat $@_ $@__ >$@
 	rm -f $@_ $@__
@@ -241,8 +241,8 @@ thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
-parsers/thunk_gen: $(srcdir)/thunk_gen/thunk_gen.y $(srcdir)/thunk_gen/thunk_gen.l
-	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/thunk_gen
+thunk_gen/thunk_gen: $(srcdir)/thunk_gen/thunk_gen.y $(srcdir)/thunk_gen/thunk_gen.l
+	+cd thunk_gen && $(MAKE) srcdir=$(abspath $(srcdir))/thunk_gen
 
 INSTALL ?= install
 install: $(ALL)
