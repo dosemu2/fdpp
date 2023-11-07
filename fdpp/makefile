@@ -236,8 +236,8 @@ thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
-parsers/thunk_gen: $(srcdir)/parsers/thunk_gen.y $(srcdir)/parsers/thunk_gen.l
-	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/parsers
+parsers/thunk_gen: $(srcdir)/thunk_gen/thunk_gen.y $(srcdir)/thunk_gen/thunk_gen.l
+	+cd parsers && $(MAKE) srcdir=$(abspath $(srcdir))/thunk_gen
 
 INSTALL ?= install
 install: $(ALL)

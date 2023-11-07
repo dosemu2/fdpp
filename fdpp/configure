@@ -6,5 +6,5 @@ if [ ! -f configure ]; then
     mkdir parsers 2>/dev/null
     cd parsers
     echo "srcdir = $SCRIPTPATH/parsers" >config.mak
-    ln -sf "$SCRIPTPATH"/parsers/makefile makefile
+    ln -sf "$SCRIPTPATH"/thunk_gen/makefile makefile
 fi
