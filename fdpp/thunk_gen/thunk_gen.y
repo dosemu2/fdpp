@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <assert.h>
 #include "tg_params.h"
@@ -531,12 +532,23 @@ arg:		  adecls STRING arr
 
 int main(int argc, char *argv[])
 {
+    const char *optstr = "d";
+    char c;
     yydebug = 0;
 
-    if (argc >= 2)
-	thunk_type = atoi(argv[1]);
-    if (argc >= 3 && argv[2][0] == 'd')
-	yydebug = 1;
+    while ((c = getopt(argc, argv, optstr)) != -1) {
+	switch (c) {
+	    case 'd':
+		yydebug = 1;
+		break;
+	    case '?':
+		fprintf(stderr, "unknown option %c\n", c);
+		return EXIT_FAILURE;
+	}
+    }
+    if (optind < argc)
+	thunk_type = atoi(argv[optind++]);
+
     yyparse();
     return 0;
 }
