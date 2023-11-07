@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
-#include "tg_params.h"
 
 #define YYDEBUG 1
 
@@ -17,6 +16,8 @@ static void yyerror(const char* s);
 int yylex(void);
 
 static int thunk_type;
+static int ptr_size;
+static int align;
 
 static int arg_num;
 static int arg_offs;
@@ -197,7 +198,7 @@ static void fin_arg(int last)
 	break;
     }
     if (is_ptr) {
-	real_arg_size = PTR_SIZE;
+	real_arg_size = ptr_size;
 	if (is_far)
 	    real_arg_size *= 2;
     } else {
@@ -242,11 +243,11 @@ static const char *get_flags(void)
 }
 
 #define AL(x) (((x) + (align - 1)) & ~(align - 1))
-static const char *al_s_type = (align == 2 ? "WORD" : "DWORD");
-static const char *al_u_type = (align == 2 ? "UWORD" : "UDWORD");
+static const char *al_s_type(void) { return (align == 2 ? "WORD" : "DWORD"); }
+static const char *al_u_type(void) { return (align == 2 ? "UWORD" : "UDWORD"); }
 #define ATYPE3(s) \
     if (al_arg_size > arg_size) \
-	strcat(atype3, al_##s##_type)
+	strcat(atype3, al_##s##_type())
 
 %}
 
@@ -275,7 +276,7 @@ line:		lnum rdecls fname lb args rb attrs SEMIC
 			  if (is_rptr) {
 			    rt = "_RET_PTR";
 			    rv = "_ARG_RPTR";
-			    rlen = PTR_SIZE;
+			    rlen = ptr_size;
 			    if (is_rfar) {
 			      rlen *= 2;
 			      rt = "_RET_PTR_FAR";
@@ -532,12 +533,18 @@ arg:		  adecls STRING arr
 
 int main(int argc, char *argv[])
 {
-    const char *optstr = "d";
+    const char *optstr = "dp:a:";
     char c;
     yydebug = 0;
 
     while ((c = getopt(argc, argv, optstr)) != -1) {
 	switch (c) {
+	    case 'a':
+		align = atoi(optarg);
+		break;
+	    case 'p':
+		ptr_size = atoi(optarg);
+		break;
 	    case 'd':
 		yydebug = 1;
 		break;

@@ -28,6 +28,7 @@ TGZ = $(TAR).gz
 FD_EXT_H = $(TOP)/include/fdpp
 EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h
 GEN_EXT = fdpp.pc
+TFLAGS = -a 2 -p 2
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 GIT_DESCRIBE := $(shell git describe)
@@ -227,11 +228,15 @@ plt_asmc.h plt_asmp.h: thunk_asms.tmp
 	$(pars)
 
 thunk_calls.h: thunk_calls.tmp parsers/thunk_gen
-	parsers/thunk_gen <$< >$@ || ($(RM) $@ ; false)
+	parsers/thunk_gen $(TFLAGS) <$< >$@ || ($(RM) $@ ; false)
 
 thunk_asms.h: thunk_asms.tmp parsers/thunk_gen $(srcdir)/parsers/thunks.m4
-	$(srcdir)/parsers/gen_thunks.sh $< $(srcdir)/parsers >$@ || \
-		($(RM) $@ ; false)
+	parsers/thunk_gen $(TFLAGS) 1 <$< | sort | uniq | autom4te -l m4sugar $(srcdir)/parsers/thunks.m4 - >$@_ \
+		|| ($(RM) $@_ ; false)
+	parsers/thunk_gen $(TFLAGS) 2 <$< >$@__ \
+		|| ($(RM) $@__ ; false)
+	cat $@_ $@__ >$@
+	rm -f $@_ $@__
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
