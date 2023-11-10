@@ -10,6 +10,7 @@ define mdir
 endef
 
 all:
+	$(MAKE) nasm-segelf
 	+$(call mdir,fdpp,all)
 
 clean:
@@ -21,3 +22,7 @@ rpm: fdpp.spec.rpkg
 
 install uninstall deb tar:
 	cd fdpp && $(MAKE) srcdir=$(srcdir)/fdpp $@
+
+nasm-segelf:
+	$@ --version 2>/dev/null || \
+		brew install $(srcdir)/nasm-segelf.rb
