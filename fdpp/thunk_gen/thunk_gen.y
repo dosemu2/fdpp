@@ -534,7 +534,7 @@ arg:		  adecls STRING arr
 int main(int argc, char *argv[])
 {
     const char *optstr = "dp:a:";
-    char c;
+    int c;
     yydebug = 0;
 
     while ((c = getopt(argc, argv, optstr)) != -1) {
