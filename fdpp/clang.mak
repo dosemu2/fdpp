@@ -24,7 +24,7 @@ endif
 CC_FOR_BUILD = $(CCACHE) clang
 CPP = $(CC_FOR_BUILD) -E
 CC_LD = $(CL)
-NASM ?= nasm
+NASM ?= nasm-segelf
 PKG_CONFIG ?= pkg-config
 
 TARGETOPT = -std=c++11 -c -fno-threadsafe-statics -fpic
