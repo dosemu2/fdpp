@@ -33,8 +33,9 @@ make install PREFIX="${DIR_ROOT}/${DIR_INSTALLED_FDPP}"
   sudo apt install devscripts equivs
   mk-build-deps --install --root-cmd sudo
 
-  export PKG_CONFIG_PATH=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/lib/pkgconfig
-  CC=clang ./default-configure -d
+  CC=clang ./default-configure -d \
+    --with-fdpp-lib-dir=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/lib/fdpp \
+    --with-fdpp-include-dir=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/include
   make
 
   # Install the FAT mount helper
