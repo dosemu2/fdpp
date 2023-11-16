@@ -272,9 +272,12 @@ void fdloudprintf(const char *format, ...)
     va_start(vl, format);
     fdpp->print(FDPP_PRINT_TERMINAL, format, vl);
     va_end(vl);
+#if 0
+    /* this may crash, depending on coopth state */
     va_start(vl, format);
     fdpp->print(FDPP_PRINT_SCREEN, format, vl);
     va_end(vl);
+#endif
 }
 
 void cpu_relax(void)
