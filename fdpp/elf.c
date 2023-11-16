@@ -150,7 +150,7 @@ void *elf_open(const char *name)
 
     fd = open(name, O_RDONLY);
     if (fd == -1) {
-        perror("open()");
+//        perror("open()");
         return NULL;
     }
     fstat(fd, &st);
