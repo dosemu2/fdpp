@@ -258,10 +258,10 @@ install: $(ALL)
 	$(INSTALL) -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
 
 uninstall:
-	$(RM) -rf $(DESTDIR)$(LIBDIR)/fdpp
-	$(RM) -rf $(DESTDIR)$(DATADIR)/fdpp
-	$(RM) -rf $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
-	$(RM) -rf $(DESTDIR)$(PREFIX)/include/fdpp
+	$(RM) -r $(DESTDIR)$(LIBDIR)/fdpp
+	$(RM) -r $(DESTDIR)$(DATADIR)/fdpp
+	$(RM) -r $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
+	$(RM) -r $(DESTDIR)$(PREFIX)/include/fdpp
 
 $(TGZ):
 	cd $(TOP) && git archive -o $(CURDIR)/$(TAR) --prefix=$(PKG)/ HEAD
