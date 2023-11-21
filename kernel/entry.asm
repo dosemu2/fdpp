@@ -221,12 +221,10 @@ rst0d:
                 retf
 hdlr0d:
                 push ax
-                mov al, 0Bh			; request In-Service Register (ISR)
-                out 20h, al			; from primary PIC
-                in al, 20h			; read the ISR
-                test al, 10_0000b		; IRQ #5 occurred ?
+                in al, 21h			; read the IMR
+                test al, 10_0000b		; IRQ #5 masked ?
                 pop ax
-                jnz @2				; yes, (likely) not a GPF
+                jz @2				; no, (likely) not a GPF
                 mov si,gpf_message
                 jmp zero_message_loop
 @2:
