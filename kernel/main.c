@@ -306,7 +306,6 @@ STATIC void setup_int_vectors(void)
       { 0x1, FP_OFF(empty_handler), NULL },  /* single step */
       { 0x3, FP_OFF(empty_handler), NULL },  /* debug breakpoint */
       { 0x6, FP_OFF(int6_handler), NULL },   /* invalid opcode */
-      { 0x0c, FP_OFF(int0c_handler), &prev_int0c_handler }, /* Stack Fault */
       { 0x0d, FP_OFF(int0d_handler), &prev_int0d_handler }, /* GPF */
       { 0x19, FP_OFF(int19_handler), NULL },
       { 0x20, FP_OFF(int20_handler), NULL },

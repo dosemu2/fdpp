@@ -859,7 +859,6 @@ reloc_ivec  _int27_handler
 reloc_ivec  _int0_handler
 reloc_ivec  _int0_handler_suppress
 reloc_ivec  _int6_handler
-reloc_ivec  _int0c_handler
 reloc_ivec  _int0d_handler
 reloc_ivec  _int19_handler
 reloc_i     _cpm_entry
@@ -884,7 +883,6 @@ __HMARelocationTableStart:
         relo _int0_handler
         relo _int0_handler_suppress
         relo _int6_handler
-        relo _int0c_handler
         relo _int0d_handler
         relo _int19_handler
         relo _cpm_entry

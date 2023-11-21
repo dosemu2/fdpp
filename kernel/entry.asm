@@ -205,31 +205,6 @@ reloc_call_int6_handler:
 
 ss_message db 0dh,0ah,'Stack Fault at ',0
 
-                global reloc_call_int0c_handler
-reloc_call_int0c_handler:
-                jmp hdlr0c
-                global  _prev_int0c_handler
-_prev_int0c_handler:
-                dd 0
-                dw 0x424B
-                db 0
-                jmp rst0c
-                times 7 db 0
-rst0c:
-                retf
-hdlr0c:
-                push ax
-                mov al, 0Bh			; request In-Service Register (ISR)
-                out 20h, al			; from primary PIC
-                in al, 20h			; read the ISR
-                test al, 1_0000b		; IRQ #4 occurred ?
-                pop ax
-                jnz @1				; yes, (likely) not an SS
-                mov si,ss_message
-                jmp zero_message_loop
-@1:
-                jmp far [cs:_prev_int0c_handler]
-
 gpf_message db 0dh,0ah,'General Protection Fault at ',0
 
                 global reloc_call_int0d_handler

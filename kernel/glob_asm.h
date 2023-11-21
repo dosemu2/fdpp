@@ -129,7 +129,6 @@ __ASM(request, MediaReqHdr) SEMIC
 __ASM_FUNC(int0_handler) SEMIC
 __ASM_FUNC(int0_handler_suppress) SEMIC
 __ASM_FUNC(int6_handler) SEMIC
-__ASM_FUNC(int0c_handler) SEMIC
 __ASM_FUNC(int0d_handler) SEMIC
 __ASM_FUNC(int19_handler) SEMIC
 __ASM_FUNC(empty_handler) SEMIC
@@ -144,7 +143,6 @@ __ASM_FUNC(int28_handler) SEMIC
 __ASM_FUNC(int29_handler) SEMIC
 __ASM_FUNC(int2a_handler) SEMIC
 __ASM_FUNC(int2f_handler) SEMIC
-__ASM_FAR(void, prev_int0c_handler) SEMIC
 __ASM_FAR(void, prev_int0d_handler) SEMIC
 __ASM_FAR(void, prev_int21_handler) SEMIC
 __ASM_FAR(void, prev_int2f_handler) SEMIC
