@@ -1,10 +1,18 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+do_sub() {
+    mkdir $1 2>/dev/null
+    cd $1
+    echo "srcdir = $SCRIPTPATH/$1" >config.mak
+    ln -sf "$SCRIPTPATH/$1"/makefile makefile
+    cd ..
+}
+
 TOPDIR=`realpath "$SCRIPTPATH/.."`
 if [ ! -f configure ]; then
     ln -sf "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
-    mkdir thunk_gen 2>/dev/null
-    cd thunk_gen
-    echo "srcdir = $SCRIPTPATH/thunk_gen" >config.mak
-    ln -sf "$SCRIPTPATH"/thunk_gen/makefile makefile
+
+    do_sub thunk_gen
+    do_sub kernel
 fi
