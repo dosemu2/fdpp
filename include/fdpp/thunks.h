@@ -21,9 +21,8 @@
 
 #include <stdint.h>
 #include <stdarg.h>
-#include <stddef.h>
 
-#define FDPP_API_VER 34
+#define FDPP_API_VER 35
 
 #ifndef FDPP
 struct fdpp_far_s {
@@ -70,25 +69,9 @@ struct fdpp_api {
     int (*is_dos_space)(const void *ptr);
 };
 int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
-
-const char *FdppKernelDir(void);
+void FdppLoaderHook(uint16_t seg, int (*getsymoff)(void *, const char *),
+        void *arg);
 const char *FdppVersionString(void);
-const char *FdppKernelMapName(void);
-
-struct fdpp_bss_ent {
-    int off;
-    int len;
-};
-
-struct fdpp_bss_list {
-    int num;
-    struct fdpp_bss_ent ent[0];
-};
-
-void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
-                     uint32_t *_start);
-const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg);
-void FdppKernelFree(void *handle);
 
 #ifdef __cplusplus
 }

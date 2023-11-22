@@ -15,4 +15,5 @@ if [ ! -f configure ]; then
 
     do_sub thunk_gen
     do_sub kernel
+    do_sub loader
 fi

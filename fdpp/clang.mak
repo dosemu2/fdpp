@@ -5,7 +5,8 @@
 LD ?= ld
 CROSS_LD ?= x86_64-linux-gnu-ld
 CCACHE ?= $(shell which ccache 2>/dev/null)
-CC = $(CCACHE) clang++
+CC = $(CCACHE) clang
+CXX = $(CCACHE) clang++
 CLANG_VER := $(shell $(CC) -v 2>&1 | head -n 1 | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
 FLEX = $(shell which flex 2>/dev/null)
@@ -13,17 +14,10 @@ ifneq ($(FLEX),)
 LEX = $(FLEX)
 endif
 
-# Override builtin CXX.
-# The assignment below is ignored if CXX was set via cmd line.
-CXX=
-ifeq ($(CXX),)
-CL = $(CC)
-else
-CL = $(CXX)
-endif
 CC_FOR_BUILD = $(CCACHE) clang
 CPP = $(CC_FOR_BUILD) -E
-CC_LD = $(CL)
+CC_LD = $(CXX)
+CL = $(CC)
 NASM ?= nasm-segelf
 PKG_CONFIG ?= pkg-config
 
@@ -64,9 +58,10 @@ ifeq ($(USE_UBSAN),1)
 DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment,function,vptr
 endif
 
-CFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
+CXXFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
+CFLAGS = -Wall $(DBGFLAGS)
 CLCFLAGS = -c -fpic $(WCFLAGS) $(DBGFLAGS) -xc++
-LDFLAGS = -shared -Wl,-Bsymbolic -Wl,--build-id=sha1
+LDFLAGS = -shared -Wl,--build-id=sha1
 
 ifeq ($(XFAT),32)
 CPPFLAGS += -DWITHFAT32

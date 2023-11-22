@@ -1,0 +1,43 @@
+T = ..
+-include config.mak
+-include $(T)/local.mak
+srcdir ?= $(CURDIR)
+
+include $(srcdir)/$(T)/clang.mak
+include $(srcdir)/$(T)/defs.mak
+
+TOP = $(abspath $(srcdir)/$(T)/..)
+HDR = $(TOP)/hdr
+PPINC = $(TOP)/include/fdpp
+AVER = $(shell echo FDPP_API_VER | cpp -include $(PPINC)/thunks.h - | tail -n 1)
+BVER = $(shell echo BPRM_VER | cpp -include $(PPINC)/bprm.h - | tail -n 1)
+TARGET=fdppkrnl.$(AVER).$(BVER)
+FDPPDEVL = libfdldr.so
+FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
+LDFLAGS += -Wl,-soname=$(FDPPLIB) -L..
+SOURCES = elf.c loader.c
+HEADERS = elf_priv.h
+OBJECTS = $(SOURCES:.c=.o)
+
+CFLAGS += -I . -I $(PPINC) \
+    -DFDPPKRNLDIR=$(DATADIR)/fdpp \
+    -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
+    -fpic
+LIBELF := $(shell $(PKG_CONFIG) --libs libelf)
+ifeq ($(LIBELF),)
+$(error libelf not installed)
+endif
+LIBS += $(LIBELF)
+
+ALL = $(T)/$(FDPPLIB)
+
+all: $(ALL)
+
+$(T)/$(FDPPLIB): $(OBJECTS)
+	$(CL) -o $@ $^ $(LDFLAGS) $(LIBS)
+
+$(OBJECTS): %.o: $(srcdir)/%.c $(addprefix $(srcdir)/,$(HEADERS)) $(srcdir)/makefile
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	$(RM) *.o

@@ -26,7 +26,6 @@
 #include "dispatch.hpp"
 #include "objtrace.hpp"
 #include "farhlp.hpp"
-#include "elf_priv.h"
 #include "thunks_c.h"
 #include "thunks_a.h"
 #include "thunks_p.h"
@@ -624,112 +623,21 @@ void thunk_fmemset(far_t d, int ch, size_t n)
     fdpp->fmemset(d, ch, n);
 }
 
-#define __S(x) #x
-#define _S(x) __S(x)
-const char *FdppKernelDir(void)
-{
-    return _S(FDPPKRNLDIR);
-}
-
 const char *FdppVersionString(void)
 {
     return KERNEL_VERSION_STRING;
 }
 
-const char *FdppKernelMapName(void)
-{
-    return _S(KRNL_MAP_NAME);
-}
-
-struct krnl_hndl {
-    void *elf;
-    const void *start;
-    unsigned load_off;
-};
-
-void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
-                     uint32_t *_start)
-{
-    struct fdpp_bss_list *bl;
-    void *start, *end;
-    void *bstart, *bend;
-    void *ibstart, *ibend;
-    char *kname;
-    void *handle;
-    struct krnl_hndl *h;
-    int i, s;
-
-    asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
-    handle = elf_open(kname);
-    if (!handle) {
-        fdloudprintf("failed to open %s\n", kname);
-        free(kname);
-        return NULL;
-    }
-    free(kname);
-    start = elf_getsym(handle, "_start");
-    s = elf_getsymoff(handle, "_start");
-    if (s == -1)
-        goto err_close;
-    *_start = s;
-    end = elf_getsym(handle, "__InitTextEnd");
-    if (!end)
-        goto err_close;
-    bstart = elf_getsym(handle, "__bss_start");
-    if (!bstart)
-        goto err_close;
-    bend = elf_getsym(handle, "__bss_end");
-    if (!bend)
-        goto err_close;
-    ibstart = elf_getsym(handle, "__ibss_start");
-    if (!ibstart)
-        goto err_close;
-    ibend = elf_getsym(handle, "__ibss_end");
-    if (!ibend)
-        goto err_close;
-    *len = (uintptr_t)end - (uintptr_t)start;
-
-    bl = (struct fdpp_bss_list *)malloc(sizeof(*bl) +
-            sizeof(struct fdpp_bss_ent) * 2);
-    i = 0;
-    if (bend != bstart) {
-        bl->ent[i].off = (uintptr_t)bstart - (uintptr_t)start;
-        bl->ent[i].len = (uintptr_t)bend - (uintptr_t)bstart;
-        i++;
-    }
-    if (ibend != ibstart) {
-        bl->ent[i].off = (uintptr_t)ibstart - (uintptr_t)start;
-        bl->ent[i].len = (uintptr_t)ibend - (uintptr_t)ibstart;
-        i++;
-    }
-    bl->num = i;
-    *bss = bl;
-
-    h = (struct krnl_hndl *)malloc(sizeof(*h));
-    h->elf = handle;
-    h->start = start;
-    h->load_off = s;
-    return h;
-
-err_close:
-    elf_close(handle);
-    return NULL;
-}
-
-const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg)
+void FdppLoaderHook(uint16_t seg, int (*getsymoff)(void *, const char *),
+        void *arg)
 {
     int i;
-    far_s f;
-    struct krnl_hndl *h = (struct krnl_hndl *)handle;
-
-    assert(!(h->load_off & 0xf));
-    seg -= h->load_off >> 4;
-    elf_reloc(h->elf, seg);
+    far_t f;
 
     farhlp_init(&sym_tab);
     f.seg = seg;
     for (i = 0; i < num_athunks; i++) {
-        int off = elf_getsymoff(h->elf, asm_thunks[i].name);
+        int off = getsymoff(arg, asm_thunks[i].name);
         assert(off != -1);
         f.off = off;
         *asm_thunks[i].ptr = f;
@@ -739,26 +647,15 @@ const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg)
     asm_tab = (struct asm_dsc_s *)malloc(num_cthunks *
                sizeof(struct asm_dsc_s *));
     for (i = 0; i < num_cthunks; i++) {
-        int off = elf_getsymoff(h->elf, asm_cthunks[i].name);
+        int off = getsymoff(arg, asm_cthunks[i].name);
         assert(off != -1);
         assert(asm_cthunks[i].name);
         asm_tab[i].seg = seg;
         asm_tab[i].off = off;
     }
 
-    f.off = elf_getsymoff(h->elf, "near_wrp");
+    f.off = getsymoff(arg, "near_wrp");
     near_wrp[0] = f;
-    f.off = elf_getsymoff(h->elf, "init_near_wrp");
+    f.off = getsymoff(arg, "init_near_wrp");
     near_wrp[1] = f;
-
-    *r_seg = seg;
-    return h->start;
-}
-
-void FdppKernelFree(void *handle)
-{
-    struct krnl_hndl *h = (struct krnl_hndl *)handle;
-
-    elf_close(h->elf);
-    free(h);
 }

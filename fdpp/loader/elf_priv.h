@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 void *elf_open(const char *name);
 void elf_reloc(void *arg, uint16_t seg);
 void elf_close(void *arg);
