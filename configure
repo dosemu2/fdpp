@@ -1,13 +1,9 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-CWD=`pwd -P`
 if [ ! -f configure ]; then
     ln -sf "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
+
     mkdir fdpp 2>/dev/null
     cd fdpp
-    echo "srcdir = $SCRIPTPATH/fdpp" >config.mak
-    mkdir thunk_gen 2>/dev/null
-    cd thunk_gen
-    echo "srcdir = $SCRIPTPATH/fdpp/thunk_gen" >config.mak
-    ln -sf "$SCRIPTPATH"/fdpp/thunk_gen/makefile makefile
+    "$SCRIPTPATH/fdpp"/configure
 fi
