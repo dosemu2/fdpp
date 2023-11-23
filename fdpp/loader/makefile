@@ -34,7 +34,7 @@ ALL = $(T)/$(FDPPLIB)
 all: $(ALL)
 
 $(T)/$(FDPPLIB): $(OBJECTS)
-	$(CL) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CC_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 $(OBJECTS): %.o: $(srcdir)/%.c $(addprefix $(srcdir)/,$(HEADERS)) $(srcdir)/makefile
 	$(CC) $(CFLAGS) -c -o $@ $<

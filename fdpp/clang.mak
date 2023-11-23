@@ -2,22 +2,25 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
-LD ?= ld
 CROSS_LD ?= x86_64-linux-gnu-ld
 CCACHE ?= $(shell which ccache 2>/dev/null)
-CC = $(CCACHE) clang
+CC ?= $(CCACHE) clang
 CXX = $(CCACHE) clang++
-CLANG_VER := $(shell $(CC) -v 2>&1 | head -n 1 | \
+CLANG_VER := $(shell $(CXX) -v 2>&1 | head -n 1 | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
 FLEX = $(shell which flex 2>/dev/null)
 ifneq ($(FLEX),)
 LEX = $(FLEX)
 endif
 
-CC_FOR_BUILD = $(CCACHE) clang
+CC_FOR_BUILD ?= $(CC)
 CPP = $(CC_FOR_BUILD) -E
-CC_LD = $(CXX)
-CL = $(CC)
+ifeq ($(CXX_LD),)
+CXX_LD = $(CXX)
+endif
+ifeq ($(CC_LD),)
+CC_LD = $(CC)
+endif
 NASM ?= nasm-segelf
 PKG_CONFIG ?= pkg-config
 
@@ -60,7 +63,7 @@ endif
 
 CXXFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
 CFLAGS = -Wall $(DBGFLAGS)
-CLCFLAGS = -c -fpic $(WCFLAGS) $(DBGFLAGS) -xc++
+CLCFLAGS = -c -fpic -Wall $(DBGFLAGS) -xc++
 LDFLAGS = -shared -Wl,--build-id=sha1
 
 ifeq ($(XFAT),32)

@@ -127,24 +127,24 @@ FDPP_CCOBJS = $(FDPP_CCFILES:.cc=.o)
 FDPP_CPPOBJS = $(CPPFILES:.cpp=.o)
 
 $(OBJECTS): %.o: %.cc $(HEADERS) $(GEN_HEADERS_FD) $(EXT_H)
-	$(CC) $(CXXFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 $(FDPP_COBJS): %.o: $(srcdir)/%.c $(PPHDRS) $(srcdir)/makefile
-	$(CC) $(CLCFLAGS) -I . -o $@ $<
+	$(CXX) $(CLCFLAGS) -I . -o $@ $<
 
 thunks.o: $(EXT_H) $(GIT_REV)
 thunks_a.o: $(SRC)/glob_asm.h $(srcdir)/glob_tmpl.h plt_asmc.h plt_asmp.h
 $(FDPP_CCOBJS): %.o: $(srcdir)/%.cc $(GEN_HEADERS) $(PPHDRS) $(srcdir)/makefile
-	$(CC) $(CXXFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
-	$(CC) $(CXXFLAGS) -o $@ $<
+	$(CXX) $(CXXFLAGS) -o $@ $<
 
 $(GEN_CC): %.cc: $(SRC)/%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
-	$(CC_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 $(FDPPDEVL): $(FDPPLIB)
