@@ -51,9 +51,10 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
     char *kname;
     void *handle;
     struct krnl_hndl *h;
-    int i, s;
+    int i, s, rc;
 
-    asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
+    rc = asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
+    assert(rc != -1);
     handle = elf_open(kname);
     if (!handle) {
         fprintf(stderr, "failed to open %s\n", kname);
