@@ -117,6 +117,9 @@ using WrpType = WrpTypeS<T, sym_store>;
         (_C(T1) || !_C(T0)))
 
 template<typename T>
+class FarPtr;
+
+template<typename T>
 class FarPtrBase {
 protected:
     far_s ptr;
@@ -143,11 +146,8 @@ public:
         typename std::enable_if<ALLOW_CNV(T0, T1)>::type* = nullptr>
     FarPtrBase(const FarPtrBase<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
-    T* operator ->() const {
-        static_assert(std::is_standard_layout<T>::value ||
-                std::is_void<T>::value, "need std layout");
-        store_far(ARROW_STORE, get_far());
-        return (T*)resolve_segoff_fd(ptr);
+    FarPtr<T> operator ->() const {
+        return FarPtr<T>(ptr);
     }
     operator T*() const {
         static_assert(std::is_standard_layout<T>::value ||
@@ -168,12 +168,16 @@ public:
 
     wrp_type_s& get_wrp() {
         wrp_type_s *s = new(get_buf()) wrp_type_s;
+        /* TODO: move store to SymWrp ctor. Currently impossible
+         * because SymWrp needs to be trivially-constructible. */
         _store_far(SYM_STORE, s, get_far());
         return *s;
     }
     wrp_type_a& operator [](int idx) {
         TheBase f = TheBase(*this + idx);
         wrp_type_a *s = new(f.get_buf()) wrp_type_a;
+        /* TODO: move store to SymWrp ctor. Currently impossible
+         * because SymWrp needs to be trivially-constructible. */
         _store_far(ARR_STORE, s, f.get_far());
         return *s;
     }
@@ -351,6 +355,7 @@ public:
     }
     uint16_t _seg_() const { return this->ptr.seg; }
     uint16_t _off_() const { return this->ptr.off; }
+
     operator T*() {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
@@ -359,6 +364,16 @@ public:
         store_far(ASTER_STORE, this->get_far());
         return (T*)resolve_segoff_fd(this->ptr);
     }
+
+    T* operator ->() const {
+        static_assert(std::is_standard_layout<T>::value ||
+                std::is_void<T>::value, "need std layout");
+        if (!nonnull && !this->ptr.seg && !this->ptr.off)
+            return NULL;
+        store_far(ARROW_STORE, this->get_far());
+        return (T*)resolve_segoff_fd(this->ptr);
+    }
+
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
