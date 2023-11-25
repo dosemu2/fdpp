@@ -144,6 +144,8 @@ public:
     FarPtrBase(const FarPtrBase<T0>& f) : ptr(_MK_S(f.seg(), f.off())) {}
 
     T* operator ->() const {
+        static_assert(std::is_standard_layout<T>::value ||
+                std::is_void<T>::value, "need std layout");
         store_far(ARROW_STORE, get_far());
         return (T*)resolve_segoff_fd(ptr);
     }
@@ -157,6 +159,8 @@ public:
     }
     template<typename T0>
     explicit operator T0*() const {
+        static_assert(std::is_standard_layout<T0>::value ||
+                std::is_void<T0>::value, "need std layout");
         if (!ptr.seg && !ptr.off)
             return NULL;
         return (T0*)resolve_segoff_fd(ptr);
