@@ -692,13 +692,15 @@ template<typename T, typename P, int (*M)(void), int O = 0>
 class SymMemb : public T, public MembBase<T, P, M, O> {
     template<const int *st>
     using wrp_type = typename WrpTypeS<T, st>::type;
-    using wrp_type_s = wrp_type<sym_store>;
 public:
+    using wrp_type_s = wrp_type<sym_store>;
     SymMemb() = default;
     SymMemb(const SymMemb&) = delete;
     T& operator =(const T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
-    wrp_type_s& use() {
+    /* This dot_barrier is needed because operator dot can't save
+     * the lhs fptr. We add manual fixups whereever it crashes... */
+    wrp_type_s& dot_barrier() const {
         FarPtr<T> sym = this->lookup_sym();
         /* TODO: move store to SymWrp ctor. Currently impossible
          * because SymWrp needs to be trivially-constructible. */
@@ -706,6 +708,20 @@ public:
         return *new(sym.get_buf()) wrp_type_s;
     }
 } NONPOD_PACKED;
+
+/* Safety wrapper, in case the dot barriers are added by some stupid script,
+ * rather than manually, as now. */
+class DotBarrierWrap {
+public:
+    template<typename T0, typename T1, int (*M)(void), int O,
+        typename TN = SymMemb<T0, T1, M, O> >
+    static constexpr typename TN::wrp_type_s&
+            dot_barrier(SymMemb<T0, T1, M, O>& s) {
+        return s.dot_barrier();
+    }
+    template<typename T1>
+    static constexpr T1& dot_barrier(T1& s) { return s; }
+};
 
 template<typename T, typename P, int (*M)(void), int O = 0>
 class SymMembT : public MembBase<T, P, M, O> {
@@ -770,7 +786,7 @@ public:
 #define GET_FAR(f) (f).get_far()
 #define GET_PTR(f) (f).get_ptr()
 #define ADJUST_FAR(f) (f).adjust_far()
-#define _DOS_FP(p) p.use()
+#define _DOS_FP(p) DotBarrierWrap::dot_barrier(p)
 
 #undef NULL
 #define NULL           nullptr
