@@ -687,12 +687,12 @@ public:
 } NONPOD_PACKED;
 
 template<typename T, typename P, int (*M)(void), int O = 0>
-class SymMemb2 : public MembBase<T, P, M, O> {
+class SymMembT : public MembBase<T, P, M, O> {
     T sym;
 
 public:
-    SymMemb2() = default;
-    SymMemb2(const SymMemb2&) = delete;
+    SymMembT() = default;
+    SymMembT(const SymMembT&) = delete;
     T& operator =(const T& f) { sym = f; return sym; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
     operator T &() { return sym; }
@@ -729,7 +729,7 @@ public:
     SymMemb<t, p, &p::off_##m, o> n
 #define SYM_MEMB_T(p, t, n) \
     DUMMY_MARK(p, n); \
-    SymMemb2<t, p, &p::off_##n> n
+    SymMembT<t, p, &p::off_##n> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
