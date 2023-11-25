@@ -675,14 +675,20 @@ public:
 
 template<typename T, typename P, int (*M)(void), int O = 0>
 class SymMemb : public T, public MembBase<T, P, M, O> {
+    template<const int *st>
+    using wrp_type = typename WrpTypeS<T, st>::type;
+    using wrp_type_s = wrp_type<sym_store>;
 public:
     SymMemb() = default;
     SymMemb(const SymMemb&) = delete;
     T& operator =(const T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
-    T& use() {
-        store_far(SYM_STORE, this->lookup_sym().get_far());
-        return *this;
+    wrp_type_s& use() {
+        FarPtr<T> sym = this->lookup_sym();
+        /* TODO: move store to SymWrp ctor. Currently impossible
+         * because SymWrp needs to be trivially-constructible. */
+        store_far(SYM_STORE, sym.get_far());
+        return *new(sym.get_buf()) wrp_type_s;
     }
 } NONPOD_PACKED;
 
