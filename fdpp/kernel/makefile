@@ -13,6 +13,8 @@ PPINC = $(TOP)/include/fdpp
 AVER = $(shell echo FDPP_API_VER | cpp -include $(PPINC)/thunks.h - | tail -n 1)
 BVER = $(shell echo BPRM_VER | cpp -include $(PPINC)/bprm.h - | tail -n 1)
 TARGET=fdppkrnl.$(AVER).$(BVER)
+VERSION = 1.7
+CPPFLAGS += -I$(TOP)/fdpp
 
 NASMFLAGS += -i$(SRC) -i$(HDR) -f elf32
 
@@ -94,15 +96,15 @@ $(PPOBJS): %.o: %.asm makefile
 
 plt.o: plt.asm plt.inc $(SRC)/segs.inc
 
-plt.asm: $(srcdir)/$(T)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h \
+plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h \
    $(srcdir)/$(T)/thunks_priv.h $(srcdir)/makefile
-	$(CPP) -iquote $(PPINC) -P $< >$@ || ($(RM) $@ ; false)
+	$(CPP) $(CPPFLAGS) -iquote $(PPINC) -P $< >$@ || ($(RM) $@ ; false)
 
 GIT_DESCRIBE := $(shell git describe)
 
-cdata.asm: $(srcdir)/$(T)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
-	$(CPP) $(CPPFLAGS) -DKERNEL_VERSION="$(VERSION) [GIT: $(GIT_DESCRIBE)]" \
-	-P $< | sed 's/" "/","/g' >$@
+cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
+	$(CPP) -iquote $(HDR) -DKERNEL_VERSION="$(VERSION) [GIT: $(GIT_DESCRIBE)]" \
+	-DCMA=, -P $< >$@
 
 thunk_calls.tmp: $(SRC)/proto.h
 	srcdir=$(srcdir)/$(T)/parsers CPP="$(CPP)" \
