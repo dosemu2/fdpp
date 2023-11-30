@@ -735,6 +735,7 @@ segment DYN_DATA
         align 10h
         global _Dyn
 _Dyn:
+                times 10h db 0      ; guard space from prev sym
 
 markEndInstanceData:  ; mark end of DOS data seg we say needs instancing
 
@@ -759,21 +760,16 @@ _InitEnd:
 
 segment HMA_TEXT_START
                 align 10h
-                times 10h db 0      ; guard space from prev sym
-                global __HMATextAvailable
-__HMATextAvailable:
                 global  __HMATextStart
 __HMATextStart:
+                times 0xd0 db 0   ; filler [ffff:0..10000:c0]
+                ; reserve space for far jump to cp/m routine
+                times 5 db 0
+                align 10h
+                global __HMATextAvailable
+__HMATextAvailable:
 
-;
-; the HMA area is filled with 1eh+3(=sizeof VDISK) = 33 byte dummy data,
-; so nothing will ever be below 0xffff:0031
-;
 segment HMA_TEXT
-begin_hma:
-                times 10h db 0   ; filler [ffff:0..ffff:10]
-                times 20h db 0
-                db 0
 
 ; to minimize relocations
                 global _DGROUP_
@@ -790,10 +786,6 @@ global __U4D
 __U4D:
                 LDIVMODU
 %endif
-
-                times 0xd0 - ($-begin_hma) db 0
-                ; reserve space for far jump to cp/m routine
-                times 5 db 0
 
 ;End of HMA segment
 segment HMA_TEXT_END
