@@ -27,7 +27,7 @@
 /****************************************************************/
 
 #include "portab.h"
-#include "time.h"
+#include "dosctime.h"
 #include "date.h"
 #include "globals.h"
 

@@ -38,7 +38,7 @@ static BYTE *Globals_hRcsId =
 #include "mcb.h"
 #include "pcb.h"
 #include "date.h"
-#include "time.h"
+#include "dosctime.h"
 #include "fat.h"
 #include "fcb.h"
 #include "tail.h"
