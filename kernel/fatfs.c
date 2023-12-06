@@ -69,8 +69,7 @@ CLUSTER getdstart(struct dpb FAR *dpbp, struct dirent *dentry)
 void setdstart(struct dpb FAR *dpbp, struct dirent *dentry, CLUSTER value)
 {
   dentry->dir_start = (UWORD)value;
-  if (ISFAT32(dpbp))
-    dentry->dir_start_high = (UWORD)(value >> 16);
+  dentry->dir_start_high = (UWORD)(value >> 16);
 }
 #endif
 
