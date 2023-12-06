@@ -1,6 +1,5 @@
 project('loader', 'c', version: '0.1')
-TOP = '../..'
-rel_inc = TOP / 'include/fdpp'
+rel_inc = 'include/fdpp'
 abs_inc = meson.current_source_dir() / rel_inc
 lelf = dependency('libelf')
 incdir = include_directories(rel_inc)
@@ -13,7 +12,7 @@ BVER = cpp.get_define('BPRM_VER',
   prefix: '#include "bprm.h"')
 FVER = AVER + '.' + BVER
 TARGET = 'fdppkrnl.' + FVER
-shared_library('fdldr', 'elf.c', 'loader.c',
+LIBLOADER = shared_library('fdldr', 'elf.c', 'loader.c',
   dependencies: lelf, include_directories: incdir,
   version: FVER,
   c_args: [

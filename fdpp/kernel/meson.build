@@ -1,10 +1,9 @@
 project('kernel', ['nasm', 'c'], version: '1.7')
-TOP = '../..'
-PD = TOP / 'fdpp/parsers/parse_decls.sh'
-SRC = TOP / 'kernel'
-DSRC = SRC / 'drivers'
-kernel_ld = TOP / 'kernel.ld'
-rel_inc = TOP / 'include/fdpp'
+PD = 'parsers/parse_decls.sh'
+SRC = 'src'
+DSRC = 'src/drivers'
+kernel_ld = meson.current_source_dir() / 'kernel.ld'
+rel_inc = 'include/fdpp'
 abs_inc = meson.current_source_dir() / rel_inc
 incdir = include_directories(rel_inc)
 cpp = meson.get_compiler('c')
@@ -17,16 +16,17 @@ BVER = cpp.get_define('BPRM_VER',
 FVER = AVER + '.' + BVER
 TARGET = 'fdppkrnl.' + FVER
 GIT_DESCRIBE = run_command('git', 'describe', check: true).stdout().strip()
-hdr = [TOP / 'kernel', TOP / 'hdr', TOP / 'fdpp', rel_inc]
+hdr = ['src', 'hdr', rel_inc]
 incdir2 = include_directories(hdr)
 sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
   output : '@BASENAME@.asm',
   include_directories: incdir2,
-  compile_args : [
-    '-D__ASSEMBLER__',
-    '-DKERNEL_VERSION=' + meson.project_version() +
+  dependencies: declare_dependency(
+    compile_args : [
+      '-D__ASSEMBLER__',
+      '-DKERNEL_VERSION=' + meson.project_version() +
         ' [GIT: ' + GIT_DESCRIBE + ']',
-    '-DCMA=,', '-P'])
+      '-DCMA=,', '-P']))
 env = environment()
 env.set('CPP', 'cpp')
 env.set('srcdir', meson.current_source_dir() / '../parsers')
@@ -83,3 +83,5 @@ custom_target(TARGET + '.elf',
   install_dir: get_option('datadir') / 'fdpp',
   install_mode: 'rw-r--r--',
   build_by_default: true)
+
+VERSION = meson.project_version()
