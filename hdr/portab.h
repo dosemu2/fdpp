@@ -315,11 +315,11 @@ typedef WORD BOOL;
 /* Convienence defines                                          */
 /*                                                              */
 #define FOREVER         while(TRUE)
-#ifndef max
-#define max(a,b)       (((a) > (b)) ? (a) : (b))
+#ifndef _max
+#define _max(a,b)       (((a) > (b)) ? (a) : (b))
 #endif
-#ifndef min
-#define min(a,b)       (((a) < (b)) ? (a) : (b))
+#ifndef _min
+#define _min(a,b)       (((a) < (b)) ? (a) : (b))
 #endif
 
 #ifdef WITHFAT32
