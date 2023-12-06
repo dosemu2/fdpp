@@ -4,7 +4,7 @@
 #if 0
 #include "version.h"
 #include "date.h"
-#include "time.h"
+#include "dosctime.h"
 #include "mcb.h"
 #include "sft.h"
 #include "fat.h"

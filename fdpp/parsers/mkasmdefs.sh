@@ -1,3 +1,5 @@
+#!/bin/sh
+
 grep "__ASM(" $1 | grep -v '^/' | grep -v '#define' | \
 	sed -E 's/.+, (.+)\).*/#define \1 __ASYM\(__\1\)/'
 grep "__ASM_ARR(" $1 | grep -v '^/' | grep -v '#define' |  \

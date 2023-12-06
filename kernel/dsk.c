@@ -950,7 +950,7 @@ STATIC unsigned DMA_max_transfer(void FAR * buffer, unsigned count)
     0xffff / maxsecsize :
     (UWORD)(-dma_off) / maxsecsize);
 
-  return min(count, sectors_to_dma_boundary);
+  return _min(count, sectors_to_dma_boundary);
 }
 
 /*

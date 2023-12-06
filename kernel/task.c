@@ -505,7 +505,7 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
       ULONG com_size_long = SftGetFsize(fd);
       /* maximally 64k - 256 bytes stack -
          256 bytes psp */
-      com_size = ((UWORD)min(com_size_long, 0xfe00u) >> 4) + 0x10;
+      com_size = ((UWORD)_min(com_size_long, 0xfe00u) >> 4) + 0x10;
     }
 
     if ((mode & 0x7f) != OVERLAY)

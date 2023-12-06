@@ -17,7 +17,7 @@
  */
 
 %include "segs.inc"
-#include "../hdr/version.h"
+#include "version.h"
 
 segment CONST2
 

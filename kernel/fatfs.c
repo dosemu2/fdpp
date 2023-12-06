@@ -69,8 +69,7 @@ CLUSTER getdstart(struct dpb FAR *dpbp, struct dirent *dentry)
 void setdstart(struct dpb FAR *dpbp, struct dirent *dentry, CLUSTER value)
 {
   dentry->dir_start = (UWORD)value;
-  if (ISFAT32(dpbp))
-    dentry->dir_start_high = (UWORD)(value >> 16);
+  dentry->dir_start_high = (UWORD)(value >> 16);
 }
 #endif
 
@@ -1386,7 +1385,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
 
       sectors_to_xfer = fnp->f_dpb->dpb_clsmask + 1 - sector;
 
-      sectors_to_xfer = min(sectors_to_xfer, sectors_wanted);
+      sectors_to_xfer = _min(sectors_to_xfer, sectors_wanted);
 
       fnp->f_offset += sectors_to_xfer * secsize;
 
@@ -1401,7 +1400,7 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
 
         sectors_to_xfer += fnp->f_dpb->dpb_clsmask + 1;
 
-        sectors_to_xfer = min(sectors_to_xfer, sectors_wanted);
+        sectors_to_xfer = _min(sectors_to_xfer, sectors_wanted);
 
         fnp->f_offset = startoffset + sectors_to_xfer * secsize;
 
@@ -1455,9 +1454,9 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
     /* requested transfer size, whichever is smaller.       */
     /* Then compare to what is left, since we can transfer  */
     /* a maximum of what is left.                           */
-    xfr_cnt = min(to_xfer, secsize - boff);
+    xfr_cnt = _min(to_xfer, secsize - boff);
     if (mode == XFR_READ)
-      xfr_cnt = (UWORD) min(xfr_cnt, fnp->f_dir.dir_size - fnp->f_offset);
+      xfr_cnt = (UWORD) _min(xfr_cnt, fnp->f_dir.dir_size - fnp->f_offset);
 
     /* transfer a block                                     */
     /* Transfer size as either a full block size, or the    */

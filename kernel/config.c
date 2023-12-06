@@ -1564,7 +1564,7 @@ STATIC VOID Files(char * pLine)
   }
 
   /* Got the value, assign either default or new value            */
-  Config.cfgFiles = max(Config.cfgFiles, nFiles);
+  Config.cfgFiles = _max(Config.cfgFiles, nFiles);
   Config.cfgFilesHigh = 0;
 }
 
@@ -1950,7 +1950,7 @@ err:
         nlsPackageHardcoded.cntry = entry.country;
         nlsPackageHardcoded.cp = entry.codepage;
         subf_data.length =      /* MS-DOS "CTYINFO" is up to 38 bytes */
-                min(subf_data.length, sizeof(struct CountrySpecificInfo));
+                _min(subf_data.length, sizeof(struct CountrySpecificInfo));
       }
       if (hdr[i].id == 7)
       {

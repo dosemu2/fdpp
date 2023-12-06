@@ -1,3 +1,5 @@
+#!/bin/sh
+
 mkfar() {
     sed -E \
 	-e ':loop' \
