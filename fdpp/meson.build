@@ -8,7 +8,7 @@ tg = subproject('thunk_gen')
 TG = tg.get_variable('TG')
 TFLAGS = ['-a', '2', '-p', '2']
 SRC = TOP / 'kernel'
-rel_inc = TOP / 'include/fdpp'
+rel_inc = 'include/fdpp'
 abs_inc = meson.current_source_dir() / rel_inc
 incdir = include_directories(rel_inc)
 cpp = meson.get_compiler('c')
@@ -62,7 +62,7 @@ ccfiles = ccgen.process(CFILES)
 
 gad = custom_target('glob_asmdefs.h',
   output: 'glob_asmdefs.h',
-  input: SRC / 'glob_asm.h',
+  input: 'src/glob_asm.h',
   command: [MA, '@INPUT@'],
   capture: true)
 
@@ -136,7 +136,7 @@ ppccf = ccgen.process(FDPP_CFILES)
 FDPP_CCFILES = ['thunks.cc', 'thunks_c.cc', 'thunks_a.cc', 'thunks_p.cc',
   'dosobj.cc']
 CPPFILES = ['objhlp.cpp', 'ctors.cpp', 'farhlp.cpp', 'objtrace.cpp']
-hdr = [TOP / 'kernel', TOP / 'hdr', TOP / 'fdpp', rel_inc]
+hdr = ['src', 'hdr', '.', rel_inc]
 incdir2 = include_directories(hdr)
 shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
