@@ -1,3 +1,7 @@
+#!/bin/sh
+
+# set -xv
+
 if [ -f meson.build ]; then
     echo -e "Create a build dir first:"
     echo -e "\tmkdir build"
@@ -8,7 +12,13 @@ if [ -f meson.build ]; then
 fi
 
 TOP=$(dirname "$0")
-meson setup --native-file $TOP/fdpp/toolchain.ini \
+
+if [ -z "${PREFIX}" ] ; then
+    PREFIX="/usr/local"
+fi
+
+meson setup --prefix ${PREFIX} \
+  --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
   --native-file $TOP/fdpp/kernel/toolchain.ini . $TOP
