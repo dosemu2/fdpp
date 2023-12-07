@@ -13,4 +13,5 @@ pkg.generate(LIBFDPP,
   version: VERSION,
   install_dir: get_option('libdir') / 'pkgconfig')
 
-install_subdir('include/fdpp', install_dir : 'include')
+install_subdir('include/fdpp',
+  install_dir: 'include')
