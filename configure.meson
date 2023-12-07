@@ -11,7 +11,7 @@ TOP=$(dirname "$0")
 meson setup --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
-  --native-file $TOP/fdpp/kernel/toolchain.ini . $TOP --reconfigure
+  --native-file $TOP/fdpp/kernel/toolchain.ini . $TOP
 [ "$?" = "0" ] || exit 1
 
 echo
