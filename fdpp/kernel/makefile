@@ -50,7 +50,7 @@ endif
 # given the names are fixed. Also $(TARGET).% won't work that way at all:
 # you need to explicitly list all files that are created simultaneously,
 # and yet use pattern in all of them.
-DEPS_OF_ELF = $(srcdir)/$(T)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
+DEPS_OF_ELF = $(srcdir)/kernel.ld $(OBJS) $(PPOBJS) $(DOBJS)
 need = 4.3
 ifneq ($(filter $(need),$(firstword $(sort $(MAKE_VERSION) $(need)))),)
 $(T)/$(TARGET).elf $(T)/$(TARGET).map &: $(DEPS_OF_ELF)
