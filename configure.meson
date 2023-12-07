@@ -12,7 +12,7 @@ meson setup --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
   --native-file $TOP/fdpp/kernel/toolchain.ini . $TOP --reconfigure
-[ "$?" == "0" ] || exit 1
+[ "$?" = "0" ] || exit 1
 
 echo
 echo "Done configure"
