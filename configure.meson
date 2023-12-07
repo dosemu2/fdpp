@@ -16,5 +16,5 @@ meson setup --native-file $TOP/fdpp/toolchain.ini \
 
 echo
 echo "Done configure"
-echo "Now run \"meson build --verbose\" to build"
+echo "Now run \"meson compile --verbose\" to build"
 echo "After that you can do \"sudo meson install\" to install"
