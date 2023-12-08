@@ -19,10 +19,6 @@
 #ifndef THUNKS_PRIV_H
 #define THUNKS_PRIV_H
 
-#define FDPP_KERNEL_VERSION          4
-
-#ifndef __ASSEMBLER__
-
 void *resolve_segoff(struct far_s fa);
 void *resolve_segoff_fd(struct far_s fa);
 void thunk_call_void(struct far_s fa);
@@ -34,7 +30,5 @@ void fdloudprintf(const char *format, ...) PRINTF(1);
 void fdvprintf(const char *format, va_list vl);
 void fddebug(const BYTE * s, ...);
 int is_dos_space(const void *ptr);
-
-#endif
 
 #endif

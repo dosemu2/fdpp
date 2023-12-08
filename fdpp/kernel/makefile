@@ -97,7 +97,7 @@ $(PPOBJS): %.o: %.asm makefile
 plt.o: plt.asm plt.inc $(SRC)/segs.inc
 
 plt.asm: $(srcdir)/plt.S $(SRC)/glob_asm.h $(TOP)/include/fdpp/bprm.h \
-   $(srcdir)/$(T)/thunks_priv.h $(srcdir)/makefile
+   $(srcdir)/makefile
 	$(CPP) $(CPPFLAGS) -iquote $(PPINC) -P $< >$@ || ($(RM) $@ ; false)
 
 GIT_DESCRIBE := $(shell git describe)

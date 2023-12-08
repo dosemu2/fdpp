@@ -16,7 +16,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "thunks_priv.h"
 #include "bprm.h"
 %include "segs.inc"
 
