@@ -2,14 +2,11 @@
 
 # set -xv
 
-if [ -f meson.build ]; then
-    echo -e "Create a build dir first:"
-    echo -e "\tmkdir build"
-    echo -e "\tcd build"
-    echo -e "\t../$(basename $0)"
-    echo "Bye!"
-    exit 0
+if [ -z "$1" ] ; then
+    echo "Usage: ./$(basename $0) builddir"
+    exit 1
 fi
+BLD="$1"
 
 TOP=$(dirname "$0")
 
@@ -21,10 +18,10 @@ meson setup --prefix ${PREFIX} \
   --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
-  --native-file $TOP/fdpp/kernel/toolchain.ini . $TOP
+  --native-file $TOP/fdpp/kernel/toolchain.ini $BLD $TOP
 [ "$?" = "0" ] || exit 1
 
 echo
 echo "Done configure"
-echo "Now run \"meson compile --verbose\" to build"
-echo "After that you can do \"sudo meson install\" to install"
+echo "Now run \"meson compile --verbose -C $BLD\" to build"
+echo "After that you can do \"sudo meson install -C $BLD\" to install"

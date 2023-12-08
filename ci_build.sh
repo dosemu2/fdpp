@@ -26,8 +26,6 @@ else
   pipx install meson
   export PATH=${HOME}/.local/bin:${PATH}
 
-  mkdir build
-  cd build || (echo "Could not switch into build dir" && exit 1)
-  PREFIX=${INST} ../configure.meson
-  meson compile --verbose
+  PREFIX=${INST} ./configure.meson build
+  meson compile --verbose -C build
 fi
