@@ -20,7 +20,11 @@ DIR_ROOT="$(pwd)"
 git clone --depth 1 --no-single-branch https://github.com/dosemu2/dosemu2.git ${DIR_TEST_DOSEMU}
 
 # Install fdpp into local directory
-make install PREFIX="${DIR_ROOT}/${DIR_INSTALLED_FDPP}"
+if false ; then
+  make install PREFIX="${DIR_ROOT}/${DIR_INSTALLED_FDPP}"
+else
+  meson install -C ${DIR_ROOT}/build
+fi
 
 (
   cd ${DIR_TEST_DOSEMU} || exit 2

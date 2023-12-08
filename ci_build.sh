@@ -11,7 +11,21 @@ if [ "x${CI}" = "xtrue" ] ; then
 fi
 
 if [ -z "${DIR_INSTALLED_FDPP}" ] ; then
-   echo env var "DIR_INSTALLED_FDPP" is empty or missing
-   exit 1
+  echo env var "DIR_INSTALLED_FDPP" is empty or missing
+  exit 1
 fi
-make clean all PREFIX=`pwd`/${DIR_INSTALLED_FDPP}
+
+INST=$(pwd)/${DIR_INSTALLED_FDPP}
+
+if false ; then
+  # Old Makefile based build
+  make clean all PREFIX=${INST}
+else
+  # Ubuntu 22.04 has too old a Meson, so pip install it
+  sudo apt install ninja-build pipx
+  pipx install meson
+  export PATH=${HOME}/.local/bin:${PATH}
+
+  PREFIX=${INST} ./configure.meson build
+  meson compile --verbose -C build
+fi
