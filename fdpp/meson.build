@@ -55,7 +55,7 @@ CFILES = [
 
 ccgen = generator(find_program(MF),
   output: '@BASENAME@.cc',
-  arguments: '@INPUT@',
+  arguments: ['@INPUT@'],
   capture: true)
 ccfiles = ccgen.process(CFILES)
 
