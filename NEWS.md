@@ -1,3 +1,29 @@
+## 1.8
+
+This release contains ~75 patches, and is mostly targeted to resolving
+the long-standing technical debts.
+
+- ELF format is now fully utilized. We now use ELF-based symbol tables
+  and relocations, including dynamic relocations (which we simulate
+  with --emit-relocs). This completes the ELF relocation work started at
+  1.3 and 1.4 releases. Unfortunately, this brought in the new toolchain
+  restrictions:
+  * we no longer support upstream nasm (can only use our own nasm-segelf
+    fork of the nasm for now)
+  * do no longer support ld.lld (can only use GNU ld for now)
+  * no longer support GNU strip (can only use llvm-strip for now,
+    but the fix is already in GNU binutils git)
+  So the ELF support went in very painfully. We will keep working with
+  the upstream projects (lld mainly) in a hope to restore their use.
+  Nasm project have rejected our contributions, so the vanilla nasm
+  support is not anticipated any soon.
+- Meson build system support. But not removing the old makefiles yet,
+  as we need meson-1.3, which is not yet widely available.
+- Minor thunk_gen and farptr compiler updates.
+- Finally fixed remaining AlphaWaves problems. This game tests for the
+  MS-DOS compatibility in a very rough ways.
+- Fixed a few regressions of 1.7 (Prehistorik2 again)
+
 ## 1.7
 
 A very important release, containing ~200 patches.
