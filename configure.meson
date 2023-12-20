@@ -7,6 +7,7 @@ if [ -z "$1" ] ; then
     exit 1
 fi
 BLD="$1"
+shift
 
 TOP=$(dirname "$0")
 
@@ -18,7 +19,7 @@ meson setup --prefix ${PREFIX} \
   --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
-  --native-file $TOP/fdpp/kernel/toolchain.ini $BLD $TOP
+  --native-file $TOP/fdpp/kernel/toolchain.ini $BLD $TOP $*
 [ "$?" = "0" ] || exit 1
 
 echo
