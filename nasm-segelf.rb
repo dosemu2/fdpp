@@ -1,7 +1,7 @@
 class NasmSegelf < Formula
   desc "nasm-segelf"
   homepage "https://github.com/stsp/nasm"
-  url "https://github.com/stsp/nasm.git", branch: "elf16"
+  url "https://github.com/stsp/nasm.git", branch: "master"
   version "2.17"
   sha256 ""
   license "BSD-2-Clause"
