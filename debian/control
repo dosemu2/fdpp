@@ -4,6 +4,8 @@ Priority: optional
 Maintainer: Stas Sergeev <stsp@users.sourceforge.net>
 Standards-Version: 3.9.7
 Build-Depends:
+    sudo,
+    python3-venv,
     pipx,
     ninja-build,
     bison,

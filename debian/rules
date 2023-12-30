@@ -3,7 +3,7 @@
 export PATH=$(shell echo $$PATH):$(shell realpath ~/.local/bin)
 
 %:
-	pipx install meson
+	sudo pipx install meson
 	./configure.meson build --prefix /usr --libdir /usr/lib
 	dh $@ --buildsystem=meson --builddirectory=build
 
