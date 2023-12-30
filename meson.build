@@ -10,8 +10,7 @@ VERSION = ke.get_variable('VERSION')
 pkg = import('pkgconfig')
 pkg.generate(LIBFDPP,
   libraries: LIBLOADER,
-  version: VERSION,
-  install_dir: get_option('libdir') / 'pkgconfig')
+  version: VERSION)
 
 install_subdir('include/fdpp',
   install_dir: 'include')

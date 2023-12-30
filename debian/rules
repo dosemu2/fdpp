@@ -1,11 +1,11 @@
 #!/usr/bin/make -f
 
+export PATH=$(shell echo $$PATH):$(shell realpath ~/.local/bin)
+
 %:
-	dh $@ --parallel --builddirectory=build
+	pipx install meson
+	./configure.meson build --prefix /usr --libdir /usr/lib
+	dh $@ --buildsystem=meson --builddirectory=build
 
-override_dh_auto_build:
-	dh_auto_build $@ -- PREFIX=/usr
-
-override_dh_auto_install:
-	dh_auto_install $@ -- PREFIX=/usr \
-		PKGCONFIGDIR=/usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
+override_dh_makeshlibs:
+	dh_makeshlibs -n
