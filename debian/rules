@@ -1,9 +1,10 @@
 #!/usr/bin/make -f
 
-export PATH=$(shell echo $$PATH):$(shell realpath ~/.local/bin)
+export PATH=$(shell echo $$PATH):/tmp/venvs/meson/bin
+export PIPX_HOME=/tmp
 
 %:
-	sudo pipx install meson
+	pipx install meson
 	./configure.meson build --prefix /usr --libdir /usr/lib
 	dh $@ --buildsystem=meson --builddirectory=build
 
