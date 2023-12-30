@@ -1,12 +1,11 @@
 #!/usr/bin/make -f
 
-export PATH=$(shell echo $$PATH):/tmp/venvs/meson/bin
-export PIPX_HOME=/tmp
-
 %:
-	pipx install meson
-	./configure.meson build --prefix /usr --libdir /usr/lib
-	dh $@ --buildsystem=meson --builddirectory=build
+	dh $@ --parallel --builddirectory=build
 
-override_dh_makeshlibs:
-	dh_makeshlibs -n
+override_dh_auto_build:
+	dh_auto_build $@ -- PREFIX=/usr
+
+override_dh_auto_install:
+	dh_auto_install $@ -- PREFIX=/usr \
+		PKGCONFIGDIR=/usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
