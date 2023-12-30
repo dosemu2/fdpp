@@ -47,7 +47,7 @@ meson compile --verbose -C build %{?_smp_mflags}
 %check
 
 %install
-export PATH=$PATH:/builddir/.local/bin
+export PATH=$PATH:~/.local/bin
 meson install -C build --destdir %{buildroot}
 
 %files
