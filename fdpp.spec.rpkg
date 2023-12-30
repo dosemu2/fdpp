@@ -12,9 +12,10 @@ Group: System/Emulator
 License: GPLv3+
 URL: https://github.com/dosemu2/fdpp
 VCS: {{{ git_dir_vcs }}}
-Source0: {{{ git_dir_archive }}}
+Source0: {{{ dir_pack }}}
 
-BuildRequires: make
+BuildRequires: meson
+BuildRequires: ninja-build
 BuildRequires: bison
 BuildRequires: flex
 BuildRequires: sed
@@ -38,12 +39,13 @@ It is based on a FreeDOS kernel ported to modern C++.
 {{{ git_dir_setup_macro }}}
 
 %build
-make PREFIX=%{_prefix} LIBDIR=%{_libdir} %{?_smp_mflags}
+./configure.meson build --prefix %{_prefix} --libdir %{_libdir}
+meson compile --verbose -C build %{?_smp_mflags}
 
 %check
 
 %install
-make DESTDIR=%{buildroot} PREFIX=%{_prefix} LIBDIR=%{_libdir} install
+meson install -C build --destdir %{buildroot}
 
 %files
 %defattr(-,root,root)

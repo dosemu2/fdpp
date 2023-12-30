@@ -1,0 +1,6 @@
+function dir_pack {
+    rm -f `find . -name .gitignore`
+    git clean -fdq
+    tar zcf fdpp-git.tar.gz . --transform s,^\.[^\.],fdpp/,
+    echo fdpp-git.tar.gz
+}
