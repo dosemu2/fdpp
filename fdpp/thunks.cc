@@ -32,7 +32,7 @@
 #include "thunks_priv.h"
 #include "thunks.h"
 
-static struct fdpp_api *fdpp;
+static const struct fdpp_api *fdpp;
 
 struct asm_dsc_s {
     UWORD off;
@@ -224,7 +224,7 @@ void do_abort(const char *file, int line)
     fdpp->abort(file, line);
 }
 
-int FdppInit(struct fdpp_api *api, int ver, int *req_ver)
+int FdppInit(const struct fdpp_api *api, int ver, int *req_ver)
 {
     *req_ver = FDPP_API_VER;
     if (ver != FDPP_API_VER)

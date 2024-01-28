@@ -68,7 +68,7 @@ struct fdpp_api {
     void (*prot_mem)(fdpp_far_t p, uint16_t size, int type);
     int (*is_dos_space)(const void *ptr);
 };
-int FdppInit(struct fdpp_api *api, int ver, int *req_ver);
+int FdppInit(const struct fdpp_api *api, int ver, int *req_ver);
 void FdppLoaderHook(uint16_t seg, int (*getsymoff)(void *, const char *),
         void *arg);
 const char *FdppVersionString(void);
