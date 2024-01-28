@@ -13,4 +13,4 @@ pgen = generator(bison,
   arguments : ['@INPUT@', '--defines=@OUTPUT1@', '--output=@OUTPUT0@'])
 pfiles = pgen.process('thunk_gen.y')
 
-TG = executable('thunk_gen', lfiles, pfiles)
+TG = executable('thunk_gen', lfiles, pfiles, native: true)
