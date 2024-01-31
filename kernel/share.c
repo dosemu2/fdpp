@@ -75,10 +75,10 @@ typedef struct {
 } open_action_exception_t;
 
 static open_action_exception_t open_exceptions[] = {
-	{ 0, 0, 2, 0, 3 },
-	{ 0, 0, 4, 0, 3 },	/* compatibility-read/deny none-read, MED 08/2004 */
+	{ 0, 0, 2, 0, /*3*/0 }, /* allow, per DOS-7 share rules */
+	{ 0, 0, 4, 0, /*3*/0 }, /* allow, per DOS-7 share rules */
 
-	{ 2, 0, 0, 0, 4 },
+	{ 2, 0, 0, 0, /*4*/0 }, /* allow, per DOS-7 share rules */
 	{ 2, 0, 2, 0, 0 },
 	{ 2, 0, 4, 0, 0 },
 	{ SHARE_DENY_WRITE, OPEN_WRITE_ONLY, SHARE_DENY_READ, OPEN_READ_ONLY, 0 },
@@ -91,7 +91,7 @@ static open_action_exception_t open_exceptions[] = {
 	{ 3, 2, 4, 1, 0 },
 	{ SHARE_DENY_READ, OPEN_WRITE_ONLY, SHARE_DENY_READ, OPEN_WRITE_ONLY, 0 },
 
-	{ 4, 0, 0, 0, 4 },
+	{ 4, 0, 0, 0, /*4*/0 }, /* allow, per DOS-7 share rules */
 	{ 4, 0, 2, 0, 0 },
 	{ 4, 0, 2, 1, 0 },
 	{ 4, 0, 2, 2, 0 },
