@@ -34,7 +34,6 @@
 
 static const struct fdpp_api *fdpp;
 
-static far_t *asm_tab;
 #define asm_tab_len num_cthunks
 static farhlp sym_tab;
 #define num_wrps 2
@@ -640,7 +639,6 @@ void FdppLoaderHook(uint16_t seg, int (*getsymoff)(void *, const char *),
         store_far_replace(&sym_tab, resolve_segoff(f), f);
     }
 
-    asm_tab = (far_t *)malloc(num_cthunks * sizeof(asm_tab[0]));
     for (i = 0; i < num_cthunks; i++) {
         int off = getsymoff(arg, asm_cthunks[i].name);
         assert(off != -1);

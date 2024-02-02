@@ -59,3 +59,5 @@ struct athunk asm_cthunks[] = {
 };
 
 const int num_cthunks = _countof(asm_cthunks);
+
+far_t asm_tab[num_cthunks];
