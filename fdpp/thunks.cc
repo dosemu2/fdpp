@@ -34,11 +34,7 @@
 
 static const struct fdpp_api *fdpp;
 
-struct asm_dsc_s {
-    UWORD off;
-    UWORD seg;
-};
-struct asm_dsc_s *asm_tab;
+static far_t *asm_tab;
 #define asm_tab_len num_cthunks
 static farhlp sym_tab;
 #define num_wrps 2
@@ -135,7 +131,7 @@ static void do_relocs(UWORD old_seg, uint8_t *start_p, uint8_t *end_p,
 {
     int i;
     int reloc;
-    struct asm_dsc_s *t;
+    far_t *t;
     uint8_t *ptr;
 
     reloc = 0;
@@ -644,8 +640,7 @@ void FdppLoaderHook(uint16_t seg, int (*getsymoff)(void *, const char *),
         store_far_replace(&sym_tab, resolve_segoff(f), f);
     }
 
-    asm_tab = (struct asm_dsc_s *)malloc(num_cthunks *
-               sizeof(struct asm_dsc_s *));
+    asm_tab = (far_t *)malloc(num_cthunks * sizeof(asm_tab[0]));
     for (i = 0; i < num_cthunks; i++) {
         int off = getsymoff(arg, asm_cthunks[i].name);
         assert(off != -1);
