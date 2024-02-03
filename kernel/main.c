@@ -807,8 +807,8 @@ STATIC int EmulatedDriveStatus(int drive,char statusOnly)
   r.a.b.l = statusOnly;
   r.d.b.l = (char)drive;
   buf = MK_FAR(buffer);
-  r.ds = FP_SEG(buf);
-  r.si = FP_OFF(buf);
+  r.ds = FP_SEG_OBJ(&r, buf);
+  r.si = FP_OFF_OBJ(&r, buf);
   init_call_intr(0x13, &r);
 
   if (r.flags & 1)
