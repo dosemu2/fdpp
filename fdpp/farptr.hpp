@@ -377,7 +377,7 @@ public:
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
-template<typename, int, typename P, int (*)(void)> class ArMemb;
+template<typename, int, typename P, auto> class ArMemb;
 
 template<typename T>
 class XFarPtr : public FarPtr<T>
@@ -388,7 +388,7 @@ public:
     XFarPtr() = delete;
     XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
-    template<typename T1 = T, int max_len, typename P, int (*M)(void)>
+    template<typename T1 = T, int max_len, typename P, auto M>
     XFarPtr(ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p) {}
 
     /* The below ctors are safe wrt implicit conversions as they take
@@ -585,12 +585,12 @@ public:
     far_s* get_ref() { return &sym.get_ref(); }
 };
 
-template<typename T, typename P, int (*M)(void), int O = 0>
+template<typename T, typename P, auto M, int O = 0>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
         FarPtr<T> fp;
-        constexpr int off = M() + O;
+        constexpr int off = M.template operator()<P>() + O;
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f;
@@ -601,7 +601,7 @@ protected:
     }
 };
 
-template<typename T, int max_len, typename P, int (*M)(void)>
+template<typename T, int max_len, typename P, auto M>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
 
@@ -688,7 +688,7 @@ public:
     far_s* get_ref() { return &ptr.get_ref(); }
 };
 
-template<typename T, typename P, int (*M)(void), int O = 0>
+template<typename T, typename P, auto M, int O = 0>
 class SymMemb : public T, public MembBase<T, P, M, O> {
     template<const int *st>
     using wrp_type = typename WrpTypeS<T, st>::type;
@@ -713,7 +713,7 @@ public:
  * rather than manually, as now. */
 class DotBarrierWrap {
 public:
-    template<typename T0, typename T1, int (*M)(void), int O,
+    template<typename T0, typename T1, auto M, int O,
         typename TN = SymMemb<T0, T1, M, O> >
     static constexpr typename TN::wrp_type_s&
             dot_barrier(SymMemb<T0, T1, M, O>& s) {
@@ -723,7 +723,7 @@ public:
     static constexpr T1& dot_barrier(T1& s) { return s; }
 };
 
-template<typename T, typename P, int (*M)(void), int O = 0>
+template<typename T, typename P, auto M, int O = 0>
 class SymMembT : public MembBase<T, P, M, O> {
     T sym;
 
@@ -754,19 +754,15 @@ public:
 #define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
-#define DUMMY_MARK(p, n) \
-    static constexpr int off_##n(void) { return offsetof(p, n); }
+#define OFF_M(n) []<typename T>() constexpr { return offsetof(T, n); }
 #define AR_MEMB(p, t, n, l) \
-    DUMMY_MARK(p, n); \
-    ArMemb<t, l, p, &p::off_##n> n
+    ArMemb<t, l, p, OFF_M(n)> n
 #define SYM_MEMB(p, t, n) \
-    DUMMY_MARK(p, n); \
-    SymMemb<t, p, &p::off_##n> n
+    SymMemb<t, p, OFF_M(n)> n
 #define SYM_MEMB2(p, m, o, t, n) \
-    SymMemb<t, p, &p::off_##m, o> n
+    SymMemb<t, p, OFF_M(m), o> n
 #define SYM_MEMB_T(p, t, n) \
-    DUMMY_MARK(p, n); \
-    SymMembT<t, p, &p::off_##n> n
+    SymMembT<t, p, OFF_M(n)> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))

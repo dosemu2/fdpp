@@ -1,4 +1,5 @@
-project('libfdpp', ['c', 'cpp'], version: '0.1')
+project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
+  version: '0.1')
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 MA = meson.current_source_dir() / 'parsers/mkasmdefs.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
