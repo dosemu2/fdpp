@@ -590,7 +590,7 @@ class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
         FarPtr<T> fp;
-        constexpr int off = M.template operator()<P>() + O;
+        constexpr int off = M() + O;
         /* find parent first */
         const uint8_t *ptr = (const uint8_t *)this - off;
         far_s f;
@@ -754,15 +754,15 @@ public:
 #define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
-#define OFF_M(n) []<typename T>() constexpr { return offsetof(T, n); }
+#define OFF_M(p, n) []<typename T = p>() constexpr { return offsetof(T, n); }
 #define AR_MEMB(p, t, n, l) \
-    ArMemb<t, l, p, OFF_M(n)> n
+    ArMemb<t, l, p, OFF_M(p, n)> n
 #define SYM_MEMB(p, t, n) \
-    SymMemb<t, p, OFF_M(n)> n
+    SymMemb<t, p, OFF_M(p, n)> n
 #define SYM_MEMB2(p, m, o, t, n) \
-    SymMemb<t, p, OFF_M(m), o> n
+    SymMemb<t, p, OFF_M(p, m), o> n
 #define SYM_MEMB_T(p, t, n) \
-    SymMembT<t, p, OFF_M(n)> n
+    SymMembT<t, p, OFF_M(p, n)> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
