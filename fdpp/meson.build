@@ -138,11 +138,12 @@ FDPP_CCFILES = ['thunks.cc', 'thunks_c.cc', 'thunks_a.cc', 'thunks_p.cc',
 CPPFILES = ['objhlp.cpp', 'ctors.cpp', 'farhlp.cpp', 'objtrace.cpp']
 hdr = ['src', 'hdr', '.', rel_inc]
 incdir2 = include_directories(hdr)
+CLANG_VER = meson.get_compiler('cpp').version().split('.')[0]
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
   version: FVER,
   sources: [gad, pac, pap, tc, ta],
-  cpp_args: ['-DFDPP', '-DDEBUG', '-DWITHFAT32',
+  cpp_args: ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
       '-fno-threadsafe-statics',
       '-Werror=packed-non-pod', '-Wno-unknown-warning-option',
       '-Wno-format-invalid-specifier', '-Wno-c99-designator'

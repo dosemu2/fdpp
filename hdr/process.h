@@ -90,7 +90,7 @@ typedef struct _psp {
   UBYTE ps_fill2c[7];           /* 49 unused, 7 bytes              */
   UBYTE ps_unix[3];             /* 50 unix style call - 0xcd 0x21 0xcb */
   BYTE ps_fill3[9];             /* 53 */
-//  DUMMY_MARK(_psp, _u);
+  DUMMY_MARK(_psp, _u);
   union {
     struct {
       SYM_MEMB2(_psp, _u, 0, fcb, _ps_fcb1);             /* 5c first command line argument */

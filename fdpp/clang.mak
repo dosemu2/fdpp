@@ -24,7 +24,8 @@ endif
 NASM ?= nasm-segelf
 PKG_CONFIG ?= pkg-config
 
-TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic
+TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic \
+  -DCLANG_VER=$(CLANG_VER)
 # _XTRA should go at the end of cmd line
 TARGETOPT_XTRA = -Wno-format-invalid-specifier -Wno-c99-designator
 

@@ -754,14 +754,24 @@ public:
 #define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) x.get_sym()
 #define ASMREF(t) AsmRef<t>
+#if CLANG_VER < 14
+#define DUMMY_MARK(p, n) \
+    static constexpr int off_##n(void) { return offsetof(p, n); }
+#define OFF_M(p, n) p::off_##n
+#else
+#define DUMMY_MARK(p, n)
 #define OFF_M(p, n) []<typename T = p>() constexpr { return offsetof(T, n); }
+#endif
 #define AR_MEMB(p, t, n, l) \
+    DUMMY_MARK(p, n); \
     ArMemb<t, l, p, OFF_M(p, n)> n
 #define SYM_MEMB(p, t, n) \
+    DUMMY_MARK(p, n); \
     SymMemb<t, p, OFF_M(p, n)> n
 #define SYM_MEMB2(p, m, o, t, n) \
     SymMemb<t, p, OFF_M(p, m), o> n
 #define SYM_MEMB_T(p, t, n) \
+    DUMMY_MARK(p, n); \
     SymMembT<t, p, OFF_M(p, n)> n
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
