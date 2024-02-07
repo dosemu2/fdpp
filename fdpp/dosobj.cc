@@ -74,7 +74,7 @@ void dosobj_reinit(far_t fa, int size)
     base = fa;
 }
 
-far_t mk_dosobj(const void *data, UWORD len)
+far_t mk_dosobj(UWORD len)
 {
     void *ptr;
     uint16_t offs;

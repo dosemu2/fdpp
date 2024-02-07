@@ -67,7 +67,7 @@ class FarObj : public FarObjBase<T>, public ObjIf, public ObjRef,
     std::unordered_set<sh_ref> owned_sh;
 
     void _ctor() {
-        this->fobj = (__DOSFAR(uint8_t))mk_dosobj(this->ptr, this->size);
+        this->fobj = (__DOSFAR(uint8_t))mk_dosobj(this->size);
         owned = get_owned_list(this->ptr);
         owned_sh = get_owned_list_sh(this->ptr);
     }

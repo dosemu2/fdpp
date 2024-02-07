@@ -24,7 +24,7 @@
 void dosobj_init(far_t fa, int size);
 void dosobj_reinit(far_t fa, int size);
 void dosobj_free(void);
-far_t mk_dosobj(const void *data, UWORD len);
+far_t mk_dosobj(UWORD len);
 void pr_dosobj(far_t fa, const void *data, UWORD len);
 void cp_dosobj(void *data, far_t fa, UWORD len);
 void rm_dosobj(far_t fa);
