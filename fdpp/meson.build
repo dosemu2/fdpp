@@ -72,8 +72,7 @@ GEN_H = { 'plt_asmc.h':'4', 'plt_asmp.h':'5' }
 env = environment()
 env.set('CPP', 'cpp')
 env.set('srcdir', meson.current_source_dir() / 'parsers')
-pd = find_program(PD)
-gtgen = generator(pd,
+gtgen = generator(find_program(PD),
   arguments: ['@EXTRA_ARGS@', '@INPUT@'],
   output: '@BASENAME@.tmp',
   capture: true)
@@ -118,11 +117,11 @@ ta2 = custom_target('thunk_asms2.h',
   feed: true,
   capture: true)
 
-find_program('autom4te')
 ta = custom_target('thunk_asms.h',
   output: 'thunk_asms.h',
   input: [ta1, ta2],
-  command: ['sh', '-c', 'cat @INPUT0@ | sort | uniq | autom4te -l m4sugar ' +
+  command: ['sh', '-c', 'cat @INPUT0@ | sort | uniq | ' +
+      find_program('autom4te').full_path() + ' -l m4sugar ' +
       M4 + ' - | cat - @INPUT1@'],
   capture: true)
 
