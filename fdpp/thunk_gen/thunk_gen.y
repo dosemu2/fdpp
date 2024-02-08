@@ -105,7 +105,8 @@ static void do_start_arg(int anum)
 		/* flat pointers need conversion to far */
 		switch (cvtype) {
 		case CVTYPE_VOID:
-		    sprintf(abuf + strlen(abuf), "_CNV_PTR_VOID, _L_REF(%i)", arg_num + 2);
+		    sprintf(abuf + strlen(abuf), "_CNV_PTR_%sVOID, _L_REF(%i)",
+			    is_const ? "C" : "", arg_num + 2);
 		    break;
 		case CVTYPE_CHAR:
 		    if (is_const)
@@ -128,8 +129,8 @@ static void do_start_arg(int anum)
 			    arg_num + 1, arr_sz);
 		    break;
 		case CVTYPE_OTHER:
-		    sprintf(abuf + strlen(abuf), "_CNV_PTR, _L_SZ(%i)",
-			    arg_num + 1);
+		    sprintf(abuf + strlen(abuf), "_CNV_%sPTR, _L_SZ(%i)",
+			    is_const ? "C" : "", arg_num + 1);
 		    break;
 		}
 		break;
@@ -146,6 +147,33 @@ static void do_start_arg(int anum)
 	case 2:
 	    strcat(abuf, "_CNV_CBK, _L_NONE");
 	    break;
+	}
+    } else if (is_arr) {
+	switch (anum) {
+	case 0:
+	    strcat(abuf, "_ARG_ARR(");
+	    break;
+	case 1:
+	    strcat(abuf, "_ARG_ARR_A(");
+	    break;
+	case 2:
+	    switch (cvtype) {
+	    case CVTYPE_CHAR_ARR:
+		if (is_const) {
+		    if (arr_sz == -1)
+			strcat(abuf, "_CNV_CCHAR_ARR, _L_REF(1)");
+		    else
+			sprintf(abuf + strlen(abuf), "_CNV_CCHAR_ARR, "
+				    "_L_IMM(%i, %i)", arg_num + 1, arr_sz);
+		} else
+		    sprintf(abuf + strlen(abuf), "_CNV_CHAR_ARR, "
+				    "_L_IMM(%i, %i)", arg_num + 1, arr_sz);
+		break;
+	    case CVTYPE_ARR:
+		sprintf(abuf + strlen(abuf), "_CNV_ARR, _L_IMM(%i, %i)",
+			    arg_num + 1, arr_sz);
+		break;
+	    }
 	}
     } else {
 	switch (anum) {
@@ -181,6 +209,13 @@ static void fin_arg(int last)
 	    strcat(abuf, "const ");
 	sprintf(abuf + strlen(abuf), "%s)", atype);
 	strcat(abuf, ", ");
+	if (is_arr) {
+	    if (arr_sz != -1)
+		sprintf(abuf + strlen(abuf), "[%i], ", arr_sz);
+	    else
+		strcat(abuf, "[], ");
+	} else
+	    strcat(abuf, ", ");
 	do_start_arg(1);
 	if (is_const)
 	    strcat(abuf, "const ");
