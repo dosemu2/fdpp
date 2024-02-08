@@ -35,7 +35,7 @@
 
 #define __CNV_PTR_FAR(t, d, f, l, t0) t d = (f)
 #define __CNV_PTR(t, d, f, l, t0) \
-    _MK_FAR_SZ(__##d, f, sizeof(*f)); \
+    _MK_FAR_SZ(__##d, f, l); \
     t d = __MK_NEAR2(__##d, t)
 #define __CNV_PTR_CCHAR(t, d, f, l, t0) \
     _MK_FAR_STR(__##d, f); \
@@ -51,5 +51,6 @@
 #define _CNV(c, t, at, l, n) c(at, _a##n, a##n, l, t)
 #define _L_REF(nl) a##nl
 #define _L_IMM(n, l) (sizeof(*_L_REF(n)) * (l))
+#define _L_SZ(n) sizeof(*_L_REF(n))
 
 #include <thunk_asms.h>
