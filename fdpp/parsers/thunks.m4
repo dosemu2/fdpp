@@ -35,6 +35,9 @@ m4_if($2, 0, [dnl
 m4_cond(m4_eval($3==0&&$1>0), 1, [dnl
     __CSTK(sizeof(_args)); \
 ])dnl
+foru(i, 1, $1, [dnl
+    _UCNV(c[]i, l[]i, i); \
+])dnl
 m4_cond($2, 0, [dnl
     return s(r, _ret); \
 ])dnl
