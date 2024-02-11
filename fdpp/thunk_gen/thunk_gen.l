@@ -68,6 +68,8 @@
 "union"		{ return UNION; }
 "const"		{ return CONST; }
 "NORETURN"	{ return NORETURN; }
+"_V_FW"		{ return V_FW; }
+"_V_BW"		{ return V_BW; }
 "/*".*"*/"	{ /* comments */ }
 [\t ]+		{ /* skip spaces */ }
 [_A-Za-z][_A-Za-z0-9]*	{

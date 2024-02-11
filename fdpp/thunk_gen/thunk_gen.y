@@ -37,6 +37,8 @@ static int is_const;
 static int is_pas;
 static int is_init;
 static int is_noret;
+static int ref_inc;
+static int ref_mult;
 static int rlen;
 static char abuf[1024];
 static char atype[256];
@@ -61,6 +63,9 @@ static void beg_arg(void)
     atype[0] = 0;
     atype2[0] = 0;
     atype3[0] = 0;
+    arg_size = 0;
+    ref_inc = 0;
+    ref_mult = 0;
 }
 
 static void init_line(void)
@@ -105,8 +110,12 @@ static void do_start_arg(int anum)
 		/* flat pointers need conversion to far */
 		switch (cvtype) {
 		case CVTYPE_VOID:
-		    sprintf(abuf + strlen(abuf), "_CNV_PTR_%sVOID, _L_REF(%i)",
-			    is_const ? "C" : "", arg_num + 2);
+		    if (ref_inc)
+			sprintf(abuf + strlen(abuf), "_CNV_PTR_%sVOID, _L_REF(%i, %i)",
+				is_const ? "C" : "", arg_num + 1 + ref_inc, ref_mult);
+		    else
+			sprintf(abuf + strlen(abuf), "_CNV_PTR_%sPVOID, _L_NONE",
+				is_const ? "C" : "");
 		    break;
 		case CVTYPE_CHAR:
 		    if (is_const)
@@ -117,7 +126,7 @@ static void do_start_arg(int anum)
 		case CVTYPE_CHAR_ARR:
 		    if (is_const) {
 			if (arr_sz == -1)  // main() template
-			    strcat(abuf, "_CNV_PTR_CCHAR_ARR, _L_REF(1)");
+			    strcat(abuf, "_CNV_PTR_CCHAR_ARR, _L_UNIMP"); // FIXME!
 			else
 			    sprintf(abuf + strlen(abuf), "_CNV_PTR_CCHAR_ARR, "
 				    "_L_IMM(%i, %i)", arg_num + 1, arr_sz);
@@ -161,7 +170,7 @@ static void do_start_arg(int anum)
 	    case CVTYPE_CHAR_ARR:
 		if (is_const) {
 		    if (arr_sz == -1)
-			strcat(abuf, "_CNV_CCHAR_ARR, _L_REF(1)");
+			strcat(abuf, "_CNV_CCHAR_ARR, _L_UNIMP"); // FIXME!
 		    else
 			sprintf(abuf + strlen(abuf), "_CNV_CCHAR_ARR, "
 				    "_L_IMM(%i, %i)", arg_num + 1, arr_sz);
@@ -297,7 +306,7 @@ static const char *al_u_type(void) { return (align == 2 ? "UWORD" : "UDWORD"); }
 %token STRUCT UNION
 %token LBR RBR
 %token CONST
-%token NORETURN
+%token NORETURN V_FW V_BW
 
 %define api.value.type union
 %type <int> num lnum NUM
@@ -468,7 +477,28 @@ rtype:		  VOID		{ rlen = 0;
 				}
 ;
 
-atype:		  VOID		{
+vref:
+		  V_FW LB NUM RB
+				{
+				  ref_inc = 1;
+				  ref_mult = $3;
+				}
+		| V_BW LB NUM RB
+				{
+				  ref_inc = -1;
+				  ref_mult = $3;
+				}
+;
+
+atype:
+		  VOID vref	{
+				  arg_size = 0;
+				  cvtype = CVTYPE_VOID;
+				  strcat(atype, "VOID");
+				  al_arg_size = AL(arg_size);
+				  is_void = 1;
+				}
+		| VOID		{
 				  arg_size = 0;
 				  cvtype = CVTYPE_VOID;
 				  strcat(atype, "VOID");

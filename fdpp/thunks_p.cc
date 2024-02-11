@@ -49,9 +49,9 @@
 #define __CNV_SIMPLE(t, d, f, l, t0) t d = (f)
 
 #define _CNV(c, t, at, l, n) c(at, _a##n, a##n, l, t)
-#define _L_REF(nl) a##nl
-#define _L_IMM(n, l) (sizeof(*_L_REF(n)) * (l))
-#define _L_SZ(n) sizeof(*_L_REF(n))
+#define _L_REF(nl, m) (a##nl * (m))
+//#define _L_IMM(n, l) (sizeof(a##n[0]) * (l))
+#define _L_SZ(n) sizeof(*a##n)
 
 #define _UCNV(c, l, n)  // unused in fdpp
 

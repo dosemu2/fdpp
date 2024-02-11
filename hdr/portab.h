@@ -244,6 +244,8 @@ void thunk_fmemset(far_t d, int ch, size_t n);
 #define USE_STDLIB
 #define PACKED         __attribute__((packed))
 #define NORETURN
+#define _V_FW(n)
+#define _V_BW(n)
 
 #else
 #error Unknown compiler
