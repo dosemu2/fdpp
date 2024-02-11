@@ -173,6 +173,10 @@ static void do_start_arg(int anum)
 		sprintf(abuf + strlen(abuf), "_CNV_ARR, _L_IMM(%i, %i)",
 			    arg_num + 1, arr_sz);
 		break;
+	    case CVTYPE_OTHER:
+		sprintf(abuf + strlen(abuf), "_CNV_%sPTR, _L_SZ(%i)",
+			    is_const ? "C" : "", arg_num + 1);
+		break;
 	    }
 	}
     } else {
