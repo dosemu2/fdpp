@@ -148,10 +148,10 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 $(FDPPDEVL): | $(FDPPLIB)
-	ln -sf $< $@
+	ln -sf $(FDPPLIB) $@
 
 $(LDRDEVL): | $(LDRLIB)
-	ln -sf $< $@
+	ln -sf $(LDRLIB) $@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
        $(wordlist 2,$(words $2),$2),x $3),$3)
