@@ -16,4 +16,5 @@ deb:
 
 nasm-segelf:
 	$@ --version 2>/dev/null || \
-		brew install $(srcdir)/nasm-segelf.rb
+		brew install $(srcdir)/nasm-segelf.rb || \
+		(echo "nasm-segelf is not installed" ; false)
