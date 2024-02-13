@@ -19,6 +19,10 @@
 #ifndef THUNKS_H
 #define THUNKS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdarg.h>
 
@@ -32,10 +36,6 @@ struct fdpp_far_s {
 typedef struct fdpp_far_s fdpp_far_t;
 #else
 #define fdpp_far_t far_t
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 struct vm86_regs;
