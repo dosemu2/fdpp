@@ -147,10 +147,10 @@ $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-$(FDPPDEVL): $(FDPPLIB)
+$(FDPPDEVL): | $(FDPPLIB)
 	ln -sf $< $@
 
-$(LDRDEVL): $(LDRLIB)
+$(LDRDEVL): | $(LDRLIB)
 	ln -sf $< $@
 
 _pos = $(if $(findstring $1,$2),$(call _pos,$1,\
@@ -205,7 +205,7 @@ uninstall:
 $(TGZ):
 	cd $(TOP) && git archive -o $(TOP)/$(TAR) --prefix=$(PKG)/ HEAD
 	gzip $(TOP)/$(TAR)
-.PHONY: $(TGZ)
+.PHONY: $(TGZ) $(TARGET).elf $(TARGET).map $(LDRLIB)
 
 tar: $(TGZ)
 
