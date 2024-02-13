@@ -9,10 +9,10 @@ Can be compiled with clang (not gcc!) and booted under
 [dosemu2](https://github.com/stsp/dosemu2).
 
 ## building and installing
-Just run `make`.<br/>
-For an out-of-tree build, run `<path_to_fdpp>/configure`
-before running `make`.<br/>
-After compiling, run `sudo make install` to install.
+Run `./configure.meson <build_dir>`.<br/>
+That should create the build directory that you specified, and print
+the instructions for the further build steps. It should also inform
+you about any missing build-dependencies, which you need to install.
 
 ## installing from pre-built package
 For the ubuntu package please visit
