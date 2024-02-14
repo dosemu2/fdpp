@@ -3,11 +3,11 @@
 # set -xv
 
 if [ -z "$1" ] ; then
-    echo "Usage: ./$(basename $0) builddir"
-    exit 1
+    BLD="build"
+else
+    BLD="$1"
+    shift
 fi
-BLD="$1"
-shift
 
 TOP=$(dirname "$0")
 
