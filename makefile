@@ -15,6 +15,7 @@ deb:
 	debuild -i -us -uc -b
 
 nasm-segelf:
-	$@ --version 2>/dev/null || \
-		brew install $(srcdir)/nasm-segelf.rb || \
+	@$@ --version 2>/dev/null || \
+		(echo "nasm-segelf missing, trying to install it with brew..." ; \
+		brew install $(srcdir)/nasm-segelf.rb) || \
 		(echo "nasm-segelf is not installed" ; false)
