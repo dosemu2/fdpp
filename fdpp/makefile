@@ -56,7 +56,8 @@ need = 4.3
 ifneq ($(filter $(need),$(firstword $(sort $(MAKE_VERSION) $(need)))),)
 $(TARGET).elf $(TARGET).map &:
 else
-%.elf %.map:
+$(TARGET).map: | $(TARGET).elf
+$(TARGET).elf:
 endif
 	$(MAKE) -C kernel
 
@@ -205,7 +206,7 @@ uninstall:
 $(TGZ):
 	cd $(TOP) && git archive -o $(TOP)/$(TAR) --prefix=$(PKG)/ HEAD
 	gzip $(TOP)/$(TAR)
-.PHONY: $(TGZ) $(TARGET).elf $(TARGET).map $(LDRLIB)
+.PHONY: $(TGZ) $(TARGET).elf $(LDRLIB)
 
 tar: $(TGZ)
 
