@@ -16,8 +16,6 @@ Source0: {{{ dir_pack }}}
 
 BuildRequires: pipx
 BuildRequires: ninja-build
-BuildRequires: bison
-BuildRequires: flex
 BuildRequires: sed
 BuildRequires: bash
 BuildRequires: clang
