@@ -27,7 +27,7 @@ BuildRequires: binutils-x86_64-linux-gnu
 BuildRequires: coreutils
 BuildRequires: libstdc++-devel
 BuildRequires: elfutils-libelf-devel
-BuildRequires: autoconf
+BuildRequires: thunk-gen
 BuildRequires: git
 BuildRequires: pkgconf-pkg-config
 

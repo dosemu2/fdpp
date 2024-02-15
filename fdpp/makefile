@@ -32,6 +32,13 @@ FD_EXT_H = $(TOP)/include/fdpp
 EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h \
      $(FD_EXT_H)/loader.h
 GEN_EXT = fdpp.pc
+TGD = $(shell pkg-config --variable=bindir thunk_gen)
+ifeq ($(TGD),)
+$(error thunk_gen not installed)
+endif
+TGS = $(TGD)/tg_m4
+TG = $(TGD)/thunk_gen
+TGM4 = $(shell pkg-config --variable=m4script thunk_gen)
 TFLAGS = -a 2 -p 2
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
@@ -67,7 +74,6 @@ $(LDRLIB):
 clean:
 	$(MAKE) -C kernel clean
 	$(MAKE) -C loader clean
-	+cd thunk_gen && $(MAKE) srcdir=$(abspath $(srcdir))/thunk_gen clean
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPDEVL) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(LDRDEVL) $(LDRLIB) $(GEN_HEADERS_FD) \
@@ -165,22 +171,19 @@ $(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
 plt_asmc.h plt_asmp.h: thunk_asms.tmp
 	$(pars)
 
-thunk_calls.h: thunk_calls.tmp thunk_gen/thunk_gen
-	thunk_gen/thunk_gen $(TFLAGS) <$< >$@ || ($(RM) $@ ; false)
+thunk_calls.h: thunk_calls.tmp
+	$(TG) $(TFLAGS) <$< >$@ || ($(RM) $@ ; false)
 
-thunk_asms.h: thunk_asms.tmp thunk_gen/thunk_gen $(srcdir)/parsers/thunks.m4
-	thunk_gen/thunk_gen $(TFLAGS) 1 <$< | sort | uniq | autom4te -l m4sugar $(srcdir)/parsers/thunks.m4 - >$@_ \
+thunk_asms.h: thunk_asms.tmp
+	$(TG) $(TFLAGS) 1 <$< | $(TGS) $(TGM4) >$@_ \
 		|| ($(RM) $@_ ; false)
-	thunk_gen/thunk_gen $(TFLAGS) 2 <$< >$@__ \
+	$(TG) $(TFLAGS) 2 <$< >$@__ \
 		|| ($(RM) $@__ ; false)
 	cat $@_ $@__ >$@
 	rm -f $@_ $@__
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
-
-thunk_gen/thunk_gen: $(srcdir)/thunk_gen/thunk_gen.y $(srcdir)/thunk_gen/thunk_gen.l
-	+cd thunk_gen && $(MAKE) srcdir=$(abspath $(srcdir))/thunk_gen
 
 INSTALL ?= install
 install: $(ALL)

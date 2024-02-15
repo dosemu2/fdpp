@@ -4,8 +4,10 @@ MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 MA = meson.current_source_dir() / 'parsers/mkasmdefs.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 M4 = meson.current_source_dir() / 'parsers/thunks.m4'
-tg = subproject('thunk_gen')
-TG = tg.get_variable('TG')
+tg = dependency('thunk_gen')
+TG = tg.get_pkgconfig_variable('bindir') / 'thunk_gen'
+TGS = tg.get_pkgconfig_variable('bindir') / 'tg_m4'
+TGM4 = tg.get_pkgconfig_variable('m4script')
 TFLAGS = ['-a', '2', '-p', '2']
 SRC = 'src'
 rel_inc = 'include/fdpp'
@@ -120,9 +122,8 @@ ta2 = custom_target('thunk_asms2.h',
 ta = custom_target('thunk_asms.h',
   output: 'thunk_asms.h',
   input: [ta1, ta2],
-  command: ['sh', '-c', 'cat @INPUT0@ | sort | uniq | ' +
-      find_program('autom4te').full_path() + ' -l m4sugar ' +
-      M4 + ' - | cat - @INPUT1@'],
+  command: ['sh', '-c', 'cat @INPUT0@ | ' + TGS + ' ' + TGM4 +
+            ' | cat - @INPUT1@'],
   capture: true)
 
 FDPP_CFILES = ['smalloc.c', 'farhlp_sta.c']

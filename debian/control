@@ -15,7 +15,7 @@ Build-Depends:
     binutils-x86-64-linux-gnu,
     coreutils,
     libelf-dev,
-    autoconf,
+    thunk-gen,
     git,
     pkg-config,
     debhelper (>= 9~)
