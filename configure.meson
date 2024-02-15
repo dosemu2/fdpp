@@ -24,4 +24,4 @@ meson setup --prefix ${PREFIX} \
 echo
 echo "Done configure"
 echo "Now run \"meson compile --verbose -C $BLD\" to build"
-echo "After that you can do \"sudo meson install -C $BLD\" to install"
+echo "After that you can do \"meson install -C $BLD\" to install"
