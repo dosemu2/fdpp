@@ -1,6 +1,6 @@
 ## 1.8
 
-This release contains ~75 patches, and is mostly targeted to resolving
+This release contains ~120 commits, and is mostly targeted to resolving
 the long-standing technical debts.
 
 - ELF format is now fully utilized. We now use ELF-based symbol tables
@@ -19,9 +19,10 @@ the long-standing technical debts.
   support is not anticipated any soon.
 - Meson build system support. But not removing the old makefiles yet,
   as we need meson-1.3, which is not yet widely available.
-- Minor thunk_gen and farptr compiler updates.
+- thunk_gen and farptr compiler updates. thunk_gen is now a separate project.
 - Finally fixed remaining AlphaWaves problems. This game tests for the
   MS-DOS compatibility in a very rough ways.
+- Share was changed to resemble MS-DOS-7 more closely.
 - Fixed a few regressions of 1.7 (Prehistorik2 again)
 
 ## 1.7
