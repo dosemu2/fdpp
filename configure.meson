@@ -1,27 +1,21 @@
-#!/bin/sh
-
-# set -xv
+#!/usr/bin/env bash
 
 if [ -z "$1" ] ; then
     BLD="build"
+    BLDH="build"
 else
-    BLD="$1"
-    shift
+    BLDH=${!#}
 fi
 
 TOP=$(dirname "$0")
 
-if [ -z "${PREFIX}" ] ; then
-    PREFIX="/usr/local"
-fi
-
-meson setup --prefix ${PREFIX} \
+meson setup \
   --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
-  $BLD $TOP $*
+  $* $BLD $TOP
 [ "$?" = "0" ] || exit 1
 
 echo
 echo "Done configure"
-echo "Now run \"meson compile --verbose -C $BLD\" to build"
-echo "After that you can do \"meson install -C $BLD\" to install"
+echo "Now run \"meson compile --verbose -C $BLDH\" to build"
+echo "After that you can do \"meson install -C $BLDH\" to install"
