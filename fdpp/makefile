@@ -32,12 +32,13 @@ FD_EXT_H = $(TOP)/include/fdpp
 EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h \
      $(FD_EXT_H)/loader.h
 GEN_EXT = fdpp.pc
-TGD = $(shell pkg-config --variable=bindir thunk_gen)
-ifeq ($(TGD),)
+TG = $(shell pkg-config --variable=binary thunk_gen)
+ifeq ($(TG),)
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
 $(error thunk_gen not installed)
 endif
-TGS = $(TGD)/tg_m4
-TG = $(TGD)/thunk_gen
+endif
+TGS = $(shell pkg-config --variable=tgscript thunk_gen)
 TGM4 = $(shell pkg-config --variable=m4script thunk_gen)
 TFLAGS = -a 2 -p 2
 
