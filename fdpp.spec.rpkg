@@ -39,7 +39,7 @@ It is based on a FreeDOS kernel ported to modern C++.
 %build
 pipx install meson
 export PATH=$PATH:/builddir/.local/bin
-./configure.meson build --prefix %{_prefix} --libdir %{_libdir}
+./configure.meson --prefix %{_prefix} --libdir %{_libdir} build
 meson compile --verbose -C build %{?_smp_mflags}
 
 %check
