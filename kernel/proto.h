@@ -53,6 +53,7 @@ UWORD HMAalloc(UWORD bytesToAllocate);
 unsigned char ctrl_break_pressed(void);
 unsigned char check_handle_break(__FAR(struct dhdr) pdev);
 void handle_break(__FAR(struct dhdr) pdev);
+void clear_break(void);
 #ifdef __WATCOMC__
 #pragma aux handle_break aborts;
 #endif

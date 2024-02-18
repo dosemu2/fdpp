@@ -222,7 +222,7 @@ long cooked_write(struct dhdr FAR *pdev, size_t n, __XFAR(const char)bp)
     do {
       /* if not fast then < 0x80; always check
          otherwise check every 32 characters */
-      if (fast_counter <= 0x80 && check_handle_break(pdev) == CTL_S)
+      if (fast_counter <= 0x80 && ndread(pdev) == CTL_S)
         raw_get_char(pdev, TRUE); /* Test for hold char and ctl_c */
       fast_counter++;
       fast_counter &= 0x9f;
@@ -321,14 +321,11 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
 
   FOREVER
   {
-    if (ctrl_break_pressed())
-    {
-      c = CTL_C;
-      break;
-    }
     if (!Busy(pdev))
     {
       c = CharIO(pdev, 0, C_INPUT);
+      if (c == CTL_C && !check_break && !break_ena)
+        clear_break();
       break;
     }
     if (pdev != syscon)

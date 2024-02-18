@@ -36,7 +36,7 @@ static BYTE *RcsId =
     "$Id: break.c 885 2004-04-14 15:40:51Z bartoldeman $";
 #endif
 
-#define CB_FLG *(UBYTE FAR*)MK_FP(0x0, 0x471)
+#define CB_FLG *(UBYTE FAR*)MK_FP(0x40, 0x71)
 #define CB_MSK 0x80
 
 /* Check for ^Break/^C.
@@ -49,6 +49,11 @@ static BYTE *RcsId =
 unsigned char ctrl_break_pressed(void)
 {
   return CB_FLG & CB_MSK;
+}
+
+void clear_break(void)
+{
+  CB_FLG &= ~CB_MSK;            /* reset the ^Break flag */
 }
 
 unsigned char check_handle_break(struct dhdr FAR *pdev)
@@ -79,7 +84,7 @@ void handle_break(struct dhdr FAR *pdev)
   /* XXX: was *buf = "^C\r\n" but const doesn't propagate to DosRWSft() */
   char buf[] = "^C\r\n";
 
-  CB_FLG &= ~CB_MSK;            /* reset the ^Break flag */
+  clear_break();
   con_flush(pdev);
   cooked_write(pdev, 4, buf);
   if (!ErrorMode) {             /* within int21_handler, InDOS is not incremented */
