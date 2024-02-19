@@ -141,18 +141,6 @@ int ClaimHMA(void)
 
   XMSDriverAddress = xms_addr;
 
-#ifdef DEBUG
-  /* A) for debugging purpose, suppress this,
-     if any shift key is pressed
-   */
-  if (KeyboardShiftState() & 0x0f)
-  {
-    DebugPrintf(("Keyboard state is %0x, NOT moving to HMA\n",
-           KeyboardShiftState()));
-    return FALSE;
-  }
-#endif
-
   /* B) check out, if we can have HMA */
 
   if (!EnableHMA())
