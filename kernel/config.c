@@ -2314,7 +2314,12 @@ void FAR * KernelAlloc(size_t nBytes, char type, int mode)
   else if (mode && (HMAState == HMA_DONE || (bprm.Flags & FDPP_FL_HEAP_HMA)))
   {
     UWORD off = HMAalloc(nBytes);
-    p = MK_FP(0xffff, off);
+    if (off == 0xffff) {
+      fdloudprintf("HMA alloc of %zi bytes failed\n", nBytes);
+      p = KernelAllocPara(nPara, type, NULL, mode);
+    } else {
+      p = MK_FP(0xffff, off);
+    }
   }
   else
   {
