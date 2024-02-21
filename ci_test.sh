@@ -2,6 +2,8 @@
 
 set -e
 
+. ./ci_test_prereq.sh
+
 if [ -z "${DIR_TEST_DOSEMU}" ] ; then
    echo env var "DIR_TEST_DOSEMU" is empty or missing
    exit 1
