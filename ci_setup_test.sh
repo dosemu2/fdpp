@@ -34,7 +34,8 @@ fi
   sed -i -e 's/fdpp-dev,/bash,/' debian/control
 
   # Use debian package build deps so we don't have to maintain a list here
-  sudo apt install devscripts equivs
+  sudo add-apt-repository ppa:stsp-0/dj64
+  sudo add-apt-repository -y ppa:dosemu2/ppa
   mk-build-deps --install --root-cmd sudo
 
   CC=clang ./default-configure -d \
