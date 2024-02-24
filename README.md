@@ -6,7 +6,7 @@ It is based on a FreeDOS kernel ported to modern C++.<br/>
 In short, FreeDOS plus-plus.
 
 Can be compiled with clang (not gcc!) and booted under
-[dosemu2](https://github.com/stsp/dosemu2).
+[dosemu2](https://github.com/dosemu2/dosemu2).
 
 ## building and installing
 Run `./configure.meson [<build_dir>]`.<br/>
@@ -24,7 +24,7 @@ OpenSUSE packages are
 
 ## running
 The simplest way to get it running is to use
-[dosemu2](https://github.com/stsp/dosemu2).<br/>
+[dosemu2](https://github.com/dosemu2/dosemu2).<br/>
 Get the pre-built dosemu2 packages from
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa)
 or from
@@ -95,12 +95,12 @@ building fdpp under itself may be a challenge. :)
 DOS-compatible kernel that is used as a core of fdpp.
 
 ### dosemu2
-[dosemu2](https://github.com/stsp/dosemu2)
+[dosemu2](https://github.com/dosemu2/dosemu2)
 is a virtual machine that allows you to run DOS software under linux.
 It is a primary host platform for fdpp.
 
 ### comcom32
-[comcom32](https://github.com/stsp/comcom32)
+[comcom32](https://github.com/dosemu2/comcom32)
 is a 32bit command.com that is supposed to be used with fdpp
 while we don't have a 64bit one.
 
