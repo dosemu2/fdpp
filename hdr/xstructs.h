@@ -83,4 +83,19 @@ struct xdpbforformat {
 };
 ANNOTATE_SIZE(struct xdpbforformat, 0x18);
 
+struct xgetvolumeinfo {
+  UBYTE version;
+  UBYTE size;        /* size of this structure */
+  UBYTE namelen;     /* length of file system type name */
+  UBYTE pad;
+  struct {
+    UWORD std;       /* 15..0 as per RBIL */
+    UWORD ext;       /* 31..16 for extension */
+  } PACKED flags;
+  UWORD maxfilenamelen;
+  UWORD maxpathlen;
+  char name[16];     /* file system type name */
+} PACKED;
+ANNOTATE_SIZE(struct xgetvolumeinfo, 28);
+
 COUNT DosGetExtFree(__FAR(BYTE) DriveString, __FAR(struct xfreespace) xfsp);

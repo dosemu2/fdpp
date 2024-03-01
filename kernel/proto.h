@@ -120,6 +120,7 @@ COUNT DosDelete(__FAR(const char) path, int attrib);
 COUNT DosRename(__FAR(const char) path1,__FAR(const char) path2);
 COUNT DosRenameTrue(__FAR(const char) path1, __FAR(const char) path2, int attrib);
 COUNT DosMkRmdir(__FAR(const char) dir, int action);
+COUNT DosGetVolumeInfo(__FAR(const char) DriveString, UBYTE bufsiz, UWORD *outv, __FAR(char) name);
 __FAR(struct dhdr)IsDevice(__XFAR(const char) FileName);
 #define IsShareInstalled(recheck) TRUE
 COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock);
@@ -410,6 +411,7 @@ BYTE remote_qualify_filename(__FAR(char) dst, __FAR(const char) src);
 #define remote_rw(cmd,s,arg) network_redirector_mx(cmd, s, arg)
 BYTE remote_getfree(__FAR(void) cds, void *dst);
 BYTE remote_getfree_11a3(__FAR(void) cds, void *dst);
+BYTE remote_getvolumeinfo(UBYTE drive, struct xgetvolumeinfo *s_ptr);
 UDWORD remote_lseek(__FAR(void) sft, DWORD new_pos);
 UWORD remote_getfattr(void);
 #define remote_setfattr(attr) (WORD)network_redirector_mx(REM_SETATTR, NULL, attr)
