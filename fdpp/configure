@@ -13,7 +13,6 @@ if [ ! -f configure ]; then
     ln -sf "$SCRIPTPATH"/makefile makefile
     echo "srcdir = $SCRIPTPATH" >config.mak
 
-    do_sub thunk_gen
     do_sub kernel
     do_sub loader
 fi
