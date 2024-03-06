@@ -36,6 +36,8 @@ It is based on a FreeDOS kernel ported to modern C++.
 %prep
 {{{ git_dir_setup_macro }}}
 
+%global toolchain clang
+
 %build
 pipx install meson
 export PATH=$PATH:/builddir/.local/bin
