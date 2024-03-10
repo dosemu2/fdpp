@@ -325,7 +325,7 @@ STATIC void setup_int_vectors(void)
   void FAR *old_vec;
   int i;
 
-  if (_CS >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
+  if (DOS_PSP >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
     plvec = MK_FP(0x70, 0x100);
     for (i = 0; i < sizeof(intvec_table); i++) {
       plvec[i].intno = intvec_table[i];
