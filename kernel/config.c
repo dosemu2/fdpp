@@ -1178,6 +1178,8 @@ VOID DoConfig(int nPass)
     if ('#' == pLine[1])
     {
       char *p;
+      int l;
+
       pLine++;
       if (!isnum(pLine[1]) || isnum(pLine[2]))
       {
@@ -1213,7 +1215,10 @@ VOID DoConfig(int nPass)
         }
         p = p1;
       }
-      pLine = p;
+      pLine--;
+      l = strlen(p);
+      memmove(pLine + l, pLine + 3, strlen(pLine + 3) + 1);
+      memcpy(pLine, p, l);
     }
 
 	/* pass 0 always executed (rem Menu prompt switches) */
