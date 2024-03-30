@@ -35,11 +35,9 @@
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 4096
 #endif
-#ifndef PAGE_MASK
-#define PAGE_MASK (~(PAGE_SIZE-1))
-#endif
+#define _PAGE_MASK (~(PAGE_SIZE-1))
 #ifndef PAGE_ALIGN
-#define PAGE_ALIGN(addr) (((addr)+PAGE_SIZE-1)&PAGE_MASK)
+#define PAGE_ALIGN(addr) (((addr)+PAGE_SIZE-1)&_PAGE_MASK)
 #endif
 
 static void smerror_dummy(int prio, const char *fmt, ...) FORMAT(printf, 2, 3);
@@ -53,13 +51,14 @@ static void smerror_dummy(int prio, const char *fmt, ...)
 
 #define smerror(mp, ...) mp->smerr(3, __VA_ARGS__)
 
-static void do_dump(struct mempool *mp, char *buf, int len)
+static int do_dump(struct mempool *mp, char *buf, int len)
 {
     int pos = 0;
     struct memnode *mn;
 
 #define DO_PRN(...) do { \
-    assert(pos < len); \
+    if (pos >= len) \
+      return -1; \
     pos += snprintf(buf + pos, len - pos, __VA_ARGS__); \
 } while (0)
     DO_PRN("Total size: %zi\n", mp->size);
@@ -70,29 +69,38 @@ static void do_dump(struct mempool *mp, char *buf, int len)
     for (mn = &mp->mn; mn; mn = mn->next)
         DO_PRN("\tarea: %zi bytes, %s\n",
                 mn->size, mn->used ? "used" : "free");
+    return 0;
 }
 
 void smdump(struct mempool *mp)
 {
-    char buf[1024];
-
-    do_dump(mp, buf, sizeof(buf));
-    mp->smerr(0, "%s", buf);
+    char buf[16384];
+    int err = do_dump(mp, buf, sizeof(buf));
+    if (!err)
+        mp->smerr(0, "%s", buf);
+    else
+        mp->smerr(3, "dump buffer overflow\n");
 }
 
 static FORMAT(printf, 3, 4)
 void do_smerror(int prio, struct mempool *mp, const char *fmt, ...)
 {
-    char buf[1024];
-    int pos;
+    char buf[16384];
+    int err;
+    size_t pos;
     va_list al;
 
     assert(prio != -1);
     va_start(al, fmt);
     pos = vsnprintf(buf, sizeof(buf), fmt, al);
     va_end(al);
-    do_dump(mp, buf + pos, sizeof(buf) - pos);
-    mp->smerr(prio, "%s", buf);
+    err = -1;
+    if (pos < sizeof(buf))
+        err = do_dump(mp, buf + pos, sizeof(buf) - pos);
+    if (!err)
+        mp->smerr(0, "%s", buf);
+    else
+        mp->smerr(3, "dump buffer overflow\n");
 }
 
 static int get_oom_pr(struct mempool *mp, size_t size)
@@ -111,7 +119,7 @@ static void sm_uncommit(struct mempool *mp, void *addr, size_t size)
     /* align address up and align down size */
     uintptr_t a = (uintptr_t)addr;
     uintptr_t aa = PAGE_ALIGN(a);
-    size_t aligned_size = (size - (aa - a)) & PAGE_MASK;
+    size_t aligned_size = (size - (aa - a)) & _PAGE_MASK;
     void *aligned_addr = (void *)aa;
     mp->avail += size;
     assert(mp->avail <= mp->size);
@@ -139,7 +147,7 @@ static int sm_commit(struct mempool *mp, void *addr, size_t size,
 {
     /* align address down and align up size */
     uintptr_t a = (uintptr_t)addr;
-    uintptr_t aa = a & PAGE_MASK;
+    uintptr_t aa = a & _PAGE_MASK;
     size_t aligned_size = PAGE_ALIGN(size + (a - aa));
     void *aligned_addr = (void *)aa;
     int ok = __sm_commit(mp, aligned_addr, aligned_size, e_addr, e_size);
@@ -267,7 +275,10 @@ static struct memnode *sm_alloc_fixed(struct mempool *mp, void *ptr,
   delta = (uint8_t *)ptr - mn->mem_area;
   assert(delta >= 0);
   if (size + delta > mn->size) {
-    smerror(mp, "SMALLOC: no space %zi at address %p\n", size, ptr);
+    int pr = get_oom_pr(mp, size);
+    if (pr < 0)
+      pr = 0;
+    do_smerror(pr, mp, "SMALLOC: no space %zi at address %p\n", size, ptr);
     return NULL;
   }
   if (delta) {
@@ -651,6 +662,22 @@ int smdestroy(struct mempool *mp)
 size_t smget_free_space(struct mempool *mp)
 {
   return mp->avail;
+}
+
+size_t smget_free_space_upto(struct mempool *mp, unsigned char *top)
+{
+  struct memnode *mn;
+  int cnt = 0;
+  for (mn = &mp->mn; mn; mn = mn->next) {
+    if (mn->mem_area + mn->size > top) {
+      if (!mn->used && mn->mem_area < top)
+        cnt += top - mn->mem_area;
+      break;
+    }
+    if (!mn->used)
+      cnt += mn->size;
+  }
+  return cnt;
 }
 
 size_t smget_largest_free_area(struct mempool *mp)
