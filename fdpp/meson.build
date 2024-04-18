@@ -1,13 +1,14 @@
 project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
-  version: '0.1')
+  version: '0.1', meson_version: '>= 1.3.0')
+
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 MA = meson.current_source_dir() / 'parsers/mkasmdefs.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 M4 = meson.current_source_dir() / 'parsers/thunks.m4'
 tg = dependency('thunk_gen')
-TG = tg.get_pkgconfig_variable('binary')
-TGS = tg.get_pkgconfig_variable('tgscript')
-TGM4 = tg.get_pkgconfig_variable('m4script')
+TG = tg.get_variable(pkgconfig: 'binary')
+TGS = tg.get_variable(pkgconfig: 'tgscript')
+TGM4 = tg.get_variable(pkgconfig: 'm4script')
 TFLAGS = ['-a', '2', '-p', '2']
 SRC = 'src'
 rel_inc = 'include/fdpp'
