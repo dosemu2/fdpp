@@ -1,4 +1,5 @@
-project('kernel', ['nasm', 'c'], version: '1.7')
+project('kernel', ['nasm', 'c'], version: '1.7', meson_version: '>= 1.3.2')
+
 PD = 'parsers/parse_decls.sh'
 SRC = 'src'
 DSRC = 'src/drivers'
@@ -21,12 +22,11 @@ incdir2 = include_directories(hdr)
 sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
   output : '@BASENAME@.asm',
   include_directories: incdir2,
-  dependencies: declare_dependency(
-    compile_args : [
+  compile_args : [
       '-D__ASSEMBLER__',
       '-DKERNEL_VERSION=' + meson.project_version() +
         ' [GIT: ' + GIT_DESCRIBE + ']',
-      '-DCMA=,', '-P']))
+      '-DCMA=,', '-P'])
 env = environment()
 env.set('CPP', 'cpp')
 env.set('srcdir', meson.current_source_dir() / '../parsers')
