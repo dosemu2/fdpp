@@ -1,6 +1,5 @@
 project('loader', 'c', version: '0.1')
 rel_inc = 'include/fdpp'
-abs_inc = meson.current_source_dir() / rel_inc
 lelf = dependency('libelf')
 incdir = include_directories(rel_inc)
 cpp = meson.get_compiler('c')

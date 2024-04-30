@@ -5,7 +5,6 @@ SRC = 'src'
 DSRC = 'src/drivers'
 kernel_ld = meson.current_source_dir() / 'kernel.ld'
 rel_inc = 'include/fdpp'
-abs_inc = meson.current_source_dir() / rel_inc
 incdir = include_directories(rel_inc)
 cpp = meson.get_compiler('c')
 AVER = cpp.get_define('FDPP_API_VER',
