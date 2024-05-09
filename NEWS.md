@@ -1,6 +1,6 @@
 ## 1.8
 
-This release contains ~120 commits, and is mostly targeted to resolving
+This release contains ~150 commits, and is mostly targeted to resolving
 the long-standing technical debts.
 
 - ELF format is now fully utilized. We now use ELF-based symbol tables
@@ -18,7 +18,7 @@ the long-standing technical debts.
   Nasm project have rejected our contributions, so the vanilla nasm
   support is not anticipated any soon.
 - Meson build system support. But not removing the old makefiles yet,
-  as we need meson-1.3, which is not yet widely available.
+  as we need meson-1.3.2, which is not yet widely available.
 - thunk_gen and farptr compiler updates. thunk_gen is now a separate project.
 - Finally fixed remaining AlphaWaves problems. This game tests for the
   MS-DOS compatibility in a very rough ways.
