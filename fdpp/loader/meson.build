@@ -12,7 +12,8 @@ BVER = cpp.get_define('BPRM_VER',
 FVER = AVER + '.' + BVER
 TARGET = 'fdppkrnl.' + FVER
 LIBLOADER = shared_library('fdldr', 'elf.c', 'loader.c',
-  dependencies: lelf, include_directories: incdir,
+  dependencies: lelf,
+  include_directories: incdir,
   version: FVER,
   c_args: [
     '-DFDPPKRNLDIR=' + get_option('prefix') / get_option('datadir') / 'fdpp',

@@ -19,9 +19,9 @@ GIT_DESCRIBE = run_command('git', 'describe', check: true).stdout().strip()
 hdr = ['src', 'hdr', rel_inc]
 incdir2 = include_directories(hdr)
 sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
-  output : '@BASENAME@.asm',
+  output: '@BASENAME@.asm',
   include_directories: incdir2,
-  compile_args : [
+  compile_args: [
       '-D__ASSEMBLER__',
       '-DKERNEL_VERSION=' + meson.project_version() +
         ' [GIT: ' + GIT_DESCRIBE + ']',
