@@ -320,7 +320,11 @@ reloc_call_call_p_0:
         int 21h
         mov ds,[cs:_DGROUP_]
         jc .L_1
+        mov ah, 4dh    ; get exit code
+        int 21h
+        push ax
         call _P_0_exit
+        pop ax
         jmp .L_2
 
 .L_1:

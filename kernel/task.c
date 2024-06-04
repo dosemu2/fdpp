@@ -964,12 +964,16 @@ VOID ASMCFUNC P_0(const struct config FAR *Config)
   p0_execblk_p = exb;
 }
 
-VOID ASMCFUNC P_0_exit(void)
+VOID ASMCFUNC P_0_exit(unsigned short retcode)
 {
-  _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
-  con_flush_stdin();
-  read_char_stdin(0);
-  fdexit(0);
+  if (retcode == 0) {
+    _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
+    con_flush_stdin();
+    read_char_stdin(0);
+  } else {
+    _printf("\nShell %s exited with code 0x%x\n", GET_PTR(Shell), retcode);
+  }
+  fdexit(retcode & 0xff);
 }
 
 VOID ASMCFUNC P_0_bad(void)
