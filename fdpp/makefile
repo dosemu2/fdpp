@@ -32,15 +32,6 @@ FD_EXT_H = $(TOP)/include/fdpp
 EXT_H = $(FD_EXT_H)/thunks.h $(FD_EXT_H)/bprm.h $(FD_EXT_H)/memtype.h \
      $(FD_EXT_H)/loader.h
 GEN_EXT = fdpp.pc
-TG = $(shell pkg-config --variable=binary thunk_gen)
-ifeq ($(TG),)
-ifeq ($(filter clean,$(MAKECMDGOALS)),)
-$(error thunk_gen not installed)
-endif
-endif
-TGS = $(shell pkg-config --variable=tgscript thunk_gen)
-TGM4 = $(shell pkg-config --variable=m4script thunk_gen)
-TFLAGS = -a 2 -p 2
 
 GIT_REV := $(shell $(srcdir)/git-rev.sh)
 GIT_DESCRIBE := $(shell git describe)
@@ -87,8 +78,6 @@ _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS = thunk_calls.h thunk_asms.h plt_asmc.h plt_asmp.h
 GEN_HEADERS_FD = glob_asmdefs.h
-# dont change file order in GEN_TMP as it matches the gen script
-GEN_TMP = thunk_calls.tmp thunk_asms.tmp plt.inc plt_asmc.h plt_asmp.h
 GEN_CC = $(CFILES:.c=.cc)
 INITHEADERS = $(SRC)/init-mod.h $(SRC)/init-dat.h
 HEADERS=$(HDRS) $(SRC)/globals.h $(SRC)/proto.h $(INITHEADERS) $(PPHDRS)
@@ -161,27 +150,17 @@ $(FDPPDEVL): | $(FDPPLIB)
 $(LDRDEVL): | $(LDRLIB)
 	ln -sf $(LDRLIB) $@
 
-_pos = $(if $(findstring $1,$2),$(call _pos,$1,\
-       $(wordlist 2,$(words $2),$2),x $3),$3)
-pos = $(words $(call _pos,$1,$2))
-pars = srcdir=$(srcdir)/parsers CPP="$(CPP)" \
-	$(srcdir)/parsers/parse_decls.sh $(call pos,$@,$(GEN_TMP)) $< >$@ || \
-	($(RM) $@ ; false)
-$(filter %.tmp,$(GEN_TMP)): $(SRC)/proto.h
-	$(pars)
-plt_asmc.h plt_asmp.h: thunk_asms.tmp
-	$(pars)
-
-thunk_calls.h: thunk_calls.tmp
-	$(TG) $(TFLAGS) <$< >$@ || ($(RM) $@ ; false)
-
-thunk_asms.h: thunk_asms.tmp
-	$(TG) $(TFLAGS) 1 <$< | $(TGS) $(TGM4) >$@_ \
-		|| ($(RM) $@_ ; false)
-	$(TG) $(TFLAGS) 2 <$< >$@__ \
-		|| ($(RM) $@__ ; false)
-	cat $@_ $@__ >$@
-	rm -f $@_ $@__
+# we have custom PDS
+PDS = srcdir=$(srcdir)/parsers CPP="$(CPP)" $(srcdir)/parsers/parse_decls.sh
+TGMK = $(shell pkg-config --variable=makeinc thunk_gen)
+ifeq ($(TGMK),)
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+$(error thunk_gen not installed)
+endif
+endif
+TFLAGS = -a 2 -p 2
+PDHDR = $(SRC)/proto.h
+include $(TGMK)
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
