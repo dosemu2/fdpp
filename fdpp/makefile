@@ -157,10 +157,11 @@ ifeq ($(TGMK),)
 ifeq ($(filter clean,$(MAKECMDGOALS)),)
 $(error thunk_gen not installed)
 endif
-endif
+else
 TFLAGS = -a 2 -p 2
 PDHDR = $(SRC)/proto.h
 include $(TGMK)
+endif
 
 glob_asmdefs.h: $(SRC)/glob_asm.h
 	$(srcdir)/parsers/mkasmdefs.sh $< >$@
