@@ -1,9 +1,9 @@
 #include <stdint.h>
 
-void *elf_open(const char *name);
-void elf_reloc(void *arg, uint16_t seg);
-void elf_close(void *arg);
-void *elf_getsym(void *arg, const char *name);
-int elf_getsymoff(void *arg, const char *name);
-void *elf_getloadaddr(void *arg);
-int elf_getloadoff(void *arg);
+void *fdelf_open(const char *name);
+void fdelf_reloc(void *arg, uint16_t seg);
+void fdelf_close(void *arg);
+void *fdelf_getsym(void *arg, const char *name);
+int fdelf_getsymoff(void *arg, const char *name);
+void *fdelf_getloadaddr(void *arg);
+int fdelf_getloadoff(void *arg);

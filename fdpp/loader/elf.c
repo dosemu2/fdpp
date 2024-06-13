@@ -132,7 +132,7 @@ static void elf_dl(struct elfstate *state, uint16_t seg)
     }
 }
 
-void *elf_open(const char *name)
+void *fdelf_open(const char *name)
 {
     Elf         *elf;
     Elf_Scn     *scn = NULL;
@@ -207,14 +207,14 @@ err2:
     return NULL;
 }
 
-void elf_reloc(void *arg, uint16_t seg)
+void fdelf_reloc(void *arg, uint16_t seg)
 {
     struct elfstate *state = (struct elfstate *)arg;
 
     elf_dl(state, seg);
 }
 
-void elf_close(void *arg)
+void fdelf_close(void *arg)
 {
     struct elfstate *state = (struct elfstate *)arg;
 
@@ -230,7 +230,7 @@ static int do_getsymoff(struct elfstate *state, const char *name)
     return (err ? -1 : sym.st_value);
 }
 
-void *elf_getsym(void *arg, const char *name)
+void *fdelf_getsym(void *arg, const char *name)
 {
     struct elfstate *state = (struct elfstate *)arg;
     int off = do_getsymoff(state, name);
@@ -239,19 +239,19 @@ void *elf_getsym(void *arg, const char *name)
     return state->addr + state->load_offs + off;
 }
 
-int elf_getsymoff(void *arg, const char *name)
+int fdelf_getsymoff(void *arg, const char *name)
 {
     struct elfstate *state = (struct elfstate *)arg;
     return do_getsymoff(state, name);
 }
 
-void *elf_getloadaddr(void *arg)
+void *fdelf_getloadaddr(void *arg)
 {
     struct elfstate *state = (struct elfstate *)arg;
     return state->addr + state->load_offs;
 }
 
-int elf_getloadoff(void *arg)
+int fdelf_getloadoff(void *arg)
 {
     struct elfstate *state = (struct elfstate *)arg;
     return state->load_offs;

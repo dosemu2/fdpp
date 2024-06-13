@@ -55,31 +55,31 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
 
     rc = asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
     assert(rc != -1);
-    handle = elf_open(kname);
+    handle = fdelf_open(kname);
     if (!handle) {
         fprintf(stderr, "failed to open %s\n", kname);
         free(kname);
         return NULL;
     }
     free(kname);
-    start = elf_getsym(handle, "_start");
-    s = elf_getsymoff(handle, "_start");
+    start = fdelf_getsym(handle, "_start");
+    s = fdelf_getsymoff(handle, "_start");
     if (s == -1)
         goto err_close;
     *_start = s;
-    end = elf_getsym(handle, "__InitTextEnd");
+    end = fdelf_getsym(handle, "__InitTextEnd");
     if (!end)
         goto err_close;
-    bstart = elf_getsym(handle, "__bss_start");
+    bstart = fdelf_getsym(handle, "__bss_start");
     if (!bstart)
         goto err_close;
-    bend = elf_getsym(handle, "__bss_end");
+    bend = fdelf_getsym(handle, "__bss_end");
     if (!bend)
         goto err_close;
-    ibstart = elf_getsym(handle, "__ibss_start");
+    ibstart = fdelf_getsym(handle, "__ibss_start");
     if (!ibstart)
         goto err_close;
-    ibend = elf_getsym(handle, "__ibss_end");
+    ibend = fdelf_getsym(handle, "__ibss_end");
     if (!ibend)
         goto err_close;
     *len = (uintptr_t)end - (uintptr_t)start;
@@ -107,7 +107,7 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
     return h;
 
 err_close:
-    elf_close(handle);
+    fdelf_close(handle);
     return NULL;
 }
 
@@ -118,9 +118,9 @@ const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg,
 
     assert(!(h->load_off & 0xf));
     seg -= h->load_off >> 4;
-    elf_reloc(h->elf, seg);
+    fdelf_reloc(h->elf, seg);
 
-    hook(seg, elf_getsymoff, h->elf);
+    hook(seg, fdelf_getsymoff, h->elf);
 
     *r_seg = seg;
     return h->start;
@@ -130,6 +130,6 @@ void FdppKernelFree(void *handle)
 {
     struct krnl_hndl *h = (struct krnl_hndl *)handle;
 
-    elf_close(h->elf);
+    fdelf_close(h->elf);
     free(h);
 }
