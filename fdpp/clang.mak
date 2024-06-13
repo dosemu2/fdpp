@@ -2,7 +2,11 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
+ifneq ($(filter x86_64 amd64,$(shell uname -m)),)
+CROSS_LD ?= ld.bfd
+else
 CROSS_LD ?= x86_64-linux-gnu-ld
+endif
 CCACHE ?= $(shell which ccache 2>/dev/null)
 CC ?= $(CCACHE) clang
 CXX = $(CCACHE) clang++
