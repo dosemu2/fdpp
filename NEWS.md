@@ -12,7 +12,7 @@ the long-standing technical debts.
     fork of the nasm for now)
   * do no longer support ld.lld (can only use GNU ld for now)
   * no longer support GNU strip (can only use llvm-strip for now,
-    but the fix is already in GNU binutils git)
+    but the fix is already in GNU binutils-2.42)
   So the ELF support went in very painfully. We will keep working with
   the upstream projects (lld mainly) in a hope to restore their use.
   Nasm project have rejected our contributions, so the vanilla nasm
