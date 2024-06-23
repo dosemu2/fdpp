@@ -1582,6 +1582,29 @@ dispatch:
           goto unsupp;
           break;
         }
+
+        case 0xa0: {
+          char FAR *path = MK_FP(lr.DS, lr.DX);
+          char FAR *name = MK_FP(lr.ES, lr.DI);
+          UBYTE bufsiz = lr.CX;
+          UWORD vals[3];
+          COUNT rc;
+
+          rc = DosGetVolumeInfo(path, bufsiz, vals, name);
+          if (rc == SUCCESS) {
+            r->BX = vals[0]; /* standard flags */
+            r->CX = vals[1]; /* max length of file name [usually 255] */
+            r->DX = vals[2]; /* max length of path [usually 260] */
+            CLEAR_CARRY_FLAG();
+          } else if (rc == DE_INVLDBUF) {
+            SET_CARRY_FLAG();
+          } else {
+            goto unsupp;
+	  }
+          r->AX = rc;
+          goto real_exit;
+        }
+
         default:
           goto unsupp;
       }
