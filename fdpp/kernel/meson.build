@@ -15,7 +15,7 @@ BVER = cpp.get_define('BPRM_VER',
   prefix: '#include "bprm.h"')
 FVER = AVER + '.' + BVER
 TARGET = 'fdppkrnl.' + FVER
-GIT_DESCRIBE = run_command('git', 'describe', check: true).stdout().strip()
+GIT_DESCRIBE = run_command('git', 'describe', check: false).stdout().strip()
 hdr = ['src', 'hdr', rel_inc]
 incdir2 = include_directories(hdr)
 sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
