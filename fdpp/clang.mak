@@ -7,9 +7,8 @@ CROSS_LD ?= ld.bfd
 else
 CROSS_LD ?= x86_64-linux-gnu-ld
 endif
-CCACHE ?= $(shell which ccache 2>/dev/null)
-CC ?= $(CCACHE) clang
-CXX = $(CCACHE) clang++
+CC ?= clang
+CXX = clang++
 CLANG_VER := $(shell $(CXX) -v 2>&1 | head -n 1 | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
 FLEX = $(shell which flex 2>/dev/null)
