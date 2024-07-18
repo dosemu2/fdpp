@@ -143,6 +143,11 @@ Int2f?14?1:
                pop bp
                iret
 Int2f?prev:
+               push bp
+               mov bp, sp
+               push WORD [bp+6]        ; sync flags
+               popf
+               pop bp
                jmp far [cs:_prev_int2f_handler]
 
 ; DRIVER.SYS calls - now only 0803.
