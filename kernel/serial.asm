@@ -62,7 +62,7 @@ ComRead:
 ComRd1:
                 call    BiosRdCom
                 or      ah,ah   ; timeout?
-                js      ComRd1  ; yes, try again
+                js      _IOErrCnt  ; yes, fail
 ComRd2:
                 stosb
                 loop    ComRd1
