@@ -22,8 +22,8 @@ LDRDEVL = libfdldr.so
 LDRLIB = $(LDRDEVL).$(AVER).$(BVER)
 LDFLAGS += -Wl,-soname=$(FDPPLIB) -Wl,-Bsymbolic
 TARGET=fdppkrnl.$(AVER).$(BVER)
-RELVER = 7
 MAJ = 1
+RELVER = 8
 VERSION = $(MAJ).$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar
