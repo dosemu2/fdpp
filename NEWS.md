@@ -1,6 +1,6 @@
 ## 1.8
 
-This release contains ~150 commits, and is mostly targeted to resolving
+This release contains ~160 commits, and is mostly targeted to resolving
 the long-standing technical debts.
 
 - ELF format is now fully utilized. We now use ELF-based symbol tables
@@ -24,6 +24,7 @@ the long-standing technical debts.
   MS-DOS compatibility in a very rough ways.
 - Share was changed to resemble MS-DOS-7 more closely.
 - Fixed a few regressions of 1.7 (Prehistorik2 again)
+- Switched from C++11 to C++20 for templated lambdas.
 
 ## 1.7
 
