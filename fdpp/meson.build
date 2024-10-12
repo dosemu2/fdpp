@@ -2,10 +2,10 @@ project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
   version: '0.1', meson_version: '>= 1.3.0')
 
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
-MA = meson.current_source_dir() / 'parsers/mkasmdefs.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 tg = dependency('thunk_gen')
 TG = tg.get_variable(pkgconfig: 'binary')
+MA = tg.get_variable(pkgconfig: 'mkadscript')
 TGS = tg.get_variable(pkgconfig: 'tgscript')
 TGM4 = tg.get_variable(pkgconfig: 'm4script')
 TFLAGS = ['-a', '2', '-p', '2']

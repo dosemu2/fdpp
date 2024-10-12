@@ -158,13 +158,17 @@ ifeq ($(filter clean,$(MAKECMDGOALS)),)
 $(error thunk_gen not installed)
 endif
 else
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+$(shell pkg-config --atleast-version=1.2 thunk_gen)
+ifneq ($(.SHELLSTATUS),0)
+$(error thunk_gen is too old, 1.2 is needed)
+endif
+endif
 TFLAGS = -a 2 -p 2
 PDHDR = $(SRC)/proto.h
+GLOB_ASM = $(SRC)/glob_asm.h
 include $(TGMK)
 endif
-
-glob_asmdefs.h: $(SRC)/glob_asm.h
-	$(srcdir)/parsers/mkasmdefs.sh $< >$@
 
 INSTALL ?= install
 install: $(ALL)

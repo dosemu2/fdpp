@@ -752,7 +752,8 @@ public:
 #define __ASMREF(f) f.get_ref()
 #define __ASMADDR(v) __##v.get_addr()
 #define __ASMCALL(f) AsmCSym f
-#define __ASYM(x) x.get_sym()
+#define __ASYM(x) __##x.get_sym()
+#define __ASYM_L(x) __##x.get_sym()
 #define ASMREF(t) AsmRef<t>
 #if CLANG_VER < 14
 #define DUMMY_MARK(p, n) \
