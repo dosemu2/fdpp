@@ -93,7 +93,7 @@ COUNT writelabelBPB(char drive, const char *name)
 
   /* store volume name */
   fs = (struct FS_info *)&DiskTransferBuffer[offset];
-  memcpy(&fs->volume[0], name, 11);
+  ConvertNameSZToName83(fs->volume, name);
 
   ret = RWzero(pddt, LBA_WRITE);
   if (ret != 0)
