@@ -15,7 +15,6 @@ VCS: {{{ git_dir_vcs }}}
 Source0: {{{ dir_pack }}}
 
 BuildRequires: meson >= 1.3.2
-BuildRequires: ninja-build
 BuildRequires: sed
 BuildRequires: bash
 BuildRequires: clang
