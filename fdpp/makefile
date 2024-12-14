@@ -153,7 +153,7 @@ $(LDRDEVL): | $(LDRLIB)
 # we have custom PDS
 PDS = srcdir=$(srcdir)/parsers CPP="$(CPP)" $(srcdir)/parsers/parse_decls.sh
 TGMK = $(shell pkg-config --variable=makeinc thunk_gen)
-ifeq ($(TGMK),)
+ifeq ($(wildcard $(TGMK)),)
 ifeq ($(filter clean,$(MAKECMDGOALS)),)
 $(error thunk_gen not installed)
 endif

@@ -14,6 +14,7 @@ LIBDIR ?= $(PREFIX)/lib
 DATADIR ?= $(PREFIX)/share
 INCLUDEDIR ?= $(PREFIX)/include
 PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
+export PKG_CONFIG_PATH = $(PKGCONFIGDIR):$(DATADIR)/pkgconfig
 
 DIRSEP = /
 RM = rm -f
