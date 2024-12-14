@@ -15,6 +15,8 @@ DATADIR ?= $(PREFIX)/share
 INCLUDEDIR ?= $(PREFIX)/include
 PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
 export PKG_CONFIG_PATH = $(PKGCONFIGDIR):$(DATADIR)/pkgconfig
+# for nasm-segelf
+export PATH := $(PATH):$(PREFIX)/bin
 
 DIRSEP = /
 RM = rm -f
