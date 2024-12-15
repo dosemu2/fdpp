@@ -19,7 +19,7 @@ INST=$(pwd)/${DIR_INSTALLED_FDPP}
 
 if false ; then
   # Old Makefile based build
-  make clean all PREFIX=${INST}
+  make clean all prefix=${INST}
 else
   # Ubuntu 22.04 has too old a Meson, so pip install it
   sudo apt install ninja-build pipx

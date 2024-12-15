@@ -180,16 +180,16 @@ install: $(ALL)
 	$(INSTALL) -d $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
-	$(INSTALL) -d $(DESTDIR)$(PKGCONFIGDIR)
-	$(INSTALL) -m 0644 fdpp.pc $(DESTDIR)$(PKGCONFIGDIR)
-	$(INSTALL) -d $(DESTDIR)$(PREFIX)/include/fdpp
-	$(INSTALL) -m 0644 $(EXT_H) $(DESTDIR)$(PREFIX)/include/fdpp
+	$(INSTALL) -d $(DESTDIR)$(pkgconfdir)
+	$(INSTALL) -m 0644 fdpp.pc $(DESTDIR)$(pkgconfdir)
+	$(INSTALL) -d $(DESTDIR)$(prefix)/include/fdpp
+	$(INSTALL) -m 0644 $(EXT_H) $(DESTDIR)$(prefix)/include/fdpp
 
 uninstall:
 	$(RM) -r $(DESTDIR)$(LIBDIR)/fdpp
 	$(RM) -r $(DESTDIR)$(DATADIR)/fdpp
-	$(RM) -r $(DESTDIR)$(PKGCONFIGDIR)/fdpp.pc
-	$(RM) -r $(DESTDIR)$(PREFIX)/include/fdpp
+	$(RM) -r $(DESTDIR)$(pkgconfdir)/fdpp.pc
+	$(RM) -r $(DESTDIR)$(prefix)/include/fdpp
 
 $(TGZ):
 	cd $(TOP) && git archive -o $(TOP)/$(TAR) --prefix=$(PKG)/ HEAD
@@ -200,7 +200,7 @@ tar: $(TGZ)
 
 $(GEN_EXT): %: $(srcdir)/%.in makefile
 	sed \
-		-e 's!@PREFIX[@]!$(PREFIX)!g' \
+		-e 's!@PREFIX[@]!$(prefix)!g' \
 		-e 's!@INCLUDEDIR[@]!$(INCLUDEDIR)!g' \
 		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
 		-e 's!@VERSION[@]!$(VERSION)!g' \

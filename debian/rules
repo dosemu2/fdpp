@@ -4,8 +4,8 @@
 	dh $@ --parallel --builddirectory=build
 
 override_dh_auto_build:
-	dh_auto_build $@ -- PREFIX=/usr
+	dh_auto_build $@ -- prefix=/usr
 
 override_dh_auto_install:
-	dh_auto_install $@ -- PREFIX=/usr \
-		PKGCONFIGDIR=/usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
+	dh_auto_install $@ -- prefix=/usr \
+		pkgconfdir=/usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig
