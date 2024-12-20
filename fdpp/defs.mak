@@ -14,7 +14,7 @@ LIBDIR ?= $(prefix)/lib
 DATADIR ?= $(prefix)/share
 INCLUDEDIR ?= $(prefix)/include
 pkgconfdir ?= $(LIBDIR)/pkgconfig
-export PKG_CONFIG_PATH = $(pkgconfdir):$(DATADIR)/pkgconfig
+export PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(pkgconfdir):$(DATADIR)/pkgconfig
 # for nasm-segelf
 export PATH := $(PATH):$(prefix)/bin
 
