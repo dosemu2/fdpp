@@ -2,10 +2,13 @@
 # CLANG.MAK - kernel copiler options for clang
 #
 
+CROSS_LD ?= x86_64-linux-gnu-ld
+ifeq ($(shell $(CROSS_LD) --version 2>/dev/null),)
 ifneq ($(filter x86_64 amd64,$(shell uname -m)),)
 CROSS_LD ?= ld.bfd
 else
-CROSS_LD ?= x86_64-linux-gnu-ld
+$(error binutils-x86-64-linux-gnu not installed)
+endif
 endif
 # don't use ?= here as that doesn't override make's builtin CC var
 CC = clang
