@@ -37,7 +37,7 @@ $(T)/$(FDPPLIB): $(OBJECTS)
 	$(CC_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 $(OBJECTS): %.o: $(srcdir)/%.c $(addprefix $(srcdir)/,$(HEADERS)) $(srcdir)/makefile
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(shell $(PKG_CONFIG) --cflags libelf) -c -o $@ $<
 
 clean:
 	$(RM) *.o
