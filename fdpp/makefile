@@ -46,6 +46,9 @@ ALL = $(FDPPLIB) $(FDPPDEVL) $(LDRLIB) $(LDRDEVL) $(TARGET).elf $(TARGET).map \
 
 all: $(ALL)
 
+export CFLAGS
+export LDFLAGS
+
 # New makes have a way to avoid parallel invocation with the use of &:
 # On old make you would write "%.elf %.map :" which is a bit silly
 # given the names are fixed. Also $(TARGET).% won't work that way at all:

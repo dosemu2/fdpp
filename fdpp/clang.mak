@@ -28,6 +28,12 @@ endif
 NASM ?= nasm-segelf
 PKG_CONFIG ?= pkg-config
 
+# export vars needed for loader sub-project
+export CC
+export CC_FOR_BUILD
+export CC_LD
+export PKG_CONFIG
+
 TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic \
   -DCLANG_VER=$(CLANG_VER)
 # _XTRA should go at the end of cmd line

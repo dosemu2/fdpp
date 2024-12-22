@@ -3,8 +3,11 @@ T = ..
 -include $(T)/local.mak
 srcdir ?= $(CURDIR)
 
+# if exported from top-level project, then don't include defaults
+ifeq ($(PKG_CONFIG),)
 include $(srcdir)/$(T)/clang.mak
 include $(srcdir)/$(T)/defs.mak
+endif
 
 TOP = $(abspath $(srcdir)/$(T)/..)
 HDR = $(TOP)/hdr
