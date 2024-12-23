@@ -17,6 +17,8 @@ pkgconfdir ?= $(LIBDIR)/pkgconfig
 export PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(pkgconfdir):$(DATADIR)/pkgconfig
 # for nasm-segelf
 export PATH := $(PATH):$(prefix)/bin
+# for loader
+export DATADIR
 
 DIRSEP = /
 RM = rm -f
