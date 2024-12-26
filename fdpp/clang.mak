@@ -49,7 +49,7 @@ USE_ASAN ?= 0
 USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
-CPPFLAGS = $(IFLAGS) -DFDPP
+CPPFLAGS += $(IFLAGS) -DFDPP
 WFLAGS = -Wall -Werror=packed-non-pod -Wno-unknown-warning-option
 ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
@@ -75,10 +75,10 @@ ifeq ($(USE_UBSAN),1)
 DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment,function,vptr
 endif
 
-CXXFLAGS = $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
-CFLAGS = -Wall $(DBGFLAGS)
+CXXFLAGS += $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
+CFLAGS += -Wall $(DBGFLAGS)
 CLCFLAGS = -c -fpic -Wall $(DBGFLAGS) -xc++
-LDFLAGS = -shared -Wl,--build-id=sha1
+LDFLAGS += -shared -Wl,--build-id=sha1
 
 ifeq ($(XFAT),32)
 CPPFLAGS += -DWITHFAT32
