@@ -66,21 +66,15 @@ SRCS = [
 
 nargs = ['-DXCPU=186', '-DWITHFAT32', '-DFDPP']
 
-lib = static_library('dummy',
+executable(TARGET + '.elf',
   [SRCS, sfiles, plt_inc],
   include_directories: incdir2,
   nasm_args: nargs,
-  build_by_default: false)
-nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
-custom_target(TARGET + '.elf',
-  output: [TARGET + '.elf', TARGET + '.map'],
-  input: lib.extract_all_objects(recursive: true),
-  command: [nasm_ld, '-melf_i386', '-static',
-    '-Map=@OUTPUT1@', '-o', '@OUTPUT0@',
-    '--emit-relocs', '-T' + kernel_ld, '@INPUT@'],
+  link_args: ['-Wl,-melf_i386', '-Wl,-static',
+    '-Wl,-Map=' + TARGET + '.map', '-nostdlib',
+    '-Wl,--emit-relocs', '-Wl,-T' + kernel_ld],
   install: true,
   install_dir: get_option('datadir') / 'fdpp',
-  install_mode: 'rw-r--r--',
-  build_by_default: true)
+  install_mode: 'rw-r--r--')
 
 VERSION = meson.project_version()
