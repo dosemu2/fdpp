@@ -3,12 +3,11 @@ project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
 
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
+RAI = meson.current_source_dir() / 'run_arg_in.sh'
+RAO = meson.current_source_dir() / 'run_arg_out.sh'
 tg = dependency('thunk_gen')
-TG = tg.get_variable(pkgconfig: 'binary')
-MA = tg.get_variable(pkgconfig: 'mkadscript')
-TGS = tg.get_variable(pkgconfig: 'tgscript')
-TGM4 = tg.get_variable(pkgconfig: 'm4script')
-TFLAGS = ['-a', '2', '-p', '2']
+TGMK = tg.get_variable(pkgconfig: 'makeinc')
+TFLAGS = '-a 2 -p 2'
 SRC = 'src'
 rel_inc = 'include/fdpp'
 incdir = include_directories(rel_inc)
@@ -61,10 +60,13 @@ ccgen = generator(find_program(MF),
   capture: true)
 ccfiles = ccgen.process(CFILES)
 
+make = find_program('make')
+
 gad = custom_target('glob_asmdefs.h',
   output: 'glob_asmdefs.h',
   input: 'src/glob_asm.h',
-  command: [MA, '@INPUT@'],
+  command: [RAO, 'glob_asmdefs.h', make, '-f', TGMK,
+            'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
   capture: true)
 
 GEN_TMP = { '1':'thunk_calls.tmp', '2':'thunk_asms.tmp' }
@@ -97,32 +99,25 @@ pap = custom_target('plt_asmp.h',
   env: env,
   capture: true)
 
+tgenv = environment()
+tgenv.set('TFLAGS', TFLAGS)
+
 tc = custom_target('thunk_calls.h',
   output: 'thunk_calls.h',
   input: GEN['thunk_calls.tmp'],
-  command: [TG, TFLAGS],
-  feed: true,
-  capture: true)
-
-ta1 = custom_target('thunk_asms1.h',
-  output: 'thunk_asms1.h',
-  input: GEN['thunk_asms.tmp'],
-  command: [TG, TFLAGS, '1'],
-  feed: true,
-  capture: true)
-
-ta2 = custom_target('thunk_asms2.h',
-  output: 'thunk_asms2.h',
-  input: GEN['thunk_asms.tmp'],
-  command: [TG, TFLAGS, '2'],
+  command: [RAI, 'thunk_calls.tmp', 'thunk_calls.h',
+            make, '-f', TGMK, 'thunk_calls.h'],
+  env: tgenv,
   feed: true,
   capture: true)
 
 ta = custom_target('thunk_asms.h',
   output: 'thunk_asms.h',
-  input: [ta1, ta2],
-  command: ['sh', '-c', 'cat @INPUT0@ | ' + TGS + ' ' + TGM4 +
-            ' | cat - @INPUT1@'],
+  input: GEN['thunk_asms.tmp'],
+  command: [RAI, 'thunk_asms.tmp', 'thunk_asms.h',
+            make, '-f', TGMK, 'thunk_asms.h'],
+  env: tgenv,
+  feed: true,
   capture: true)
 
 FDPP_CFILES = ['smalloc.c', 'farhlp_sta.c']
