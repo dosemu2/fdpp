@@ -3,8 +3,7 @@ project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
 
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
-RAI = meson.current_source_dir() / 'run_arg_in.sh'
-RAO = meson.current_source_dir() / 'run_arg_out.sh'
+RA = meson.current_source_dir() / 'run_arg.sh'
 tg = dependency('thunk_gen')
 TGMK = tg.get_variable(pkgconfig: 'makeinc')
 TFLAGS = '-a 2 -p 2'
@@ -65,7 +64,7 @@ make = find_program('make')
 gad = custom_target('glob_asmdefs.h',
   output: 'glob_asmdefs.h',
   input: 'src/glob_asm.h',
-  command: [RAO, 'glob_asmdefs.h', make, '-f', TGMK,
+  command: [RA, 'glob_asmdefs.h', make, '-f', TGMK,
             'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
   capture: true)
 
@@ -105,7 +104,7 @@ tgenv.set('TFLAGS', TFLAGS)
 tc = custom_target('thunk_calls.h',
   output: 'thunk_calls.h',
   input: GEN['thunk_calls.tmp'],
-  command: [RAI, 'thunk_calls.tmp', 'thunk_calls.h',
+  command: [RA, '-i', 'thunk_calls.tmp', 'thunk_calls.h',
             make, '-f', TGMK, 'thunk_calls.h'],
   env: tgenv,
   feed: true,
@@ -114,7 +113,7 @@ tc = custom_target('thunk_calls.h',
 ta = custom_target('thunk_asms.h',
   output: 'thunk_asms.h',
   input: GEN['thunk_asms.tmp'],
-  command: [RAI, 'thunk_asms.tmp', 'thunk_asms.h',
+  command: [RA, '-i', 'thunk_asms.tmp', 'thunk_asms.h',
             make, '-f', TGMK, 'thunk_asms.h'],
   env: tgenv,
   feed: true,

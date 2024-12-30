@@ -1,7 +1,9 @@
 #!/bin/sh
 
-cat >$1
-shift
+if [ "$1" = "-i" ]; then
+  cat >$2
+  shift 2
+fi
 OUT=$1
 shift
 PRG=$1
