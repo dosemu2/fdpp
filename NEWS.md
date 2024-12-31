@@ -1,3 +1,13 @@
+## 1.9
+
+Maintenance release with just 20 commits.
+
+- meson build updates. Feels a bit better now, but I still consider
+  meson a failed experiment.
+- Termux build support.
+- switch to thunk_gen-1.2 (well, 1.3 is already released since, but its
+  ABI-compatible with 1.2 so no need for a specific update to 1.3)
+
 ## 1.8
 
 This release contains ~160 commits, and is mostly targeted to resolving
