@@ -643,8 +643,8 @@ void FdppLoaderHook(uint16_t seg, int (*getsymoff)(void *, const char *),
         int off = getsymoff(arg, asm_cthunks[i].name);
         assert(off != -1);
         assert(asm_cthunks[i].name);
-        asm_tab[i].seg = seg;
-        asm_tab[i].off = off;
+        asm_tab[asm_cthunks[i].num].seg = seg;
+        asm_tab[asm_cthunks[i].num].off = off;
     }
 
     f.off = getsymoff(arg, "near_wrp");
