@@ -51,10 +51,10 @@ struct athunk asm_thunks[] = {
 
 const int num_athunks = _countof(asm_thunks);
 
-struct athunk asm_cthunks[] = {
-#define ASMCSYM(s, n) [n] = { _S(_##s), NULL, 0 },
+struct cthunk asm_cthunks[] = {
+#define ASMCSYM(s, n) { _S(_##s), n, NULL },
 #include "plt_asmc.h"
-#define ASMPSYM(s, n) [n] = { _S(s), NULL, 0 },
+#define ASMPSYM(s, n) { _S(s), n, NULL },
 #include "plt_asmp.h"
 };
 

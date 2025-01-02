@@ -6,8 +6,14 @@ struct athunk {
     unsigned flags;
 };
 
+struct cthunk {
+    const char *name;
+    int num;
+    struct far_s *ptr;
+};
+
 extern struct athunk asm_thunks[];
 extern const int num_athunks;
-extern struct athunk asm_cthunks[];
+extern struct cthunk asm_cthunks[];
 extern const int num_cthunks;
 extern far_t asm_tab[];
