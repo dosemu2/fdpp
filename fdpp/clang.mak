@@ -10,6 +10,9 @@ else
 $(error binutils-x86-64-linux-gnu not installed)
 endif
 endif
+# don't use ?= here as that doesn't override make's builtin CC var
+CC = clang
+CXX = clang++
 CLANG_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep clang | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
 ifeq ($(CLANG_VER),)
