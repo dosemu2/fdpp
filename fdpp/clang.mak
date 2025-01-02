@@ -15,10 +15,9 @@ CLANG_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep clang | \
 ifeq ($(CLANG_VER),)
 # its gcc, set to 16 as it had buggy packed diagnostic, similar to gcc
 CLANG_VER := 16
-GCC_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep GCC | \
-  sed -E 's/.+ \(GCC\) ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
+GCC_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep g++)
 ifeq ($(GCC_VER),)
-$(error unknown compiler)
+$(error unknown compiler $(CXX) $(shell $(CXX) --version))
 endif
 endif
 FLEX = $(shell which flex 2>/dev/null)
