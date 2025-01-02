@@ -10,11 +10,17 @@ else
 $(error binutils-x86-64-linux-gnu not installed)
 endif
 endif
-# don't use ?= here as that doesn't override make's builtin CC var
-CC = clang
-CXX = clang++
-CLANG_VER := $(shell $(CXX) -v 2>&1 | head -n 1 | \
+CLANG_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep clang | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
+ifeq ($(CLANG_VER),)
+# its gcc, set to 16 as it had buggy packed diagnostic, similar to gcc
+CLANG_VER := 16
+GCC_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep GCC | \
+  sed -E 's/.+ \(GCC\) ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
+ifeq ($(GCC_VER),)
+$(error unknown compiler)
+endif
+endif
 FLEX = $(shell which flex 2>/dev/null)
 ifneq ($(FLEX),)
 LEX = $(FLEX)
@@ -40,7 +46,9 @@ export PKG_CONFIG
 TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic \
   -DCLANG_VER=$(CLANG_VER)
 # _XTRA should go at the end of cmd line
+ifeq ($(GCC_VER),)
 TARGETOPT_XTRA = -Wno-format-invalid-specifier -Wno-c99-designator
+endif
 
 DEBUG_MODE ?= 1
 EXTRA_DEBUG ?= 0
@@ -50,11 +58,15 @@ USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS += $(IFLAGS) -DFDPP
-WFLAGS = -Wall -Werror=packed-non-pod -Wno-unknown-warning-option \
-  -Wno-address-of-packed-member
+ifeq ($(GCC_VER),)
+WFLAGS := -Wall -Werror=packed-non-pod -Wno-unknown-warning-option
 ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
 endif
+else
+WFLAGS := -Wno-attributes
+endif
+WFLAGS += -Wno-address-of-packed-member
 WCFLAGS = $(WFLAGS)
 ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
