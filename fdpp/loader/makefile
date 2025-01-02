@@ -26,11 +26,13 @@ CFLAGS += -I . -I $(PPINC) \
     -DFDPPKRNLDIR=$(DATADIR)/fdpp \
     -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
     -fpic
+ifeq ($(filter clean install,$(MAKECMDGOALS)),)
 LIBELF := $(shell $(PKG_CONFIG) --libs libelf)
 ifeq ($(LIBELF),)
 $(error libelf not installed)
 endif
 LIBS += $(LIBELF)
+endif
 
 ALL = $(T)/$(FDPPLIB)
 
