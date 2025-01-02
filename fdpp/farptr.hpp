@@ -210,7 +210,7 @@ public:
     uint16_t off() const { return ptr.off; }
     uint32_t get_fp32() const { return ((ptr.seg << 16) | ptr.off); }
     far_s get_far() const { return ptr; }
-    far_s& get_ref() { return ptr; }
+    far_s *get_ref() { return &ptr; }
     T* get_ptr() const { return (T*)resolve_segoff(ptr); }
     void *get_buf() const { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
@@ -508,7 +508,7 @@ public:
     /* everyone with get_ref() method should have no copy ctor */
     AsmSym() = default;
     AsmSym(const AsmSym<T> &) = delete;
-    far_s* get_ref() { return &sym.get_ref(); }
+    far_s* get_ref() { return sym.get_ref(); }
 };
 
 template<typename T>
@@ -521,7 +521,7 @@ public:
 
     AsmFSym() = default;
     AsmFSym(const AsmFSym<T> &) = delete;
-    far_s* get_ref() { return &sym.get_ref(); }
+    far_s* get_ref() { return sym.get_ref(); }
 };
 
 class CallSym {
@@ -582,7 +582,7 @@ public:
         return sym[idx];
     }
 
-    far_s* get_ref() { return &sym.get_ref(); }
+    far_s* get_ref() { return sym.get_ref(); }
 };
 
 template<typename T, typename P, auto M, int O = 0>
@@ -672,7 +672,7 @@ public:
 
     AsmFarPtr() = default;
     AsmFarPtr(const AsmFarPtr<T> &) = delete;
-    far_s* get_ref() { return &ptr.get_ref(); }
+    far_s* get_ref() { return ptr.get_ref(); }
 };
 
 template<typename T, uint16_t (*SEG)(void)>
@@ -685,7 +685,7 @@ public:
 
     AsmNearPtr() = default;
     AsmNearPtr(const AsmNearPtr<T, SEG> &) = delete;
-    far_s* get_ref() { return &ptr.get_ref(); }
+    far_s* get_ref() { return ptr.get_ref(); }
 };
 
 template<typename T, typename P, auto M, int O = 0>

@@ -50,7 +50,8 @@ USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS += $(IFLAGS) -DFDPP
-WFLAGS = -Wall -Werror=packed-non-pod -Wno-unknown-warning-option
+WFLAGS = -Wall -Werror=packed-non-pod -Wno-unknown-warning-option \
+  -Wno-address-of-packed-member
 ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
 endif
