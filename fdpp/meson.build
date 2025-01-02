@@ -133,7 +133,7 @@ hdr = ['src', 'hdr', '.', rel_inc]
 incdir2 = include_directories(hdr)
 CLANG_VER = meson.get_compiler('cpp').version().split('.')[0]
 if get_option('buildtype').startswith('debug')
-  DEBUG_OPTS = ['-DFDPP_DEBUG', '-DEXTRA_DEBUG']
+  DEBUG_OPTS = ['-DFDPP_DEBUG', '-DEXTRA_DEBUG', '-fdebug-macro']
 else
   DEBUG_OPTS = []
 endif
@@ -142,7 +142,9 @@ LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   version: FVER,
   sources: [gad, pac, pap, tc, ta],
   cpp_args: ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
-      DEBUG_OPTS
+      '-fno-threadsafe-statics',
+      '-Werror=packed-non-pod', '-Wno-unknown-warning-option',
+      '-Wno-format-invalid-specifier', '-Wno-c99-designator', DEBUG_OPTS
   ],
   link_args: ['-Wl,-Bsymbolic'],
   install: true,
