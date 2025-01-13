@@ -144,7 +144,8 @@ LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   cpp_args: ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
       '-fno-threadsafe-statics',
       '-Werror=packed-non-pod', '-Wno-unknown-warning-option',
-      '-Wno-format-invalid-specifier', '-Wno-c99-designator', DEBUG_OPTS
+      '-Wno-format-invalid-specifier', '-Wno-c99-designator',
+      '-Wno-address-of-packed-member', DEBUG_OPTS
   ],
   link_args: ['-Wl,-Bsymbolic'],
   install: true,
