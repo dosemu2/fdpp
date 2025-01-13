@@ -1,6 +1,6 @@
 project('kernel', ['nasm', 'c'], version: '1.7', meson_version: '>= 1.3.2')
 
-PD = 'parsers/parse_decls.sh'
+PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 SRC = 'src'
 DSRC = 'src/drivers'
 kernel_ld = meson.current_source_dir() / 'kernel.ld'
