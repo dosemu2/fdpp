@@ -60,13 +60,14 @@ USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS += $(IFLAGS) -DFDPP
+WFLAGS := -Wall
 ifeq ($(GCC_VER),)
-WFLAGS := -Wall -Werror=packed-non-pod -Wno-unknown-warning-option
+WFLAGS += -Werror=packed-non-pod -Wno-unknown-warning-option
 ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
 endif
 else
-WFLAGS := -Wno-attributes
+WFLAGS += -Wno-attributes -Wno-format
 endif
 WFLAGS += -Wno-address-of-packed-member
 WCFLAGS = $(WFLAGS)
