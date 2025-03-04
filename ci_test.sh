@@ -22,5 +22,5 @@ DIR_ROOT="$(pwd)"
   # Now do the tests
   export LD_LIBRARY_PATH=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/lib/fdpp
   export SKIP_EXPENSIVE=1
-  test/test_dos.py PPDOSGITTestCase
+  test/test_dosemu.py PPDOSGITTestCase
 )
