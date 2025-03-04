@@ -23,7 +23,7 @@ HEADERS = elf_priv.h
 OBJECTS = $(SOURCES:.c=.o)
 
 CFLAGS += -I . -I $(PPINC) \
-    -DFDPPKRNLDIR=$(DATADIR)/fdpp \
+    -DFDPPKRNLDIR=$(datadir)/fdpp \
     -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
     -fpic
 ifeq ($(filter clean install,$(MAKECMDGOALS)),)
