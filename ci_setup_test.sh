@@ -83,5 +83,5 @@ fi
   make -C test/cpu clean all
 
   # Get the test binaries
-  test/test_dos.py --get-test-binaries
+  test/test_dosemu.py --get-test-binaries
 )
