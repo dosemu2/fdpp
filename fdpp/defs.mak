@@ -10,15 +10,15 @@ XCPU=186
 XFAT=32
 
 prefix ?= /usr/local
-LIBDIR ?= $(prefix)/lib
-DATADIR ?= $(prefix)/share
-INCLUDEDIR ?= $(prefix)/include
-pkgconfdir ?= $(LIBDIR)/pkgconfig
-export PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(pkgconfdir):$(DATADIR)/pkgconfig
+libdir ?= $(prefix)/lib
+datadir ?= $(prefix)/share
+includedir ?= $(prefix)/include
+pkgconfdir ?= $(libdir)/pkgconfig
+export PKG_CONFIG_PATH := $(PKG_CONFIG_PATH):$(pkgconfdir):$(datadir)/pkgconfig
 # for nasm-segelf
 export PATH := $(PATH):$(prefix)/bin
 # for loader
-export DATADIR
+export datadir
 
 DIRSEP = /
 RM = rm -f

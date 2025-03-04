@@ -175,22 +175,22 @@ endif
 
 INSTALL ?= install
 install: $(ALL)
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/fdpp
-	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(LIBDIR)/fdpp
-	cp -fP $(FDPPDEVL) $(DESTDIR)$(LIBDIR)/fdpp
-	$(INSTALL) $(LDRLIB) $(DESTDIR)$(LIBDIR)/fdpp
-	cp -fP $(LDRDEVL) $(DESTDIR)$(LIBDIR)/fdpp
-	$(INSTALL) -d $(DESTDIR)$(DATADIR)/fdpp
-	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(DATADIR)/fdpp
-	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(DATADIR)/fdpp
+	$(INSTALL) -d $(DESTDIR)$(libdir)/fdpp
+	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(libdir)/fdpp
+	cp -fP $(FDPPDEVL) $(DESTDIR)$(libdir)/fdpp
+	$(INSTALL) $(LDRLIB) $(DESTDIR)$(libdir)/fdpp
+	cp -fP $(LDRDEVL) $(DESTDIR)$(libdir)/fdpp
+	$(INSTALL) -d $(DESTDIR)$(datadir)/fdpp
+	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(datadir)/fdpp
+	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(datadir)/fdpp
 	$(INSTALL) -d $(DESTDIR)$(pkgconfdir)
 	$(INSTALL) -m 0644 fdpp.pc $(DESTDIR)$(pkgconfdir)
 	$(INSTALL) -d $(DESTDIR)$(prefix)/include/fdpp
 	$(INSTALL) -m 0644 $(EXT_H) $(DESTDIR)$(prefix)/include/fdpp
 
 uninstall:
-	$(RM) -r $(DESTDIR)$(LIBDIR)/fdpp
-	$(RM) -r $(DESTDIR)$(DATADIR)/fdpp
+	$(RM) -r $(DESTDIR)$(libdir)/fdpp
+	$(RM) -r $(DESTDIR)$(datadir)/fdpp
 	$(RM) -r $(DESTDIR)$(pkgconfdir)/fdpp.pc
 	$(RM) -r $(DESTDIR)$(prefix)/include/fdpp
 
@@ -204,7 +204,7 @@ tar: $(TGZ)
 $(GEN_EXT): %: $(srcdir)/%.in makefile
 	sed \
 		-e 's!@PREFIX[@]!$(prefix)!g' \
-		-e 's!@INCLUDEDIR[@]!$(INCLUDEDIR)!g' \
-		-e 's!@LIBDIR[@]!$(LIBDIR)!g' \
+		-e 's!@INCLUDEDIR[@]!$(includedir)!g' \
+		-e 's!@LIBDIR[@]!$(libdir)!g' \
 		-e 's!@VERSION[@]!$(VERSION)!g' \
 		$< >$@
