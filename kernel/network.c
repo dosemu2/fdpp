@@ -155,3 +155,27 @@ BYTE remote_getfree_11a3(void FAR *cds, void *dst)
     udst[4] = regs.si;
     return SUCCESS;
 }
+
+BYTE remote_getvolumeinfo(UBYTE drive, struct xgetvolumeinfo *s_ptr)
+{
+    iregs regs = {};
+    struct xgetvolumeinfo s;
+    struct xgetvolumeinfo FAR *p;
+
+    p = MK_FAR(s);
+
+    regs.a.x = 0x11a0;
+    regs.c.x = sizeof(s);
+    regs.d.b.l = drive;
+    regs.d.b.h = 1;           /* we'd like a version one structure returned */
+    regs.es = FP_SEG_OBJ(&regs, p);
+    regs.di = FP_OFF_OBJ(&regs, p);
+
+    regs.flags = FLG_CARRY;
+    call_intr(0x2f, MK_FAR_SCP(regs));
+    if ((regs.flags & FLG_CARRY) || (regs.a.x != 0x1c01))
+        return DE_INVLDFUNC;
+
+    *s_ptr = s;
+    return SUCCESS;
+}
