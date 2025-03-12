@@ -71,43 +71,24 @@ SECTIONS
 		*(IB_E)
 	}
 
-    /* We do not DISCARD any sections. But we still need to list them
-     * explicitly to prevent linker from trying to put some _before_ our
-     * sections. */
-    .shstrtab : {
+    .shstrtab (NOLOAD) : {
 		*(.shstrtab)
 	}
-    .strtab : {
+    .strtab (NOLOAD) : {
 		*(.strtab)
 	}
-    .symtab : {
+    .symtab (NOLOAD) : {
 		*(.symtab)
 	}
-    .rel.plt : {
+    .rel.plt (NOLOAD) : {
 		*(.rel.plt)
 	}
-    .rela.plt : {
+    .rela.plt (NOLOAD) : {
 		*(.rela.plt)
 	}
     /* for build-id */
-    .note.gnu.build-id  : {
+    .note.gnu.build-id (NOLOAD) : {
 		*(.note.gnu.build-id)
 	}
-    /* for solib */
-    .dynsym         : {
-		*(.dynsym)
-	}
-    .dynstr         : {
-		*(.dynstr)
-	}
-    .dynamic        : {
-		*(.dynamic)
-	}
-    .hash           : {
-		*(.hash)
-	}
-    .gnu.hash       : {
-		*(.gnu.hash)
-	}
-    .interp : { *(.interp) }
+    /DISCARD/ : { *(.*) }
   }
