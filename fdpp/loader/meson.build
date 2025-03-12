@@ -20,5 +20,9 @@ LIBLOADER = shared_library('fdldr', 'elf.c', 'loader.c',
     '-DKRNL_ELFNAME=' + TARGET + '.elf',
     '-DKRNL_MAP_NAME=' + TARGET + '.map'
   ],
+  # meson thinks we cross-compile and won't allow native.
+  # But we trick it by having gcc as cross-compiler, and cross-linking
+  # via custom_target.
+#  native: true,
   install: true,
   install_dir: get_option('libdir') / 'fdpp')
