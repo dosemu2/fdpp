@@ -634,3 +634,63 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   tn_printf(("Physical path: \"%s\"\n", GET_PTR(dest)));
   return result;
 }
+
+COUNT DosGetVolumeInfo(const char FAR *DriveString, UBYTE bufsiz, UWORD *outv, char FAR *name)
+{
+  struct dpb FAR *dpbp;
+  struct cds FAR *cdsp;
+  UBYTE drive = 0xff;
+  COUNT rc;
+
+  /*
+    DriveString should be in form of "C:\"
+  */
+  if (!DriveString)
+    return DE_INVLDDRV;
+
+  if (DriveString[0] && DriveString[1] == ':')
+  {
+    drive = DosUpFChar(DriveString[0]) - 'A';
+    cdsp = get_cds(drive);
+  }
+  else
+    cdsp = NULL;
+
+  if (cdsp == NULL) /* either error, really bad string, or network name */
+    return DE_INVLDDRV;
+
+  if (cdsp->cdsFlags & CDSNETWDRV) /* Try redirector extension */
+  {
+    struct xgetvolumeinfo xg;
+    rc = remote_getvolumeinfo(drive, &xg);
+    if (rc == SUCCESS)
+    {
+      if (bufsiz < xg.namelen + 1)
+        return DE_INVLDBUF;
+      outv[0] = xg.flags.std;
+      outv[1] = xg.maxfilenamelen;
+      outv[2] = xg.maxpathlen;
+      n_fmemcpy(name, xg.name, xg.namelen + 1);
+    }
+    return rc;
+  }
+
+  /* local drive */
+  dpbp = cdsp->cdsDpb;
+  if (dpbp == NULL || media_check(dpbp) < 0)
+    return DE_INVLDDRV;
+
+  if (bufsiz < sizeof("FAT32"))
+    return DE_INVLDBUF;
+
+  outv[0] = 0; // std flags
+  outv[1] = 12; // max filename length (includes '.')
+  outv[2] = 67; // max pathname length (includes 'C:')
+
+  if (ISFAT32(dpbp))
+    n_fmemcpy(name, "FAT32", sizeof("FAT32"));
+  else
+    n_fmemcpy(name, "FAT", sizeof("FAT"));
+
+  return SUCCESS;
+}
