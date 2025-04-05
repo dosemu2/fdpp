@@ -122,14 +122,6 @@ was scrapped, and currently
 [something else](https://github.com/salvois/kernel)
 is being developed.
 
-### NightKernel
-[NightKernel](https://github.com/mercury0x000d/NightKernel)
-is `A 32-bit drop-in replacement for the FreeDOS kernel`, as
-they call themselves. In fact, it is an assembly-written
-ring-0 kernel, currently w/o any DOS compatibility at all.
-Can't be used to run fdpp because it doesn't support user-space
-add-ons.
-
 ### PDOS/386
 [pdos/386](http://pdos.sourceforge.net/)
 is a Public Domain Operating System with a user interface as simple
