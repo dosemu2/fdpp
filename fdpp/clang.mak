@@ -4,7 +4,7 @@
 
 CROSS_LD ?= x86_64-linux-gnu-ld
 ifeq ($(shell $(CROSS_LD) --version 2>/dev/null),)
-ifneq ($(filter x86_64 amd64,$(shell uname -m)),)
+ifneq ($(filter x86_64 amd64 i686,$(shell uname -m)),)
 CROSS_LD ?= ld.bfd
 else
 $(error binutils-x86-64-linux-gnu not installed)
