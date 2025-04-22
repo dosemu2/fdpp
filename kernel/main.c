@@ -40,7 +40,7 @@ static const char *mainRcsId =
 #endif
 
 static const char *copyright =
-    "Written by Stas Sergeev, FDPP project.\n"
+    "Written by @stsp, FDPP project.\n"
     "Based on FreeDOS sources (C) Pasquale J. Villani and The FreeDOS Project.\n\n"
     "This program is free software: you can redistribute it and/or modify\n"
     "it under the terms of the GNU General Public License as published by\n"
