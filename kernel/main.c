@@ -111,10 +111,11 @@ VOID ASMCFUNC FreeDOSmain(void)
   BootParamVer = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_VER_OFFSET);
   if (*BootParamVer != BPRM_VER) {
     if (*BootParamVer < BPRM_MIN_VER)
-      fpanic("Wrong boot param version %i, need %i", *BootParamVer,
+      fpanic("Wrong boot param version %i, need %i", GET_SYM(*BootParamVer),
           BPRM_VER);
     else
-      fdloudprintf("Wrong boot param version %i, need %i\n", *BootParamVer,
+      fdloudprintf("Wrong boot param version %i, need %i\n",
+          GET_SYM(*BootParamVer),
           BPRM_VER);
   }
   b = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_OFFSET);

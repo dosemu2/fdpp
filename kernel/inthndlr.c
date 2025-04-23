@@ -1807,7 +1807,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
 {
   COUNT rc;
   long lrc;
-  #define r (*regs)
+  #define r (*GET_PTR(regs))
 
   if (r.AH == 0x4a)
   {
