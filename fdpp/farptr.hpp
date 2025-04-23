@@ -589,12 +589,12 @@ template<typename T, typename P, auto M, int O = 0>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
+        using wrp_type = typename WrpTypeS<P, memb_store>::type;
         FarPtr<T> fp;
         constexpr int off = M() + O;
         /* find parent first */
-        const uint8_t *ptr = (const uint8_t *)this - off;
-        far_s f;
-        f = lookup_far(memb_store, ptr);
+        const wrp_type& ptr = *new((void *)((const uint8_t *)this - off)) wrp_type;
+        far_s f = (&ptr).get_far();
         ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
