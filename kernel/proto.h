@@ -166,7 +166,7 @@ BOOL fcmp_wild(const char * s1, const char * s2, unsigned n);
 COUNT dos_close(COUNT fd);
 COUNT dos_delete(const char * path, int attrib);
 COUNT dos_rmdir(const char * path);
-COUNT dos_rename(const char * path1, const char * path2, int attrib);
+COUNT dos_rename(__FAR(const char) path1, __FAR(const char) path2, int attrib);
 date dos_getdate(void);
 _time dos_gettime(void);
 COUNT dos_mkdir(const char * dir);
@@ -310,28 +310,32 @@ void fmemcpy(__FAR(void) d, __FAR(const void) s, size_t n);
 void n_fmemcpy(__FAR(void) d, const void *s, size_t n);
 void fstrcpy(__FAR(char) d, __FAR(const char) s);
 void n_fstrcpy(__FAR(char) d, const char *s);
+void fstrcpy_n(char *d, __FAR(const char) s);
 void fmemset(__FAR(void) d, int ch, size_t n);
+COUNT fstrlen(__FAR(const char) s);
+int fstrcmp(__FAR(const char) d,__FAR(const char) s);
+int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
+void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
+void n_fmemcpy(__FAR(void) d, const void * s, size_t n);
+int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
+int n_fmemcmp(__FAR(const void)m1, const void * m2, size_t n);
+int fmemcmp_n(const void * m1, __FAR(const void)m2, size_t n);
 
 #ifndef USE_STDLIB
 /* strings.c */
 //size_t strlen(const char * s);
-size_t fstrlen(__FAR(const char) s);
 //__FAR(char) _fstrcpy(__FAR(char) d,__FAR(const char) s);
 //int strcmp(const char * d, const char * s);
-int fstrcmp(__FAR(const char) d,__FAR(const char) s);
-int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
 //int strncmp(const char * d, const char * s, size_t l);
 //char * strchr(const char * s, int c);
 
 /* misc.c */
 //char * strcpy(char * d, const char * s);
 //void ASMPASCAL fmemcpyBack(__FAR(void) d,__FAR(const void) s, size_t n);
-void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
 //void * memcpy(void *d, const void * s, size_t n);
 //void * memset(void * s, int ch, size_t n);
 
 //int memcmp(const void *m1, const void *m2, size_t n);
-int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 
 #ifdef __WATCOMC__
 /* bx, cx, dx and es not used or clobbered for all asmsupt.asm functions except
@@ -352,14 +356,6 @@ int fmemcmp(__FAR(const void)m1,__FAR(const void)m2, size_t n);
 #pragma aux (pascal) strchr modify exact [ax dx] nomemory
 #pragma aux (pascal) fstrchr modify exact [ax dx] nomemory
 #endif
-#else    // USE_STDLIB
-#define fstrlen strlen
-#define fstrcpy_n strcpy
-#define fstrcmp strcmp
-#define fstrncmp strncmp
-
-#define fmemcpy_n memcpy
-#define fmemcmp memcmp
 #endif
 __FAR(char) fstrchr(__FAR(const char) s, int c);
 __FAR(void) fmemchr(__FAR(const void) s, int c, size_t n);

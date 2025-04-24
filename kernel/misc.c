@@ -72,13 +72,13 @@ VOID fmemmove(REG VOID FAR * d, REG CONST VOID FAR * s, REG size_t n)
 }
 #endif
 
-#ifndef USE_STDLIB
 VOID fmemcpy_n(REG VOID * d, REG CONST VOID FAR * s, REG size_t n)
 {
   while (n--)
     ((BYTE *) d)[n] = ((BYTE FAR *) s)[n];
 }
 
+#ifndef USE_STDLIB
 VOID *memset(VOID * s, int ch, size_t n)
 {
   while (n--)

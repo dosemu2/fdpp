@@ -681,7 +681,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
 
           for (afentry.sector = 1;
                afentry.sector <= pddt->ddt_bpb.bpb_nsecs; afentry.sector++)
-            memcpy(addrfield++, &afentry, sizeof(afentry));
+            n_fmemcpy(addrfield++, &afentry, sizeof(afentry));
 
           ret =
               Genblockio(pddt, LBA_FORMAT, afentry.head, afentry.track, 0,

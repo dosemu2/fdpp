@@ -43,8 +43,9 @@ size_t strlen(REG CONST BYTE * s)
     ++cnt;
   return cnt;
 }
+#endif
 
-size_t fstrlen(REG CONST BYTE FAR * s)
+COUNT fstrlen(REG CONST BYTE FAR * s)
 {
   REG size_t cnt = 0;
 
@@ -53,6 +54,7 @@ size_t fstrlen(REG CONST BYTE FAR * s)
   return cnt;
 }
 
+#ifndef USE_STDLIB
 int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
 {
   while (*s != '\0' && *d != '\0')
@@ -64,8 +66,9 @@ int strcmp(REG CONST BYTE * d, REG CONST BYTE * s)
   }
   return *d - *s;
 }
+#endif
 
-COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
+int fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
 {
   while (*s != '\0' && *d != '\0')
   {
@@ -77,6 +80,7 @@ COUNT fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
   return *d - *s;
 }
 
+#ifndef USE_STDLIB
 int strncmp(REG const char *d, REG const char *s, size_t l)
 {
   size_t index = 1;
@@ -89,6 +93,7 @@ int strncmp(REG const char *d, REG const char *s, size_t l)
   }
   return *d - *s;
 }
+#endif
 
 COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
 {
@@ -103,6 +108,7 @@ COUNT fstrncmp(REG BYTE FAR * d, REG BYTE FAR * s, COUNT l)
   return *d - *s;
 }
 
+#ifndef USE_STDLIB
 char *strchr(const char * s, int c)
 {
   REG CONST BYTE *p;
@@ -125,6 +131,11 @@ VOID fstrcpy(char FAR * d, const char FAR * s)
 VOID n_fstrcpy(char FAR * d, const char * s)
 {
   n_fmemcpy(d, s, strlen(s) + 1);
+}
+
+VOID fstrcpy_n(char * d, const char FAR * s)
+{
+  fmemcpy_n(d, s, fstrlen(s) + 1);
 }
 
 char FAR * fstrchr(const char FAR * s, int c)
@@ -181,6 +192,7 @@ int memcmp(CONST VOID * c_d, CONST VOID * c_s, size_t n)
   }
   return 0;
 }
+#endif
 
 int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
 {
@@ -196,4 +208,18 @@ int fmemcmp(CONST VOID FAR * c_d, CONST VOID FAR * c_s, size_t n)
   }
   return 0;
 }
-#endif
+
+int n_fmemcmp(CONST VOID FAR * c_d, CONST VOID * c_s, size_t n)
+{
+  CONST BYTE FAR *d = (CONST BYTE FAR *)c_d;
+  CONST BYTE *s = (CONST BYTE *)c_s;
+
+  while (n--)
+  {
+    if (*d == *s)
+      ++s, ++d;
+    else
+      return *d - *s;
+  }
+  return 0;
+}

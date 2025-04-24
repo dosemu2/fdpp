@@ -557,7 +557,7 @@ COUNT dos_rmdir(const char * path)
   return delete_dir_entry(fnp);
 }
 
-COUNT dos_rename(const char * path1, const char * path2, int attrib)
+COUNT dos_rename(const char FAR * path1, const char FAR * path2, int attrib)
 {
   REG f_node_ptr fnp1;
   REG f_node_ptr fnp2;

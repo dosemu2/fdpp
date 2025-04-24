@@ -88,7 +88,7 @@ VOID fatal(BYTE * err_msg)
 #endif
 
 /* Abort, retry or fail for character devices                   */
-COUNT char_error(request * rq, struct dhdr FAR * lpDevice)
+COUNT char_error(request FAR * rq, struct dhdr FAR * lpDevice)
 {
   CritErrCode = (rq->r_status & S_MASK) + 0x13;
   return CriticalError(EFLG_CHAR | EFLG_ABORT | EFLG_RETRY | EFLG_IGNORE,
@@ -96,7 +96,7 @@ COUNT char_error(request * rq, struct dhdr FAR * lpDevice)
 }
 
 /* Abort, retry or fail for block devices                       */
-COUNT block_error(request * rq, COUNT nDrive, struct dhdr FAR * lpDevice,
+COUNT block_error(request FAR * rq, COUNT nDrive, struct dhdr FAR * lpDevice,
                   int mode)
 {
   CritErrCode = (rq->r_status & S_MASK) + 0x13;

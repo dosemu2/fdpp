@@ -30,8 +30,9 @@ static BYTE *mainRcsId =
     "$Id: newstuff.c 1479 2009-07-07 13:33:24Z bartoldeman $";
 #endif
 
-#include        "portab.h"
-#include        "globals.h"
+#include "portab.h"
+#include "globals.h"
+#include "proto.h"
 
 /*
     TE-TODO: if called repeatedly by same process,
@@ -378,7 +379,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
         if (dest[3] == '/') dest[3] = '\\';
         if (dest[7] == '/') dest[7] = '\\';
       }
-      if (froot == src || fmemcmp(dest + 3, "\\DEV\\", 5) == 0)
+      if (froot == src || n_fmemcmp(dest + 3, "\\DEV\\", 5) == 0)
       {
         /* /// Bugfix: NUL.LST is the same as NUL.  This is true for all
            devices.  On a device name, the extension is irrelevant
@@ -592,7 +593,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
       if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0')
-         && fmemcmp(dest, cdsp->cdsCurrentPath, j) == 0)
+         && n_fmemcmp(dest, cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';

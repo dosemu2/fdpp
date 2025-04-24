@@ -491,8 +491,8 @@ __FAR(ddt) getddt(int dev);
 COUNT writelabelBPB(char drive, const char *name);
 
 /* error.c */
-COUNT char_error(request * rq, __FAR(struct dhdr) lpDevice);
-COUNT block_error(request * rq, COUNT nDrive, __FAR(struct dhdr) lpDevice, int mode);
+COUNT char_error(__FAR(request) rq, __FAR(struct dhdr) lpDevice);
+COUNT block_error(__FAR(request) rq, COUNT nDrive, __FAR(struct dhdr) lpDevice, int mode);
 
 /*
  *      end of device.h

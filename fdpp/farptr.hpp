@@ -555,7 +555,7 @@ public:
     explicit NearPtr(uint16_t o) : _off(o) {}    // for farobj only
     NearPtr(std::nullptr_t) : _off(0) {}
     explicit operator uint16_t () const { return _off; }
-    operator T *() const { return FarPtr<T>(SEG(), _off); }
+    operator T *() const { return FarPtr<T>(SEG(), _off).get_ptr(); }
     int operator - (const NearPtr<T, SEG>& n) const {
         return _off - n.off();
     }

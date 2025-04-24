@@ -89,7 +89,7 @@ struct dpb FAR * GetDriveDPB(UBYTE drive, COUNT * rc)
     return NULL;
   }
   dpb = cdsp->cdsDpb;
-  if (dpb == 0 || cdsp->cdsFlags & CDSNETWDRV)
+  if (dpb == NULL || cdsp->cdsFlags & CDSNETWDRV)
   {
     *rc = DE_INVLDDRV;
     return NULL;
@@ -1136,7 +1136,7 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
     rc = network_redirector_fp(REM_FINDFIRST, current_ldt);
   else if (rc & IS_DEVICE)
   {
-    const char *p;
+    const char FAR *p;
     COUNT i;
 
     /* make sure the next search fails */
