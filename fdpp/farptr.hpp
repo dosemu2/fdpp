@@ -154,7 +154,6 @@ public:
                 std::is_void<T>::value, "need std layout");
         if (!ptr.seg && !ptr.off)
             return NULL;
-        store_far(ASTER_STORE, get_far());
         return (T*)resolve_segoff_fd(ptr);
     }
     template<typename T0>
@@ -362,7 +361,6 @@ public:
                 std::is_void<T>::value, "need std layout");
         if (!nonnull && !this->ptr.seg && !this->ptr.off)
             return NULL;
-        store_far(ASTER_STORE, this->get_far());
         return (T*)resolve_segoff_fd(this->ptr);
     }
 
