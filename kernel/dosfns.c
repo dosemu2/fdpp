@@ -1140,15 +1140,15 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
     COUNT i;
 
     /* make sure the next search fails */
-    sda_tmp_dm.dm_entry = 0xffff;
+    ____sda_tmp_dm.dm_entry = 0xffff;
     /* Found a matching device. Hence there cannot be wildcards. */
-    SearchDir.dir_attrib = D_DEVICE;
-    SearchDir.dir_time = dos_gettime();
-    SearchDir.dir_date = dos_getdate();
+    ____SearchDir.dir_attrib = D_DEVICE;
+    ____SearchDir.dir_time = dos_gettime();
+    ____SearchDir.dir_date = dos_getdate();
     p = get_root(PriPathName);
     memset(SearchDir.dir_name, ' ', FNAME_SIZE + FEXT_SIZE);
     for (i = 0; i < FNAME_SIZE && *p && *p != '.'; i++)
-      SearchDir.dir_name[i] = *p++;
+      ____SearchDir.dir_name[i] = *p++;
     rc = SUCCESS;
     /* /// End of additions.  - Ron Cemer ; heavily edited - Bart Oldeman */
   }

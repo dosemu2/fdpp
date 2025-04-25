@@ -211,6 +211,10 @@ public:
     far_s get_far() const { return ptr; }
     far_s *get_ref() { return &ptr; }
     T* get_ptr() const { return (T*)resolve_segoff(ptr); }
+    /* TODO: get rid of this placement-new! */
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+    T1& get_symref() const { return *new(resolve_segoff(ptr)) T1; }
     void *get_buf() const { return (void*)resolve_segoff(ptr); }
     explicit operator uint32_t () const { return get_fp32(); }
 } NONPOD_PACKED;
@@ -458,6 +462,7 @@ public:
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
             lookup_far(st, this)); }
     far_t get_far() const { return lookup_far(st, this); }
+    T& get_sym() { return *this; }
 };
 
 template<typename T, const int *st>
@@ -479,6 +484,7 @@ public:
     operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, lookup_far(st, this));
     }
+    T& get_sym() { return sym; }
 };
 
 template<typename T>
@@ -510,6 +516,7 @@ class AsmSym {
 public:
     using sym_type = typename WrpType<T>::ref_type;
     sym_type get_sym() { return sym.get_wrp(); }
+    T& get_symref() { return sym.get_symref(); }
     AsmRef<T> get_addr() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
@@ -759,6 +766,8 @@ public:
 #define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) __##x.get_sym()
 #define __ASYM_L(x) __##x.get_sym()
+#define __ASYM2(x) __##x.get_symref()
+#define __ASYM_L2(x) __##x.get_symref()
 #define ASMREF(t) AsmRef<t>
 #if CLANG_VER < 14
 #define DUMMY_MARK(p, n) \
@@ -799,6 +808,7 @@ public:
 #define GET_PTR(f) (f).get_ptr()
 #define ADJUST_FAR(f) (f).adjust_far()
 #define _DOS_FP(p) DotBarrierWrap::dot_barrier(p)
+#define GET_SYM(w) (w).get_sym()
 
 #undef NULL
 #define NULL           nullptr

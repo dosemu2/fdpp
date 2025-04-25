@@ -80,7 +80,7 @@ _PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
     farhlp_sta.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS = thunk_calls.h thunk_asms.h plt_asmc.h plt_asmp.h
-GEN_HEADERS_FD = glob_asmdefs.h
+GEN_HEADERS_FD = glob_asmdefs.h glob_asmdefs2.h
 GEN_CC = $(CFILES:.c=.cc)
 INITHEADERS = $(SRC)/init-mod.h $(SRC)/init-dat.h
 HEADERS=$(HDRS) $(SRC)/globals.h $(SRC)/proto.h $(INITHEADERS) $(PPHDRS)
@@ -172,6 +172,12 @@ PDHDR = $(SRC)/proto.h
 GLOB_ASM = $(SRC)/glob_asm.h
 include $(TGMK)
 endif
+
+glob_asmdefs2.h: glob_asmdefs.h
+	sed -E \
+	  -e 's/^#define /#define ____/' \
+	  -e 's/\(/2\(/' \
+	  $< >$@
 
 INSTALL ?= install
 install: $(ALL)

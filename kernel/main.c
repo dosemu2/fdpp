@@ -328,7 +328,7 @@ STATIC void setup_int_vectors(void)
   if (DOS_PSP >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
     plvec = MK_FP(0x70, 0x100);
     for (i = 0; i < sizeof(intvec_table); i++) {
-      plvec[i].intno = intvec_table[i];
+      GET_SYM(plvec[i]).intno = intvec_table[i];
       plvec[i].isv = getvec(intvec_table[i]);
     }
   } else {
@@ -618,7 +618,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
     {
       LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
-      LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
+      GET_SYM(LoL->_CDSp[LoL->_nblkdev]).cdsFlags = CDSPHYSDRV;
     }
     ++dpb;
     ++LoL->_nblkdev;
