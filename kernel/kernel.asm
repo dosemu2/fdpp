@@ -381,9 +381,9 @@ _rev_number     db      0
                 global  _version_flags
 _version_flags  db      0
 
-                global  ____os_release
+                global  _os_rel
                 extern  _os_release
-____os_release  dw      _os_release
+_os_rel         dw      _os_release
 
 %IFDEF WIN31SUPPORT
                 global  _winStartupInfo, _winInstanced
