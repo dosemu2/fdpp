@@ -314,6 +314,7 @@ void fstrcpy_n(char *d, __FAR(const char) s);
 void fmemset(__FAR(void) d, int ch, size_t n);
 COUNT fstrlen(__FAR(const char) s);
 int fstrcmp(__FAR(const char) d,__FAR(const char) s);
+int fstrcmp_n(const char *d, __FAR(const char) s);
 int fstrncmp(__FAR(const char) d,__FAR(const char) s, size_t l);
 void fmemcpy_n(void *d,__FAR(const void) s, size_t n);
 void n_fmemcpy(__FAR(void) d, const void * s, size_t n);

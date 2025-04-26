@@ -149,7 +149,7 @@ __ASM_FAR(void, prev_int2f_handler) SEMIC
 __ASM_FUNC(got_cbreak) SEMIC
 __ASM_FUNC(cpm_entry) SEMIC
 __ASM_ARRI_F(const char, os_release) SEMIC
-__ASM_NEAR(const char, ___os_release) SEMIC
+__ASM_NEAR(const char, os_rel) SEMIC
 __ASM(UWORD, DaysSinceEpoch) SEMIC
 __ASM(UBYTE, p0_exec_mode) SEMIC
 __ASM_FAR(const char, p0_cmdline_p) SEMIC

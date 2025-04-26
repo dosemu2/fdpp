@@ -2,4 +2,5 @@
 
 sudo apt update -q
 sudo apt install -y \
-    diffutils
+    diffutils \
+    gdb

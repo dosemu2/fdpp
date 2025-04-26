@@ -30,8 +30,7 @@
 #define MAX_CDSPATH 67
 
 struct cds {
-//  AR_MEMB(cds, BYTE, cdsCurrentPath, MAX_CDSPATH);
-  BYTE cdsCurrentPath[MAX_CDSPATH];
+  AR_MEMB(cds, BYTE, cdsCurrentPath, MAX_CDSPATH);
   UWORD cdsFlags;           /* see below */
   __DOSFAR(struct dpb)cdsDpb;   /* if != 0, associated DPB */
 

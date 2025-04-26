@@ -80,6 +80,18 @@ int fstrcmp(CONST BYTE FAR * d, CONST BYTE FAR * s)
   return *d - *s;
 }
 
+int fstrcmp_n(const char * d, CONST BYTE FAR * s)
+{
+  while (*s != '\0' && *d != '\0')
+  {
+    if (*d == *s)
+      ++s, ++d;
+    else
+      return *d - *s;
+  }
+  return *d - *s;
+}
+
 #ifndef USE_STDLIB
 int strncmp(REG const char *d, REG const char *s, size_t l)
 {

@@ -1081,7 +1081,7 @@ COUNT DosChangeDir(const char FAR * s)
 */
   if (FP_OFF(current_ldt) != 0xFFFF)
   {
-     fstrcpy_n(current_ldt->cdsCurrentPath, PriPathName);
+     fstrcpy(current_ldt->cdsCurrentPath, PriPathName);
      if (PriPathName[7] == 0)
        current_ldt->cdsCurrentPath[8] = 0; /* Need two Zeros at the end */
   }

@@ -247,6 +247,7 @@ public:
     using TheBase = typename FarPtrBase<T>::FarPtrBase::TheBase;
     using FarPtrBase<T>::FarPtrBase;
     using wrp_type_m = SymWrp<T, memb_store>;
+    using wrp_type_mp = wrp_type_m*;
     FarPtr() = default;
 
     FarPtr(const TheBase& f) : TheBase(f) {}
@@ -364,7 +365,7 @@ public:
         return (T*)resolve_segoff_fd(this->ptr);
     }
 
-    wrp_type_m* operator ->() const {
+    wrp_type_mp operator ->() const {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
         if (!nonnull && !this->ptr.seg && !this->ptr.off)
@@ -372,7 +373,7 @@ public:
         /* TODO: move store to SymWrp ctor. Currently impossible
          * because SymWrp needs to be trivially-constructible. */
         store_far(ARROW_STORE, this->get_far());
-        return new(resolve_segoff_fd(this->ptr)) wrp_type_m;
+        return wrp_type_mp(new(resolve_segoff_fd(this->ptr)) wrp_type_m);
     }
 
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
@@ -485,12 +486,13 @@ class AsmRef {
 
 public:
     using wrp_type_m = SymWrp<T, memb_store>;
+    using wrp_type_mp = wrp_type_m*;
     AsmRef(FarPtr<T> *s) : sym(s) {}
-    wrp_type_m* operator ->() {
+    wrp_type_mp operator ->() {
         /* TODO: move store to SymWrp ctor. Currently impossible
          * because SymWrp needs to be trivially-constructible. */
         store_far(ARROW_STORE, sym->get_far());
-        return new(sym->get_buf()) wrp_type_m;
+        return wrp_type_mp(new(sym->get_buf()) wrp_type_m);
     }
     operator FarPtr<T> () { return *sym; }
     template <typename T1 = T,
