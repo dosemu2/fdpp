@@ -127,7 +127,7 @@ ta = custom_target('thunk_asms.h',
   feed: true,
   capture: true)
 
-FDPP_CFILES = ['smalloc.c', 'farhlp_sta.c']
+FDPP_CFILES = ['smalloc.c']
 ccgen = generator(find_program('echo'),
   arguments: ['#include', '"@BASENAME@.c"'],
   output: '@BASENAME@.cc',

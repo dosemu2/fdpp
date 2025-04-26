@@ -76,8 +76,7 @@ clean:
 
 HDRS = $(wildcard $(HDR)/*.h) $(wildcard $(SRC)/*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
-_PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h \
-    farhlp_sta.h
+_PPHDRS = $(PLPHDRS) dosobj.h farhlp.hpp thunks_priv.h smalloc.h
 PPHDRS = $(addprefix $(srcdir)/,$(_PPHDRS))
 GEN_HEADERS = thunk_calls.h thunk_asms.h plt_asmc.h plt_asmp.h
 GEN_HEADERS_FD = glob_asmdefs.h glob_asmdefs2.h
@@ -117,7 +116,7 @@ CFILES = blockio.c \
     prf.c \
     share.c
 
-FDPP_CFILES = smalloc.c farhlp_sta.c
+FDPP_CFILES = smalloc.c
 FDPP_CCFILES = thunks.cc thunks_c.cc thunks_a.cc thunks_p.cc dosobj.cc
 CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp
 

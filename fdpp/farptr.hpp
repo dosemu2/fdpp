@@ -25,7 +25,6 @@
 #include <cstring>
 #include <unordered_set>
 #include "thunks_priv.h"
-#include "farhlp_sta.h"
 
 #if !defined(__clang__) || (__clang_major__ >= 16) || defined(__ANDROID__)
 #define NONPOD_PACKED __attribute__((packed))
@@ -34,46 +33,6 @@
 #define NONPOD_PACKED
 #define MAYBE_PACKED __attribute__((packed))
 #endif
-
-/* for get_sym() */
-static const int sym_store[] = { SYM_STORE, STORE_MAX };
-static const int arr_store[] = { ARR_STORE, STORE_MAX };
-/* for -> */
-static const int memb_store[] = { SYM_STORE, ARROW_STORE,
-    ASTER_STORE, ARR_STORE, STORE_MAX };
-
-static inline far_s _lookup_far(int idx, const void *ptr)
-{
-    fh1 *fh = &store[idx];
-    far_s f = {};
-    if (ptr != fh->ptr)
-        return f;
-    f = fh->f;
-    return f;
-}
-
-static inline far_s lookup_far(const int *st, const void *ptr)
-{
-    far_s f = {};
-    while (*st != STORE_MAX) {
-        f = _lookup_far(*st++, ptr);
-        if (f.seg || f.off)
-            break;
-    }
-    return f;
-}
-
-static inline void _store_far(int idx, const void *ptr, far_s fptr)
-{
-    fh1 *fh = &store[idx];
-    fh->ptr = ptr;
-    fh->f = fptr;
-}
-
-static inline void store_far(int idx, far_s fptr)
-{
-    _store_far(idx, resolve_segoff(fptr), fptr);
-}
 
 static inline far_s _MK_S(uint32_t s, uint16_t o)
 {
@@ -91,19 +50,19 @@ static inline far_s _MK_S(uint32_t s, uint16_t o)
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
 #define _RC(T1) typename std::remove_const<T1>::type
-template<typename, const int *> class SymWrp;
-template<typename, const int *> class SymWrp2;
+template<typename> class SymWrp;
+template<typename> class SymWrp2;
 
-template<typename T, const int *st>
+template<typename T>
 class WrpTypeS {
 public:
     using type = typename std::conditional<std::is_class<T>::value,
-        SymWrp<T, st>, SymWrp2<T, st>>::type;
+        SymWrp<T>, SymWrp2<T>>::type;
     using ref_type = typename std::add_lvalue_reference<type>::type;
 };
 
 template<typename T>
-using WrpType = WrpTypeS<T, sym_store>;
+using WrpType = typename WrpTypeS<T>::type;
 
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
@@ -124,10 +83,9 @@ class FarPtrBase {
 protected:
     far_s ptr;
 
-    template<const int *st>
-    using wrp_type = typename WrpTypeS<T, st>::type;
-    using wrp_type_s = wrp_type<sym_store>;
-    using wrp_type_a = wrp_type<arr_store>;
+    using wrp_type = typename WrpTypeS<T>::type;
+    using wrp_type_s = wrp_type;
+    using wrp_type_a = wrp_type;
     using TheBase = FarPtrBase<T>;
 
     void do_adjust_far() {
@@ -241,8 +199,8 @@ public:
     template <typename> friend class FarPtr;
     using TheBase = typename FarPtrBase<T>::FarPtrBase::TheBase;
     using FarPtrBase<T>::FarPtrBase;
-    using wrp_type_m = SymWrp<T, memb_store>;
-    using wrp_type_s = typename WrpTypeS<T, sym_store>::type;
+    using wrp_type_m = SymWrp<T>;
+    using wrp_type_s = typename WrpTypeS<T>::type;
     using wrp_type_mp = std::unique_ptr<wrp_type_m>;
     FarPtr() = default;
 
@@ -417,7 +375,7 @@ public:
 
 #define _MK_F(f, s) ({ ___assert(s.seg || s.off); (f)s; })
 
-template<typename T, const int *st>
+template<typename T>
 class SymWrp : public T {
     FarPtr<T> fptr;
     T backup;
@@ -458,8 +416,8 @@ public:
         *(T *)this = *(T *)&s;
         s.clear();
     }
-    SymWrp<T, st>& operator =(T& f) { *(T *)this = f; return *this; }
-    SymWrp<T, st>& operator =(const SymWrp<T, st>& f) {
+    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
+    SymWrp<T>& operator =(const SymWrp<T>& f) {
         *(T *)this = f;
         return *this;
     }
@@ -469,7 +427,7 @@ public:
     void clear() { fptr = NULL; }
 };
 
-template<typename T, const int *st>
+template<typename T>
 class SymWrp2 {
     /* remove const or default ctor will be deleted */
     _RC(T) sym;
@@ -495,8 +453,8 @@ public:
     SymWrp2(SymWrp2&& s) : sym(s.sym), fptr(s.fptr), backup(s.backup) {
         s.clear();
     }
-    SymWrp2<T, st>& operator =(const T& f) { sym = f; return *this; }
-    SymWrp2<T, st>& operator =(const SymWrp2<T, st>& f) {
+    SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
+    SymWrp2<T>& operator =(const SymWrp2<T>& f) {
         sym = f.sym;
         return *this;
     }
@@ -518,7 +476,7 @@ class AsmRef {
     FarPtr<T> *sym;
 
 public:
-    using wrp_type_m = SymWrp<T, memb_store>;
+    using wrp_type_m = SymWrp<T>;
     using wrp_type_mp = std::unique_ptr<wrp_type_m>;
     AsmRef(FarPtr<T> *s) : sym(s) {}
     wrp_type_mp operator ->() {
@@ -537,7 +495,7 @@ class AsmSym {
     FarPtr<T> sym;
 
 public:
-    using sym_type = typename WrpType<T>::type;
+    using sym_type = typename WrpTypeS<T>::type;
     sym_type get_sym() { return sym.get_wrp(); }
     T& get_symref() { return sym.get_symref(); }
     AsmRef<T> get_addr() { return AsmRef<T>(&sym); }
@@ -612,7 +570,7 @@ class ArSymBase {
 protected:
     FarPtrBase<T> sym;
 
-    using wrp_type = typename WrpType<T>::type;
+    using wrp_type = WrpType<T>;
 public:
     wrp_type& operator [](int idx) {
         ___assert(!max_len || idx < max_len);
@@ -626,7 +584,7 @@ template<typename T, typename P, auto M, int O = 0>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
-        using wrp_type = typename WrpTypeS<P, memb_store>::type;
+        using wrp_type = typename WrpTypeS<P>::type;
         FarPtr<T> fp;
         constexpr int off = M() + O;
         /* find parent first */
@@ -642,7 +600,7 @@ template<typename T, int max_len, typename P, auto M>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
 
-    using wrp_type = typename WrpTypeS<T, arr_store>::type;
+    using wrp_type = typename WrpTypeS<T>::type;
 public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
@@ -726,7 +684,7 @@ public:
 template<typename T, typename P, auto M, int O = 0>
 class SymMemb : public T, public MembBase<T, P, M, O> {
 public:
-    using wrp_type_s = SymWrp<T, sym_store>;
+    using wrp_type_s = SymWrp<T>;
     SymMemb() = default;
     T& operator =(const T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
