@@ -589,11 +589,11 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     for(i = 0; i < lastdrive; ++i, ++cdsp)
     {
       /* How many bytes must match */
-      size_t j = strlen(cdsp->cdsCurrentPath);
+      size_t j = fstrlen(cdsp->cdsCurrentPath);
       /* the last component must end before the backslash offset and */
       /* the path the drive is joined to leads the logical path */
       if ((cdsp->cdsFlags & CDSJOINED) && (dest[j] == '\\' || dest[j] == '\0')
-         && n_fmemcmp(dest, cdsp->cdsCurrentPath, j) == 0)
+         && fmemcmp(dest, cdsp->cdsCurrentPath, j) == 0)
       { /* JOINed drive found */
         dest[0] = drNrToLetter(i);	/* index is physical here */
         dest[1] = ':';

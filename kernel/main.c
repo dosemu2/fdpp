@@ -448,7 +448,7 @@ STATIC VOID FsConfig(BOOL reinit)
         continue;
       }
     }
-    memcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
+    n_fmemcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
 
     pcds_table->cdsCurrentPath[0] += i;
     pcds_table->cdsDpb = NULL;
