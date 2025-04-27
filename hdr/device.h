@@ -216,8 +216,7 @@ typedef struct ddtstruct {
   UWORD ddt_descflags;          /* bit flags describing drive */
   UWORD ddt_ncyl;               /* number of cylinders
                                    (for partition only, if hard disk) */
-//  SYM_MEMB(ddtstruct, bpb, ddt_defbpb);               /* BPB for default (highest) capacity supported */
-  bpb ddt_defbpb;               /* BPB for default (highest) capacity supported */
+  SYM_MEMB(ddtstruct, bpb, ddt_defbpb);               /* BPB for default (highest) capacity supported */
   UBYTE ddt_reserved[6];        /* (part of BPB above) */
   UBYTE ddt_ltrack;             /* last track accessed */
   union {

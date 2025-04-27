@@ -280,7 +280,7 @@ STATIC int int21_fat32(lregs *r)
         case 0x01:
         {
           ddt *pddt = getddt(r->DL);
-          memcpy(&pddt->ddt_bpb, xdffp->xdff_f.rebuilddpb.bpbp,
+          fmemcpy(&pddt->ddt_bpb, xdffp->xdff_f.rebuilddpb.bpbp,
                   sizeof(bpb));
         }
         case 0x02:
@@ -1739,7 +1739,7 @@ VOID ASMCFUNC int2526_handler(WORD mode, struct int25regs FAR * r)
 
   {
     ddt *pddt = getddt(drv);
-    bpb *pbpb = pddt ? &pddt->ddt_defbpb : NULL;
+    bpb FAR *pbpb = pddt ? &pddt->ddt_defbpb : NULL;
     if (pbpb != NULL && pbpb->bpb_nsize > 32 * 1024 * 1024 / pbpb->bpb_nbyte)
     {
       r->ax = 0x207;

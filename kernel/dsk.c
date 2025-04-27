@@ -376,7 +376,7 @@ STATIC WORD blk_Media(rqptr rp, ddt FAR * pddt)
 STATIC WORD getbpb(ddt FAR * pddt)
 {
   ULONG count;
-  bpb *pbpbarray = &pddt->ddt_bpb;
+  bpb FAR *pbpbarray = &pddt->ddt_bpb;
   unsigned secs_per_cyl;
   WORD ret;
 
@@ -397,7 +397,7 @@ STATIC WORD getbpb(ddt FAR * pddt)
       || DiskTransferBuffer[0x1ff] != 0xaa || pbpbarray->bpb_nbyte % 512)
   {
     /* copy default bpb to be sure that there is no bogus data */
-    memcpy(pbpbarray, &pddt->ddt_defbpb, sizeof(bpb));
+    fmemcpy(pbpbarray, &pddt->ddt_defbpb, sizeof(bpb));
     return S_DONE;
   }
 
@@ -568,7 +568,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
     case 0x40:                 /* set device parameters */
       {
         struct gblkio FAR *gblp = rp->r_io;
-        bpb *pbpb;
+        bpb FAR *pbpb;
 
         pddt->ddt_type = gblp->gbio_devtype;
         pddt->ddt_descflags = (descflags & ~3) | (gblp->gbio_devattrib & 3)
@@ -579,10 +579,10 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
             (gblp->gbio_spcfunbit & 0x01) ==
             0 ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
 #ifdef WITHFAT32
-        memcpy(pbpb, &gblp->gbio_bpb,
+        fmemcpy(pbpb, &gblp->gbio_bpb,
                 extended ? sizeof(gblp->gbio_bpb) : BPB_SIZEOF);
 #else
-        memcpy(pbpb, &gblp->gbio_bpb, sizeof(gblp->gbio_bpb));
+        fmemcpy(pbpb, &gblp->gbio_bpb, sizeof(gblp->gbio_bpb));
 #endif
         /*pbpb->bpb_nsector = gblp->gbio_nsecs; */
         break;
@@ -752,7 +752,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
     case 0x60:                 /* get device parameters */
       {
         struct gblkio FAR *gblp = rp->r_io;
-        bpb *pbpb;
+        bpb FAR *pbpb;
 
         gblp->gbio_devtype = pddt->ddt_type;
         gblp->gbio_devattrib = descflags & 3;
@@ -764,10 +764,10 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
             (gblp->gbio_spcfunbit & 0x01) ==
             0 ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
 #ifdef WITHFAT32
-        memcpy(&gblp->gbio_bpb, pbpb,
+        fmemcpy(&gblp->gbio_bpb, pbpb,
                 extended ? sizeof(gblp->gbio_bpb) : BPB_SIZEOF);
 #else
-        memcpy(&gblp->gbio_bpb, pbpb, sizeof(gblp->gbio_bpb));
+        fmemcpy(&gblp->gbio_bpb, pbpb, sizeof(gblp->gbio_bpb));
 #endif
         /*gblp->gbio_nsecs = pbpb->bpb_nsector; */
         break;
@@ -814,7 +814,7 @@ STATIC WORD blockio(rqptr rp, ddt FAR * pddt)
   UWORD done;
 
   int action;
-  bpb *pbpb;
+  bpb FAR *pbpb;
 
   switch (rp->r_command)
   {
@@ -917,7 +917,7 @@ STATIC int LBA_to_CHS(ULONG LBA_address, struct CHS *chs, ddt FAR * pddt,
      BIOS, not from some random boot sector, except when
      we're dealing with a floppy */
 
-  const bpb *pbpb = hd(pddt->ddt_descflags) ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
+  const bpb FAR *pbpb = hd(pddt->ddt_descflags) ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
   unsigned hs = pbpb->bpb_nsecs * pbpb->bpb_nheads;
   unsigned hsrem = (unsigned)(LBA_address % hs);
 
