@@ -631,7 +631,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
 BOOL init_device(struct dhdr FAR * dhp, char *cmdLine, COUNT mode,
                  char FAR **r_top)
 {
-  request rq;
+  request rq = {};
   char name[8];
 
   if (cmdLine) {

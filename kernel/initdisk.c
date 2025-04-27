@@ -588,7 +588,7 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
                         ULONG StartSector, struct PartTableEntry *pEntry,
                         int extendedPartNo, int PrimaryNum)
 {
-  _nddt nddt;
+  _nddt nddt = {};
   _nddt *pddt = &nddt;
   struct CHS chs;
 
@@ -1318,7 +1318,7 @@ STATIC void ReadAllPartitionTables(void)
 
   unsigned int HardDrive;
   unsigned int nHardDisk;
-  _nddt nddt;
+  _nddt nddt = {};
   iregs regs = {};
 
 #if 0
