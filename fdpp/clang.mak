@@ -75,7 +75,10 @@ ifeq ($(DEBUG_MODE),1)
 DBGFLAGS += -ggdb3
 endif
 ifeq ($(EXTRA_DEBUG),1)
-DBGFLAGS += -O0 -fdebug-macro
+DBGFLAGS += -O0
+ifeq ($(GCC_VER),)
+DBGFLAGS += -fdebug-macro
+endif
 CPPFLAGS += -DFDPP_DEBUG -DEXTRA_DEBUG
 NASMFLAGS += -DEXTRA_DEBUG
 else
