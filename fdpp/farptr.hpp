@@ -379,6 +379,11 @@ template<typename T>
 class SymWrp : public T {
     FarPtr<T> fptr;
     T backup;
+    /* Magic is needed to check in a parent lookup if the wrapper
+     * was actually emitted. It is checked in get_far() method.
+     */
+    static constexpr const char magic_val[] = "voodoo magic 123";
+    char magic[sizeof(magic_val)];
 
     void copy_mods(T *dest, T *src, T *ref) {
         char *d = (char *)dest;
@@ -397,22 +402,33 @@ class SymWrp : public T {
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
     void dtor() {
+        check_magic();
         /* get_ptr() doesn't throw */
         if (fptr.get_ptr())
             copy_mods((T1 *)resolve_segoff(fptr.get_far()), this, &backup);
     }
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
-    void dtor() {}
+    void dtor() { check_magic(); }
+
+    bool check_magic() const {
+        bool ok = std::strcmp(magic, magic_val) == 0;
+        if (!ok)
+            fdloudprintf("magic bytes corrupted\n");
+        return ok;
+    }
 public:
     SymWrp(far_s f, bool nonnull = false) :
             fptr(f), backup(*(T *)resolve_segoff(f)) {
         ___assert(f.seg || f.off || nonnull);
         *(_RC(T) *)this = backup;
+        std::strcpy(magic, magic_val);
     }
     ~SymWrp() { dtor(); }
     SymWrp(const SymWrp&) = delete;
     SymWrp(SymWrp&& s) : fptr(s.fptr), backup(s.backup) {
+        std::strcpy(magic, s.magic);
+        ___assert(check_magic());
         *(T *)this = *(T *)&s;
         s.clear();
     }
@@ -422,7 +438,7 @@ public:
         return *this;
     }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, fptr.get_far()); }
-    far_t get_far() const { return fptr.get_far(); }
+    far_t get_far() const { ___assert(check_magic()); return fptr.get_far(); }
     T& get_sym() { return *this; }
     void clear() { fptr = NULL; }
 };
