@@ -457,6 +457,7 @@ public:
     SymWrp<T, st>& operator =(T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
             lookup_far(st, this)); }
+    far_t get_far() const { return lookup_far(st, this); }
 };
 
 template<typename T, const int *st>
@@ -599,8 +600,8 @@ protected:
         FarPtr<T> fp;
         constexpr int off = M() + O;
         /* find parent first */
-        const wrp_type& ptr = *new((void *)((const uint8_t *)this - off)) wrp_type;
-        far_s f = (&ptr).get_far();
+        const wrp_type *ptr = (wrp_type *)((const uint8_t *)this - off);
+        far_s f = ptr->get_far();
         ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
