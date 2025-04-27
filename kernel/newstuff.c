@@ -319,7 +319,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     }
   }
 
-  fmemcpy(&TempCDS, cdsEntry, sizeof(TempCDS));
+  fmemcpy(&TempCDS, cdsEntry, sizeof(struct cds));
   tn_printf(("CDS entry: #%u @%P (%u) '%s'\n", result, GET_FP32(cdsEntry),
             TempCDS.cdsBackslashOffset, GET_FP32(TempCDS.cdsCurrentPath)));
   /* is the current_ldt thing necessary for compatibly??
