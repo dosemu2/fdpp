@@ -123,7 +123,7 @@ f_node_ptr dir_open(REG const char *dirname, BOOL split, f_node_ptr fnp)
 
     if (!i || !(fnp->f_dir.dir_attrib & D_DIR))
     {
-      return (f_node_ptr) 0;
+      return NULL;
     }
     else
     {

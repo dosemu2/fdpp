@@ -57,7 +57,7 @@ static BYTE *RcsId =
 
 #if 0
 struct nlsInfoBlock ASM nlsInfo = {
-  (char FAR *)0                 /* filename to COUNTRY.SYS */
+        NULL                    /* filename to COUNTRY.SYS */
       , 437                     /* system code page */
       /* Implementation flags */
       , 0
