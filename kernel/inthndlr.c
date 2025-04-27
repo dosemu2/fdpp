@@ -2092,7 +2092,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
           r.FLAGS |= FLG_CARRY;
           break;
         }
-        _sprintf(TempCDS.cdsCurrentPath, "%c:\\", r.callerARG1 & 0xff);
+        _sprintf(GET_PTR(TempCDS.cdsCurrentPath), "%c:\\", r.callerARG1 & 0xff);
         TempCDS.cdsBackslashOffset = 2;
         if (cdsp->cdsFlags)
         {
@@ -2107,7 +2107,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
         TempCDS.cdsStrtClst = 0xffff;
         TempCDS.cdsParam = 0xffff;
         TempCDS.cdsStoreUData = 0xffff;
-        r.CX = sizeof(TempCDS);
+        r.CX = sizeof(struct cds);
         r.ES = FP_SEG(&TempCDS);
         r.DI = FP_OFF(&TempCDS);
         r.FLAGS &= ~FLG_CARRY;

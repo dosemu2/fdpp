@@ -1509,7 +1509,7 @@ STATIC VOID sysScreenMode(char * pLine)
   COUNT nFunc = 0x11;
 
   /* Get the argument                                             */
-  if (GetNumArg(pLine, &nMode) == (char *) 0)
+  if (GetNumArg(pLine, &nMode) == NULL)
     return;
 
   if(nMode<0x10)
@@ -1540,11 +1540,11 @@ STATIC VOID sysVersion(char * pLine)
   p++;
 
   /* Get major number */
-  if (GetNumArg(pLine, &major) == (char *) 0)
+  if (GetNumArg(pLine, &major) == NULL)
     return;
 
   /* Get minor number */
-  if (GetNumArg(p, &minor) == (char *) 0)
+  if (GetNumArg(p, &minor) == NULL)
     return;
 
   _printf("Changing reported version to %d.%d\n", major, minor);
@@ -1559,7 +1559,7 @@ STATIC VOID Files(char * pLine)
   COUNT nFiles;
 
   /* Get the argument                                             */
-  if (GetNumArg(pLine, &nFiles) == (char *) 0)
+  if (GetNumArg(pLine, &nFiles) == NULL)
     return;
 
   if (nFiles > SFTMAX)

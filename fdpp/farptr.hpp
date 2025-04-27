@@ -457,6 +457,7 @@ public:
     SymWrp<T, st>& operator =(T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
             lookup_far(st, this)); }
+    far_t get_far() const { return lookup_far(st, this); }
 };
 
 template<typename T, const int *st>
@@ -599,8 +600,8 @@ protected:
         FarPtr<T> fp;
         constexpr int off = M() + O;
         /* find parent first */
-        const wrp_type& ptr = *new((void *)((const uint8_t *)this - off)) wrp_type;
-        far_s f = (&ptr).get_far();
+        const wrp_type *ptr = (wrp_type *)((const uint8_t *)this - off);
+        far_s f = ptr->get_far();
         ___assert(f.seg || f.off);
         fp = _MK_F(FarPtr<uint8_t>, f) + off;
         return fp;
@@ -630,12 +631,10 @@ public:
         return NearPtr<T, SEG>(f.off());
     }
     operator T *() { return sym; }
-    template <typename T0, typename T1 = T,
-        typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
-    explicit operator T0 *() { return (T0 *)sym; }
     FarPtr<T> operator +(int inc) { return this->lookup_sym() + inc; }
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
     far_s get_far() const { return this->lookup_sym().get_far(); }
+    T *get_ptr() { return sym; }
 
     wrp_type& operator [](int idx) {
         ___assert(!max_len || idx < max_len);

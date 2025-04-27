@@ -287,7 +287,7 @@ f_node_ptr split_path(const char * path, f_node_ptr fnp)
 {
   /* check if the path ends in a backslash                        */
   if (path[strlen(path) - 1] == '\\')
-    return (f_node_ptr) 0;
+    return NULL;
 
 /*  11/29/99 jt
    * Networking and Cdroms. You can put in here a return.
@@ -304,7 +304,7 @@ f_node_ptr split_path(const char * path, f_node_ptr fnp)
   if (get_cds(path[0]-'A')->cdsFlags & CDSNETWDRV)
   {
     DebugPrintf(("split path called for redirected file: `%s'\n", path));
-    return (f_node_ptr) 0;
+    return NULL;
   }
 #endif
 
@@ -562,7 +562,7 @@ COUNT dos_rename(const char FAR * path1, const char FAR * path2, int attrib)
   REG f_node_ptr fnp1;
   REG f_node_ptr fnp2;
   COUNT ret;
-  char *fcbname;
+  char FAR *fcbname;
 
   /* prevent renaming of the current directory of that drive */
   REG struct cds FAR *cdsp = get_cds(path1[0] - 'A');
