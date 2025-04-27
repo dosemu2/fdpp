@@ -74,7 +74,7 @@ STATIC WORD RWzero(ddt FAR * pddt, UWORD mode);
 COUNT writelabelBPB(char drive, const char *name)
 {
   ddt FAR *pddt = getddt(drive - 'A');
-  struct FS_info *fs;
+  struct FS_info FAR *fs;
   int offset;
   int ret;
 
@@ -92,7 +92,7 @@ COUNT writelabelBPB(char drive, const char *name)
     return -1;
 
   /* store volume name */
-  fs = (struct FS_info *)&DiskTransferBuffer[offset];
+  fs = (struct FS_info FAR *)&DiskTransferBuffer[offset];
   ConvertNameSZToName83(fs->volume, name);
 
   ret = RWzero(pddt, LBA_WRITE);

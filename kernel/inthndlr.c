@@ -2092,7 +2092,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
           r.FLAGS |= FLG_CARRY;
           break;
         }
-        _sprintf(TempCDS.cdsCurrentPath, "%c:\\", r.callerARG1 & 0xff);
+        _sprintf(GET_PTR(TempCDS.cdsCurrentPath), "%c:\\", r.callerARG1 & 0xff);
         TempCDS.cdsBackslashOffset = 2;
         if (cdsp->cdsFlags)
         {

@@ -61,7 +61,7 @@ VOID dir_init_fnode(f_node_ptr fnp, CLUSTER dirstart)
 f_node_ptr dir_open(REG const char *dirname, BOOL split, f_node_ptr fnp)
 {
   int i;
-  char *fcbname;
+  char FAR *fcbname;
 
   /* determine what drive and dpb we are using...                 */
   fnp->f_dpb = get_dpb(dirname[0]-'A');

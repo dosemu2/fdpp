@@ -630,12 +630,10 @@ public:
         return NearPtr<T, SEG>(f.off());
     }
     operator T *() { return sym; }
-    template <typename T0, typename T1 = T,
-        typename std::enable_if<!std::is_same<T0, T1>::value>::type* = nullptr>
-    explicit operator T0 *() { return (T0 *)sym; }
     FarPtr<T> operator +(int inc) { return this->lookup_sym() + inc; }
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
     far_s get_far() const { return this->lookup_sym().get_far(); }
+    T *get_ptr() { return sym; }
 
     wrp_type& operator [](int idx) {
         ___assert(!max_len || idx < max_len);

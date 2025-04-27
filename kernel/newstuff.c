@@ -403,7 +403,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   rootPos = p = dest + 2;
   if (*p != '/') /* i.e., it's a backslash! */
   {
-    BYTE *cp;
+    BYTE FAR *cp;
 
     cp = TempCDS.cdsCurrentPath;
     /* ensure termination of strcpy */

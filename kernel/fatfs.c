@@ -562,7 +562,7 @@ COUNT dos_rename(const char FAR * path1, const char FAR * path2, int attrib)
   REG f_node_ptr fnp1;
   REG f_node_ptr fnp2;
   COUNT ret;
-  char *fcbname;
+  char FAR *fcbname;
 
   /* prevent renaming of the current directory of that drive */
   REG struct cds FAR *cdsp = get_cds(path1[0] - 'A');
