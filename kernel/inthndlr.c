@@ -280,7 +280,7 @@ STATIC int int21_fat32(lregs *r)
         case 0x01:
         {
           ddt *pddt = getddt(r->DL);
-          memcpy(&pddt->ddt_bpb, xdffp->xdff_f.rebuilddpb.bpbp,
+          fmemcpy(&pddt->ddt_bpb, xdffp->xdff_f.rebuilddpb.bpbp,
                   sizeof(bpb));
         }
         case 0x02:

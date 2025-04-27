@@ -568,7 +568,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
     case 0x40:                 /* set device parameters */
       {
         struct gblkio FAR *gblp = rp->r_io;
-        bpb *pbpb;
+        bpb FAR *pbpb;
 
         pddt->ddt_type = gblp->gbio_devtype;
         pddt->ddt_descflags = (descflags & ~3) | (gblp->gbio_devattrib & 3)
@@ -579,10 +579,10 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
             (gblp->gbio_spcfunbit & 0x01) ==
             0 ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
 #ifdef WITHFAT32
-        memcpy(pbpb, &gblp->gbio_bpb,
+        fmemcpy(pbpb, &gblp->gbio_bpb,
                 extended ? sizeof(gblp->gbio_bpb) : BPB_SIZEOF);
 #else
-        memcpy(pbpb, &gblp->gbio_bpb, sizeof(gblp->gbio_bpb));
+        fmemcpy(pbpb, &gblp->gbio_bpb, sizeof(gblp->gbio_bpb));
 #endif
         /*pbpb->bpb_nsector = gblp->gbio_nsecs; */
         break;
@@ -752,7 +752,7 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
     case 0x60:                 /* get device parameters */
       {
         struct gblkio FAR *gblp = rp->r_io;
-        bpb *pbpb;
+        bpb FAR *pbpb;
 
         gblp->gbio_devtype = pddt->ddt_type;
         gblp->gbio_devattrib = descflags & 3;
@@ -764,10 +764,10 @@ STATIC WORD Genblkdev(rqptr rp, ddt FAR * pddt)
             (gblp->gbio_spcfunbit & 0x01) ==
             0 ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
 #ifdef WITHFAT32
-        memcpy(&gblp->gbio_bpb, pbpb,
+        fmemcpy(&gblp->gbio_bpb, pbpb,
                 extended ? sizeof(gblp->gbio_bpb) : BPB_SIZEOF);
 #else
-        memcpy(&gblp->gbio_bpb, pbpb, sizeof(gblp->gbio_bpb));
+        fmemcpy(&gblp->gbio_bpb, pbpb, sizeof(gblp->gbio_bpb));
 #endif
         /*gblp->gbio_nsecs = pbpb->bpb_nsector; */
         break;
