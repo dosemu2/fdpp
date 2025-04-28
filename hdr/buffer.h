@@ -49,11 +49,12 @@ struct buffer {
   UBYTE b_copies;               /* number of copies to write    */
   UWORD b_offset;               /* offset in sectors between copies
                                    to write for FAT sectors     */
-  struct dpb FAR *b_dpbp;       /* pointer to DPB               */
+  __DOSFAR(dpb) b_dpbp;         /* pointer to DPB               */
   UWORD b_remotesz;             /* size of remote buffer if remote */
   BYTE b_padding;
   AR_MEMB(buffer, UBYTE, b_buffer, BUFFERSIZE);   /* 512 byte sectors for now     */
-};
+} PACKED;
+ANNOTATE_SIZE(struct buffer, 0x14+BUFFERSIZE);
 
 #define BFR_DIRTY       0x40    /* buffer modified              */
 #define BFR_VALID       0x20    /* buffer contains valid data   */
