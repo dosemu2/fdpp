@@ -431,7 +431,7 @@ struct nlsPackage {             /* the contents of one chain item of the
   UWORD nochar;
   UWORD numSubfct;           /* number of supported sub-functions */
   AR_MEMB(nlsPackage, nlsPointer, nlsPointers, 0);     /* grows dynamically */
-};
+} PACKED;
 
 struct nlsDBCS {                /* The internal structure is unknown to me */
   UWORD numEntries;
@@ -447,7 +447,7 @@ struct nlsCharTbl {
                                    If <= 0x80, the first element of
                                    the table corresponse to character 0x80 */
   AR_MEMB(nlsCharTbl, unsigned char, tbl, 1);         /* grows dynamically */
-};
+} PACKED;
 #define nlsChBuf(len)		struct nlsCharTbl##len {		\
 			UWORD numEntries;							\
 			unsigned char tbl[len];						\

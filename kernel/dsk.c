@@ -59,7 +59,7 @@ struct FS_info {
   ULONG serialno;
   AR_MEMB(FS_info, BYTE, volume, 11);
   AR_MEMB(FS_info, BYTE, fstype, 8);
-};
+} PACKED;
 
 /*TE - array access functions */
 ddt FAR *getddt(int dev)
