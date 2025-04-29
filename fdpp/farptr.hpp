@@ -1,6 +1,6 @@
 /*
  *  FDPP - freedos port to modern C++
- *  Copyright (C) 2018  Stas Sergeev (stsp)
+ *  Copyright (C) 2018-2025  Stas Sergeev (stsp)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
 #include <cstring>
 #include <unordered_set>
 #include "thunks_priv.h"
-#include "farhlp_sta.h"
 
 #if !defined(__clang__) || (__clang_major__ >= 16) || defined(__ANDROID__)
 #define NONPOD_PACKED __attribute__((packed))
@@ -34,46 +33,6 @@
 #define NONPOD_PACKED
 #define MAYBE_PACKED __attribute__((packed))
 #endif
-
-/* for get_sym() */
-static const int sym_store[] = { SYM_STORE, STORE_MAX };
-static const int arr_store[] = { ARR_STORE, STORE_MAX };
-/* for -> */
-static const int memb_store[] = { SYM_STORE, ARROW_STORE,
-    ASTER_STORE, ARR_STORE, STORE_MAX };
-
-static inline far_s _lookup_far(int idx, const void *ptr)
-{
-    fh1 *fh = &store[idx];
-    far_s f = {};
-    if (ptr != fh->ptr)
-        return f;
-    f = fh->f;
-    return f;
-}
-
-static inline far_s lookup_far(const int *st, const void *ptr)
-{
-    far_s f = {};
-    while (*st != STORE_MAX) {
-        f = _lookup_far(*st++, ptr);
-        if (f.seg || f.off)
-            break;
-    }
-    return f;
-}
-
-static inline void _store_far(int idx, const void *ptr, far_s fptr)
-{
-    fh1 *fh = &store[idx];
-    fh->ptr = ptr;
-    fh->f = fptr;
-}
-
-static inline void store_far(int idx, far_s fptr)
-{
-    _store_far(idx, resolve_segoff(fptr), fptr);
-}
 
 static inline far_s _MK_S(uint32_t s, uint16_t o)
 {
@@ -91,19 +50,19 @@ static inline far_s _MK_S(uint32_t s, uint16_t o)
 #define _C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
 #define _RC(T1) typename std::remove_const<T1>::type
-template<typename, const int *> class SymWrp;
-template<typename, const int *> class SymWrp2;
+template<typename> class SymWrp;
+template<typename> class SymWrp2;
 
-template<typename T, const int *st>
+template<typename T>
 class WrpTypeS {
 public:
     using type = typename std::conditional<std::is_class<T>::value,
-        SymWrp<T, st>, SymWrp2<T, st>>::type;
+        SymWrp<T>, SymWrp2<T>>::type;
     using ref_type = typename std::add_lvalue_reference<type>::type;
 };
 
 template<typename T>
-using WrpType = WrpTypeS<T, sym_store>;
+using WrpType = typename WrpTypeS<T>::type;
 
 #define ALLOW_CNV(T0, T1) (( \
         std::is_void<T0>::value || \
@@ -124,10 +83,9 @@ class FarPtrBase {
 protected:
     far_s ptr;
 
-    template<const int *st>
-    using wrp_type = typename WrpTypeS<T, st>::type;
-    using wrp_type_s = wrp_type<sym_store>;
-    using wrp_type_a = wrp_type<arr_store>;
+    using wrp_type = typename WrpTypeS<T>::type;
+    using wrp_type_s = wrp_type;
+    using wrp_type_a = wrp_type;
     using TheBase = FarPtrBase<T>;
 
     void do_adjust_far() {
@@ -165,20 +123,12 @@ public:
         return (T0*)resolve_segoff_fd(ptr);
     }
 
-    wrp_type_s& get_wrp() {
-        wrp_type_s *s = new(get_buf()) wrp_type_s;
-        /* TODO: move store to SymWrp ctor. Currently impossible
-         * because SymWrp needs to be trivially-constructible. */
-        _store_far(SYM_STORE, s, get_far());
-        return *s;
+    wrp_type_s get_wrp() {
+        return wrp_type_s(get_far());
     }
-    wrp_type_a& operator [](int idx) {
+    wrp_type_a operator [](int idx) {
         TheBase f = TheBase(*this + idx);
-        wrp_type_a *s = new(f.get_buf()) wrp_type_a;
-        /* TODO: move store to SymWrp ctor. Currently impossible
-         * because SymWrp needs to be trivially-constructible. */
-        _store_far(ARR_STORE, s, f.get_far());
-        return *s;
+        return wrp_type_a(f.get_far());
     }
 
     TheBase operator ++(int) {
@@ -211,7 +161,10 @@ public:
     far_s get_far() const { return ptr; }
     far_s *get_ref() { return &ptr; }
     T* get_ptr() const { return (T*)resolve_segoff(ptr); }
-    void *get_buf() const { return (void*)resolve_segoff(ptr); }
+    /* TODO: get rid of this placement-new! */
+    template <typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
+    T1& get_symref() const { return *new(resolve_segoff(ptr)) T1; }
     explicit operator uint32_t () const { return get_fp32(); }
 } NONPOD_PACKED;
 
@@ -246,8 +199,9 @@ public:
     template <typename> friend class FarPtr;
     using TheBase = typename FarPtrBase<T>::FarPtrBase::TheBase;
     using FarPtrBase<T>::FarPtrBase;
-    using wrp_type_m = SymWrp<T, memb_store>;
-    using wrp_type_mp = wrp_type_m*;
+    using wrp_type_m = SymWrp<T>;
+    using wrp_type_s = typename WrpTypeS<T>::type;
+    using wrp_type_mp = std::unique_ptr<wrp_type_m>;
     FarPtr() = default;
 
     FarPtr(const TheBase& f) : TheBase(f) {}
@@ -365,21 +319,20 @@ public:
         return (T*)resolve_segoff_fd(this->ptr);
     }
 
+    wrp_type_s operator *() { return wrp_type_s(this->get_far(), nonnull); }
+
     wrp_type_mp operator ->() const {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
         if (!nonnull && !this->ptr.seg && !this->ptr.off)
             return NULL;
-        /* TODO: move store to SymWrp ctor. Currently impossible
-         * because SymWrp needs to be trivially-constructible. */
-        store_far(ARROW_STORE, this->get_far());
-        return wrp_type_mp(new(resolve_segoff_fd(this->ptr)) wrp_type_m);
+        return wrp_type_mp(new wrp_type_m(this->ptr));
     }
 
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
-template<typename, int, typename P, auto> class ArMemb;
+template<typename, int, typename P, auto, bool> class ArMemb;
 
 template<typename T>
 class XFarPtr : public FarPtr<T>
@@ -390,8 +343,8 @@ public:
     XFarPtr() = delete;
     XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
-    template<typename T1 = T, int max_len, typename P, auto M>
-    XFarPtr(ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p) {}
+    template<typename T1 = T, int max_len, typename P, auto M, bool V>
+    XFarPtr(const ArMemb<T1, max_len, P, M, V> &p) : FarPtr<T>(p.get_far()) {}
 
     /* The below ctors are safe wrt implicit conversions as they take
      * the lvalue reference to the pointer, not just the pointer itself.
@@ -401,7 +354,7 @@ public:
           !std::is_same<T1, char>::value &&
           !std::is_same<T1, const char>::value
         >::type* = nullptr>
-    XFarPtr(T1 *&p) : FarPtr<T>(_MK_FAR(*p)) {}
+    XFarPtr(const T1 *&p) : FarPtr<T>(_MK_FAR(*p)) {}
     template<typename T1 = T,
         typename std::enable_if<
           std::is_same<T1, char>::value ||
@@ -417,68 +370,121 @@ public:
     XFarPtr(const char *&s) : FarPtr<T>(_MK_FAR_CS(s)) {}
     template<typename T1 = T, int N,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
-    XFarPtr(T1 (&p)[N]) : FarPtr<T>(_MK_FAR(p)) {}
+    XFarPtr(const T1 (&p)[N]) : FarPtr<T>(_MK_FAR(p)) {}
 };
 
 #define _MK_F(f, s) ({ ___assert(s.seg || s.off); (f)s; })
 
-/* These SymWrp are tricky, and are needed only because we
- * can't provide 'operator.':
- * https://isocpp.org/blog/2016/02/a-bit-of-background-for-the-operator-dot-proposal-bjarne-stroustrup
- * Consider the following code (1):
- * void FAR *f = &fp[idx];
- * In this case & should create "void FAR *" from ref, not just "void *".
- * Wrapper helps with this.
- * And some other code (2) does this:
- * int a = fp[idx].a_memb;
- * in which case we should better have no wrapper.
- * Getting both cases to work together is challenging.
- * Note that the simplest solution "operator T &()" for case 2
- * currently doesn't work, but it may work in the future:
- * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0352r1.pdf
- * But I don't think waiting for this document to materialize in
- * gcc/g++ is a good idea, as it is not even a part of the upcoming C++20.
- * So what I do is a public inheritance of T. This kind of works,
- * but puts an additional restrictions on the wrapper, namely, that
- * it should be a POD, it should not add any data members and it should
- * be non-copyable.
- * Fortunately the POD requirement is satisfied with 'ctor = default'
- * trick, and non-copyable is simple, but having no data members means
- * I can't easily retrieve the far ptr for case 1.
- * So the only solution I can come up with, is to put the static
- * map somewhere that will allow to look up the "lost" far pointers.
- * Thus farhlp.cpp
- */
-template<typename T, const int *st>
+template<typename T>
 class SymWrp : public T {
+    FarPtr<T> fptr;
+    T backup;
+    /* Magic is needed to check in a parent lookup if the wrapper
+     * was actually emitted. It is checked in get_far() method.
+     */
+    static constexpr const char magic_val[] = "voodoo magic 123";
+    char magic[sizeof(magic_val)];
+
+    void copy_mods(T *dest, T *src, T *ref) {
+        char *d = (char *)dest;
+        const char *s = (const char *)src;
+        const char *r = (const char *)ref;
+        size_t size = sizeof(T);
+        while (size--) {
+            if (*s != *r)
+                *d = *s;
+            s++;
+            d++;
+            r++;
+        }
+    }
+
+    template <typename T1 = T,
+        typename std::enable_if<!_C(T1)>::type* = nullptr>
+    void dtor() {
+        check_magic();
+        /* get_ptr() doesn't throw */
+        if (fptr.get_ptr())
+            copy_mods((T1 *)resolve_segoff(fptr.get_far()), this, &backup);
+    }
+    template <typename T1 = T,
+        typename std::enable_if<_C(T1)>::type* = nullptr>
+    void dtor() { check_magic(); }
+
+    bool check_magic() const {
+        bool ok = std::strcmp(magic, magic_val) == 0;
+        if (!ok)
+            fdloudprintf("magic bytes corrupted\n");
+        return ok;
+    }
 public:
-    SymWrp() = default;
+    SymWrp(far_s f, bool nonnull = false) :
+            fptr(f), backup(*(T *)resolve_segoff(f)) {
+        ___assert(f.seg || f.off || nonnull);
+        *(_RC(T) *)this = backup;
+        std::strcpy(magic, magic_val);
+    }
+    ~SymWrp() { dtor(); }
     SymWrp(const SymWrp&) = delete;
-    SymWrp<T, st>& operator =(T& f) { *(T *)this = f; return *this; }
-    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
-            lookup_far(st, this)); }
-    far_t get_far() const { return lookup_far(st, this); }
+    SymWrp(SymWrp&& s) : fptr(s.fptr), backup(s.backup) {
+        std::strcpy(magic, s.magic);
+        ___assert(check_magic());
+        *(T *)this = *(T *)&s;
+        s.clear();
+    }
+    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
+    SymWrp<T>& operator =(const SymWrp<T>& f) {
+        *(T *)this = f;
+        return *this;
+    }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, fptr.get_far()); }
+    far_t get_far() const { ___assert(check_magic()); return fptr.get_far(); }
+    T& get_sym() { return *this; }
+    void clear() { fptr = NULL; }
 };
 
-template<typename T, const int *st>
+template<typename T>
 class SymWrp2 {
     /* remove const or default ctor will be deleted */
     _RC(T) sym;
+    FarPtr<T> fptr;
+    T backup;
 
+    template <typename T1 = T,
+        typename std::enable_if<!_C(T1)>::type* = nullptr>
+    void dtor() {
+        if (fptr.get_ptr() && sym != backup)
+            *(decltype(sym) *)resolve_segoff(fptr.get_far()) = sym;
+    }
+    template <typename T1 = T,
+        typename std::enable_if<_C(T1)>::type* = nullptr>
+    void dtor() {}
 public:
-    SymWrp2() = default;
+    SymWrp2(far_s f, bool nonnull = false) :
+            sym(*(T *)resolve_segoff(f)), fptr(f), backup(sym) {
+        ___assert(f.seg || f.off || nonnull);
+    }
+    ~SymWrp2() { dtor(); }
     SymWrp2(const SymWrp2&) = delete;
-    SymWrp2<T, st>& operator =(const T& f) { sym = f; return *this; }
-    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>,
-            lookup_far(st, this)); }
+    SymWrp2(SymWrp2&& s) : sym(s.sym), fptr(s.fptr), backup(s.backup) {
+        s.clear();
+    }
+    SymWrp2<T>& operator =(const T& f) { sym = f; return *this; }
+    SymWrp2<T>& operator =(const SymWrp2<T>& f) {
+        sym = f.sym;
+        return *this;
+    }
+    FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, fptr.get_far()); }
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
         typename std::enable_if<_P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
-        return _MK_F(FarPtr<const void>, lookup_far(st, this));
+        return _MK_F(FarPtr<const void>, fptr.get_far());
     }
+    T& get_sym() { return sym; }
+    void clear() { fptr = NULL; }
 };
 
 template<typename T>
@@ -486,14 +492,11 @@ class AsmRef {
     FarPtr<T> *sym;
 
 public:
-    using wrp_type_m = SymWrp<T, memb_store>;
-    using wrp_type_mp = wrp_type_m*;
+    using wrp_type_m = SymWrp<T>;
+    using wrp_type_mp = std::unique_ptr<wrp_type_m>;
     AsmRef(FarPtr<T> *s) : sym(s) {}
     wrp_type_mp operator ->() {
-        /* TODO: move store to SymWrp ctor. Currently impossible
-         * because SymWrp needs to be trivially-constructible. */
-        store_far(ARROW_STORE, sym->get_far());
-        return wrp_type_mp(new(sym->get_buf()) wrp_type_m);
+        return wrp_type_mp(new wrp_type_m(sym->get_far()));
     }
     operator FarPtr<T> () { return *sym; }
     template <typename T1 = T,
@@ -508,8 +511,9 @@ class AsmSym {
     FarPtr<T> sym;
 
 public:
-    using sym_type = typename WrpType<T>::ref_type;
+    using sym_type = typename WrpTypeS<T>::type;
     sym_type get_sym() { return sym.get_wrp(); }
+    T& get_symref() { return sym.get_symref(); }
     AsmRef<T> get_addr() { return AsmRef<T>(&sym); }
 
     /* everyone with get_ref() method should have no copy ctor */
@@ -582,7 +586,7 @@ class ArSymBase {
 protected:
     FarPtrBase<T> sym;
 
-    using wrp_type = typename WrpType<T>::type;
+    using wrp_type = WrpType<T>;
 public:
     wrp_type& operator [](int idx) {
         ___assert(!max_len || idx < max_len);
@@ -596,7 +600,7 @@ template<typename T, typename P, auto M, int O = 0>
 class MembBase {
 protected:
     FarPtr<T> lookup_sym() const {
-        using wrp_type = typename WrpTypeS<P, memb_store>::type;
+        using wrp_type = typename WrpTypeS<P>::type;
         FarPtr<T> fp;
         constexpr int off = M() + O;
         /* find parent first */
@@ -608,11 +612,12 @@ protected:
     }
 };
 
-template<typename T, int max_len, typename P, auto M>
+template<typename T, int max_len, typename P, auto M, bool V = false>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
+    static_assert(max_len > 0, "0-length array");
 
-    using wrp_type = typename WrpTypeS<T, arr_store>::type;
+    using wrp_type = typename WrpTypeS<T>::type;
 public:
     using type = T;
     static constexpr decltype(max_len) len = max_len;
@@ -636,8 +641,8 @@ public:
     far_s get_far() const { return this->lookup_sym().get_far(); }
     T *get_ptr() { return sym; }
 
-    wrp_type& operator [](int idx) {
-        ___assert(!max_len || idx < max_len);
+    wrp_type operator [](int idx) {
+        ___assert(V || idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }
@@ -695,22 +700,16 @@ public:
 
 template<typename T, typename P, auto M, int O = 0>
 class SymMemb : public T, public MembBase<T, P, M, O> {
-    template<const int *st>
-    using wrp_type = typename WrpTypeS<T, st>::type;
 public:
-    using wrp_type_s = wrp_type<sym_store>;
+    using wrp_type_s = SymWrp<T>;
     SymMemb() = default;
-    SymMemb(const SymMemb&) = delete;
     T& operator =(const T& f) { *(T *)this = f; return *this; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
     /* This dot_barrier is needed because operator dot can't save
      * the lhs fptr. We add manual fixups whereever it crashes... */
-    wrp_type_s& dot_barrier() const {
+    wrp_type_s dot_barrier() const {
         FarPtr<T> sym = this->lookup_sym();
-        /* TODO: move store to SymWrp ctor. Currently impossible
-         * because SymWrp needs to be trivially-constructible. */
-        store_far(SYM_STORE, sym.get_far());
-        return *new(sym.get_buf()) wrp_type_s;
+        return wrp_type_s(sym.get_far());
     }
 } NONPOD_PACKED;
 
@@ -720,7 +719,7 @@ class DotBarrierWrap {
 public:
     template<typename T0, typename T1, auto M, int O,
         typename TN = SymMemb<T0, T1, M, O> >
-    static constexpr typename TN::wrp_type_s&
+    static constexpr typename TN::wrp_type_s
             dot_barrier(SymMemb<T0, T1, M, O>& s) {
         return s.dot_barrier();
     }
@@ -734,7 +733,6 @@ class SymMembT : public MembBase<T, P, M, O> {
 
 public:
     SymMembT() = default;
-    SymMembT(const SymMembT&) = delete;
     T& operator =(const T& f) { sym = f; return sym; }
     FarPtr<T> operator &() const { return this->lookup_sym(); }
     operator T &() { return sym; }
@@ -759,6 +757,8 @@ public:
 #define __ASMCALL(f) AsmCSym f
 #define __ASYM(x) __##x.get_sym()
 #define __ASYM_L(x) __##x.get_sym()
+#define __ASYM2(x) __##x.get_symref()
+#define __ASYM_L2(x) __##x.get_symref()
 #define ASMREF(t) AsmRef<t>
 #if CLANG_VER < 14
 #define DUMMY_MARK(p, n) \
@@ -771,6 +771,9 @@ public:
 #define AR_MEMB(p, t, n, l) \
     DUMMY_MARK(p, n); \
     ArMemb<t, l, p, OFF_M(p, n)> n
+#define AR_MEMB_V(p, t, n, l) \
+    DUMMY_MARK(p, n); \
+    ArMemb<t, l, p, OFF_M(p, n), true> n
 #define SYM_MEMB(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMemb<t, p, OFF_M(p, n)> n
@@ -799,6 +802,7 @@ public:
 #define GET_PTR(f) (f).get_ptr()
 #define ADJUST_FAR(f) (f).adjust_far()
 #define _DOS_FP(p) DotBarrierWrap::dot_barrier(p)
+#define GET_SYM(w) (w).get_sym()
 
 #undef NULL
 #define NULL           nullptr

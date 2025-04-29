@@ -68,6 +68,14 @@ gad = custom_target('glob_asmdefs.h',
             'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
   capture: true)
 
+gad2 = custom_target('glob_asmdefs2.h',
+  output: 'glob_asmdefs2.h',
+  input: gad,
+  command: [
+    find_program('sed'),
+    '-e', 's/^#define /#define ____/', '-e', 's/(/2(/', '@INPUT@' ],
+  capture: true)
+
 GEN_TMP = { '1':'thunk_calls.tmp', '2':'thunk_asms.tmp' }
 GEN_H = { 'plt_asmc.h':'4', 'plt_asmp.h':'5' }
 
@@ -119,7 +127,7 @@ ta = custom_target('thunk_asms.h',
   feed: true,
   capture: true)
 
-FDPP_CFILES = ['smalloc.c', 'farhlp_sta.c']
+FDPP_CFILES = ['smalloc.c']
 ccgen = generator(find_program('echo'),
   arguments: ['#include', '"@BASENAME@.c"'],
   output: '@BASENAME@.cc',
@@ -140,7 +148,7 @@ endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
   version: FVER,
-  sources: [gad, pac, pap, tc, ta],
+  sources: [gad, gad2, pac, pap, tc, ta],
   cpp_args: ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
       '-fno-threadsafe-statics',
       '-Werror=packed-non-pod', '-Wno-unknown-warning-option',

@@ -402,7 +402,7 @@ struct nlsExtCntryInfo {
                                    0: 12 hours (append AM/PM)
                                    1: 24 houres
                                  */
-    VOID(FAR * upCaseFct) (VOID);       /* far call to a function upcasing the
+  __DOSFAR(VOID) upCaseFct;       /* far call to a function upcasing the
                                            character in register AL */
   char dataSep[2];              /* ASCIZ of separator in data records */
 } PACKED;
@@ -430,8 +430,8 @@ struct nlsPackage {             /* the contents of one chain item of the
   UWORD yeschar;                /* yes / no character DOS-65-23 */
   UWORD nochar;
   UWORD numSubfct;           /* number of supported sub-functions */
-  AR_MEMB(nlsPackage, nlsPointer, nlsPointers, 0);     /* grows dynamically */
-};
+  AR_MEMB_V(nlsPackage, nlsPointer, nlsPointers, 1);     /* grows dynamically */
+} PACKED;
 
 struct nlsDBCS {                /* The internal structure is unknown to me */
   UWORD numEntries;
@@ -447,7 +447,7 @@ struct nlsCharTbl {
                                    If <= 0x80, the first element of
                                    the table corresponse to character 0x80 */
   AR_MEMB(nlsCharTbl, unsigned char, tbl, 1);         /* grows dynamically */
-};
+} PACKED;
 #define nlsChBuf(len)		struct nlsCharTbl##len {		\
 			UWORD numEntries;							\
 			unsigned char tbl[len];						\

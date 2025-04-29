@@ -44,7 +44,8 @@ additionally:
 
 enum { HEAP_FAR, HEAP_NEAR, HEAP_LOW, HEAP_MAX };
 struct HeapS {
-    struct DynS FAR *Dynp;
+    struct DynS Dynp_;
+    #define Dynp Dynp_.Buffer
     UDWORD Allocated;
     UDWORD MaxSize;
     void (*AllocHook)(struct HeapS *, unsigned);
@@ -55,7 +56,7 @@ STATIC struct HeapS Heap[HEAPS];
 
 static void BasicAllocHook(struct HeapS *h, unsigned size)
 {
-  void FAR *now = (void FAR *)&h->Dynp->Buffer[h->Allocated];
+  void FAR *now = (void FAR *)&h->Dynp[h->Allocated];
   fmemset(now, 0, size);
 }
 
@@ -68,7 +69,7 @@ static void HmaAllocHook(struct HeapS *h, unsigned size)
 
 void DynInit(void)
 {
-  void FAR *dyn = MK_FP(FP_SEG(LoL), FP_OFF(&Dyn));
+  void FAR *dyn = MK_FP(FP_SEG(LoL), FP_OFF(Dyn));
   void FAR *hma = MK_FP(0xffff, HMAFree);
   int i;
 
@@ -137,7 +138,7 @@ static far_t DoAlloc(const char *what, unsigned num, unsigned size, int heap)
                Allocated + total));
 #endif
 
-  now = (void FAR *)&h->Dynp->Buffer[h->Allocated];
+  now = (void FAR *)&h->Dynp[h->Allocated];
 
   h->AllocHook(h, total);
   h->Allocated += total;
@@ -164,9 +165,9 @@ void FAR *DynLast(void)
 {
   struct HeapS *h = HeapMap[HEAP_LOW];
   DebugPrintf(("dynamic data end at %P\n",
-               GET_FP32(h->Dynp->Buffer + h->Allocated)));
+               GET_FP32(h->Dynp + h->Allocated)));
 
-  return h->Dynp->Buffer + h->Allocated;
+  return h->Dynp + h->Allocated;
 }
 
 seg DynLastSeg(void)

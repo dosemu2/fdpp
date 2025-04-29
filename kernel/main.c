@@ -99,7 +99,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   /* try to split data segment out of our TINY model */
   ___assert(!(FP_OFF(DataStart) & 0xf));
   relo = FP_OFF(DataStart) >> 4;
-  RelocSplitSeg(FP_SEG(&Dyn), FP_SEG(&Dyn) + relo, FP_OFF(&Dyn), 0);
+  RelocSplitSeg(FP_SEG(Dyn), FP_SEG(Dyn) + relo, FP_OFF(Dyn), 0);
   RelocSplitSeg(FP_SEG(swap_indos), FP_SEG(swap_indos) + relo,
       FP_OFF(swap_indos), 0);
   /* DataStart should be split after others */
@@ -111,10 +111,11 @@ VOID ASMCFUNC FreeDOSmain(void)
   BootParamVer = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_VER_OFFSET);
   if (*BootParamVer != BPRM_VER) {
     if (*BootParamVer < BPRM_MIN_VER)
-      fpanic("Wrong boot param version %i, need %i", *BootParamVer,
+      fpanic("Wrong boot param version %i, need %i", GET_SYM(*BootParamVer),
           BPRM_VER);
     else
-      fdloudprintf("Wrong boot param version %i, need %i\n", *BootParamVer,
+      fdloudprintf("Wrong boot param version %i, need %i\n",
+          GET_SYM(*BootParamVer),
           BPRM_VER);
   }
   b = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_OFFSET);
@@ -328,7 +329,7 @@ STATIC void setup_int_vectors(void)
   if (DOS_PSP >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
     plvec = MK_FP(0x70, 0x100);
     for (i = 0; i < sizeof(intvec_table); i++) {
-      plvec[i].intno = intvec_table[i];
+      GET_SYM(plvec[i]).intno = intvec_table[i];
       plvec[i].isv = getvec(intvec_table[i]);
     }
   } else {
@@ -618,7 +619,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
     {
       LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
-      LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
+      GET_SYM(LoL->_CDSp[LoL->_nblkdev]).cdsFlags = CDSPHYSDRV;
     }
     ++dpb;
     ++LoL->_nblkdev;

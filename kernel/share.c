@@ -129,7 +129,7 @@ static lock_t lock_table[lock_table_size];
 		/* ------------- HOOK ------------- */
 void int2F_10_handler(iregs FAR *iregs_p)
 {
-#define iregs (*iregs_p)
+#define iregs (*GET_PTR(iregs_p))
 #define ax a.x
 #define bx b.x
 #define cx c.x
