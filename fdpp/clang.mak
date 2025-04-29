@@ -91,7 +91,10 @@ ifeq ($(USE_ASAN),1)
 DBGFLAGS += -fsanitize=address
 endif
 ifeq ($(USE_UBSAN),1)
-DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment,function,vptr
+DBGFLAGS += -fsanitize=undefined -fno-sanitize=alignment,vptr
+ifeq ($(GCC_VER),)
+DBGFLAGS += -fno-sanitize=function
+endif
 endif
 
 CXXFLAGS += $(TARGETOPT) $(CPPFLAGS) $(WFLAGS) $(DBGFLAGS) $(TARGETOPT_XTRA)
