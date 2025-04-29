@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -82,7 +83,7 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
         if (GELF_R_TYPE(rel.r_info) != R_386_16)
             continue;
         if (GELF_R_SYM(rel.r_info) >= st_count) {
-            fprintf(stderr, "bad reloc %lx %i %li off=%lx\n",
+            fprintf(stderr, "bad reloc %"PRIx64" %i %"PRIi64" off=%"PRIx64"\n",
                 GELF_R_TYPE(rel.r_info), st_count,
                 GELF_R_SYM(rel.r_info), rel.r_offset);
             return;
