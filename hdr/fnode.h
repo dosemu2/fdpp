@@ -64,4 +64,4 @@ struct lfn_inode {
   UWORD l_diroff;               /* Current directory entry offset */
 };
 
-typedef struct lfn_inode FAR * lfn_inode_ptr;
+typedef __FAR(lfn_inode) lfn_inode_ptr;

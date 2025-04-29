@@ -402,7 +402,7 @@ struct nlsExtCntryInfo {
                                    0: 12 hours (append AM/PM)
                                    1: 24 houres
                                  */
-    VOID(FAR * upCaseFct) (VOID);       /* far call to a function upcasing the
+  __DOSFAR(VOID) upCaseFct;       /* far call to a function upcasing the
                                            character in register AL */
   char dataSep[2];              /* ASCIZ of separator in data records */
 } PACKED;
