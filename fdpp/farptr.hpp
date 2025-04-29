@@ -332,7 +332,7 @@ public:
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
-template<typename, int, typename P, auto> class ArMemb;
+template<typename, int, typename P, auto, bool> class ArMemb;
 
 template<typename T>
 class XFarPtr : public FarPtr<T>
@@ -343,8 +343,8 @@ public:
     XFarPtr() = delete;
     XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
-    template<typename T1 = T, int max_len, typename P, auto M>
-    XFarPtr(const ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p.get_far()) {}
+    template<typename T1 = T, int max_len, typename P, auto M, bool V>
+    XFarPtr(const ArMemb<T1, max_len, P, M, V> &p) : FarPtr<T>(p.get_far()) {}
 
     /* The below ctors are safe wrt implicit conversions as they take
      * the lvalue reference to the pointer, not just the pointer itself.
@@ -612,9 +612,10 @@ protected:
     }
 };
 
-template<typename T, int max_len, typename P, auto M>
+template<typename T, int max_len, typename P, auto M, bool V = false>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
+    static_assert(max_len > 0, "0-length array");
 
     using wrp_type = typename WrpTypeS<T>::type;
 public:
@@ -641,7 +642,7 @@ public:
     T *get_ptr() { return sym; }
 
     wrp_type operator [](int idx) {
-        ___assert(!max_len || idx < max_len);
+        ___assert(V || idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }
@@ -770,6 +771,9 @@ public:
 #define AR_MEMB(p, t, n, l) \
     DUMMY_MARK(p, n); \
     ArMemb<t, l, p, OFF_M(p, n)> n
+#define AR_MEMB_V(p, t, n, l) \
+    DUMMY_MARK(p, n); \
+    ArMemb<t, l, p, OFF_M(p, n), true> n
 #define SYM_MEMB(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMemb<t, p, OFF_M(p, n)> n
