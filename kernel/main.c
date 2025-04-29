@@ -99,7 +99,7 @@ VOID ASMCFUNC FreeDOSmain(void)
   /* try to split data segment out of our TINY model */
   ___assert(!(FP_OFF(DataStart) & 0xf));
   relo = FP_OFF(DataStart) >> 4;
-  RelocSplitSeg(FP_SEG(&Dyn), FP_SEG(&Dyn) + relo, FP_OFF(&Dyn), 0);
+  RelocSplitSeg(FP_SEG(Dyn), FP_SEG(Dyn) + relo, FP_OFF(Dyn), 0);
   RelocSplitSeg(FP_SEG(swap_indos), FP_SEG(swap_indos) + relo,
       FP_OFF(swap_indos), 0);
   /* DataStart should be split after others */

@@ -754,7 +754,7 @@ STATIC void umb_init(void)
       if (umb_seg > umb_max)
         umb_max = umb_seg;
     }
-    if ((bprm.Flags & FDPP_FL_HEAP_HMA) && FP_SEG(&Dyn) > umb_max)
+    if ((bprm.Flags & FDPP_FL_HEAP_HMA) && FP_SEG(Dyn) > umb_max)
     {
       /* create UMB at unused heap */
       seg umb_prev = umb_max;
