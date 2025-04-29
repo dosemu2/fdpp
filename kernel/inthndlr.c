@@ -2093,20 +2093,20 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
           break;
         }
         _sprintf(GET_PTR(TempCDS.cdsCurrentPath), "%c:\\", r.callerARG1 & 0xff);
-        ____TempCDS.cdsBackslashOffset = 2;
+        TempCDS.cdsBackslashOffset = 2;
         if (cdsp->cdsFlags)
         {
           TempCDS.cdsDpb = cdsp->cdsDpb;
-          ____TempCDS.cdsFlags = CDSPHYSDRV;    // don't inherit CDS flags
+          TempCDS.cdsFlags = CDSPHYSDRV;    // don't inherit CDS flags
         }
         else
         {
           TempCDS.cdsDpb = NULL;
-          ____TempCDS.cdsFlags = 0;
+          TempCDS.cdsFlags = 0;
         }
-        ____TempCDS.cdsStrtClst = 0xffff;
-        ____TempCDS.cdsParam = 0xffff;
-        ____TempCDS.cdsStoreUData = 0xffff;
+        TempCDS.cdsStrtClst = 0xffff;
+        TempCDS.cdsParam = 0xffff;
+        TempCDS.cdsStoreUData = 0xffff;
         r.CX = sizeof(struct cds);
         r.ES = FP_SEG(&TempCDS);
         r.DI = FP_OFF(&TempCDS);

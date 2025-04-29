@@ -97,10 +97,10 @@ int DosSetTime(const struct dostime *dt)
   /* for ClkRecord.clkDays */
   ExecuteClockDriverRequest(C_INPUT);
 
-  ____ClkRecord.clkHours = dt->hour;
-  ____ClkRecord.clkMinutes = dt->minute;
-  ____ClkRecord.clkSeconds = dt->second;
-  ____ClkRecord.clkHundredths = dt->hundredth;
+  ClkRecord.clkHours = dt->hour;
+  ClkRecord.clkMinutes = dt->minute;
+  ClkRecord.clkSeconds = dt->second;
+  ClkRecord.clkHundredths = dt->hundredth;
 
   ExecuteClockDriverRequest(C_OUTPUT);
 
@@ -165,7 +165,7 @@ int DosSetDate(const struct dosdate *dd)
 
   ExecuteClockDriverRequest(C_INPUT);
 
-  ____ClkRecord.clkDays = DaysFromYearMonthDay(Year, Month, DayOfMonth);
+  ClkRecord.clkDays = DaysFromYearMonthDay(Year, Month, DayOfMonth);
 
   ExecuteClockDriverRequest(C_OUTPUT);
 

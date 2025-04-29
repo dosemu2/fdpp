@@ -393,40 +393,40 @@ UWORD dskxfer(COUNT dsk, ULONG blkno, VOID FAR * buf, UWORD numblocks,
 
   for (;;)
   {
-    ____IoReqHdr.r_length = sizeof(request);
-    ____IoReqHdr.r_unit = dpbp->dpb_subunit;
+    IoReqHdr.r_length = sizeof(request);
+    IoReqHdr.r_unit = dpbp->dpb_subunit;
 
     switch (mode)
     {
       case DSKWRITE:
         if (verify_ena)
         {
-          ____IoReqHdr.r_command = C_OUTVFY;
+          IoReqHdr.r_command = C_OUTVFY;
           break;
         }
         /* else fall through */
       case DSKWRITEINT26:
-        ____IoReqHdr.r_command = C_OUTPUT;
+        IoReqHdr.r_command = C_OUTPUT;
         break;
 
       case DSKREADINT25:
       case DSKREAD:
-        ____IoReqHdr.r_command = C_INPUT;
+        IoReqHdr.r_command = C_INPUT;
         break;
       default:
         return 0x0100;          /* illegal command */
     }
 
-    ____IoReqHdr.r_status = 0;
-    ____IoReqHdr.r_meddesc = dpbp->dpb_mdb;
-    ____IoReqHdr.r_count = numblocks;
+    IoReqHdr.r_status = 0;
+    IoReqHdr.r_meddesc = dpbp->dpb_mdb;
+    IoReqHdr.r_count = numblocks;
     if ((dpbp->dpb_device->dh_attr & ATTR_HUGE) || blkno >= MAXSHORT)
     {
-      ____IoReqHdr.r_start = HUGECOUNT;
-      ____IoReqHdr.r_huge = blkno;
+      IoReqHdr.r_start = HUGECOUNT;
+      IoReqHdr.r_huge = blkno;
     }
     else
-      ____IoReqHdr.r_start = (UWORD)blkno;
+      IoReqHdr.r_start = (UWORD)blkno;
     /*
      * Some drivers normalise transfer address so HMA transfers are disastrous!
      * Then transfer block through xferbuf (DiskTransferBuffer doesn't work!)

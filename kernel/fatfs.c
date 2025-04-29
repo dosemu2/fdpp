@@ -1714,11 +1714,11 @@ ckok:;
 STATIC int rqblockio(unsigned char command, struct dpb FAR * dpbp)
 {
  retry:
-  ____MediaReqHdr.r_length = sizeof(request);
-  ____MediaReqHdr.r_unit = dpbp->dpb_subunit;
-  ____MediaReqHdr.r_command = command;
-  ____MediaReqHdr.r_mcmdesc = dpbp->dpb_mdb;
-  ____MediaReqHdr.r_status = 0;
+  MediaReqHdr.r_length = sizeof(request);
+  MediaReqHdr.r_unit = dpbp->dpb_subunit;
+  MediaReqHdr.r_command = command;
+  MediaReqHdr.r_mcmdesc = dpbp->dpb_mdb;
+  MediaReqHdr.r_status = 0;
 
   if (command == C_BLDBPB) /* help USBASPI.SYS & DI1000DD.SYS (TE) */
     MediaReqHdr.r_bpfat = DiskTransferBuffer;

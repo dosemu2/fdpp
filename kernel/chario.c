@@ -40,10 +40,10 @@ static BYTE *charioRcsId =
 
 STATIC int CharRequest(struct dhdr FAR *dev, unsigned command)
 {
-  ____CharReqHdr.r_command = command;
-  ____CharReqHdr.r_unit = 0;
-  ____CharReqHdr.r_status = 0;
-  ____CharReqHdr.r_length = sizeof(request);
+  CharReqHdr.r_command = command;
+  CharReqHdr.r_unit = 0;
+  CharReqHdr.r_status = 0;
+  CharReqHdr.r_length = sizeof(request);
   execrh(&CharReqHdr, dev);
   if (CharReqHdr.r_status & S_ERROR)
   {
@@ -54,7 +54,7 @@ STATIC int CharRequest(struct dhdr FAR *dev, unsigned command)
       case FAIL:
         return DE_INVLDACC;
       case CONTINUE:
-        ____CharReqHdr.r_count = 0;
+        CharReqHdr.r_count = 0;
         return 0;
       case RETRY:
         return 1;
@@ -70,7 +70,7 @@ long BinaryCharIO(struct dhdr FAR *pdev, size_t n, void FAR * bp,
   int err;
   do
   {
-    ____CharReqHdr.r_count = n;
+    CharReqHdr.r_count = n;
     CharReqHdr.r_trans = bp;
     err = CharRequest(pdev, command);
   } while (err == 1);
@@ -538,7 +538,7 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
   /* if local_buffer overflows into the CON default buffer we
      must invalidate it */
   if (count > LINEBUFSIZECON)
-    ____kb_buf.kb_size = 0;
+    kb_buf.kb_size = 0;
   /* kb_count does not include the final CR */
   kp->kb_count = count - 1;
 }
@@ -558,8 +558,8 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
     /* can we reuse kb_buf or was it overwritten? */
     if (kb_buf.kb_size != LINEBUFSIZECON)
     {
-      ____kb_buf.kb_count = 0;
-      ____kb_buf.kb_size = LINEBUFSIZECON;
+      kb_buf.kb_count = 0;
+      kb_buf.kb_size = LINEBUFSIZECON;
     }
     do_read_line(sft_idx, (kbd0a FAR *)&kb_buf, check_break, dev_read_char);
     kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
