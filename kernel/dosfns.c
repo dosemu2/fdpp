@@ -239,7 +239,7 @@ DWORD DosReadSft(int sft_idx, size_t n, void FAR *bp)
 
 unsigned char read_char(int sft_in, BOOL check_break)
 {
-  unsigned char c;
+  unsigned char c = 0;
   DWORD rc = DosReadSftExt(sft_in, 1, MK_FAR_SCP(c), FALSE, check_break);
   return (rc == 1 ? c : 0);
 }
