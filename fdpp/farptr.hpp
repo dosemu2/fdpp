@@ -760,7 +760,7 @@ public:
 #define __ASYM2(x) __##x.get_symref()
 #define __ASYM_L2(x) __##x.get_symref()
 #define ASMREF(t) AsmRef<t>
-#if CLANG_VER < 14
+#if defined(__clang__) && CLANG_VER < 14
 #define DUMMY_MARK(p, n) \
     static constexpr int off_##n(void) { return offsetof(p, n); }
 #define OFF_M(p, n) p::off_##n

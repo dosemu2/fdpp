@@ -140,21 +140,27 @@ CPPFILES = ['objhlp.cpp', 'ctors.cpp', 'farhlp.cpp', 'objtrace.cpp']
 hdr = ['src', 'hdr', '.', rel_inc]
 incdir2 = include_directories(hdr)
 CLANG_VER = meson.get_compiler('cpp').version().split('.')[0]
+cxx_id = meson.get_compiler('cpp').get_id()
 if get_option('buildtype').startswith('debug')
   DEBUG_OPTS = ['-DFDPP_DEBUG', '-DEXTRA_DEBUG']
+  if cxx_id == 'clang'
+    DEBUG_OPTS += ['-fdebug-macro']
+  endif
 else
   DEBUG_OPTS = []
+endif
+CXX_ARGS = ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
+      '-fno-threadsafe-statics',
+      '-Wno-address-of-packed-member', DEBUG_OPTS]
+if cxx_id == 'clang'
+  CXX_ARGS += ['-Werror=packed-non-pod', '-Wno-c99-designator',
+      '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option']
 endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
   version: FVER,
   sources: [gad, gad2, pac, pap, tc, ta],
-  cpp_args: ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
-      '-fno-threadsafe-statics',
-      '-Wno-unknown-warning-option',
-      '-Wno-format-invalid-specifier', '-Wno-c99-designator',
-      '-Wno-address-of-packed-member', DEBUG_OPTS
-  ],
+  cpp_args: CXX_ARGS,
   link_args: ['-Wl,-Bsymbolic'],
   install: true,
   install_dir: get_option('libdir') / 'fdpp')
