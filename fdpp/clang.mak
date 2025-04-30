@@ -62,7 +62,7 @@ IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS += $(IFLAGS) -DFDPP
 WFLAGS := -Wall
 ifeq ($(GCC_VER),)
-WFLAGS += -Werror=packed-non-pod -Wno-unknown-warning-option
+WFLAGS += -Werror=packed-non-pod -Wno-unknown-warning-option -Wsign-compare
 ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
 endif

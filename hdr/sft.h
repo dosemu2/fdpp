@@ -75,7 +75,7 @@ typedef struct _sft {
   __DOSFAR(BYTE)sft_bshare;         /* 2b - backward link of file sharing sft    */
 #endif
   WORD sft_mach;                /* 2f - machine number - network apps        */
-  WORD sft_psp;                 /* 31 - owner psp                            */
+  UWORD sft_psp;                 /* 31 - owner psp                            */
   WORD sft_shroff;              /* 33 - Sharing offset                       */
   CLUSTER sft_cuclust;          /* 35 - File current cluster                 */
 #ifdef WITHFAT32

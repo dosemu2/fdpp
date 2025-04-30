@@ -48,10 +48,10 @@ STATIC void FcbNextRecord(fcb FAR * lpFcb);
 STATIC void FcbCalcRec(xfcb FAR * lpXfcb);
 STATIC const char FAR *_GetNameField(const char FAR * lpFileName,
                        char *lpDestField,
-                       COUNT nFieldSize, BOOL * pbWildCard);
+                       UCOUNT nFieldSize, BOOL * pbWildCard);
 STATIC const char FAR *GetNameField(const char FAR * lpFileName,
                        char FAR * lpDestField,
-                       COUNT nFieldSize, BOOL * pbWildCard);
+                       UCOUNT nFieldSize, BOOL * pbWildCard);
 
 #define TestCmnSeps(lpFileName) (*lpFileName && strchr(":;,=+ \t", *lpFileName) != NULL)
 #define TestFieldSeps(lpFileName) ((unsigned char)*lpFileName <= ' ' || strchr("/\\\"[]<>|.:;,=+\t", *lpFileName) != NULL)
@@ -181,7 +181,7 @@ const char FAR * ParseSkipWh(const char FAR * lpFileName)
 
 
 const char FAR * _GetNameField(const char FAR * lpFileName, char * lpDestField,
-                       COUNT nFieldSize, BOOL * pbWildCard)
+                       UCOUNT nFieldSize, BOOL * pbWildCard)
 {
   COUNT nIndex = 0;
   BYTE cFill = ' ';
@@ -213,7 +213,7 @@ const char FAR * _GetNameField(const char FAR * lpFileName, char * lpDestField,
 
 const char FAR * GetNameField(const char FAR * lpFileName,
                        char FAR * lpDestField,
-                       COUNT nFieldSize, BOOL * pbWildCard)
+                       UCOUNT nFieldSize, BOOL * pbWildCard)
 {
   BYTE buf[FNAME_SIZE + FEXT_SIZE];
   const char FAR *ret;

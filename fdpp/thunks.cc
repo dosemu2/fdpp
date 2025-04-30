@@ -491,7 +491,7 @@ void fddebug(const BYTE * s, ...)
 
 void RelocHook(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
 {
-    unsigned i;
+    int i;
     int reloc = 0;
     int miss = 0;
     uint8_t *start_p = (uint8_t *)so2lin(old_seg, offs);
@@ -562,7 +562,7 @@ void RelocSplitSeg(UWORD old_seg, UWORD new_seg, UWORD offs, UDWORD len)
 
 void PurgeHook(void *ptr, UDWORD len)
 {
-    unsigned i;
+    int i;
     int reloc = 0;
     int miss = 0;
     uint8_t *start_p = (uint8_t *)ptr;

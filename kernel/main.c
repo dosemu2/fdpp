@@ -324,7 +324,7 @@ STATIC void setup_int_vectors(void)
   struct vec *pvec;
   struct lowvec FAR *plvec;
   void FAR *old_vec;
-  int i;
+  unsigned int i;
 
   if (DOS_PSP >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
     plvec = MK_FP(0x70, 0x100);

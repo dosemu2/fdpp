@@ -169,14 +169,14 @@ static void free_file_table_entry(int fileno) {
 #define fnmatches(fn1, fn2) (strcmp(fn1, fn2) == 0)
 
 static WORD do_open_check(
-	int fileno,		/* file_table entry number */
+	UWORD fileno,		/* file_table entry number */
 	BOOL rdonly,
 	__FAR(struct dhdr) lpDevice,
 	UWORD ax)
 {
 	file_t *p;
 	file_t *fptr = &file_table[fileno];
-	int i, j, action = 0, foundexc;
+	unsigned int i, j, action = 0, foundexc;
 	unsigned char current_sharemode = fptr->sharemode;
 	unsigned char current_openmode = fptr->openmode;
 	open_action_exception_t *excptr;
@@ -262,7 +262,8 @@ WORD share_open_file
 	 UWORD ax)
 {
 
-	int i, fileno = -1;
+	unsigned int i;
+	int fileno = -1;
 	file_t *fptr;
 
 		/* Whack off unused bits in the share mode
