@@ -63,7 +63,7 @@ static void BasicAllocHook(struct HeapS *h, unsigned size)
 static void HmaAllocHook(struct HeapS *h, unsigned size)
 {
     UDWORD off = FP_OFF(h->Dynp) + h->Allocated;
-    ___assert(HMAFree == ((off + 0xf) & 0x1fff0));
+    ___assert(HMAFree == (LONG)((off + 0xf) & 0x1fff0));
     HMAFree = (off + size + 0xf) & 0x1fff0;
 }
 

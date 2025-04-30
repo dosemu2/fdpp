@@ -60,9 +60,9 @@ USE_UBSAN ?= 0
 
 IFLAGS = -iquote $(srcdir)/../hdr
 CPPFLAGS += $(IFLAGS) -DFDPP
-WFLAGS := -Wall
+WFLAGS := -Wall -Wsign-compare
 ifeq ($(GCC_VER),)
-WFLAGS += -Werror=packed-non-pod -Wno-unknown-warning-option -Wsign-compare
+WFLAGS += -Werror=packed-non-pod -Wno-unknown-warning-option
 ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
 endif
