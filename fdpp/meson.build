@@ -155,6 +155,8 @@ CXX_ARGS = ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
 if cxx_id == 'clang'
   CXX_ARGS += ['-Werror=packed-non-pod', '-Wno-c99-designator',
       '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option']
+else
+  CXX_ARGS += ['-Wno-format', '-Wno-format-extra-args']
 endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,

@@ -67,7 +67,7 @@ ifneq ($(CLANG_VER),16)
 WFLAGS += -Wpacked
 endif
 else
-WFLAGS += -Wno-attributes -Wno-format
+WFLAGS += -Wno-format -Wno-format-extra-args
 endif
 WFLAGS += -Wno-address-of-packed-member
 WCFLAGS = $(WFLAGS)
