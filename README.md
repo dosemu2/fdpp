@@ -5,7 +5,7 @@ fdpp is a 64-bit DOS core.<br/>
 It is based on a FreeDOS kernel ported to modern C++.<br/>
 In short, FreeDOS plus-plus.
 
-Can be compiled with clang (not gcc!) and booted under
+Can be compiled with clang (or experimentally with gcc) and booted under
 [dosemu2](https://github.com/dosemu2/dosemu2).
 
 ## building and installing
@@ -85,9 +85,7 @@ fdpp can work in any environment with STL/C++ runtime & minimal
 posix support.
 The build requirements are in line with today's posix-compatible
 environments: you'll need the full stack of tools like bison,
-autoconf, sed etc. Additionally you'll need a clang tool-chain
-as clang++ is the only compiler to build fdpp with. That said,
-building fdpp under itself may be a challenge. :)
+autoconf, sed etc.
 
 ## related projects
 ### FreeDOS
