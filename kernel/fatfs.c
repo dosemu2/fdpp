@@ -160,7 +160,8 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
     p = strrchr(path, '\\');
     if (!p)
       return DE_ACCESS;
-    strncpy(rpath + 3, p + 1, sizeof(rpath) - 3);
+    strncpy(rpath + 3, p + 1, 12);
+    rpath[15] = '\0';
 
     /* Create our new label */
     ret = alloc_find_free(fnp, rpath);
