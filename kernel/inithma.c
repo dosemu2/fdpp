@@ -38,7 +38,7 @@ static BYTE *RcsId =
 
 BSS(BYTE, DosLoadedInHMA, FALSE);  /* set to TRUE if loaded HIGH          */
 BSS(BYTE, HMAclaimed, 0);          /* set to TRUE if claimed from HIMEM   */
-BSS(UDWORD, HMAFree, 0x10);           /* first byte in HMA not yet used      */
+BSS(LONG, HMAFree, 0x10);           /* first byte in HMA not yet used      */
 
 #ifdef DEBUG
 #ifdef __TURBOC__
@@ -234,7 +234,7 @@ void MoveKernel(UWORD NewKernelSegment)
 
   if (NewKernelSegment == 0xffff)
   {
-    UDWORD new_offs;
+    DWORD new_offs;
     HMASource += HMAOFFSET;
     HMADest += HMAOFFSET;
     len -= HMAOFFSET;
