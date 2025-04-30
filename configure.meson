@@ -10,7 +10,6 @@ fi
 TOP=$(dirname "$0")
 
 meson setup \
-  --native-file $TOP/fdpp/toolchain.ini \
   --cross-file $TOP/fdpp/kernel/toolchain.ini \
   $* $BLD $TOP
 [ "$?" = "0" ] || exit 1
