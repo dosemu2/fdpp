@@ -65,7 +65,7 @@ static BYTE *Globals_hRcsId =
 #include "memtype.h"
 #include "glob_fd.h"
 #include "debug.h"
-#ifdef FDPP
+#if defined(FDPP) && defined(__clang__)
 #include "hackrefs.h"
 #endif
 

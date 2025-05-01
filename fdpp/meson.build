@@ -149,7 +149,7 @@ if cxx_id == 'clang'
       '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option']
 else
   CXX_ARGS += ['-Wno-format', '-Wno-format-extra-args',
-      '-Wno-error=format-security']
+      '-Wno-error=format-security', '-fpermissive']
 endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,

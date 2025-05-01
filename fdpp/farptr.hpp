@@ -768,12 +768,17 @@ public:
 #define SYM_MEMB_T(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMembT<t, p, OFF_M(p, n)> n
+#ifdef __clang__
 #define REF_MEMB(t, n) \
     t ___##n; \
     t& _##n() { return ___##n; }
 #define RARR_MEMB(t, n, l) \
     t ___##n[l]; \
     t *_##n() { return ___##n; }
+#else
+#define REF_MEMB(t, n) t n
+#define RARR_MEMB(t, n, l) t n[l]
+#endif
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
