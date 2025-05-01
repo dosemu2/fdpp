@@ -862,27 +862,27 @@ dispatch:
       /* Get/Set Country Info                                         */
     case 0x38:
       {
-        UWORD _cntry = lr.AL;
+        UWORD cntry = lr.AL;
 
-        if (_cntry == 0xff)
-          _cntry = lr.BX;
+        if (cntry == 0xff)
+          cntry = lr.BX;
 
         if (0xffff == lr.DX)
         {
           /* Set Country Code */
-          rc = DosSetCountry(_cntry);
+          rc = DosSetCountry(cntry);
         }
         else
         {
-          if (_cntry == 0)
-            _cntry--;
+          if (cntry == 0)
+            cntry--;
           /* Get Country Information */
-          rc = DosGetCountryInformation(_cntry, FP_DS_DX);
+          rc = DosGetCountryInformation(cntry, FP_DS_DX);
           if (rc >= SUCCESS)
           {
-            if (_cntry == (UWORD) - 1)
-              _cntry = nlsInfo.actPkg->cntry;
-            lr.AX = lr.BX = _cntry;
+            if (cntry == (UWORD) - 1)
+              cntry = nlsInfo.actPkg->cntry;
+            lr.AX = lr.BX = cntry;
           }
         }
         goto short_check;
@@ -2093,20 +2093,20 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
           break;
         }
         _sprintf(GET_PTR(TempCDS.cdsCurrentPath), "%c:\\", r.callerARG1 & 0xff);
-        TempCDS.cdsBackslashOffset = 2;
+        ____R(TempCDS.cdsBackslashOffset) = 2;
         if (cdsp->cdsFlags)
         {
           TempCDS.cdsDpb = cdsp->cdsDpb;
-          TempCDS.cdsFlags = CDSPHYSDRV;    // don't inherit CDS flags
+          ____R(TempCDS.cdsFlags) = CDSPHYSDRV;    // don't inherit CDS flags
         }
         else
         {
           TempCDS.cdsDpb = NULL;
-          TempCDS.cdsFlags = 0;
+          ____R(TempCDS.cdsFlags) = 0;
         }
-        TempCDS.cdsStrtClst = 0xffff;
-        TempCDS.cdsParam = 0xffff;
-        TempCDS.cdsStoreUData = 0xffff;
+        ____R(TempCDS.cdsStrtClst) = 0xffff;
+        ____R(TempCDS.cdsParam) = 0xffff;
+        ____R(TempCDS.cdsStoreUData) = 0xffff;
         r.CX = sizeof(struct cds);
         r.ES = FP_SEG(&TempCDS);
         r.DI = FP_OFF(&TempCDS);

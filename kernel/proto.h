@@ -281,13 +281,13 @@ VOID DosUpString(__FAR(char) str);
 VOID DosUpFMem(__FAR(VOID) str, unsigned len);
 unsigned char DosUpFChar(unsigned char ch);
 VOID DosUpFString(__XFAR(char) str);
-COUNT DosGetData(int subfct, UWORD _cp, UWORD _cntry, UWORD bufsize,
+COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
                  __FAR(VOID) buf);
 #ifndef DosGetCountryInformation
-COUNT DosGetCountryInformation(UWORD _cntry, __FAR(VOID) buf);
+COUNT DosGetCountryInformation(UWORD cntry,__FAR(VOID) buf);
 #endif
 #ifndef DosSetCountry
-COUNT DosSetCountry(UWORD _cntry);
+COUNT DosSetCountry(UWORD cntry);
 #endif
 COUNT DosGetCodepage(UWORD * actCP, UWORD * sysCP);
 COUNT DosSetCodepage(UWORD actCP, UWORD sysCP);

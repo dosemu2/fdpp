@@ -415,7 +415,6 @@ public:
     }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, fptr.get_far()); }
     far_t get_far() const { ___assert(check_magic()); return fptr.get_far(); }
-    T& get_sym() { return *this; }
     void clear() { fptr = NULL; }
 };
 
@@ -459,7 +458,7 @@ public:
     operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, fptr.get_far());
     }
-    T& get_sym() { return sym; }
+    const T get_sym() const { return sym; }
     void clear() { fptr = NULL; }
 };
 
@@ -755,17 +754,6 @@ public:
 #define SYM_MEMB_T(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMembT<t, p, OFF_M(p, n)> n
-#ifdef __clang__
-#define REF_MEMB(t, n) \
-    t ___##n; \
-    t& _##n() { return ___##n; }
-#define RARR_MEMB(t, n, l) \
-    t ___##n[l]; \
-    t *_##n() { return ___##n; }
-#else
-#define REF_MEMB(t, n) t n
-#define RARR_MEMB(t, n, l) t n[l]
-#endif
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
@@ -787,6 +775,7 @@ public:
 #define ADJUST_FAR(f) (f).adjust_far()
 #define _DOS_FP(p) DotBarrierWrap::dot_barrier(p)
 #define GET_SYM(w) (w).get_sym()
+#define ____R(x) (decltype(x)&)x
 
 #undef NULL
 #define NULL           nullptr

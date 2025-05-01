@@ -403,11 +403,11 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   rootPos = p = dest + 2;
   if (*p != '/') /* i.e., it's a backslash! */
   {
-    BYTE FAR *_cp;
+    BYTE FAR *cp;
 
-    _cp = TempCDS.cdsCurrentPath;
+    cp = TempCDS.cdsCurrentPath;
     /* ensure termination of strcpy */
-    _cp[MAX_CDSPATH - 1] = '\0';
+    cp[MAX_CDSPATH - 1] = '\0';
     if ((TempCDS.cdsFlags & CDSNETWDRV) == 0)
     {
       if (media_check(TempCDS.cdsDpb) < 0)
@@ -415,22 +415,22 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 
       /* dos_cd ensures that the path exists; if not, we
          need to change to the root directory */
-      if (dos_cd(_cp) != SUCCESS) {
-        _cp[TempCDS.cdsBackslashOffset + 1] =
+      if (dos_cd(cp) != SUCCESS) {
+        cp[TempCDS.cdsBackslashOffset + 1] =
           cdsEntry->cdsCurrentPath[TempCDS.cdsBackslashOffset + 1] = '\0';
-        dos_cd(_cp);
+        dos_cd(cp);
       }
     }
 
     if (!(mode & CDS_MODE_SKIP_PHYSICAL))
     {
-      tn_printf(("SUBSTing from: %s\n", _cp));
+      tn_printf(("SUBSTing from: %s\n", cp));
 /* What to do now: the logical drive letter will be replaced by the hidden
    portion of the associated path. This is necessary for NETWORK and
    SUBST drives. For local drives it should not harm.
    This is actually the reverse mechanism of JOINED drives. */
 
-      n_fstrcpy(dest, _cp);
+      n_fstrcpy(dest, cp);
       if (TempCDS.cdsFlags & CDSSUBST)
       {
         /* The drive had been changed --> update the CDS pointer */
@@ -447,10 +447,10 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     }
     else
     {
-      _cp += TempCDS.cdsBackslashOffset;
+      cp += TempCDS.cdsBackslashOffset;
       /* truename must use the CuDir of the "virtual" drive letter! */
       /* tn_printf(("DosGetCuDir drive #%u\n", prevresult & 0x1f)); */
-      strcpy(p, _cp);
+      strcpy(p, cp);
     }
     if (p[0] == '\0')
       p[1] = p[0];

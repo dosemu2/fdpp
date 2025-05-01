@@ -324,12 +324,9 @@ STATIC void setup_int_vectors(void)
   struct vec *pvec;
 /* original interrupt vectors, at 70:xxxx */
   struct lowvec {
-    REF_MEMB(unsigned char, intno);
+    unsigned char intno;
     intvec isv;
   } PACKED;
-#ifdef __clang__
-  #define intno _intno()
-#endif
   struct lowvec FAR *plvec;
   void FAR *old_vec;
   unsigned int i;
@@ -337,14 +334,13 @@ STATIC void setup_int_vectors(void)
   if (DOS_PSP >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
     plvec = MK_FP(0x70, 0x100);
     for (i = 0; i < sizeof(intvec_table); i++) {
-      plvec[i].intno = intvec_table[i];
+      ____R(plvec[i].intno) = intvec_table[i];
       plvec[i].isv = getvec(intvec_table[i]);
     }
   } else {
     fdloudprintf("Load at seg 0x%x, 0x%x is not supported\n", _CS,
         bprm.HeapSeg);
   }
-  #undef intno
 
   for (i = 0x23; i <= 0x3f; i++) {
     old_vec = getvec(i);
@@ -628,7 +624,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
     {
       LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
-      LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
+      ____R(LoL->_CDSp[LoL->_nblkdev].cdsFlags) = CDSPHYSDRV;
     }
     ++dpb;
     ++LoL->_nblkdev;

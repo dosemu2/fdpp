@@ -47,9 +47,6 @@ export PKG_CONFIG
 
 TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic \
   -DCLANG_VER=$(CLANG_VER)
-ifneq ($(GCC_VER),)
-TARGETOPT += -fpermissive
-endif
 # _XTRA should go at the end of cmd line
 ifeq ($(GCC_VER),)
 TARGETOPT_XTRA = -Wno-format-invalid-specifier -Wno-c99-designator
