@@ -20,7 +20,6 @@
 #define FARPTR_HPP
 
 #include <type_traits>
-#include <new>
 #include <memory>
 #include <cstring>
 #include <unordered_set>
