@@ -322,6 +322,12 @@ STATIC void setup_int_vectors(void)
     };
   unsigned char intvec_table[] = { 0x10, 0x13, 0x15, 0x19, 0x1B };
   struct vec *pvec;
+/* original interrupt vectors, at 70:xxxx */
+  struct lowvec {
+    REF_MEMB(unsigned char, intno);
+    intvec isv;
+  } PACKED;
+  #define intno _intno()
   struct lowvec FAR *plvec;
   void FAR *old_vec;
   unsigned int i;
@@ -329,13 +335,14 @@ STATIC void setup_int_vectors(void)
   if (DOS_PSP >= 0x90 && (!bprm.HeapSeg || bprm.HeapSeg >= 0x90)) {
     plvec = MK_FP(0x70, 0x100);
     for (i = 0; i < sizeof(intvec_table); i++) {
-      GET_SYM(plvec[i]).intno = intvec_table[i];
+      plvec[i].intno = intvec_table[i];
       plvec[i].isv = getvec(intvec_table[i]);
     }
   } else {
     fdloudprintf("Load at seg 0x%x, 0x%x is not supported\n", _CS,
         bprm.HeapSeg);
   }
+  #undef intno
 
   for (i = 0x23; i <= 0x3f; i++) {
     old_vec = getvec(i);

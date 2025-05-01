@@ -194,12 +194,6 @@ GLOBAL BYTE copyright[] =
 /* ARE DOCUMENTED AS UNDOCUMENTED (?) AND HAVE MANY  PROGRAMS AND TSRs  */
 /* ACCESSING THEM                                                       */
 
-/* original interrupt vectors, at 70:xxxx */
-struct lowvec {
-  unsigned char intno;
-  intvec isv;
-} PACKED;
-
 enum {LOC_CONV=0, LOC_HMA=1};
 
 struct _FcbSearchBuffer {
