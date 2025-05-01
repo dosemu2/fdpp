@@ -327,9 +327,7 @@ STATIC void setup_int_vectors(void)
     REF_MEMB(unsigned char, intno);
     intvec isv;
   } PACKED;
-#ifdef __clang__
   #define intno _intno()
-#endif
   struct lowvec FAR *plvec;
   void FAR *old_vec;
   unsigned int i;
