@@ -38,9 +38,9 @@ static BYTE *clock_hRcsId =
 #endif
 
 struct ClockRecord {
-  UWORD clkDays;                /* days since Jan 1, 1980.              */
-  UBYTE clkMinutes;             /* residual minutes.                    */
-  UBYTE clkHours;               /* residual hours.                      */
-  UBYTE clkHundredths;          /* residual hundredths of a second.     */
-  UBYTE clkSeconds;             /* residual seconds.                    */
+  REF_MEMB(UWORD, clkDays);                /* days since Jan 1, 1980.              */
+  REF_MEMB(UBYTE, clkMinutes);             /* residual minutes.                    */
+  REF_MEMB(UBYTE, clkHours);               /* residual hours.                      */
+  REF_MEMB(UBYTE, clkHundredths);          /* residual hundredths of a second.     */
+  REF_MEMB(UBYTE, clkSeconds);             /* residual seconds.                    */
 };

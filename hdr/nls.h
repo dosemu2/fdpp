@@ -338,23 +338,23 @@
 #define NLS_DEFAULT ((UWORD)-1)
 
 struct CountrySpecificInfo {
-  short CountryID;    /*  = W1 W437   # Country ID & Codepage */
+  REF_MEMB(short, CountryID);    /*  = W1 W437   # Country ID & Codepage */
   short CodePage;
-  short DateFormat;           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
-  char  CurrencyString[5];    /* '$' ,'EUR'   */
-  char  ThousandSeparator[2]; /* ','          # Thousand's separator */
-  char  DecimalPoint[2];      /* '.'        # Decimal point        */
-  char  DateSeparator[2];     /* '-'  */
-  char  TimeSeparator[2];     /* ':'  */
-  char  CurrencyFormat;       /* = 0  # Currency format (bit array)
+  REF_MEMB(short, DateFormat);           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
+  RARR_MEMB(char, CurrencyString, 5);    /* '$' ,'EUR'   */
+  RARR_MEMB(char, ThousandSeparator, 2); /* ','          # Thousand's separator */
+  RARR_MEMB(char, DecimalPoint, 2);      /* '.'        # Decimal point        */
+  RARR_MEMB(char, DateSeparator, 2);     /* '-'  */
+  RARR_MEMB(char, TimeSeparator, 2);     /* ':'  */
+  REF_MEMB(char,  CurrencyFormat);       /* = 0  # Currency format (bit array)
                                  0Fh    BYTE    currency format
                                  bit 2 = set if currency symbol replaces decimal point
                                  bit 1 = number of spaces between value and currency symbol
                                  bit 0 = 0 if currency symbol precedes value
                                  1 if currency symbol follows value
                               */
-  char  CurrencyPrecision;    /* = 2  # Currency precision           */
-  char  TimeFormat;           /* = 0  # time format: 0/1: 12/24 houres */
+  REF_MEMB(char,  CurrencyPrecision);    /* = 2  # Currency precision           */
+  REF_MEMB(char,  TimeFormat);           /* = 0  # time format: 0/1: 12/24 houres */
 };
 
 /*
@@ -420,7 +420,8 @@ ANNOTATE_SIZE(struct nlsPointer, 5);
 struct nlsPackage {             /* the contents of one chain item of the
                                    list of NLS packages */
   __DOSFAR(struct nlsPackage)nxt;   /* next item in chain */
-  UWORD cntry, cp;              /* country ID / codepage of this NLS pkg */
+  REF_MEMB(UWORD, cntry);
+  REF_MEMB(UWORD, cp);              /* country ID / codepage of this NLS pkg */
   UWORD flags;                    /* direct access and other flags */
   /* Note: Depending on the flags above all remaining
      portions may be omitted, if the external NLSFUNC-like

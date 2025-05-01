@@ -108,16 +108,16 @@ static BYTE *fat_hRcsId =
 /* FAT file system directory entry                                      */
 struct dirent {
 //  AR_MEMB(dirent, char, dir_name, FNAME_SIZE + FEXT_SIZE);   /* Filename + extension in FCB format */
-  char dir_name[FNAME_SIZE + FEXT_SIZE];   /* Filename + extension in FCB format */
-  UBYTE dir_attrib;             /* File Attribute               */
+  RARR_MEMB(char, dir_name, FNAME_SIZE + FEXT_SIZE);   /* Filename + extension in FCB format */
+  REF_MEMB(UBYTE, dir_attrib);             /* File Attribute               */
   UBYTE dir_case;               /* File case                    */
   UBYTE dir_crtimems_or_fchar;  /* Create time (msecs) or first name char */
   UWORD dir_crtime;             /* Creation time                */
   UWORD dir_crdate;             /* Creation date                */
   UWORD dir_accdate;            /* Last access date             */
   UWORD dir_start_high;         /* High word of the cluster     */
-  _time dir_time;                /* Time file created/updated    */
-  date dir_date;                /* Date file created/updated    */
+  REF_MEMB(_time, dir_time);                /* Time file created/updated    */
+  REF_MEMB(date, dir_date);                /* Date file created/updated    */
   UWORD dir_start;              /* Starting cluster             */
   /* 1st available = 2            */
   ULONG dir_size;               /* File size in bytes           */

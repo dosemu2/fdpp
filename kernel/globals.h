@@ -65,6 +65,9 @@ static BYTE *Globals_hRcsId =
 #include "memtype.h"
 #include "glob_fd.h"
 #include "debug.h"
+#if defined(FDPP) && defined(__clang__)
+#include "hackrefs.h"
+#endif
 
 /* fatfs.c */
 #ifdef WITHFAT32
@@ -190,12 +193,6 @@ GLOBAL BYTE copyright[] =
 /* KERNEL.ASM AND MUST NOT BE CHANGED. DO NOT CHANGE ORDER BECAUSE THEY */
 /* ARE DOCUMENTED AS UNDOCUMENTED (?) AND HAVE MANY  PROGRAMS AND TSRs  */
 /* ACCESSING THEM                                                       */
-
-/* original interrupt vectors, at 70:xxxx */
-struct lowvec {
-  unsigned char intno;
-  intvec isv;
-} PACKED;
 
 enum {LOC_CONV=0, LOC_HMA=1};
 

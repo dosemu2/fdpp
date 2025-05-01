@@ -1897,9 +1897,9 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     if (filenam == NULL) {
       rc = !LoadCountryInfoHardCoded(ctryCode);
       if (rc) {
-        ____nlsPackageHardcoded.cntry = ctryCode;
+        nlsPackageHardcoded.cntry = ctryCode;
         if (codePage)
-          ____nlsPackageHardcoded.cp = codePage;
+          nlsPackageHardcoded.cp = codePage;
       }
     } else {
       _printf("%s not found\n", filename);
@@ -1952,8 +1952,8 @@ err:
                                                      != entry.codepage
          && codePage))
           continue;
-        ____nlsPackageHardcoded.cntry = entry.country;
-        ____nlsPackageHardcoded.cp = entry.codepage;
+        nlsPackageHardcoded.cntry = entry.country;
+        nlsPackageHardcoded.cp = entry.codepage;
         subf_data.length =      /* MS-DOS "CTYINFO" is up to 38 bytes */
                 _min(subf_data.length, sizeof(struct CountrySpecificInfo));
       }
@@ -2851,16 +2851,16 @@ STATIC void CfgMenuColor(char * pLine)
 #define _TIME_24 1
 
 struct CountrySpecificInfoSmall {
-  short CountryID;    /*  = W1 W437   # Country ID */
-  char  DateFormat;           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
-  char  CurrencyString[4];    /* '$' ,'EUR', XXX was 3   */
-  char  ThousandSeparator;    /* ','          # Thousand's separator */
-  char  DecimalPoint;         /* '.'        # Decimal point        */
-  char  DateSeparator;        /* '-'  */
-  char  TimeSeparator;        /* ':'  */
-  char  CurrencyFormat;       /* = 0  # Currency format (bit array)  */
-  char  CurrencyPrecision;    /* = 2  # Currency precision           */
-  char  TimeFormat;           /* = 0  # time format: 0/1: 12/24 houres */
+  REF_MEMB(short, CountryID);    /*  = W1 W437   # Country ID */
+  REF_MEMB(char,  DateFormat);           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
+  RARR_MEMB(char, CurrencyString, 4);    /* '$' ,'EUR', XXX was 3   */
+  REF_MEMB(char,  ThousandSeparator);    /* ','          # Thousand's separator */
+  REF_MEMB(char,  DecimalPoint);         /* '.'        # Decimal point        */
+  REF_MEMB(char,  DateSeparator);        /* '-'  */
+  REF_MEMB(char,  TimeSeparator);        /* ':'  */
+  REF_MEMB(char,  CurrencyFormat);       /* = 0  # Currency format (bit array)  */
+  REF_MEMB(char,  CurrencyPrecision);    /* = 2  # Currency precision           */
+  REF_MEMB(char,  TimeFormat);           /* = 0  # time format: 0/1: 12/24 houres */
 };
 
 struct CountrySpecificInfoSmall specificCountriesSupported[] = {
@@ -2935,18 +2935,18 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode)
   {
     if (country->CountryID == ctryCode)
     {
-      ____nlsCountryInfoHardcoded.C.CountryID = country->CountryID;
-      ____nlsCountryInfoHardcoded.C.DateFormat = country->DateFormat;
-      ____nlsCountryInfoHardcoded.C.CurrencyString[0] = country->CurrencyString[0];
-      ____nlsCountryInfoHardcoded.C.CurrencyString[1] = country->CurrencyString[1];
-      ____nlsCountryInfoHardcoded.C.CurrencyString[2] = country->CurrencyString[2];
-      ____nlsCountryInfoHardcoded.C.ThousandSeparator[0] = country->ThousandSeparator;
-      ____nlsCountryInfoHardcoded.C.DecimalPoint[0] = country->DecimalPoint;
-      ____nlsCountryInfoHardcoded.C.DateSeparator[0] = country->DateSeparator;
-      ____nlsCountryInfoHardcoded.C.TimeSeparator[0] = country->TimeSeparator;
-      ____nlsCountryInfoHardcoded.C.CurrencyFormat = country->CurrencyFormat;
-      ____nlsCountryInfoHardcoded.C.CurrencyPrecision = country->CurrencyPrecision;
-      ____nlsCountryInfoHardcoded.C.TimeFormat = country->TimeFormat;
+      nlsCountryInfoHardcoded.C.CountryID = country->CountryID;
+      nlsCountryInfoHardcoded.C.DateFormat = country->DateFormat;
+      nlsCountryInfoHardcoded.C.CurrencyString[0] = country->CurrencyString[0];
+      nlsCountryInfoHardcoded.C.CurrencyString[1] = country->CurrencyString[1];
+      nlsCountryInfoHardcoded.C.CurrencyString[2] = country->CurrencyString[2];
+      nlsCountryInfoHardcoded.C.ThousandSeparator[0] = country->ThousandSeparator;
+      nlsCountryInfoHardcoded.C.DecimalPoint[0] = country->DecimalPoint;
+      nlsCountryInfoHardcoded.C.DateSeparator[0] = country->DateSeparator;
+      nlsCountryInfoHardcoded.C.TimeSeparator[0] = country->TimeSeparator;
+      nlsCountryInfoHardcoded.C.CurrencyFormat = country->CurrencyFormat;
+      nlsCountryInfoHardcoded.C.CurrencyPrecision = country->CurrencyPrecision;
+      nlsCountryInfoHardcoded.C.TimeFormat = country->TimeFormat;
       return 0;
     }
   }
