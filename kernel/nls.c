@@ -97,13 +97,13 @@ struct nlsInfoBlock ASM nlsInfo = {
 
 /*== DS:SI _always_ points to global NLS info structure <-> no
  * subfct can use these registers for anything different. ==ska*/
-STATIC long muxGo(int subfct, UWORD bp, UWORD cp, UWORD cntry, UWORD bufsize,
+STATIC long muxGo(int subfct, UWORD bp, UWORD _cp, UWORD _cntry, UWORD bufsize,
 		  void FAR *buf)
 {
   long ret;
   log(("NLS: muxGo(): subfct=%x, cntry=%u, cp=%u, ES:DI=%P\n",
-       subfct, cntry, cp, GET_FP32(buf)));
-  ret = call_nls(bp, buf, subfct, cp, cntry, bufsize);
+       subfct, _cntry, _cp, GET_FP32(buf)));
+  ret = call_nls(bp, buf, subfct, _cp, _cntry, bufsize);
   log(("NLS: muxGo(): return value = %lx\n", ret));
   return ret;
 }
@@ -111,7 +111,7 @@ STATIC long muxGo(int subfct, UWORD bp, UWORD cp, UWORD cntry, UWORD bufsize,
 /*
  *	Call NLSFUNC to load the NLS package
  */
-STATIC COUNT muxLoadPkg(int subfct, UWORD cp, UWORD cntry)
+STATIC COUNT muxLoadPkg(int subfct, UWORD _cp, UWORD _cntry)
 {
   long ret;
 
@@ -137,16 +137,16 @@ STATIC COUNT muxLoadPkg(int subfct, UWORD cp, UWORD cntry)
   /* OK, the correct NLSFUNC is available --> load pkg */
   /* If cp == -1 on entry, NLSFUNC updates cp to the codepage loaded
      into memory. The system must then change to this one later */
-  return (WORD)muxGo(subfct, 0, cp, cntry, 0, NULL);
+  return (WORD)muxGo(subfct, 0, _cp, _cntry, 0, NULL);
 }
 
-STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
+STATIC int muxBufGo(int subfct, int bp, UWORD _cp, UWORD _cntry,
                     UWORD bufsize, VOID FAR * buf)
 {
   log(("NLS: muxBufGo(): subfct=%x, BP=%u, cp=%u, cntry=%u, len=%u, buf=%P\n",
-       subfct, bp, cp, cntry, bufsize, GET_FP32(buf)));
+       subfct, bp, _cp, _cntry, bufsize, GET_FP32(buf)));
 
-  return (WORD)muxGo(subfct, bp, cp, cntry, bufsize, buf);
+  return (WORD)muxGo(subfct, bp, _cp, _cntry, bufsize, buf);
 }
 
 #define mux65(s,cp,cc,bs,b)	muxBufGo(2, (s), (cp), (cc), (bs), (b))
@@ -163,17 +163,17 @@ STATIC int muxBufGo(int subfct, int bp, UWORD cp, UWORD cntry,
  *	Also resolves the default values (-1) into the currently
  *	active codepage/country code.
  */
-STATIC struct nlsPackage FAR *searchPackage(UWORD cp, UWORD cntry)
+STATIC struct nlsPackage FAR *searchPackage(UWORD _cp, UWORD _cntry)
 {
   struct nlsPackage FAR *nls;
 
-  if (cp == NLS_DEFAULT)
-    cp = nlsInfo.actPkg->cp;
-  if (cntry == NLS_DEFAULT)
-    cntry = nlsInfo.actPkg->cntry;
+  if (_cp == NLS_DEFAULT)
+    _cp = nlsInfo.actPkg->cp;
+  if (_cntry == NLS_DEFAULT)
+    _cntry = nlsInfo.actPkg->cntry;
 
   nls = nlsInfo.chain;
-  while ((nls->cp != cp || nls->cntry != cntry)
+  while ((nls->cp != _cp || nls->cntry != _cntry)
          && (nls = nls->nxt) != NULL) ;
 
   return nls;
@@ -335,9 +335,9 @@ STATIC int nlsGetData(struct nlsPackage FAR * nls, int subfct,
   return DE_INVLDFUNC;
 }
 
-STATIC VOID nlsCPchange(UWORD cp)
+STATIC VOID nlsCPchange(UWORD _cp)
 {
-  UNREFERENCED_PARAMETER(cp);
+  UNREFERENCED_PARAMETER(_cp);
   put_string("\7\nchange codepage not yet done ska\n");
 }
 
@@ -374,7 +374,7 @@ STATIC COUNT nlsSetPackage(struct nlsPackage FAR * nls)
 
   return SUCCESS;
 }
-STATIC COUNT DosSetPackage(UWORD cp, UWORD cntry)
+STATIC COUNT DosSetPackage(UWORD _cp, UWORD _cntry)
 {
   /* Right now, we do not have codepage change support in kernel, so push
      it through the mux in any case. */
@@ -382,13 +382,13 @@ STATIC COUNT DosSetPackage(UWORD cp, UWORD cntry)
   struct nlsPackage FAR *nls;   /* NLS package to use to return the info from */
 
   /* nls := NLS package of cntry/codepage */
-  if ((nls = searchPackage(cp, cntry)) != NULL)
+  if ((nls = searchPackage(_cp, _cntry)) != NULL)
     /* OK the NLS pkg is loaded --> activate it */
     return nlsSetPackage(nls);
 
   /* not loaded --> invoke NLSFUNC to load it */
 #endif
-  return muxLoadPkg(NLSFUNC_LOAD_PKG2, cp, cntry);
+  return muxLoadPkg(NLSFUNC_LOAD_PKG2, _cp, _cntry);
 }
 
 STATIC COUNT nlsLoadPackage(struct nlsPackage FAR * nls)
@@ -398,17 +398,17 @@ STATIC COUNT nlsLoadPackage(struct nlsPackage FAR * nls)
 
   return SUCCESS;
 }
-STATIC COUNT DosLoadPackage(UWORD cp, UWORD cntry)
+STATIC COUNT DosLoadPackage(UWORD _cp, UWORD _cntry)
 {
   struct nlsPackage FAR *nls;   /* NLS package to use to return the info from */
 
   /* nls := NLS package of cntry/codepage */
-  if ((nls = searchPackage(cp, cntry)) != NULL)
+  if ((nls = searchPackage(_cp, _cntry)) != NULL)
     /* OK the NLS pkg is loaded --> activate it */
     return nlsLoadPackage(nls);
 
   /* not loaded --> invoke NLSFUNC to load it */
-  return muxLoadPkg(NLSFUNC_LOAD_PKG, cp, cntry);
+  return muxLoadPkg(NLSFUNC_LOAD_PKG, _cp, _cntry);
 }
 
 STATIC void nlsUpMem(struct nlsPackage FAR * nls, VOID FAR * str, int len)
@@ -555,13 +555,13 @@ VOID DosUpFString(__XFAR(char)str)
  *	loaded, MUX-14 is invoked; otherwise the pkg's NLS_Fct_buf
  *	function is invoked.
  */
-COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
+COUNT DosGetData(int subfct, UWORD _cp, UWORD _cntry, UWORD bufsize,
                  VOID FAR * buf)
 {
   struct nlsPackage FAR *nls;   /* NLS package to use to return the info from */
 
   log(("NLS: GetData(): subfct=%x, cp=%u, cntry=%u, bufsize=%u\n",
-       subfct, cp, cntry, bufsize));
+       subfct, _cp, _cntry, bufsize));
 
   if (!buf || !bufsize)
     return DE_INVLDDATA;
@@ -569,21 +569,21 @@ COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
     return DE_INVLDFUNC;
 
   /* nls := NLS package of cntry/codepage */
-  if ((nls = searchPackage(cp, cntry)) != NULL)
+  if ((nls = searchPackage(_cp, _cntry)) != NULL)
   {
     /* matching NLS package found */
     if (nls->flags & NLS_FLAG_DIRECT_GETDATA)
       /* Direct access to the data */
       return nlsGetData(nls, subfct, buf, bufsize);
-    cp = nls->cp;
-    cntry = nls->cntry;
+    _cp = nls->cp;
+    _cntry = nls->cntry;
   }
 
   /* If the NLS pkg is not loaded into memory or the direct-access
      flag is disabled, the request must be passed through MUX */
   return (subfct == NLS_DOS_38)
-        ? mux38(cp, cntry, bufsize, buf)
-        : mux65(subfct, cp, cntry, bufsize, buf);
+        ? mux38(_cp, _cntry, bufsize, buf)
+        : mux65(subfct, _cp, _cntry, bufsize, buf);
 }
 
 /*
@@ -602,9 +602,9 @@ COUNT DosGetData(int subfct, UWORD cp, UWORD cntry, UWORD bufsize,
  */
 
 #ifndef DosGetCountryInformation
-COUNT DosGetCountryInformation(UWORD cntry, VOID FAR * buf)
+COUNT DosGetCountryInformation(UWORD _cntry, VOID FAR * buf)
 {
-  return DosGetData(NLS_DOS_38, NLS_DEFAULT, cntry, 0x18, buf);
+  return DosGetData(NLS_DOS_38, NLS_DEFAULT, _cntry, 0x18, buf);
 }
 #endif
 
@@ -612,9 +612,9 @@ COUNT DosGetCountryInformation(UWORD cntry, VOID FAR * buf)
  *	Called for DOS-38 set country code
  */
 #ifndef DosSetCountry
-COUNT DosSetCountry(UWORD cntry)
+COUNT DosSetCountry(UWORD _cntry)
 {
-  return DosLoadPackage(NLS_DEFAULT, cntry);
+  return DosLoadPackage(NLS_DEFAULT, _cntry);
 }
 #endif
 

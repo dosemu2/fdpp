@@ -31,23 +31,23 @@
 
 struct cds {
   AR_MEMB(cds, BYTE, cdsCurrentPath, MAX_CDSPATH);
-  UWORD cdsFlags;           /* see below */
+  REF_MEMB(UWORD, cdsFlags);           /* see below */
   __DOSFAR(struct dpb)cdsDpb;   /* if != 0, associated DPB */
 
   union {
     __DOSFAR(BYTE)_cdsRedirRec; /* IFS record */
     struct {
-      UWORD _cdsStrtClst;   /* if local path (Flags & CDSPHYSDRV):
+      REF_MEMB(UWORD, _cdsStrtClst);   /* if local path (Flags & CDSPHYSDRV):
                                start cluster of CWD; root == 0,
                                never access == 0xFFFF */
-      UWORD _cdsParam;
+      REF_MEMB(UWORD, _cdsParam);
     } _cdsRedir;
   } NONPOD_PACKED _cdsUnion;
 
-  UWORD cdsStoreUData;
+  REF_MEMB(UWORD, cdsStoreUData);
 
 #define cdsJoinOffset cdsBackslashOffset
-  WORD cdsBackslashOffset; /* Position of "root directory" backslash for
+  REF_MEMB(WORD, cdsBackslashOffset); /* Position of "root directory" backslash for
                                this drive within CurrentPath[]
                                prerequisites:
                                    + ofs <= strlen(currentPath)

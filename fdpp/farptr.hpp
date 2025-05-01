@@ -782,6 +782,15 @@ public:
 #define SYM_MEMB_T(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMembT<t, p, OFF_M(p, n)> n
+#define REF_MEMB(t, n) \
+    t ___##n; \
+    t& _##n() { return ___##n; }
+#define REF_MEMB_A(t, n, l) \
+    t n[l]; \
+    t *_##n() { return n; }
+#define RARR_MEMB(t, n, l) \
+    t ___##n[l]; \
+    t *_##n() { return ___##n; }
 #define FP_SEG(fp) ((fp).seg())
 #define FP_OFF(fp) ((fp).off())
 #define FP_SEG_OBJ(o, fp) ((fp).seg(o))
