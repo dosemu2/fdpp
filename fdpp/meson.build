@@ -68,14 +68,6 @@ gad = custom_target('glob_asmdefs.h',
             'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
   capture: true)
 
-gad2 = custom_target('glob_asmdefs2.h',
-  output: 'glob_asmdefs2.h',
-  input: gad,
-  command: [
-    find_program('sed'),
-    '-e', 's/^#define /#define ____/', '-e', 's/(/2(/', '@INPUT@' ],
-  capture: true)
-
 GEN_TMP = { '1':'thunk_calls.tmp', '2':'thunk_asms.tmp' }
 GEN_H = { 'plt_asmc.h':'4', 'plt_asmp.h':'5' }
 
@@ -162,7 +154,7 @@ endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
   version: FVER,
-  sources: [gad, gad2, pac, pap, tc, ta],
+  sources: [gad, pac, pap, tc, ta],
   cpp_args: CXX_ARGS,
   link_args: ['-Wl,-Bsymbolic'],
   install: true,

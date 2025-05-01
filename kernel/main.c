@@ -626,7 +626,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
     {
       LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
-      GET_SYM(LoL->_CDSp[LoL->_nblkdev]).cdsFlags = CDSPHYSDRV;
+      LoL->_CDSp[LoL->_nblkdev].cdsFlags = CDSPHYSDRV;
     }
     ++dpb;
     ++LoL->_nblkdev;
