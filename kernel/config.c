@@ -1897,9 +1897,9 @@ STATIC BOOL LoadCountryInfo(char *filenam, UWORD ctryCode, UWORD codePage)
     if (filenam == NULL) {
       rc = !LoadCountryInfoHardCoded(ctryCode);
       if (rc) {
-        nlsPackageHardcoded.cntry = ctryCode;
+        ____R(nlsPackageHardcoded.cntry) = ctryCode;
         if (codePage)
-          nlsPackageHardcoded.cp = codePage;
+          ____R(nlsPackageHardcoded.cp) = codePage;
       }
     } else {
       _printf("%s not found\n", filename);
@@ -1952,8 +1952,8 @@ err:
                                                      != entry.codepage
          && codePage))
           continue;
-        nlsPackageHardcoded.cntry = entry.country;
-        nlsPackageHardcoded.cp = entry.codepage;
+        ____R(nlsPackageHardcoded.cntry) = entry.country;
+        ____R(nlsPackageHardcoded.cp) = entry.codepage;
         subf_data.length =      /* MS-DOS "CTYINFO" is up to 38 bytes */
                 _min(subf_data.length, sizeof(struct CountrySpecificInfo));
       }
@@ -2935,18 +2935,18 @@ STATIC int LoadCountryInfoHardCoded(COUNT ctryCode)
   {
     if (country->CountryID == ctryCode)
     {
-      nlsCountryInfoHardcoded.C.CountryID = country->CountryID;
-      nlsCountryInfoHardcoded.C.DateFormat = country->DateFormat;
-      nlsCountryInfoHardcoded.C.CurrencyString[0] = country->CurrencyString[0];
-      nlsCountryInfoHardcoded.C.CurrencyString[1] = country->CurrencyString[1];
-      nlsCountryInfoHardcoded.C.CurrencyString[2] = country->CurrencyString[2];
-      nlsCountryInfoHardcoded.C.ThousandSeparator[0] = country->ThousandSeparator;
-      nlsCountryInfoHardcoded.C.DecimalPoint[0] = country->DecimalPoint;
-      nlsCountryInfoHardcoded.C.DateSeparator[0] = country->DateSeparator;
-      nlsCountryInfoHardcoded.C.TimeSeparator[0] = country->TimeSeparator;
-      nlsCountryInfoHardcoded.C.CurrencyFormat = country->CurrencyFormat;
-      nlsCountryInfoHardcoded.C.CurrencyPrecision = country->CurrencyPrecision;
-      nlsCountryInfoHardcoded.C.TimeFormat = country->TimeFormat;
+      ____R(nlsCountryInfoHardcoded.C.CountryID) = country->CountryID;
+      ____R(nlsCountryInfoHardcoded.C.DateFormat) = country->DateFormat;
+      ____R(nlsCountryInfoHardcoded.C.CurrencyString[0]) = country->CurrencyString[0];
+      ____R(nlsCountryInfoHardcoded.C.CurrencyString[1]) = country->CurrencyString[1];
+      ____R(nlsCountryInfoHardcoded.C.CurrencyString[2]) = country->CurrencyString[2];
+      ____R(nlsCountryInfoHardcoded.C.ThousandSeparator[0]) = country->ThousandSeparator;
+      ____R(nlsCountryInfoHardcoded.C.DecimalPoint[0]) = country->DecimalPoint;
+      ____R(nlsCountryInfoHardcoded.C.DateSeparator[0]) = country->DateSeparator;
+      ____R(nlsCountryInfoHardcoded.C.TimeSeparator[0]) = country->TimeSeparator;
+      ____R(nlsCountryInfoHardcoded.C.CurrencyFormat) = country->CurrencyFormat;
+      ____R(nlsCountryInfoHardcoded.C.CurrencyPrecision) = country->CurrencyPrecision;
+      ____R(nlsCountryInfoHardcoded.C.TimeFormat) = country->TimeFormat;
       return 0;
     }
   }

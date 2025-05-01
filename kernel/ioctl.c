@@ -156,7 +156,7 @@ COUNT DosDevIOctl(lregs * r)
         return SUCCESS;
       }
       dev = s->sft_dev;
-      CharReqHdr.r_unit = 0;
+      ____R(CharReqHdr.r_unit) = 0;
       break;
     }
 
@@ -178,7 +178,7 @@ COUNT DosDevIOctl(lregs * r)
       dpbp = get_dpb((r->BL & 0x1f) == 0 ? (WORD)default_drive : (r->BL & 0x1f) - 1);
       if (dpbp)
       {
-        CharReqHdr.r_unit = dpbp->dpb_subunit;
+        ____R(CharReqHdr.r_unit) = dpbp->dpb_subunit;
         dev = dpbp->dpb_device;
         attr = dev->dh_attr;
       }
@@ -244,22 +244,22 @@ COUNT DosDevIOctl(lregs * r)
       return DE_INVLDFUNC;
   }
 
-  CharReqHdr.r_command = cmd[r->AL];
+  ____R(CharReqHdr.r_command) = cmd[r->AL];
   if (r->AL == 0x0C || r->AL == 0x0D || r->AL >= 0x10) /* generic or query */
   {
-    CharReqHdr.r_cat = r->CH;            /* category (major) code */
-    CharReqHdr.r_fun = r->CL;            /* function (minor) code */
-    CharReqHdr.r_si = r->SI;             /* contents of SI and DI */
-    CharReqHdr.r_di = r->DI;
+    ____R(CharReqHdr.r_cat) = r->CH;            /* category (major) code */
+    ____R(CharReqHdr.r_fun) = r->CL;            /* function (minor) code */
+    ____R(CharReqHdr.r_si) = r->SI;             /* contents of SI and DI */
+    ____R(CharReqHdr.r_di) = r->DI;
     CharReqHdr.r_io = MK_FP(r->DS, r->DX);    /* parameter block */
   }
   else
   {
-    CharReqHdr.r_count = r->CX;
+    ____R(CharReqHdr.r_count) = r->CX;
     CharReqHdr.r_trans = MK_FP(r->DS, r->DX);
   }
-  CharReqHdr.r_length = sizeof(request);
-  CharReqHdr.r_status = 0;
+  ____R(CharReqHdr.r_length) = sizeof(request);
+  ____R(CharReqHdr.r_status) = 0;
 
   execrh(&CharReqHdr, dev);
 

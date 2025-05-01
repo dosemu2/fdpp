@@ -787,6 +787,7 @@ public:
 #define ADJUST_FAR(f) (f).adjust_far()
 #define _DOS_FP(p) DotBarrierWrap::dot_barrier(p)
 #define GET_SYM(w) (w).get_sym()
+#define ____R(x) (decltype(x)&)x
 
 #undef NULL
 #define NULL           nullptr
