@@ -120,7 +120,7 @@ COUNT DosDelete(__FAR(const char) path, int attrib);
 COUNT DosRename(__FAR(const char) path1,__FAR(const char) path2);
 COUNT DosRenameTrue(__FAR(const char) path1, __FAR(const char) path2, int attrib);
 COUNT DosMkRmdir(__FAR(const char) dir, int action);
-__FAR(struct dhdr)IsDevice(__XFAR(const char) FileName);
+__FAR(struct dhdr)IsDevice(__FAR(const char) FileName);
 #define IsShareInstalled(recheck) TRUE
 COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock);
 int idx_to_sft_(int SftIndex);
