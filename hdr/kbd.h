@@ -41,13 +41,13 @@ static BYTE *kbd_hRcsId =
 
 /* Keyboard buffer                                                      */
 typedef struct _kbd {
-  REF_MEMB(UBYTE, kb_size);                /* size of buffer in bytes              */
-  REF_MEMB(UBYTE, kb_count);               /* number of bytes returned             */
+  UBYTE kb_size;                /* size of buffer in bytes              */
+  UBYTE kb_count;               /* number of bytes returned             */
   AR_MEMB(_kbd, BYTE, _kb_buf, KBD_MAXLENGTH);   /* the buffer itself            */
 } keyboard;
 
-typedef struct _kbd0a {
-  REF_MEMB(UBYTE, kb_size);                /* size of buffer in bytes              */
-  REF_MEMB(UBYTE, kb_count);               /* number of bytes returned             */
+typedef struct {
+  UBYTE kb_size;                /* size of buffer in bytes              */
+  UBYTE kb_count;               /* number of bytes returned             */
   BYTE _kb_buf[LINEBUFSIZE0A];  /* the buffer itself            */
 } kbd0a;

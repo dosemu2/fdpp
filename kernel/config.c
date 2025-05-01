@@ -2851,16 +2851,16 @@ STATIC void CfgMenuColor(char * pLine)
 #define _TIME_24 1
 
 struct CountrySpecificInfoSmall {
-  REF_MEMB(short, CountryID);    /*  = W1 W437   # Country ID */
-  REF_MEMB(char,  DateFormat);           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
-  RARR_MEMB(char, CurrencyString, 4);    /* '$' ,'EUR', XXX was 3   */
-  REF_MEMB(char,  ThousandSeparator);    /* ','          # Thousand's separator */
-  REF_MEMB(char,  DecimalPoint);         /* '.'        # Decimal point        */
-  REF_MEMB(char,  DateSeparator);        /* '-'  */
-  REF_MEMB(char,  TimeSeparator);        /* ':'  */
-  REF_MEMB(char,  CurrencyFormat);       /* = 0  # Currency format (bit array)  */
-  REF_MEMB(char,  CurrencyPrecision);    /* = 2  # Currency precision           */
-  REF_MEMB(char,  TimeFormat);           /* = 0  # time format: 0/1: 12/24 houres */
+  short CountryID;    /*  = W1 W437   # Country ID */
+  char  DateFormat;           /*    Date format: 0/1/2: U.S.A./Europe/Japan */
+  char  CurrencyString[4];    /* '$' ,'EUR', XXX was 3   */
+  char  ThousandSeparator;    /* ','          # Thousand's separator */
+  char  DecimalPoint;         /* '.'        # Decimal point        */
+  char  DateSeparator;        /* '-'  */
+  char  TimeSeparator;        /* ':'  */
+  char  CurrencyFormat;       /* = 0  # Currency format (bit array)  */
+  char  CurrencyPrecision;    /* = 2  # Currency precision           */
+  char  TimeFormat;           /* = 0  # time format: 0/1: 12/24 houres */
 };
 
 struct CountrySpecificInfoSmall specificCountriesSupported[] = {

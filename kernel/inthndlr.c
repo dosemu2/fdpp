@@ -862,27 +862,27 @@ dispatch:
       /* Get/Set Country Info                                         */
     case 0x38:
       {
-        UWORD _cntry = lr.AL;
+        UWORD cntry = lr.AL;
 
-        if (_cntry == 0xff)
-          _cntry = lr.BX;
+        if (cntry == 0xff)
+          cntry = lr.BX;
 
         if (0xffff == lr.DX)
         {
           /* Set Country Code */
-          rc = DosSetCountry(_cntry);
+          rc = DosSetCountry(cntry);
         }
         else
         {
-          if (_cntry == 0)
-            _cntry--;
+          if (cntry == 0)
+            cntry--;
           /* Get Country Information */
-          rc = DosGetCountryInformation(_cntry, FP_DS_DX);
+          rc = DosGetCountryInformation(cntry, FP_DS_DX);
           if (rc >= SUCCESS)
           {
-            if (_cntry == (UWORD) - 1)
-              _cntry = nlsInfo.actPkg->cntry;
-            lr.AX = lr.BX = _cntry;
+            if (cntry == (UWORD) - 1)
+              cntry = nlsInfo.actPkg->cntry;
+            lr.AX = lr.BX = cntry;
           }
         }
         goto short_check;

@@ -178,14 +178,14 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
   status = find_fname(path, D_ALL | attrib, fnp);
   if (status == SUCCESS)
   {
-    unsigned char _dir_attrib = fnp->f_dir.dir_attrib;
+    unsigned char dir_attrib = fnp->f_dir.dir_attrib;
     if (flags & _O_TRUNC)
     {
       /* The only permissable attribute is archive,   */
       /* check for any other bit set. If it is, give  */
       /* an access error.                             */
-      if ((_dir_attrib & (D_RDONLY | D_DIR | D_VOLID))
-          || (_dir_attrib & ~D_ARCHIVE & ~attrib))
+      if ((dir_attrib & (D_RDONLY | D_DIR | D_VOLID))
+          || (dir_attrib & ~D_ARCHIVE & ~attrib))
         return DE_ACCESS;
 
       /* Release the existing files FAT and set the   */
@@ -197,14 +197,14 @@ int dos_open(char *path, unsigned flags, unsigned attrib, int fd)
     else if (flags & _O_OPEN)
     {
       /* force r/o open for FCB if the file is read-only */
-      if ((flags & _O_FCB) && (_dir_attrib & D_RDONLY))
+      if ((flags & _O_FCB) && (dir_attrib & D_RDONLY))
         flags = (flags & ~3) | _O_RDONLY;
 
       /* Check permissions. -- JPP
          (do not allow to open volume labels/directories,
           and do not allow writing to r/o files) */
-      if ((_dir_attrib & (D_DIR | D_VOLID)) ||
-          ((_dir_attrib & D_RDONLY) && ((flags & _O_ACCMODE) != _O_RDONLY)))
+      if ((dir_attrib & (D_DIR | D_VOLID)) ||
+          ((dir_attrib & D_RDONLY) && ((flags & _O_ACCMODE) != _O_RDONLY)))
         return DE_ACCESS;
       status = S_OPENED;
     }

@@ -333,11 +333,11 @@ struct fsinfo {
 
 typedef boot super;             /* Alias for boot structure             */
 
-typedef struct _request {
-  REF_MEMB(UBYTE, r_length);               /*  Request Header length               */
-  REF_MEMB(UBYTE, r_unit);                 /*  Unit Code                           */
-  REF_MEMB(UBYTE, r_command);              /*  Command Code                        */
-  REF_MEMB(UWORD, r_status);               /*  Status                              */
+typedef struct {
+  UBYTE r_length;               /*  Request Header length               */
+  UBYTE r_unit;                 /*  Unit Code                           */
+  UBYTE r_command;              /*  Command Code                        */
+  UWORD r_status;               /*  Status                              */
   BYTE r_reserved[8];           /*  DOS Reserved Area                   */
   union {
     struct {
@@ -350,31 +350,31 @@ typedef struct _request {
       UBYTE _r_firstunit;
     } PACKED _r_init;
     struct {
-      REF_MEMB(BYTE, _r_mcmdesc);          /*  MEDIA Descriptor    */
+      BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       BYTE _r_retcode;          /*  Return Code         */
       __DOSFAR(BYTE) _r_vid;        /* volume id */
     } PACKED _r_media;
     struct {
-      REF_MEMB(BYTE, _r_bpmdesc);          /*  MEDIA Descriptor    */
+      BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       __DOSFAR(boot) _r_fat;        /*  boot sector pointer */
       __DOSFAR(bpb) _r_bpbpt;       /*  ptr to BPB table    */
     } PACKED _r_bpb;
     struct {
-      REF_MEMB(BYTE, _r_meddesc);          /*  MEDIA Descriptor    */
+      BYTE _r_meddesc;          /*  MEDIA Descriptor    */
       __DOSFAR(BYTE) _r_trans;      /*  Transfer Address    */
-      REF_MEMB(UWORD, _r_count);           /*  Byte/Sector Count   */
-      REF_MEMB(UWORD, _r_start);           /*  Starting Sector No. */
+      UWORD _r_count;           /*  Byte/Sector Count   */
+      UWORD _r_start;           /*  Starting Sector No. */
       __DOSFAR(BYTE) _r_vid;        /* Pointer to volume id */
-      REF_MEMB(LONG, _r_huge);             /* for > 32Mb drives    */
+      LONG _r_huge;             /* for > 32Mb drives    */
     } PACKED _r_rw;
     struct {
       unsigned char _r_ndbyte;  /*  Byte Read From Device       */
     } _r_nd;
     struct {
-      REF_MEMB(UBYTE, _r_cat);             /* Category code */
-      REF_MEMB(UBYTE, _r_fun);             /* Function code */
-      REF_MEMB(UWORD, _r_si);              /* Contents of SI and DI */
-      REF_MEMB(UWORD, _r_di);              /* (PC DOS 7 Technical Update, pp 104,105) */
+      UBYTE _r_cat;             /* Category code */
+      UBYTE _r_fun;             /* Function code */
+      UWORD _r_si;              /* Contents of SI and DI */
+      UWORD _r_di;              /* (PC DOS 7 Technical Update, pp 104,105) */
       union
       {
         __DOSFAR(struct gblkio)_r_io;
@@ -403,12 +403,12 @@ ANNOTATE_SIZE(request, 30);
 #define r_firstunit     _r_x._r_init._r_firstunit
 
 /* MEDIA Check packet macros                                            */
-#define r_mcmdesc       _r_x._r_media._r_mcmdesc
+#define r_mcmdesc       _r_x._r_media._r_meddesc
 #define r_mcretcode     _r_x._r_media._r_retcode
 #define r_mcvid         _r_x._r_media._r_vid
 
 /* Build BPB packet macros                                              */
-#define r_bpmdesc       _r_x._r_bpb._r_bpmdesc
+#define r_bpmdesc       _r_x._r_bpb._r_meddesc
 #define r_bpfat         _r_x._r_bpb._r_fat
 #define r_bpptr         _r_x._r_bpb._r_bpbpt
 

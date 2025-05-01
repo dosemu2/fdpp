@@ -36,11 +36,11 @@ static BYTE *dirmatch_hRcsId =
 #endif
 
 typedef struct _dmatch {
-  REF_MEMB(UBYTE, dm_drive);
+  UBYTE dm_drive;
   AR_MEMB(_dmatch, BYTE, dm_name_pat, FNAME_SIZE + FEXT_SIZE);
-  REF_MEMB(UBYTE, dm_attr_srch);
-  REF_MEMB(UWORD, dm_entry);
-  REF_MEMB(CLUSTER, dm_dircluster);
+  UBYTE dm_attr_srch;
+  UWORD dm_entry;
+  CLUSTER dm_dircluster;
 #ifndef WITHFAT32
   UWORD reserved;
 #endif
