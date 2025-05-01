@@ -1148,7 +1148,7 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
     p = get_root(PriPathName);
     memset(SearchDir.dir_name, ' ', FNAME_SIZE + FEXT_SIZE);
     for (i = 0; i < FNAME_SIZE && *p && *p != '.'; i++)
-      SearchDir.___dir_name[i] = *p++;
+      SearchDir.dir_name[i] = *p++;
     rc = SUCCESS;
     /* /// End of additions.  - Ron Cemer ; heavily edited - Bart Oldeman */
   }

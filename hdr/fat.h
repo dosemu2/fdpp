@@ -108,7 +108,7 @@ static BYTE *fat_hRcsId =
 /* FAT file system directory entry                                      */
 struct dirent {
 //  AR_MEMB(dirent, char, dir_name, FNAME_SIZE + FEXT_SIZE);   /* Filename + extension in FCB format */
-  REF_MEMB_A(char, dir_name, FNAME_SIZE + FEXT_SIZE);   /* Filename + extension in FCB format */
+  RARR_MEMB(char, dir_name, FNAME_SIZE + FEXT_SIZE);   /* Filename + extension in FCB format */
   REF_MEMB(UBYTE, dir_attrib);             /* File Attribute               */
   UBYTE dir_case;               /* File case                    */
   UBYTE dir_crtimems_or_fchar;  /* Create time (msecs) or first name char */

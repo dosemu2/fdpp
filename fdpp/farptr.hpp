@@ -356,13 +356,7 @@ public:
           std::is_same<T1, const char>::value ||
           std::is_void<T1>::value
         >::type* = nullptr>
-    XFarPtr(char *&s) : FarPtr<T>(_MK_FAR_S(s)) {}
-    template<typename T1 = T,
-        typename std::enable_if<
-          std::is_same<T1, const char>::value ||
-          std::is_same<T1, const void>::value
-        >::type* = nullptr>
-    XFarPtr(const char *&s) : FarPtr<T>(_MK_FAR_CS(s)) {}
+    XFarPtr(const char *s) : FarPtr<T>(_MK_FAR_CS(s)) {}
     template<typename T1 = T, int N,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     XFarPtr(const T1 (&p)[N]) : FarPtr<T>(_MK_FAR(p)) {}
@@ -777,9 +771,6 @@ public:
 #define REF_MEMB(t, n) \
     t ___##n; \
     t& _##n() { return ___##n; }
-#define REF_MEMB_A(t, n, l) \
-    t n[l]; \
-    t *_##n() { return n; }
 #define RARR_MEMB(t, n, l) \
     t ___##n[l]; \
     t *_##n() { return ___##n; }

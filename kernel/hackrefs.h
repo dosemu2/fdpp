@@ -39,7 +39,7 @@ grep -h ____ *.c | cut -d "." -f 2 | cut -d " " -f 1 | \
 #define dir_attrib _dir_attrib()
 #define dir_time _dir_time()
 #define dir_date _dir_date()
-#define ___dir_name _dir_name()
+#define dir_name _dir_name()
 #define r_length _r_length()
 #define r_unit _r_unit()
 #define r_command _r_command()
