@@ -415,7 +415,6 @@ public:
     }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, fptr.get_far()); }
     far_t get_far() const { ___assert(check_magic()); return fptr.get_far(); }
-    T& get_sym() { return *this; }
     void clear() { fptr = NULL; }
 };
 
@@ -459,7 +458,7 @@ public:
     operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, fptr.get_far());
     }
-    T& get_sym() { return sym; }
+    const T get_sym() const { return sym; }
     void clear() { fptr = NULL; }
 };
 
