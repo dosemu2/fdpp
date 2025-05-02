@@ -344,6 +344,19 @@ public:
     /* The below ctors are safe wrt implicit conversions as they take
      * the lvalue reference to the pointer, not just the pointer itself.
      * This is the reason why they exist at all. */
+    template<typename T1 = T,
+        typename std::enable_if<
+          !std::is_same<T1, char>::value &&
+          !std::is_same<T1, const char>::value
+        >::type* = nullptr>
+    XFarPtr(const T1 *&p) : FarPtr<T>(_MK_FAR(*p)) {}
+    template<typename T1 = T,
+        typename std::enable_if<
+          std::is_same<T1, char>::value ||
+          std::is_same<T1, const char>::value ||
+          std::is_void<T1>::value
+        >::type* = nullptr>
+    XFarPtr(const char *s) : FarPtr<T>(_MK_FAR_CS(s)) {}
     template<typename T1 = T, int N,
         typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     XFarPtr(const T1 (&p)[N]) : FarPtr<T>(_MK_FAR(p)) {}

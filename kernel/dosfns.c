@@ -1420,7 +1420,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
    returns device header if match, else returns NULL
    can only match character devices (as only they have names)
  */
-struct dhdr FAR *IsDevice(const char FAR *fname)
+struct dhdr FAR *IsDevice(__XFAR(const char)fname)
 {
   struct dhdr FAR *dhp;
   const char FAR *froot = get_root(fname);

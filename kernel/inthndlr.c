@@ -2142,7 +2142,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
       {
         struct dhdr FAR *dhp;
 
-        dhp = IsDevice(MK_FAR_CSTR_SCP(DirEntBuffer.dir_name));
+        dhp = IsDevice(DirEntBuffer.dir_name);
 
         if (dhp == NULL)
         {
