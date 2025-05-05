@@ -5,8 +5,10 @@ srcdir ?= $(CURDIR)
 
 # if exported from top-level project, then don't include defaults
 ifeq ($(PKG_CONFIG),)
-include $(srcdir)/$(T)/clang.mak
 include $(srcdir)/$(T)/defs.mak
+ifeq ($(filter clean install,$(MAKECMDGOALS)),)
+include $(srcdir)/$(T)/clang.mak
+endif
 endif
 
 TOP = $(abspath $(srcdir)/$(T)/..)

@@ -8,7 +8,9 @@ unexport srcdir
 MAKEOVERRIDES =
 
 include $(srcdir)/$(T)/defs.mak
+ifeq ($(filter clean install,$(MAKECMDGOALS)),)
 include $(srcdir)/$(T)/clang.mak
+endif
 
 TOP = $(abspath $(srcdir)/$(T)/..)
 HDR = $(TOP)/hdr
