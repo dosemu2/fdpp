@@ -84,8 +84,10 @@ If you find some compatibility problems, please
 fdpp can work in any environment with STL/C++ runtime & minimal
 posix support.
 The build requirements are in line with today's posix-compatible
-environments: you'll need the full stack of tools like bison,
-autoconf, sed etc.
+environments, with the following exceptions:
+- we do not support nasm, using
+  [nasm-segelf](https://github.com/stsp/nasm-segelf) instead
+- we do not support ld.lld or any other linker, but only GNU ld
 
 ## related projects
 ### FreeDOS
