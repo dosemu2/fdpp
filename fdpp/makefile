@@ -51,6 +51,7 @@ all: $(ALL)
 export CFLAGS
 export LDFLAGS
 
+ifeq ($(filter clean install,$(MAKECMDGOALS)),)
 # New makes have a way to avoid parallel invocation with the use of &:
 # On old make you would write "%.elf %.map :" which is a bit silly
 # given the names are fixed. Also $(TARGET).% won't work that way at all:
@@ -67,6 +68,7 @@ endif
 
 $(LDRLIB):
 	$(MAKE) -C loader
+endif
 
 clean:
 	$(MAKE) -C kernel clean
