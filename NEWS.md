@@ -126,7 +126,7 @@ Major development efforts again. Look out for new bugs...
 - Switched to TINY model. This required a large redesign, and
   allowed to simplify the build process and reduce the build
   dependencies.
-- Switched to lld linked from bfd ld.
+- Switched to lld linker from bfd ld.
 - Lot of work on share. Region locking and share modes are now
   supported properly. Also share no longer allocates the precious
   DOS memory.
