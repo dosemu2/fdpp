@@ -339,6 +339,6 @@ the development. :)
 - valgrind and ubsan fixes (ubsan found some real bugs!)
 - lots of work on memory management, object tracking and thunk dispatching
   (but not yet complete)
-- drop all hops of C++-less run-time: libstdc++ is now and forever a mandatory
+- drop all hopes of C++-less run-time: libstdc++ is now and forever a mandatory
 - FCB subsystem ported, with additional fixes from Andrew
 - many bugfixes
