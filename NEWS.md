@@ -1,3 +1,16 @@
+## 1.10
+
+Nearly ~100 commits, mostly introducing the new architecture with
+experimental gcc compatibility. This architecture does not rely on
+an exotic C++ features like unaligned references, which makes it
+more portable. Also it doesn't rely on an "explicit lifetime management"
+feature of c++23, which currently isn't yet implemented in any compiler.
+As such, the old architecture actually relied on an UB.
+Aside from that:
+
+- more work on meson
+- support building for i686
+
 ## 1.9
 
 Maintenance release with just 20 commits.
