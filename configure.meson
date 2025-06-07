@@ -1,20 +1,40 @@
 #!/usr/bin/env bash
 
-if [ -z "$1" ] ; then
-    BLD="build"
-    BLDH="build"
-else
-    BLDH=${!#}
-fi
+usage() {
+  echo "$0 [-b <build_dir>] [-c] [-- <meson_args>]"
+  echo -e "\t-c selects clang for build"
+}
+
+CROSS_F="toolchain.ini"
+BLD="build"
+
+while getopts "b:ch" opt; do
+  case "$opt" in
+    b)
+      BLD="$OPTARG"
+      ;;
+    c)
+      CROSS_F="toolchain-clang.ini"
+      ;;
+    h)
+      usage
+      exit 0
+      ;;
+    \?)
+      exit 1
+      ;;
+  esac
+done
+shift $(($OPTIND-1))
 
 TOP=$(dirname "$0")
 
 meson setup \
-  --cross-file $TOP/fdpp/kernel/toolchain.ini \
+  --cross-file $TOP/fdpp/kernel/$CROSS_F \
   $* $BLD $TOP
 [ "$?" = "0" ] || exit 1
 
 echo
 echo "Done configure"
-echo "Now run \"meson compile --verbose -C $BLDH\" to build"
-echo "After that you can do \"meson install -C $BLDH\" to install"
+echo "Now run \"meson compile --verbose -C $BLD\" to build"
+echo "After that you can do \"meson install -C $BLD\" to install"
