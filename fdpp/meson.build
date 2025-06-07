@@ -152,6 +152,9 @@ if cxx_id == 'clang'
 else
   CXX_ARGS += ['-Wno-format', '-Wno-format-extra-args',
       '-Wno-error=format-security']
+  if CXX_MAJ.to_int() < 15
+    CXX_ARGS += ['-Wno-subobject-linkage']
+  endif
 endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
