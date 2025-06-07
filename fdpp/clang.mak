@@ -47,7 +47,7 @@ TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line
 ifeq ($(GCC_VER),)
 TARGETOPT += -DCLANG_VER=$(CLANG_VER)
-TARGETOPT_XTRA = -Wno-format-invalid-specifier -Wno-c99-designator
+TARGETOPT_XTRA = -Wno-format-invalid-specifier
 else
 TARGETOPT_XTRA = -Wno-error=format-security
 endif

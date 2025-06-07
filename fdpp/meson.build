@@ -146,10 +146,11 @@ CXX_ARGS = ['-DFDPP', '-DDEBUG', '-DWITHFAT32',
       '-fno-threadsafe-statics',
       '-Wno-address-of-packed-member', DEBUG_OPTS]
 if cxx_id == 'clang'
-  CXX_ARGS += ['-Werror=packed-non-pod', '-Wno-c99-designator',
+  CXX_ARGS += ['-Werror=packed-non-pod',
       '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option',
       '-DCLANG_VER=' + CXX_MAJ]
 else
+  # -Wno-format suppresses extra-args too, so below is a bit redundant
   CXX_ARGS += ['-Wno-format', '-Wno-format-extra-args',
       '-Wno-error=format-security']
   if CXX_MAJ.to_int() < 15
