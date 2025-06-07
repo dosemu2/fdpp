@@ -753,7 +753,19 @@ public:
 #define __ASYM(x) __##x.get_sym()
 #define __ASYM_L(x) __##x.get_sym()
 #define ASMREF(t) AsmRef<t>
-#if defined(__clang__) && CLANG_VER < 14
+#if defined(__clang__)
+#ifndef CLANG_VER
+#error CLANG_VER not defined
+#endif
+#if CLANG_VER < 14
+#define OLD_CLANG 1
+#else
+#define OLD_CLANG 0
+#endif
+#else
+#define OLD_CLANG 0
+#endif
+#if OLD_CLANG
 #define DUMMY_MARK(p, n) \
     static constexpr int off_##n(void) { return offsetof(p, n); }
 #define OFF_M(p, n) p::off_##n

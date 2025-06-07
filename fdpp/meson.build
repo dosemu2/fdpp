@@ -131,8 +131,9 @@ FDPP_CCFILES = ['thunks.cc', 'thunks_c.cc', 'thunks_a.cc', 'thunks_p.cc',
 CPPFILES = ['objhlp.cpp', 'ctors.cpp', 'farhlp.cpp', 'objtrace.cpp']
 hdr = ['src', 'hdr', '.', rel_inc]
 incdir2 = include_directories(hdr)
-CLANG_VER = meson.get_compiler('cpp').version().split('.')[0]
-cxx_id = meson.get_compiler('cpp').get_id()
+cxx = meson.get_compiler('cpp')
+CXX_MAJ = cxx.version().split('.')[0]
+cxx_id = cxx.get_id()
 if get_option('buildtype').startswith('debug')
   DEBUG_OPTS = ['-DFDPP_DEBUG', '-DEXTRA_DEBUG']
   if cxx_id == 'clang'
@@ -141,12 +142,13 @@ if get_option('buildtype').startswith('debug')
 else
   DEBUG_OPTS = []
 endif
-CXX_ARGS = ['-DFDPP', '-DDEBUG', '-DWITHFAT32', '-DCLANG_VER=' + CLANG_VER,
+CXX_ARGS = ['-DFDPP', '-DDEBUG', '-DWITHFAT32',
       '-fno-threadsafe-statics',
       '-Wno-address-of-packed-member', DEBUG_OPTS]
 if cxx_id == 'clang'
   CXX_ARGS += ['-Werror=packed-non-pod', '-Wno-c99-designator',
-      '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option']
+      '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option',
+      '-DCLANG_VER=' + CXX_MAJ]
 else
   CXX_ARGS += ['-Wno-format', '-Wno-format-extra-args',
       '-Wno-error=format-security']
