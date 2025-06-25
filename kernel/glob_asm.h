@@ -27,7 +27,7 @@ __ASM(dmatch, sda_tmp_dm) SEMIC       /* Temporary directory match buffer     */
 __ASM(dmatch, sda_tmp_dm_ren) SEMIC   /* 2nd Temporary directory match buffer */
 __ASM(dmatch, dmatch_ff) SEMIC        /* directory match buffer for fcb */
 __ASM_FAR(void, dta) SEMIC
-__ASM(seg, cu_psp) SEMIC              /* current psp segment                  */
+__ASM(UWORD, cu_psp) SEMIC            /* current psp segment                  */
 __ASM_FAR(iregs, user_r) SEMIC      /* User registers for int 21h call      */
 __ASM_FAR(fcb, sda_lpFcb) SEMIC     /* Pointer to users fcb                 */
 __ASM_FAR(sft, lpCurSft) SEMIC
