@@ -186,8 +186,8 @@ const char FAR * _GetNameField(const char FAR * lpFileName, char * lpDestField,
   COUNT nIndex = 0;
   BYTE cFill = ' ';
 
-  while (*lpFileName != '\0' && !TestFieldSeps(lpFileName)
-         && nIndex < nFieldSize)
+  while (nIndex < nFieldSize && *lpFileName != '\0' &&
+        !TestFieldSeps(lpFileName))
   {
     /* convert * into multiple ? for remaining length of field    */
     if (*lpFileName == '*')
