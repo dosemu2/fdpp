@@ -21,11 +21,6 @@
 #include "thunks_priv.h"
 #include "farhlp.hpp"
 
-/* hackish helper to store/lookup far pointers - using static
- * object (map) is an ugly hack in an OOP world.
- * Need this to work around some C++ deficiencies, see comments
- * in farptr.hpp */
-
 void farhlp_init(farhlp *ctx)
 {
     ctx->map.clear();
