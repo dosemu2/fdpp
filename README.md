@@ -9,7 +9,7 @@ Can be compiled with clang (or experimentally with gcc) and booted under
 [dosemu2](https://github.com/dosemu2/dosemu2).
 
 ## building and installing
-Run `./configure.meson [<build_dir>]`.<br/>
+Run `./configure.meson [-b <build_dir>]`.<br/>
 This creates and configures the build dir and prints
 the instructions for the further build steps. It should also inform
 you about any missing build-dependencies, which you need to install.
