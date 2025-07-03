@@ -66,7 +66,12 @@ group   I_GROUP         ID_B ID ID_E IC IDATA IB_B IB IB_E
 
 BITS 16
 extern __LOADADDR
+%ifdef FDPP_STATIC
+extern _LOADSEG
+%define LOAD_SEG _LOADSEG
+%else
 %define LOAD_SEG seg __LOADADDR
+%endif
 %define INIT_LS LOAD_SEG
 %define DGROUP  LOAD_SEG
 %define LGROUP  LOAD_SEG

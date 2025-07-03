@@ -37,21 +37,21 @@ const char *FdppKernelMapName(void)
 
 struct krnl_hndl {
     void *elf;
-    const void *start;
-    unsigned load_off;
+    unsigned start;
+    uint16_t load_seg;
 };
 
 void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
                      uint32_t *_start)
 {
     struct fdpp_bss_list *bl;
-    void *start, *end;
-    void *bstart, *bend;
-    void *ibstart, *ibend;
+    int start, end;
+    int bstart, bend;
+    int ibstart, ibend;
     char *kname;
     void *handle;
     struct krnl_hndl *h;
-    int i, s, rc;
+    int i, ls, rc;
 
     rc = asprintf(&kname, "%s/%s", dname, _S(KRNL_ELFNAME));
     assert(rc != -1);
@@ -62,39 +62,43 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
         return NULL;
     }
     free(kname);
-    start = fdelf_getsym(handle, "_start");
-    s = fdelf_getsymoff(handle, "_start");
-    if (s == -1)
+    start = fdelf_getsymoff(handle, "_start");
+    if (start == -1)
         goto err_close;
-    *_start = s;
-    end = fdelf_getsym(handle, "__InitTextEnd");
-    if (!end)
+    *_start = start;
+    end = fdelf_getsymoff(handle, "__InitTextEnd");
+    if (end == -1)
         goto err_close;
-    bstart = fdelf_getsym(handle, "__bss_start");
-    if (!bstart)
+    bstart = fdelf_getsymoff(handle, "__bss_start");
+    if (bstart == -1)
         goto err_close;
-    bend = fdelf_getsym(handle, "__bss_end");
-    if (!bend)
+    bend = fdelf_getsymoff(handle, "__bss_end");
+    if (bend == -1)
         goto err_close;
-    ibstart = fdelf_getsym(handle, "__ibss_start");
-    if (!ibstart)
+    ibstart = fdelf_getsymoff(handle, "__ibss_start");
+    if (ibstart == -1)
         goto err_close;
-    ibend = fdelf_getsym(handle, "__ibss_end");
-    if (!ibend)
+    ibend = fdelf_getsymoff(handle, "__ibss_end");
+    if (ibend == -1)
         goto err_close;
-    *len = (uintptr_t)end - (uintptr_t)start;
+
+    ls = fdelf_getsymoff(handle, "_LOADSEG");
+    if (ls == -1 || ls > 0xffff)
+        goto err_close;
+    /* if we are relocatable (ls==0), then skip garbage before "start" */
+    *len = end - (ls ? 0 : start);
 
     bl = (struct fdpp_bss_list *)malloc(sizeof(*bl) +
             sizeof(struct fdpp_bss_ent) * 2);
     i = 0;
     if (bend != bstart) {
-        bl->ent[i].off = (uintptr_t)bstart - (uintptr_t)start;
-        bl->ent[i].len = (uintptr_t)bend - (uintptr_t)bstart;
+        bl->ent[i].off = bstart - start;
+        bl->ent[i].len = bend - bstart;
         i++;
     }
     if (ibend != ibstart) {
-        bl->ent[i].off = (uintptr_t)ibstart - (uintptr_t)start;
-        bl->ent[i].len = (uintptr_t)ibend - (uintptr_t)ibstart;
+        bl->ent[i].off = ibstart - start;
+        bl->ent[i].len = ibend - ibstart;
         i++;
     }
     bl->num = i;
@@ -103,7 +107,7 @@ void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
     h = (struct krnl_hndl *)malloc(sizeof(*h));
     h->elf = handle;
     h->start = start;
-    h->load_off = s;
+    h->load_seg = ls;
     return h;
 
 err_close:
@@ -111,19 +115,31 @@ err_close:
     return NULL;
 }
 
+uint16_t FdppGetLoadSeg(void *handle)
+{
+    struct krnl_hndl *h = (struct krnl_hndl *)handle;
+
+    return h->load_seg;
+}
+
 const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg,
         reloc_hook_t hook)
 {
     struct krnl_hndl *h = (struct krnl_hndl *)handle;
+    char *la = fdelf_getloadaddr(h->elf);
 
-    assert(!(h->load_off & 0xf));
-    seg -= h->load_off >> 4;
-    fdelf_reloc(h->elf, seg);
-
+    assert(!(h->start & 0xf));
+    /* if relocatable then skip up to "start" to save DOS mem */
+    if (!h->load_seg) {
+        seg -= h->start >> 4;
+        fdelf_reloc(h->elf, seg);
+    } else {
+        seg = h->load_seg;
+    }
     hook(seg, fdelf_getsymoff, h->elf);
 
     *r_seg = seg;
-    return h->start;
+    return (la + (h->load_seg ? 0 : h->start));
 }
 
 void FdppKernelFree(void *handle)

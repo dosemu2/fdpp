@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#define FDPP_LDR_VER 2
+
 const char *FdppKernelDir(void);
 const char *FdppKernelMapName(void);
 
@@ -36,6 +38,7 @@ struct fdpp_bss_list {
 
 void *FdppKernelLoad(const char *dname, int *len, struct fdpp_bss_list **bss,
                      uint32_t *_start);
+uint16_t FdppGetLoadSeg(void *handle);
 typedef void (*reloc_hook_t)(uint16_t, int (*)(void *, const char *), void *);
 const void *FdppKernelReloc(void *handle, uint16_t seg, uint16_t *r_seg,
                             reloc_hook_t hook);

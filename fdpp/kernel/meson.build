@@ -65,20 +65,31 @@ SRCS = [
 ]
 
 nargs = ['-DXCPU=186', '-DWITHFAT32', '-DFDPP']
+as = meson.get_compiler('nasm')
+ld_id = as.get_linker_id()
+if ld_id == 'ld.bfd'
+  nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
+  LA = '--emit-relocs'
+else
+# lld doesn't work
+#  nasm_ld = find_program(['ld.lld'])
+  nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
+  LA = '--defsym=loadaddr=0x900'
+  nargs += '-DFDPP_STATIC'
+endif
 
 lib = static_library('dummy',
   [SRCS, sfiles, plt_inc],
   include_directories: incdir2,
   nasm_args: nargs,
   build_by_default: false)
-nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
 custom_target(TARGET + '.elf',
   output: [TARGET + '.elf', TARGET + '.map'],
   input: lib.extract_all_objects(recursive: true),
   command: [nasm_ld, '-melf_i386', '-static',
     '-Map=@OUTPUT1@', '-o', '@OUTPUT0@',
     '--build-id=none',
-    '--emit-relocs', '-T' + kernel_ld, '@INPUT@'],
+    LA, '-T' + kernel_ld, '@INPUT@'],
   install: true,
   install_dir: get_option('datadir') / 'fdpp',
   install_mode: 'rw-r--r--',

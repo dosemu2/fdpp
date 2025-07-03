@@ -3,6 +3,7 @@
 SECTIONS
   {
     _LOADADDR = DEFINED(loadaddr) ? loadaddr : 0;
+    _LOADSEG  = DEFINED(loadaddr) ? loadaddr >> 4 : 0;
     /* these GROUPs play the same role as GROUPS (segments) in OMF */
     /* TINY model, all segments are equal */
     /* currently unused
