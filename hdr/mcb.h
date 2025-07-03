@@ -51,13 +51,13 @@ static BYTE *mcb_hRcsId =
 #define MCB_NORMAL      0x4d
 #define MCB_LAST        0x5a
 
-extern UWORD DOS_PSP;
 #define FREE_PSP        0
 
 #define MCB_SIZE(x)     ((((LONG)(x))<<4)+sizeof(mcb))
 
 typedef UDWORD seg;
 typedef UWORD offset;
+extern seg DOS_PSP;
 
 typedef struct _mcb {
   BYTE m_type;                  /* mcb type - chain or end              */

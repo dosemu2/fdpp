@@ -745,6 +745,11 @@ segment INIT_TEXT_START
                 times 10h db 0      ; guard space from prev sym
                 global  __InitTextStart
 __InitTextStart:                    ; and c version
+                global _INIT_LS
+_INIT_LS        dw INIT_LS
+                global _PG_OFF
+                extern _PGROUP
+_PG_OFF         dw _PGROUP
 
 segment INIT_TEXT_END
                 global  __InitTextEnd
@@ -774,8 +779,6 @@ segment HMA_TEXT
 ; to minimize relocations
                 global _DGROUP_
 _DGROUP_        dw DGROUP
-                global _DOS_PSP
-_DOS_PSP        dw PGROUP
 
 %ifdef WATCOM
 ;               32 bit multiplication + division

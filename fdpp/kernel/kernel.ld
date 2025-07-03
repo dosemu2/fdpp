@@ -5,19 +5,19 @@ SECTIONS
     _LOADADDR = DEFINED(loadaddr) ? loadaddr : 0;
     /* these GROUPs play the same role as GROUPS (segments) in OMF */
     /* TINY model, all segments are equal */
+    /* currently unused
     _LGROUP = ABSOLUTE(.);
-    _DGROUP = ABSOLUTE(.);
     _IGROUP = ABSOLUTE(.);
-    _LGROUP~ = . + _LOADADDR;
-    _DGROUP~ = . + _LOADADDR;
-    _IGROUP~ = . + _LOADADDR;
+     */
+    _DGROUP = ABSOLUTE(.);
+
+    __LOADADDR = . + _LOADADDR;
 
     . = SIZEOF_HEADERS;
     . = ALIGN(0x100);
     /* Target PSP section.  */
     .ptext : {
 		_PGROUP = ABSOLUTE(.);
-		_PGROUP~ = . + _LOADADDR;
 		*(PSP)
 		. = ALIGN(0x100);
     }

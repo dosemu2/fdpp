@@ -65,15 +65,12 @@ group   I_GROUP         ID_B ID ID_E IC IDATA IB_B IB IB_E
 %else ; using ELF
 
 BITS 16
-; groups are defined in the linker script kernel.ld
-extern _PGROUP~
-extern _DGROUP~
-extern _LGROUP~
-extern _IGROUP~
-%define PGROUP seg _PGROUP~
-%define DGROUP seg _DGROUP~
-%define LGROUP seg _LGROUP~
-%define IGROUP seg _IGROUP~
+extern __LOADADDR
+%define LOAD_SEG seg __LOADADDR
+%define INIT_LS LOAD_SEG
+%define DGROUP  LOAD_SEG
+%define LGROUP  LOAD_SEG
+%define IGROUP  LOAD_SEG
 %define class(x)
 %define stack
 %define INITSTACKSIZE 512

@@ -76,6 +76,7 @@ __segment DosTextSeg = 0;
 ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
 struct _bprm bprm;
 #define TEXT_SIZE (_InitTextEnd - _HMATextStart)
+seg DOS_PSP;
 
 VOID ASMCFUNC FreeDOSmain(void)
 {
@@ -107,6 +108,8 @@ VOID ASMCFUNC FreeDOSmain(void)
       FP_OFF(DataStart), DataEnd - DataStart);
   setDS(FP_SEG(&DATASTART));
   setES(FP_SEG(&DATASTART));
+  ___assert(!(PG_OFF & 0xf));
+  DOS_PSP = INIT_LS + (PG_OFF >> 4);
 
   BootParamVer = MK_FP(FDPP_BS_SEG, FDPP_BS_OFF + FDPP_BPRM_VER_OFFSET);
   if (*BootParamVer != BPRM_VER) {

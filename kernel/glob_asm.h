@@ -1,6 +1,7 @@
 /* grep "ASM " globals.h | grep "extern" | grep ";" | sed 's/extern \(.\+\) ASM \(.\+\);/__ASM(\1, \2) SEMIC/' */
 
-__ASM(UWORD, DOS_PSP) SEMIC
+__ASM(UWORD, INIT_LS) SEMIC
+__ASM(UWORD, PG_OFF) SEMIC
 __ASM(UWORD, NetBios) SEMIC
 __ASM(BYTE *, net_name) SEMIC
 __ASM(BYTE, net_set_count) SEMIC
