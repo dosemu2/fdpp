@@ -10,6 +10,14 @@ else
 $(error binutils-x86-64-linux-gnu not installed)
 endif
 endif
+LD_VER = $(shell $(CROSS_LD) --version 2>/dev/null)
+ifneq ($(filter LLD,$(LD_VER)),)
+$(warning lld found, producing unrelocatable build)
+want_loadaddr = 0x900
+NASM = nasm
+NASMFLAGS += -DFDPP_STATIC
+endif
+
 # don't use ?= here as that doesn't override make's builtin CC var
 CC = clang
 CXX = clang++
@@ -110,4 +118,4 @@ ifeq ($(XCPU),386)
 CPPFLAGS += -DI386
 endif
 
-NASMFLAGS := $(NASMFLAGS) -i$(srcdir)/../hdr/ -DXCPU=$(XCPU) -DFDPP
+NASMFLAGS += -i$(srcdir)/../hdr/ -DXCPU=$(XCPU) -DFDPP

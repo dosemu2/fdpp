@@ -36,9 +36,8 @@ ALL = $(T)/$(TARGET).elf $(T)/$(TARGET).map
 
 all: $(ALL)
 
-want_loadaddr = 0
-ifeq ($(want_loadaddr),1)
-LA = --defsym=loadaddr=0xfa100
+ifneq ($(want_loadaddr),)
+LA = --defsym=loadaddr=$(want_loadaddr)
 else
 LA = --emit-relocs
 endif
