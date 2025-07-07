@@ -71,14 +71,14 @@ SECTIONS
 		__ibss_end = .;
 		*(IB_E)
 	}
-
-    .shstrtab (NOLOAD) : {
+    /* lld doesn't want the below 3 to be removed or marked NOLOAD */
+    .shstrtab : {
 		*(.shstrtab)
 	}
-    .strtab (NOLOAD) : {
+    .strtab : {
 		*(.strtab)
 	}
-    .symtab (NOLOAD) : {
+    .symtab : {
 		*(.symtab)
 	}
     .rel.plt (NOLOAD) : {
