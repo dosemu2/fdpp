@@ -9,10 +9,17 @@ Can be compiled with clang (or experimentally with gcc) and booted under
 [dosemu2](https://github.com/dosemu2/dosemu2).
 
 ## building and installing
-Run `./configure.meson [-b <build_dir>]`.<br/>
+Run `./configure.meson [-c] [-b <build_dir>]`.<br/>
 This creates and configures the build dir and prints
 the instructions for the further build steps. It should also inform
 you about any missing build-dependencies, which you need to install.
+Among those are
+[nasm-segelf](https://github.com/stsp/nasm-segelf)
+and GNU ld (in case you have LLVM toolchain installed instead).
+
+`-c` stands for "compatibility" build. This way you don't need `nasm-segelf`
+and you can use `ld.lld` from LLVM. But the cost is extra ~8K of
+the DOS memory space eaten at boot.
 
 ## installing from pre-built package
 For the ubuntu package please visit
@@ -84,10 +91,7 @@ If you find some compatibility problems, please
 fdpp can work in any environment with STL/C++ runtime & minimal
 posix support.
 The build requirements are in line with today's posix-compatible
-environments, with the following exceptions:
-- we do not support nasm, using
-  [nasm-segelf](https://github.com/stsp/nasm-segelf) instead
-- we do not support ld.lld or any other linker, but only GNU ld
+environments.
 
 ## related projects
 ### FreeDOS
