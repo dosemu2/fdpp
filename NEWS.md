@@ -1,11 +1,16 @@
 ## 1.10
 
-Nearly ~100 commits, mostly introducing the new architecture with
+Nearly ~110 commits, mostly introducing the new architecture with
 experimental gcc compatibility. This architecture does not rely on
 an exotic C++ features like unaligned references, which makes it
 more portable. Also it doesn't rely on an "explicit lifetime management"
 feature of c++23, which currently isn't yet implemented in any compiler.
 As such, the old architecture actually relied on an UB.
+
+Another major "feature" is the return of lld linker support and nasm.
+With those you can now build the non-relocatable kernel, which will cost
+you ~8K of the DOS memory space, compared to nasm-segelf + GNU ld.
+
 Aside from that:
 
 - more work on meson
