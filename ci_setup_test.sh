@@ -62,7 +62,7 @@ fi
   sudo apt update -q
 
   sudo apt install -y \
-    comcom32 \
+    comcom64 \
     python3-cpuinfo \
     python3-pexpect \
     mtools \
