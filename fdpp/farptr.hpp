@@ -776,9 +776,9 @@ public:
 #define AR_MEMB(p, t, n, l) \
     DUMMY_MARK(p, n); \
     ArMemb<t, l, p, OFF_M(p, n)> n
-#define AR_MEMB_V(p, t, n, l) \
+#define AR_MEMB_V(p, t, n) \
     DUMMY_MARK(p, n); \
-    ArMemb<t, l, p, OFF_M(p, n), true> n
+    ArMemb<t, 1, p, OFF_M(p, n), true> n
 #define SYM_MEMB(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMemb<t, p, OFF_M(p, n)> n

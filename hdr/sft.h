@@ -101,7 +101,7 @@ typedef struct sfttbl {
     sftt_next;
   WORD sftt_count;              /* # of handle definition       */
   /* entries, this table          */
-  AR_MEMB_V(sfttbl, sft, sftt_table, 1);       /* The array of sft for block   */
+  AR_MEMB_V(sfttbl, sft, sftt_table);       /* The array of sft for block   */
 } PACKED sfttbl;
 
 #define SFTTBL_END(p) (FP_OFF(p) == 0xffff)
