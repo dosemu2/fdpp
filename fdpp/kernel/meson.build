@@ -71,9 +71,7 @@ if ld_id == 'ld.bfd'
   nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
   LA = '--emit-relocs'
 else
-# lld doesn't work
-#  nasm_ld = find_program(['ld.lld'])
-  nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
+  nasm_ld = find_program(['ld.lld'])
   LA = '--defsym=loadaddr=0x900'
   nargs += '-DFDPP_STATIC'
 endif
