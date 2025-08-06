@@ -943,7 +943,8 @@ VOID ASMCFUNC P_0(const struct config FAR *Config)
   BYTE off = 0;
 
   /* build exec block and save all parameters here as init part will vanish! */
-  exb->exec.fcb_1 = exb->exec.fcb_2 = (fcb FAR *)-1L;
+  exb->exec.fcb_1 = (fcb FAR *)-1L;
+  exb->exec.fcb_2 = (fcb FAR *)-1L;
   exb->exec.env_seg = 0;
   if ((bprm.ShellDrive & 0x80) && Config->cfgInit[1] != ':')
   {
