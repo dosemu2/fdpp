@@ -24,6 +24,7 @@
 #include <cstring>
 #include <unordered_set>
 #include "thunks_priv.h"
+#include "objlock.hpp"
 
 #if !defined(__clang__) || (__clang_major__ >= 16) || defined(__ANDROID__)
 #define NONPOD_PACKED __attribute__((packed))
@@ -383,21 +384,27 @@ class SymWrp : public T {
     char magic[sizeof(magic_val)];
 
     static void copy_mods(far_t fp, const T *src, const T *ref) {
-        if (std::memcmp(src, ref, sizeof(T)))
+        if (std::memcmp(src, ref, sizeof(T))) {
+            objlock_lock(fp);
             std::memcpy(resolve_segoff(fp), src, sizeof(T));
+        }
+    }
+
+    void dtor_common(bool mods) {
+        bool ok = check_magic();
+        if (ok) {
+            if (mods)
+                copy_mods(fptr.get_far(), this, &backup);
+            objlock_unref(fptr.get_far());
+        }
     }
 
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    void dtor() {
-        check_magic();
-        /* get_ptr() doesn't throw */
-        if (fptr.get_ptr())
-            copy_mods(fptr.get_far(), this, &backup);
-    }
+    void dtor() { dtor_common(fptr.get_ptr() ? true : false); }
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
-    void dtor() { check_magic(); }
+    void dtor() { dtor_common(false); }
 
     bool check_magic() const {
         bool ok = std::strcmp(magic, magic_val) == 0;
@@ -409,6 +416,7 @@ public:
     SymWrp(far_s f, bool nonnull = false) :
             fptr(f), backup(*(T *)resolve_segoff(f)) {
         ___assert(f.seg || f.off || nonnull);
+        objlock_ref(f);
         *(_RC(T) *)this = backup;
         std::strcpy(magic, magic_val);
     }
