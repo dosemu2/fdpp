@@ -382,18 +382,9 @@ class SymWrp : public T {
     static constexpr const char magic_val[] = "voodoo magic 123";
     char magic[sizeof(magic_val)];
 
-    void copy_mods(T *dest, T *src, T *ref) {
-        char *d = (char *)dest;
-        const char *s = (const char *)src;
-        const char *r = (const char *)ref;
-        size_t size = sizeof(T);
-        while (size--) {
-            if (*s != *r)
-                *d = *s;
-            s++;
-            d++;
-            r++;
-        }
+    static void copy_mods(far_t fp, const T *src, const T *ref) {
+        if (std::memcmp(src, ref, sizeof(T)))
+            std::memcpy(resolve_segoff(fp), src, sizeof(T));
     }
 
     template <typename T1 = T,
@@ -402,7 +393,7 @@ class SymWrp : public T {
         check_magic();
         /* get_ptr() doesn't throw */
         if (fptr.get_ptr())
-            copy_mods((T1 *)resolve_segoff(fptr.get_far()), this, &backup);
+            copy_mods(fptr.get_far(), this, &backup);
     }
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
