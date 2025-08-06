@@ -127,7 +127,8 @@ UWORD FcbParseFname(UBYTE *wTestMode, const char FAR * lpFileName, fcb FAR * lpF
   /* Undocumented behavior, set record number & record size to 0  */
   /* per MS-DOS Encyclopedia pp269 no other FCB fields modified   */
   /* except zeroing current block and record size fields          */
-  lpFcb->fcb_cublock = lpFcb->fcb_recsiz = 0;
+  lpFcb->fcb_cublock = 0;
+  lpFcb->fcb_recsiz = 0;
 
   if (!(*wTestMode & PARSE_BLNK_FNAME))
   {

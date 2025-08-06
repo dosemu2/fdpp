@@ -122,7 +122,7 @@ CFILES = blockio.c \
 
 FDPP_CFILES = smalloc.c
 FDPP_CCFILES = thunks.cc thunks_c.cc thunks_a.cc thunks_p.cc dosobj.cc
-CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp
+CPPFILES = objhlp.cpp ctors.cpp farhlp.cpp objtrace.cpp objlock.cpp
 
 OBJECTS = $(CFILES:.c=.o)
 FDPP_COBJS = $(FDPP_CFILES:.c=.o)

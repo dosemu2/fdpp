@@ -128,7 +128,8 @@ ppccf = ccgen.process(FDPP_CFILES)
 
 FDPP_CCFILES = ['thunks.cc', 'thunks_c.cc', 'thunks_a.cc', 'thunks_p.cc',
   'dosobj.cc']
-CPPFILES = ['objhlp.cpp', 'ctors.cpp', 'farhlp.cpp', 'objtrace.cpp']
+CPPFILES = ['objhlp.cpp', 'ctors.cpp', 'farhlp.cpp', 'objtrace.cpp',
+  'objlock.cpp']
 hdr = ['src', 'hdr', '.', rel_inc]
 incdir2 = include_directories(hdr)
 cxx = meson.get_compiler('cpp')
