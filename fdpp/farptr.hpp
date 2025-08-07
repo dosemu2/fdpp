@@ -380,17 +380,18 @@ public:
 template<typename T>
 class SymWrp : public T {
     FarPtr<T> fptr;
-    T backup;
+    size_t len;
+    _RC(T) backup;
     /* Magic is needed to check in a parent lookup if the wrapper
      * was actually emitted. It is checked in get_far() method.
      */
     static constexpr const char magic_val[] = "voodoo magic 123";
     char magic[sizeof(magic_val)];
 
-    static void copy_mods(far_t fp, const T *src, const T *ref) {
-        if (std::memcmp(src, ref, sizeof(T))) {
+    static void copy_mods(far_t fp, const T *src, const T *ref, size_t l) {
+        if (std::memcmp(src, ref, l)) {
             objlock_lock(fp);
-            std::memcpy(resolve_segoff(fp), src, sizeof(T));
+            std::memcpy(resolve_segoff(fp), src, l);
         }
     }
 
@@ -398,7 +399,7 @@ class SymWrp : public T {
         bool ok = check_magic();
         if (ok) {
             if (mods)
-                copy_mods(fptr.get_far(), this, &backup);
+                copy_mods(fptr.get_far(), this, &backup, len);
             objlock_unref(fptr.get_far());
         }
     }
@@ -409,6 +410,13 @@ class SymWrp : public T {
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
     void dtor() { dtor_common(false); }
+    void ctor(far_s f, size_t l) {
+        objlock_ref(f);
+        std::memcpy(&backup, resolve_segoff(f), l);
+        std::memcpy((_RC(T) *)this, &backup, l);
+        len = l;
+        std::strcpy(magic, magic_val);
+    }
 
     bool check_magic() const {
         bool ok = std::strcmp(magic, magic_val) == 0;
@@ -417,22 +425,23 @@ class SymWrp : public T {
         return ok;
     }
 public:
-    SymWrp(far_s f) :
-            fptr(f), backup(*(T *)resolve_segoff(f)) {
-        objlock_ref(f);
-        *(_RC(T) *)this = backup;
-        std::strcpy(magic, magic_val);
-    }
+    SymWrp(far_s f) : fptr(f) { ctor(f, sizeof(T)); }
     ~SymWrp() { dtor(); }
     SymWrp(const SymWrp&) = delete;
-    SymWrp(SymWrp&& s) : fptr(s.fptr), backup(s.backup) {
+    SymWrp(SymWrp&& s) : fptr(s.fptr), len(s.l)  {
         std::strcpy(magic, s.magic);
         ___assert(check_magic());
-        *(T *)this = *(T *)&s;
+        std::memcpy(&backup, &s.backup, len);
+        std::memcpy((T *)this, (T *)&s, len);
         s.clear();
     }
-    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
+    SymWrp<T>& operator =(T& f) {
+        ___assert(len == sizeof(T));
+        *(T *)this = f;
+        return *this;
+    }
     SymWrp<T>& operator =(const SymWrp<T>& f) {
+        ___assert(len == sizeof(T) && f.len == sizeof(T));
         *(T *)this = f;
         return *this;
     }
