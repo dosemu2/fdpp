@@ -332,7 +332,7 @@ public:
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
-template<typename, int, typename P, auto, bool> class ArMemb;
+template<typename, int, typename P, auto> class ArMemb;
 
 template<typename T>
 class XFarPtr : public FarPtr<T>
@@ -343,8 +343,8 @@ public:
     XFarPtr() = delete;
     XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
-    template<typename T1 = T, int max_len, typename P, auto M, bool V>
-    XFarPtr(const ArMemb<T1, max_len, P, M, V> &p) : FarPtr<T>(p.get_far()) {}
+    template<typename T1 = T, int max_len, typename P, auto M>
+    XFarPtr(const ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p.get_far()) {}
 
     /* The below ctors are safe wrt implicit conversions as they take
      * the lvalue reference to the pointer, not just the pointer itself.
@@ -376,6 +376,9 @@ public:
 };
 
 #define _MK_F(f, s) ({ ___assert(s.seg || s.off); (f)s; })
+
+template<typename T>
+concept is_vlen = requires(T obj) { obj._vmin(); obj._vadd(); };
 
 template<typename T>
 class SymWrp : public T {
@@ -410,10 +413,21 @@ class SymWrp : public T {
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
     void dtor() { dtor_common(false); }
-    void ctor(far_s f, size_t l) {
+    void ctor(far_s f, size_t l, auto vadd) {
+        char *ptr = (char *)resolve_segoff(f);
+        size_t add;
+        /* too large symbols may slow down execution */
+        ___assert(l < 1024);
         objlock_ref(f);
-        std::memcpy(&backup, resolve_segoff(f), l);
-        std::memcpy((_RC(T) *)this, &backup, l);
+        std::memcpy((_RC(T) *)this, ptr, l);
+        /* now safe to call vadd() */
+        add = vadd();
+        if (add) {
+            /* load variadic part of the symbol */
+            std::memcpy((char *)((_RC(T) *)this) + l, ptr + l, add);
+            l += add;
+        }
+        std::memcpy(&backup, ptr, l);
         len = l;
         std::strcpy(magic, magic_val);
     }
@@ -425,7 +439,14 @@ class SymWrp : public T {
         return ok;
     }
 public:
-    SymWrp(far_s f) : fptr(f) { ctor(f, sizeof(T)); }
+    template <typename T1 = T,
+        typename std::enable_if<!is_vlen<T1> >::type* = nullptr>
+    SymWrp(far_s f) : fptr(f) { ctor(f, sizeof(T), [](){return 0;}); }
+    template <typename T1 = T,
+        typename std::enable_if<is_vlen<T1> >::type* = nullptr>
+    SymWrp(far_s f) : fptr(f) { ctor(f, T1::_vmin(),
+            [this]() -> size_t { return this->_vadd(); });
+    }
     ~SymWrp() { dtor(); }
     SymWrp(const SymWrp&) = delete;
     SymWrp(SymWrp&& s) : fptr(s.fptr), len(s.l)  {
@@ -602,10 +623,11 @@ public:
 template<typename T, typename P, auto M, int O = 0>
 class MembBase {
 protected:
+    static constexpr const int off = M() + O;
+
     FarPtr<T> lookup_sym() const {
         using wrp_type = typename WrpTypeS<P>::type;
         FarPtr<T> fp;
-        constexpr int off = M() + O;
         /* find parent first */
         const wrp_type *ptr = (wrp_type *)((const uint8_t *)this - off);
         far_s f = ptr->get_far();
@@ -615,7 +637,7 @@ protected:
     }
 };
 
-template<typename T, int max_len, typename P, auto M, bool V = false>
+template<typename T, int max_len, typename P, auto M>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
     static_assert(max_len > 0, "0-length array");
@@ -643,9 +665,10 @@ public:
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
     far_s get_far() const { return this->lookup_sym().get_far(); }
     T *get_ptr() { return sym; }
+    static size_t get_off() { return MembBase<T, P, M>::off; }
 
     wrp_type operator [](int idx) {
-        ___assert(V || idx < max_len);
+        ___assert(idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }
@@ -784,9 +807,11 @@ public:
 #define AR_MEMB(p, t, n, l) \
     DUMMY_MARK(p, n); \
     ArMemb<t, l, p, OFF_M(p, n)> n
-#define AR_MEMB_V(p, t, n) \
+#define AR_MEMB_V(p, t, n, m, l) \
     DUMMY_MARK(p, n); \
-    ArMemb<t, 1, p, OFF_M(p, n), true> n
+    ArMemb<t, l, p, OFF_M(p, n)> n; \
+    static size_t _vmin() { return decltype(n)::get_off(); } \
+    size_t _vadd() { return (m) * sizeof(t); }
 #define SYM_MEMB(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMemb<t, p, OFF_M(p, n)> n

@@ -430,7 +430,7 @@ struct nlsPackage {             /* the contents of one chain item of the
   UWORD yeschar;                /* yes / no character DOS-65-23 */
   UWORD nochar;
   UWORD numSubfct;           /* number of supported sub-functions */
-  AR_MEMB_V(nlsPackage, nlsPointer, nlsPointers);     /* grows dynamically */
+  AR_MEMB_V(nlsPackage, nlsPointer, nlsPointers, numSubfct, 256);     /* grows dynamically */
 } PACKED;
 
 struct nlsDBCS {                /* The internal structure is unknown to me */
