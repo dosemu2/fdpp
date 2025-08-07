@@ -315,7 +315,11 @@ public:
         return (T*)resolve_segoff_fd(this->ptr);
     }
 
-    wrp_type_s operator *() { return wrp_type_s(this->get_far(), nonnull); }
+    wrp_type_s operator *() {
+        far_t f = this->get_far();
+        ___assert(f.seg || f.off || nonnull);
+        return wrp_type_s(f);
+    }
 
     wrp_type_mp operator ->() const {
         static_assert(std::is_standard_layout<T>::value ||
@@ -413,9 +417,8 @@ class SymWrp : public T {
         return ok;
     }
 public:
-    SymWrp(far_s f, bool nonnull = false) :
+    SymWrp(far_s f) :
             fptr(f), backup(*(T *)resolve_segoff(f)) {
-        ___assert(f.seg || f.off || nonnull);
         objlock_ref(f);
         *(_RC(T) *)this = backup;
         std::strcpy(magic, magic_val);
@@ -455,10 +458,7 @@ class SymWrp2 {
         typename std::enable_if<_C(T1)>::type* = nullptr>
     void dtor() {}
 public:
-    SymWrp2(far_s f, bool nonnull = false) :
-            sym(*(T *)resolve_segoff(f)), fptr(f), backup(sym) {
-        ___assert(f.seg || f.off || nonnull);
-    }
+    SymWrp2(far_s f) : sym(*(T *)resolve_segoff(f)), fptr(f), backup(sym) {}
     ~SymWrp2() { dtor(); }
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2(SymWrp2&& s) : sym(s.sym), fptr(s.fptr), backup(s.backup) {
