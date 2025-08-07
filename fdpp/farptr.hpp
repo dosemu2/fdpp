@@ -315,7 +315,11 @@ public:
         return (T*)resolve_segoff_fd(this->ptr);
     }
 
-    wrp_type_s operator *() { return wrp_type_s(this->get_far(), nonnull); }
+    wrp_type_s operator *() {
+        far_t f = this->get_far();
+        ___assert(f.seg || f.off || nonnull);
+        return wrp_type_s(f);
+    }
 
     wrp_type_mp operator ->() const {
         static_assert(std::is_standard_layout<T>::value ||
@@ -328,7 +332,7 @@ public:
     FarPtr<T>& adjust_far() { this->do_adjust_far(); return *this; }
 };
 
-template<typename, int, typename P, auto, bool> class ArMemb;
+template<typename, int, typename P, auto> class ArMemb;
 
 template<typename T>
 class XFarPtr : public FarPtr<T>
@@ -339,8 +343,8 @@ public:
     XFarPtr() = delete;
     XFarPtr(FarPtr<T>& f) : FarPtr<T>(f) {}
 
-    template<typename T1 = T, int max_len, typename P, auto M, bool V>
-    XFarPtr(const ArMemb<T1, max_len, P, M, V> &p) : FarPtr<T>(p.get_far()) {}
+    template<typename T1 = T, int max_len, typename P, auto M>
+    XFarPtr(const ArMemb<T1, max_len, P, M> &p) : FarPtr<T>(p.get_far()) {}
 
     /* The below ctors are safe wrt implicit conversions as they take
      * the lvalue reference to the pointer, not just the pointer itself.
@@ -374,19 +378,23 @@ public:
 #define _MK_F(f, s) ({ ___assert(s.seg || s.off); (f)s; })
 
 template<typename T>
+concept is_vlen = requires(T obj) { obj._vmin(); obj._vadd(); };
+
+template<typename T>
 class SymWrp : public T {
     FarPtr<T> fptr;
-    T backup;
+    size_t len;
+    _RC(T) backup;
     /* Magic is needed to check in a parent lookup if the wrapper
      * was actually emitted. It is checked in get_far() method.
      */
     static constexpr const char magic_val[] = "voodoo magic 123";
     char magic[sizeof(magic_val)];
 
-    static void copy_mods(far_t fp, const T *src, const T *ref) {
-        if (std::memcmp(src, ref, sizeof(T))) {
+    static void copy_mods(far_t fp, const T *src, const T *ref, size_t l) {
+        if (std::memcmp(src, ref, l)) {
             objlock_lock(fp);
-            std::memcpy(resolve_segoff(fp), src, sizeof(T));
+            std::memcpy(resolve_segoff(fp), src, l);
         }
     }
 
@@ -394,7 +402,7 @@ class SymWrp : public T {
         bool ok = check_magic();
         if (ok) {
             if (mods)
-                copy_mods(fptr.get_far(), this, &backup);
+                copy_mods(fptr.get_far(), this, &backup, len);
             objlock_unref(fptr.get_far());
         }
     }
@@ -405,6 +413,24 @@ class SymWrp : public T {
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
     void dtor() { dtor_common(false); }
+    void ctor(far_s f, size_t l, auto vadd) {
+        char *ptr = (char *)resolve_segoff(f);
+        size_t add;
+        /* too large symbols may slow down execution */
+        ___assert(l < 1024);
+        objlock_ref(f);
+        std::memcpy((_RC(T) *)this, ptr, l);
+        /* now safe to call vadd() */
+        add = vadd();
+        if (add) {
+            /* load variadic part of the symbol */
+            std::memcpy((char *)((_RC(T) *)this) + l, ptr + l, add);
+            l += add;
+        }
+        std::memcpy(&backup, ptr, l);
+        len = l;
+        std::strcpy(magic, magic_val);
+    }
 
     bool check_magic() const {
         bool ok = std::strcmp(magic, magic_val) == 0;
@@ -413,23 +439,30 @@ class SymWrp : public T {
         return ok;
     }
 public:
-    SymWrp(far_s f, bool nonnull = false) :
-            fptr(f), backup(*(T *)resolve_segoff(f)) {
-        ___assert(f.seg || f.off || nonnull);
-        objlock_ref(f);
-        *(_RC(T) *)this = backup;
-        std::strcpy(magic, magic_val);
+    template <typename T1 = T,
+        typename std::enable_if<!is_vlen<T1> >::type* = nullptr>
+    SymWrp(far_s f) : fptr(f) { ctor(f, sizeof(T), [](){return 0;}); }
+    template <typename T1 = T,
+        typename std::enable_if<is_vlen<T1> >::type* = nullptr>
+    SymWrp(far_s f) : fptr(f) { ctor(f, T1::_vmin(),
+            [this]() -> size_t { return this->_vadd(); });
     }
     ~SymWrp() { dtor(); }
     SymWrp(const SymWrp&) = delete;
-    SymWrp(SymWrp&& s) : fptr(s.fptr), backup(s.backup) {
+    SymWrp(SymWrp&& s) : fptr(s.fptr), len(s.l)  {
         std::strcpy(magic, s.magic);
         ___assert(check_magic());
-        *(T *)this = *(T *)&s;
+        std::memcpy(&backup, &s.backup, len);
+        std::memcpy((T *)this, (T *)&s, len);
         s.clear();
     }
-    SymWrp<T>& operator =(T& f) { *(T *)this = f; return *this; }
+    SymWrp<T>& operator =(T& f) {
+        ___assert(len == sizeof(T));
+        *(T *)this = f;
+        return *this;
+    }
     SymWrp<T>& operator =(const SymWrp<T>& f) {
+        ___assert(len == sizeof(T) && f.len == sizeof(T));
         *(T *)this = f;
         return *this;
     }
@@ -455,10 +488,7 @@ class SymWrp2 {
         typename std::enable_if<_C(T1)>::type* = nullptr>
     void dtor() {}
 public:
-    SymWrp2(far_s f, bool nonnull = false) :
-            sym(*(T *)resolve_segoff(f)), fptr(f), backup(sym) {
-        ___assert(f.seg || f.off || nonnull);
-    }
+    SymWrp2(far_s f) : sym(*(T *)resolve_segoff(f)), fptr(f), backup(sym) {}
     ~SymWrp2() { dtor(); }
     SymWrp2(const SymWrp2&) = delete;
     SymWrp2(SymWrp2&& s) : sym(s.sym), fptr(s.fptr), backup(s.backup) {
@@ -593,10 +623,11 @@ public:
 template<typename T, typename P, auto M, int O = 0>
 class MembBase {
 protected:
+    static constexpr const int off = M() + O;
+
     FarPtr<T> lookup_sym() const {
         using wrp_type = typename WrpTypeS<P>::type;
         FarPtr<T> fp;
-        constexpr int off = M() + O;
         /* find parent first */
         const wrp_type *ptr = (wrp_type *)((const uint8_t *)this - off);
         far_s f = ptr->get_far();
@@ -606,7 +637,7 @@ protected:
     }
 };
 
-template<typename T, int max_len, typename P, auto M, bool V = false>
+template<typename T, int max_len, typename P, auto M>
 class ArMemb : public MembBase<T, P, M> {
     T sym[max_len];
     static_assert(max_len > 0, "0-length array");
@@ -634,9 +665,10 @@ public:
     FarPtr<T> operator -(int dec) { return this->lookup_sym() - dec; }
     far_s get_far() const { return this->lookup_sym().get_far(); }
     T *get_ptr() { return sym; }
+    static size_t get_off() { return MembBase<T, P, M>::off; }
 
     wrp_type operator [](int idx) {
-        ___assert(V || idx < max_len);
+        ___assert(idx < max_len);
         FarPtr<T> f = this->lookup_sym();
         return f[idx];
     }
@@ -775,9 +807,11 @@ public:
 #define AR_MEMB(p, t, n, l) \
     DUMMY_MARK(p, n); \
     ArMemb<t, l, p, OFF_M(p, n)> n
-#define AR_MEMB_V(p, t, n) \
+#define AR_MEMB_V(p, t, n, m, l) \
     DUMMY_MARK(p, n); \
-    ArMemb<t, 1, p, OFF_M(p, n), true> n
+    ArMemb<t, l, p, OFF_M(p, n)> n; \
+    static size_t _vmin() { return decltype(n)::get_off(); } \
+    size_t _vadd() { return (m) * sizeof(t); }
 #define SYM_MEMB(p, t, n) \
     DUMMY_MARK(p, n); \
     SymMemb<t, p, OFF_M(p, n)> n
