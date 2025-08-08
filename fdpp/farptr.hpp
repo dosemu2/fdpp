@@ -424,12 +424,12 @@ class SymWrp : public T {
 
     template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    void dtor() { dtor_common1(true); }
+    void dtor() { dtor_common1(len > 0); }
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
     void dtor() { dtor_common(false, 0); }
     void ctor(far_s f, size_t l, auto vadd) {
-        char *ptr = (char *)resolve_segoff(f);
+        const char *ptr = (char *)resolve_segoff(f);
         size_t add;
         /* too large symbols may slow down execution */
         ___assert(l < 1024);
@@ -486,7 +486,7 @@ public:
     }
     FarPtr<T> operator &() const { return _MK_F(FarPtr<T>, fptr.get_far()); }
     far_t get_far() const { ___assert(check_magic()); return fptr.get_far(); }
-    void clear() { fptr = NULL; }
+    void clear() { len = 0; }
 };
 
 template<typename T>
