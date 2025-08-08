@@ -398,36 +398,21 @@ class SymWrp : public T {
         }
     }
 
-    void dtor_common(bool mods, size_t len1) {
+    void dtor_common(bool mods) {
         bool ok = check_magic();
         if (ok) {
-            if (mods) {
-                const T *src = (T *)this;
-                far_t fp = fptr.get_far();
-                copy_mods(fp, src, &backup, len);
-                /* symbol could dynamically grow */
-                if (len1 > len)
-                    std::memcpy((char *)resolve_segoff(fp) + len,
-                            (char *)src + len, len1 - len);
-            }
+            if (mods)
+                copy_mods(fptr.get_far(), this, &backup, len);
             objlock_unref(fptr.get_far());
         }
     }
 
     template <typename T1 = T,
-        typename std::enable_if<!is_vlen<T1> >::type* = nullptr>
-    void dtor_common1(bool mods) { dtor_common(mods, len); }
-    template <typename T1 = T,
-        typename std::enable_if<is_vlen<T1> >::type* = nullptr>
-    void dtor_common1(bool mods) { dtor_common(mods,
-            T1::_vmin() + this->_vadd()); }
-
-    template <typename T1 = T,
         typename std::enable_if<!_C(T1)>::type* = nullptr>
-    void dtor() { dtor_common1(len > 0); }
+    void dtor() { dtor_common(len > 0); }
     template <typename T1 = T,
         typename std::enable_if<_C(T1)>::type* = nullptr>
-    void dtor() { dtor_common(false, 0); }
+    void dtor() { dtor_common(false); }
     void ctor(far_s f, size_t l, auto vadd) {
         const char *ptr = (char *)resolve_segoff(f);
         size_t add;
