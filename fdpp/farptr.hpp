@@ -438,15 +438,18 @@ class SymWrp : public T {
             fdloudprintf("magic bytes corrupted\n");
         return ok;
     }
-public:
+
     template <typename T1 = T,
         typename std::enable_if<!is_vlen<T1> >::type* = nullptr>
-    SymWrp(far_s f) : fptr(f) { ctor(f, sizeof(T), [](){return 0;}); }
+    void ctor1(far_s f) { ctor(f, sizeof(T), [](){return 0;}); }
     template <typename T1 = T,
         typename std::enable_if<is_vlen<T1> >::type* = nullptr>
-    SymWrp(far_s f) : fptr(f) { ctor(f, T1::_vmin(),
+    void ctor1(far_s f) { ctor(f, T1::_vmin(),
             [this]() -> size_t { return this->_vadd(); });
     }
+
+public:
+    SymWrp(far_s f) : fptr(f) { ctor1(f); }
     ~SymWrp() { dtor(); }
     SymWrp(const SymWrp&) = delete;
     SymWrp(SymWrp&& s) : fptr(s.fptr), len(s.l)  {
