@@ -90,7 +90,8 @@ endif
 CPPFLAGS += -DFDPP_DEBUG -DEXTRA_DEBUG
 NASMFLAGS += -DEXTRA_DEBUG
 else
-DBGFLAGS += -O2
+DBGFLAGS += -O2 -flto=auto
+LDFLAGS += -O2 -flto=auto
 endif
 ifeq ($(DEBUG_MSGS),1)
 CPPFLAGS += -DDEBUG

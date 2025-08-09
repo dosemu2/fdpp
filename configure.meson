@@ -31,7 +31,7 @@ TOP=$(dirname "$0")
 
 meson setup \
   --cross-file $TOP/fdpp/kernel/$CROSS_F \
-  --buildtype=debugoptimized \
+  --buildtype=debugoptimized -Db_lto=true \
   $* $BLD $TOP
 [ "$?" = "0" ] || exit 1
 
