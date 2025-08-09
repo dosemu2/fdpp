@@ -146,6 +146,7 @@ endif
 CXX_ARGS = ['-DFDPP', '-DDEBUG', '-DWITHFAT32',
       '-fno-threadsafe-statics',
       '-Wno-address-of-packed-member', DEBUG_OPTS]
+LD_ARGS = []
 if cxx_id == 'clang'
   CXX_ARGS += ['-Werror=packed-non-pod',
       '-Wno-format-invalid-specifier', '-Wno-unknown-warning-option',
@@ -156,6 +157,7 @@ else
       '-Wno-error=format-security']
   if CXX_MAJ.to_int() < 15
     CXX_ARGS += ['-Wno-subobject-linkage']
+    LD_ARGS += ['-Wno-odr']
   endif
 endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
@@ -163,6 +165,6 @@ LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   version: FVER,
   sources: [gad, pac, pap, tc, ta],
   cpp_args: CXX_ARGS,
-  link_args: ['-Wl,-Bsymbolic'],
+  link_args: ['-Wl,-Bsymbolic', LD_ARGS],
   install: true,
   install_dir: get_option('libdir') / 'fdpp')
