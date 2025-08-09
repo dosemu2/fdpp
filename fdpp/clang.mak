@@ -90,8 +90,12 @@ endif
 CPPFLAGS += -DFDPP_DEBUG -DEXTRA_DEBUG
 NASMFLAGS += -DEXTRA_DEBUG
 else
-DBGFLAGS += -O2 -flto=auto
+DBGFLAGS += -O2
+# must be > but old make :(
+ifneq ($(CLANG_VER),10)
+DBGFLAGS += -flto=auto
 LDFLAGS += -O2 -flto=auto
+endif
 endif
 ifeq ($(DEBUG_MSGS),1)
 CPPFLAGS += -DDEBUG
