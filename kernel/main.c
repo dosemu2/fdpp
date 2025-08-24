@@ -55,7 +55,8 @@ STATIC VOID update_dcb(struct dhdr FAR *);
 STATIC VOID init_kernel(VOID);
 STATIC VOID signon(VOID);
 STATIC VOID kernel(VOID);
-STATIC VOID FsConfig(BOOL reinit);
+STATIC VOID FsConfig(VOID);
+STATIC VOID InitCds(VOID);
 STATIC VOID InitPrinters(VOID);
 STATIC VOID InitSerialPorts(VOID);
 #ifndef FDPP
@@ -405,7 +406,8 @@ STATIC void init_kernel(void)
     update_dcb(&blk_dev);
 
   /* Now config the temporary file system */
-  FsConfig(0);
+  InitCds();
+  FsConfig();
 
   /* Now process CONFIG.SYS     */
   DoConfig(0);
@@ -425,7 +427,8 @@ STATIC void init_kernel(void)
   PostConfig();
 
   /* Init the file system one more time     */
-  FsConfig(1);
+  fmemcpy(LoL->_CDSp, old_CDSp, LoL->_lastdrive * sizeof(struct cds));
+  FsConfig();
 
   configDone();
 
@@ -436,7 +439,7 @@ STATIC void init_kernel(void)
   if (_open(n, m) == -1) \
     init_fatal("unable to open " n)
 
-STATIC VOID FsConfig(BOOL reinit)
+STATIC VOID InitCds(VOID)
 {
   struct dpb FAR *dpb = LoL->_DPBp;
   int i;
@@ -446,38 +449,31 @@ STATIC VOID FsConfig(BOOL reinit)
   {
     struct cds FAR *pcds_table = &LoL->_CDSp[i];
 
-    if (reinit && old_CDSp)
+    if (FP_OFF(dpb) != (UWORD) -1)
     {
-      struct cds FAR *old_cds = &old_CDSp[i];
-      if (old_cds->cdsFlags)
-      {
-        fmemcpy(pcds_table, old_cds, sizeof(struct cds));
-        if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
-          dpb = dpb->dpb_next;
-        continue;
-      }
+      pcds_table->cdsDpb = dpb;
+      pcds_table->cdsFlags = ((1 << i) & bprm.DriveMask) ? 0 : CDSPHYSDRV;
+      dpb = dpb->dpb_next;
     }
+    else
+    {
+      pcds_table->cdsDpb = NULL;
+      pcds_table->cdsFlags = 0;
+    }
+
     n_fmemcpy(pcds_table->cdsCurrentPath, "A:\\\0", 4);
 
     pcds_table->cdsCurrentPath[0] += i;
-    pcds_table->cdsDpb = NULL;
-    pcds_table->cdsFlags = 0;
 
-    if (i < LoL->_nblkdev && (ULONG) dpb != 0xffffffffl)
-    {
-      if (!((1 << i) & bprm.DriveMask))
-      {
-        pcds_table->cdsDpb = dpb;
-        pcds_table->cdsFlags = CDSPHYSDRV;
-      }
-      dpb = dpb->dpb_next;
-    }
     pcds_table->cdsStrtClst = 0xffff;
     pcds_table->cdsParam = 0xffff;
     pcds_table->cdsStoreUData = 0xffff;
     pcds_table->cdsJoinOffset = 2;
   }
+}
 
+STATIC VOID FsConfig(VOID)
+{
   /* Log-in the default drive. */
   init_setdrive(LoL->_BootDrive - 1);
 
@@ -600,7 +596,7 @@ STATIC void kernel()
 /* check for a block device and update  device control block    */
 STATIC VOID update_dcb(struct dhdr FAR * dhp)
 {
-  REG COUNT Index;
+  COUNT Index, offs;
   COUNT nunits = dhp->dh_name[0];
   struct dpb FAR *dpb;
 
@@ -617,6 +613,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     dpb = dpb->dpb_next;
   }
 
+  offs = 0;
   for (Index = 0; Index < nunits; Index++)
   {
     dpb->dpb_next = dpb + 1;
@@ -624,11 +621,17 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     dpb->dpb_subunit = Index;
     dpb->dpb_device = dhp;
     dpb->dpb_flags = M_CHANGED;
-    if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
+    /* find empty slot */
+    while (LoL->_nblkdev + offs < LoL->_lastdrive &&
+        LoL->_CDSp[LoL->_nblkdev + offs].cdsFlags & CDSVALID)
+      offs++;
+    if (LoL->_nblkdev + offs < LoL->_lastdrive)
     {
-      LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
-      ____R(LoL->_CDSp[LoL->_nblkdev].cdsFlags) = CDSPHYSDRV;
+      LoL->_CDSp[LoL->_nblkdev + offs].cdsDpb = dpb;
+      ____R(LoL->_CDSp[LoL->_nblkdev + offs].cdsFlags) = CDSPHYSDRV;
     }
+    else
+      fdloudprintf("CDS array overflow, lastdrive=%i\n", LoL->_lastdrive);
     ++dpb;
     ++LoL->_nblkdev;
   }
