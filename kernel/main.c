@@ -600,7 +600,7 @@ STATIC void kernel()
 /* check for a block device and update  device control block    */
 STATIC VOID update_dcb(struct dhdr FAR * dhp)
 {
-  REG COUNT Index;
+  COUNT Index, offs;
   COUNT nunits = dhp->dh_name[0];
   struct dpb FAR *dpb;
 
@@ -617,6 +617,7 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     dpb = dpb->dpb_next;
   }
 
+  offs = 0;
   for (Index = 0; Index < nunits; Index++)
   {
     dpb->dpb_next = dpb + 1;
@@ -624,11 +625,17 @@ STATIC VOID update_dcb(struct dhdr FAR * dhp)
     dpb->dpb_subunit = Index;
     dpb->dpb_device = dhp;
     dpb->dpb_flags = M_CHANGED;
-    if ((LoL->_CDSp != NULL) && (LoL->_nblkdev < LoL->_lastdrive))
+    /* find empty slot */
+    while (LoL->_nblkdev + offs < LoL->_lastdrive &&
+        LoL->_CDSp[LoL->_nblkdev + offs].cdsFlags & CDSVALID)
+      offs++;
+    if (LoL->_nblkdev + offs < LoL->_lastdrive)
     {
-      LoL->_CDSp[LoL->_nblkdev].cdsDpb = dpb;
-      ____R(LoL->_CDSp[LoL->_nblkdev].cdsFlags) = CDSPHYSDRV;
+      LoL->_CDSp[LoL->_nblkdev + offs].cdsDpb = dpb;
+      ____R(LoL->_CDSp[LoL->_nblkdev + offs].cdsFlags) = CDSPHYSDRV;
     }
+    else
+      fdloudprintf("CDS array overflow, lastdrive=%i\n", LoL->_lastdrive);
     ++dpb;
     ++LoL->_nblkdev;
   }
