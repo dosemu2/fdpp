@@ -8,5 +8,5 @@ OUT=$1
 shift
 PRG=$1
 shift
-$PRG $* 1>&2
+$PRG $* 1>&2 || rm -f $OUT
 cat $OUT
