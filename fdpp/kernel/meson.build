@@ -69,11 +69,17 @@ as = meson.get_compiler('nasm')
 ld_id = as.get_linker_id()
 if ld_id == 'ld.bfd'
   nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
-  LA = '--emit-relocs'
 else
   nasm_ld = find_program(['ld.lld'])
+endif
+as_id = as.cmd_array()[0]
+if as_id == 'nasm-segelf' and ld_id == 'ld.bfd'
+  LA = '--emit-relocs'
+  message('Building relocatable kernel')
+else
   LA = '--defsym=loadaddr=0x900'
   nargs += '-DFDPP_STATIC'
+  message('Building static kernel')
 endif
 
 lib = static_library('dummy',
