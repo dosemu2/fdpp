@@ -5,7 +5,13 @@ MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 RA = meson.current_source_dir() / 'run_arg.sh'
 tg = dependency('thunk_gen')
-TGMK = tg.get_variable(pkgconfig: 'makeinc')
+TGMK = tg.get_variable('makeinc')
+tgmke = environment()
+tgmke.set('TG', tg.get_variable('binary'))
+tgmke.set('TGS', tg.get_variable('tgscript'))
+tgmke.set('PDS', tg.get_variable('pdscript'))
+tgmke.set('MKADS', tg.get_variable('mkadscript'))
+tgmke.set('TGM4', tg.get_variable('m4script'))
 TFLAGS = '-a 2 -p 2'
 SRC = 'src'
 rel_inc = 'include/fdpp'
@@ -66,6 +72,7 @@ gad = custom_target('glob_asmdefs.h',
   input: 'src/glob_asm.h',
   command: [RA, 'glob_asmdefs.h', make, '-f', TGMK,
             'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
+  env: tgmke,
   capture: true)
 
 GEN_TMP = { '1':'thunk_calls.tmp', '2':'thunk_asms.tmp' }
@@ -98,7 +105,7 @@ pap = custom_target('plt_asmp.h',
   env: env,
   capture: true)
 
-tgenv = environment()
+tgenv = tgmke
 tgenv.set('TFLAGS', TFLAGS)
 
 tc = custom_target('thunk_calls.h',
