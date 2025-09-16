@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/stsp/thunk_gen.git
+revision = main
+depth = 1
+
+[provide]
+program_names = thunk_gen

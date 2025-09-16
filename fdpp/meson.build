@@ -7,6 +7,7 @@ RA = meson.current_source_dir() / 'run_arg.sh'
 tg = dependency('thunk_gen')
 TGMK = tg.get_variable('makeinc')
 tgmke = environment()
+tgbin = find_program('thunk_gen')
 tgmke.set('TG', tg.get_variable('binary'))
 tgmke.set('TGS', tg.get_variable('tgscript'))
 tgmke.set('PDS', tg.get_variable('pdscript'))
@@ -73,6 +74,7 @@ gad = custom_target('glob_asmdefs.h',
   command: [RA, 'glob_asmdefs.h', make, '-f', TGMK,
             'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
   env: tgmke,
+  depends: tgbin,
   capture: true)
 
 GEN_TMP = { '1':'thunk_calls.tmp', '2':'thunk_asms.tmp' }
@@ -114,6 +116,7 @@ tc = custom_target('thunk_calls.h',
   command: [RA, '-i', 'thunk_calls.tmp', 'thunk_calls.h',
             make, '-f', TGMK, 'thunk_calls.h'],
   env: tgenv,
+  depends: tgbin,
   feed: true,
   capture: true)
 
@@ -123,6 +126,7 @@ ta = custom_target('thunk_asms.h',
   command: [RA, '-i', 'thunk_asms.tmp', 'thunk_asms.h',
             make, '-f', TGMK, 'thunk_asms.h'],
   env: tgenv,
+  depends: tgbin,
   feed: true,
   capture: true)
 
