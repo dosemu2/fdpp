@@ -10,7 +10,7 @@ tgmke = environment()
 TG = tg.get_variable('binary')
 tgbin = find_program(['thunk_gen', TG])
 # working around https://github.com/mesonbuild/meson/issues/15035
-if tgbin.full_path().startswith(get_option('prefix'))
+if tgbin.full_path().startswith('/usr/')
   tgbin = []
   message('Using standalone thunk_gen')
 endif
