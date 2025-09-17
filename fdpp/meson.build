@@ -7,8 +7,15 @@ RA = meson.current_source_dir() / 'run_arg.sh'
 tg = dependency('thunk_gen')
 TGMK = tg.get_variable('makeinc')
 tgmke = environment()
-tgbin = find_program('thunk_gen')
-tgmke.set('TG', tg.get_variable('binary'))
+TG = tg.get_variable('binary')
+tgbin = find_program(['thunk_gen', TG])
+# working around https://github.com/mesonbuild/meson/issues/15035
+if tgbin.full_path().startswith(get_option('prefix'))
+  tgbin = []
+  message('Using standalone thunk_gen')
+endif
+
+tgmke.set('TG', TG)
 tgmke.set('TGS', tg.get_variable('tgscript'))
 tgmke.set('PDS', tg.get_variable('pdscript'))
 tgmke.set('MKADS', tg.get_variable('mkadscript'))
