@@ -552,6 +552,7 @@ void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
 size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
 {
   size_t chars_left;
+  kbd0a FAR *ktmp;
 
   if (inputptr == NULL)
   {
@@ -561,7 +562,8 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
       ____R(kb_buf.kb_count) = 0;
       ____R(kb_buf.kb_size) = LINEBUFSIZECON;
     }
-    do_read_line(sft_idx, (kbd0a FAR *)&kb_buf, check_break, dev_read_char);
+    ktmp = (kbd0a FAR *)&kb_buf;
+    do_read_line(sft_idx, ktmp, check_break, dev_read_char);
     kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)
