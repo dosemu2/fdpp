@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 
 usage() {
-  echo "$0 [-b <build_dir>] [-c] [-- <meson_args>]"
+  echo "$0 [-b <build_dir>] [-c] [-d] [-- <meson_args>]"
   echo -e "\t-c selects clang for build"
 }
 
 CROSS_F="toolchain.ini"
 BLD="build"
 
-while getopts "b:ch" opt; do
+while getopts "b:cdh" opt; do
   case "$opt" in
     b)
       BLD="$OPTARG"
       ;;
     c)
       CROSS_F="toolchain-clang.ini"
+      ;;
+    d)
+      DEBUG="1"
       ;;
     h)
       usage
@@ -29,10 +32,14 @@ shift $(($OPTIND-1))
 
 TOP=$(dirname "$0")
 
+if [ "$DEBUG" != "1" ]; then
+  ARGS="--buildtype=debugoptimized -Db_lto=true"
+else
+  ARGS="--buildtype=debug -Db_lto=false"
+fi
+
 meson setup \
-  --cross-file $TOP/fdpp/kernel/$CROSS_F \
-  --buildtype=debugoptimized -Db_lto=true \
-  $* $BLD $TOP
+  --cross-file $TOP/fdpp/kernel/$CROSS_F $ARGS $* $BLD $TOP
 [ "$?" = "0" ] || exit 1
 
 echo
