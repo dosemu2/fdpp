@@ -1,11 +1,11 @@
-project('fdpp', ['cpp', 'c', 'nasm'], version: '0.1', meson_version: '>= 0.64')
+project('fdpp', ['cpp', 'c', 'nasm'], version: '1.9', meson_version: '>= 0.64')
 
 li = subproject('libfdpp')
 LIBFDPP = li.get_variable('LIBFDPP')
 lo = subproject('loader')
 LIBLOADER = lo.get_variable('LIBLOADER')
 ke = subproject('kernel')
-VERSION = ke.get_variable('VERSION')
+VERSION = meson.project_version()
 
 pkg = import('pkgconfig')
 pkg.generate(LIBFDPP,

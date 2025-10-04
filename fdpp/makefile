@@ -25,7 +25,7 @@ LDRLIB = $(LDRDEVL).$(AVER).$(BVER)
 LDFLAGS += -Wl,-soname=$(FDPPLIB) -Wl,-Bsymbolic
 TARGET=fdppkrnl.$(AVER).$(BVER)
 MAJ = 1
-RELVER = 8
+RELVER = 9
 VERSION = $(MAJ).$(RELVER)
 PKG = fdpp-$(VERSION)
 TAR = $(PKG).tar

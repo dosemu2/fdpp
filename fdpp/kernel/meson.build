@@ -98,5 +98,3 @@ custom_target(TARGET + '.elf',
   install_dir: get_option('datadir') / 'fdpp',
   install_mode: 'rw-r--r--',
   build_by_default: true)
-
-VERSION = meson.project_version()
