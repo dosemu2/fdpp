@@ -1,6 +1,6 @@
 ## 1.10
 
-Nearly ~110 commits, mostly introducing the new architecture with
+Nearly ~150 commits, mostly introducing the new architecture with
 experimental gcc compatibility. This architecture does not rely on
 an exotic C++ features like unaligned references, which makes it
 more portable. Also it doesn't rely on an "explicit lifetime management"
@@ -13,7 +13,7 @@ you ~8K of the DOS memory space, compared to nasm-segelf + GNU ld.
 
 Aside from that:
 
-- more work on meson
+- more work on meson, add wrap for thunk_gen
 - support building for i686
 
 ## 1.9
