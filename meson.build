@@ -1,4 +1,4 @@
-project('fdpp', ['cpp', 'c', 'nasm'], version: '1.9', meson_version: '>= 0.64')
+project('fdpp', ['cpp', 'c', 'nasm'], version: '1.10', meson_version: '>= 0.64')
 
 li = subproject('libfdpp')
 LIBFDPP = li.get_variable('LIBFDPP')
