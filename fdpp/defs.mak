@@ -9,7 +9,12 @@ XCPU=186
 # XFAT=16
 XFAT=32
 
+# on Termux PREFIX is used
+ifneq ($(PREFIX),)
+prefix := $(PREFIX)
+else
 prefix ?= /usr/local
+endif
 libdir ?= $(prefix)/lib
 datadir ?= $(prefix)/share
 includedir ?= $(prefix)/include
