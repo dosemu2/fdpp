@@ -26,8 +26,6 @@ For the ubuntu package please visit
 [this PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa).
 Fedora packages are
 [here](https://copr.fedorainfracloud.org/coprs/stsp/dosemu2).
-OpenSUSE packages are
-[here](https://download.opensuse.org/repositories/home:/stsp2/openSUSE_Tumbleweed).
 
 ## running
 The simplest way to get it running is to use
@@ -36,8 +34,6 @@ Get the pre-built dosemu2 packages from
 [ubuntu PPA](https://code.launchpad.net/~dosemu2/+archive/ubuntu/ppa)
 or from
 [COPR repo](https://copr.fedorainfracloud.org/coprs/stsp/dosemu2)
-or from
-[OpenSUSE repo](https://download.opensuse.org/repositories/home:/stsp2/openSUSE_Tumbleweed)
 or build it from
 [sources](https://github.com/dosemu2/dosemu2).
 
