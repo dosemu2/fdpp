@@ -355,7 +355,14 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 
   /* Do we have a drive? */
   if (src[1] == ':')
+  {
     src += 2;
+    if (result & IS_DEVICE)
+    {
+      if (src[0] == '\\' || src[0] == '/')
+        src++;
+    }
+  }
 
 /*
     Code repoff from dosfns.c
@@ -366,8 +373,6 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   dest[2] = '\\';
   if (result & IS_DEVICE)
   {
-    if (src[0] == '\\' || src[0] == '/')
-      src++;
     froot = get_root(src);
     if (froot == src || froot == src + 5)
     {
