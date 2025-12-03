@@ -18,7 +18,7 @@ TARGET=fdppkrnl.$(AVER).$(BVER)
 VERSION = 1.7
 CPPFLAGS += -I$(TOP)/fdpp
 
-NASMFLAGS += -i$(SRC) -i$(HDR) -f elf32
+NASMFLAGS += -I$(SRC) -I$(HDR) -f elf32
 
 ASMS = kernel.asm entry.asm io.asm console.asm serial.asm printer.asm \
     execrh.asm nlssupt.asm procsupt.asm dosidle.asm int2f.asm \

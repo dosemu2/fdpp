@@ -123,4 +123,4 @@ ifeq ($(XCPU),386)
 CPPFLAGS += -DI386
 endif
 
-NASMFLAGS += -i$(srcdir)/../hdr/ -DXCPU=$(XCPU) -DFDPP
+NASMFLAGS += -I$(srcdir)/../hdr/ -DXCPU=$(XCPU) -DFDPP
