@@ -732,7 +732,7 @@ _p_0_tos:
 
 segment DYN_DATA
 
-        align 10h
+        align 16
         global _Dyn
 _Dyn:
                 times 10h db 0      ; guard space from prev sym
@@ -741,7 +741,7 @@ markEndInstanceData:  ; mark end of DOS data seg we say needs instancing
 
 
 segment INIT_TEXT_START
-                align 10h
+                align 16
                 times 10h db 0      ; guard space from prev sym
                 global  __InitTextStart
 __InitTextStart:                    ; and c version
@@ -764,13 +764,13 @@ _InitEnd:
 ; start end end of HMA area
 
 segment HMA_TEXT_START
-                align 10h
+                align 16
                 global  __HMATextStart
 __HMATextStart:
                 times 0xd0 db 0   ; filler [ffff:0..10000:c0]
                 ; reserve space for far jump to cp/m routine
                 times 5 db 0
-                align 10h
+                align 16
                 global __HMATextAvailable
 __HMATextAvailable:
 
