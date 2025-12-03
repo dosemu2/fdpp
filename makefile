@@ -1,5 +1,4 @@
 all:
-	$(MAKE) nasm-segelf
 	$(MAKE) -C fdpp
 
 clean install uninstall tar:
