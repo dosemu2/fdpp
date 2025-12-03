@@ -43,6 +43,13 @@ ifeq ($(CC_LD),)
 CC_LD = $(CC)
 endif
 NASM ?= nasm-segelf
+NASM_VER = $(shell $(NASM) -v 2>/dev/null)
+ifeq ($(filter (segelf),$(NASM_VER)),)
+$(warning nasm-segelf not found, producing unrelocatable build)
+want_loadaddr = 0x900
+NASM = nasm
+NASMFLAGS += -DFDPP_STATIC
+endif
 PKG_CONFIG ?= pkg-config
 
 # export vars needed for loader sub-project
