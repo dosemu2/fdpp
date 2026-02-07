@@ -42,6 +42,8 @@ endif
 ifeq ($(CC_LD),)
 CC_LD = $(CC)
 endif
+
+ifeq ($(want_loadaddr),)
 NASM ?= nasm-segelf
 NASM_VER = $(shell $(NASM) -v 2>/dev/null)
 ifeq ($(filter (segelf),$(NASM_VER)),)
@@ -50,6 +52,8 @@ want_loadaddr = 0x900
 NASM = nasm
 NASMFLAGS += -DFDPP_STATIC
 endif
+endif
+
 PKG_CONFIG ?= pkg-config
 
 # export vars needed for loader sub-project
