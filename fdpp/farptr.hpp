@@ -315,6 +315,8 @@ public:
         return (T*)resolve_segoff_fd(this->ptr);
     }
 
+    template<typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     wrp_type_s operator *() {
         far_t f = this->get_far();
         ___assert(f.seg || f.off || nonnull);
