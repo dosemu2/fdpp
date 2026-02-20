@@ -123,9 +123,13 @@ public:
         return (T0*)resolve_segoff_fd(ptr);
     }
 
+    template<typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     wrp_type_s get_wrp() {
         return wrp_type_s(get_far());
     }
+    template<typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     wrp_type_a operator [](int idx) {
         TheBase f = TheBase(*this + idx);
         return wrp_type_a(f.get_far());
@@ -323,6 +327,8 @@ public:
         return wrp_type_s(f);
     }
 
+    template<typename T1 = T,
+        typename std::enable_if<!std::is_void<T1>::value>::type* = nullptr>
     wrp_type_mp operator ->() const {
         static_assert(std::is_standard_layout<T>::value ||
                 std::is_void<T>::value, "need std layout");
