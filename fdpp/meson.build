@@ -154,7 +154,7 @@ cxx = meson.get_compiler('cpp')
 CXX_MAJ = cxx.version().split('.')[0]
 cxx_id = cxx.get_id()
 if get_option('buildtype').startswith('debug')
-  DEBUG_OPTS = ['-DFDPP_DEBUG', '-DEXTRA_DEBUG']
+  DEBUG_OPTS = ['-DFDPP_DEBUG', '-DEXTRA_DEBUG', '-g3']
   if cxx_id == 'clang'
     DEBUG_OPTS += ['-fdebug-macro']
   endif
