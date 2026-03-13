@@ -664,7 +664,7 @@ STATIC void DosDefinePartition(struct DriveParamS *driveParam,
       ExtPri = "Ext";
       num = extendedPartNo;
     }
-    _printf("\r%c: HD%d, %s[%2d]", 'A' + nUnits,
+    _printf("%c: HD%d, %s[%2d]", 'A' + nUnits,
            (driveParam->driveno & 0x7f) + 1, ExtPri, num);
 
     printCHS(", CHS= ", &chs);
@@ -1441,7 +1441,7 @@ STATIC void ReadAllPartitionTables(void)
 /* disk initialization: returns number of units */
 COUNT dsk_init()
 {
-  _printf(" - InitDisk: ");
+//  _printf(" - InitDisk: ");
 
 #if 0
   {
