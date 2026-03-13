@@ -941,6 +941,7 @@ VOID ASMCFUNC P_0(const struct config FAR *Config)
   BYTE FAR *endp;
   exec_blk FAR *exb = TempExeBlock_p;
   BYTE off = 0;
+  char buf[2];
 
   /* build exec block and save all parameters here as init part will vanish! */
   exb->exec.fcb_1 = (fcb FAR *)-1L;
@@ -957,8 +958,14 @@ VOID ASMCFUNC P_0(const struct config FAR *Config)
   fstrcpy(Shell + strlen(Shell), _MK_DOS_FP(char, FP_SEG(Config), (uint16_t)Config->cfgInitTail));
   endp =  Shell + strlen(Shell);
   exb->exec.cmd_line = ParseCmdLine(endp);
+  /* avoid extra \r for printing */
+  fmemcpy_n(buf, endp, 2);
+  endp[0] = '\n';
+  endp[1] = '\0';
   _printf("Process 0 starting: %s%s", GET_PTR(Shell),
       exb->exec.cmd_line->ctBuffer);
+  /* and back */
+  n_fmemcpy(endp, buf, 2);
 
   p0_exec_mode = Config->cfgP_0_startmode;
   p0_cmdline_p = Shell;
