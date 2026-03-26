@@ -340,7 +340,7 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
         if (c1 == CTL_C)
         {
           con_flush(syscon);
-          c = -1;  // EOF
+          c = 256;  // EOF
           break;
         }
       }
