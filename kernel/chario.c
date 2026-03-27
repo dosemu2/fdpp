@@ -106,8 +106,13 @@ STATIC void CharCmd(struct dhdr FAR *pdev, unsigned command)
 
 STATIC int Busy(struct dhdr FAR *pdev)
 {
+  int ret;
+  ____R(CharReqHdr.r_count) = 1;
   CharCmd(pdev, C_ISTAT);
-  return CharReqHdr.r_status & S_BUSY;
+  ret = CharReqHdr.r_status & S_BUSY;
+  if (!ret && !CharReqHdr.r_count)
+    return 256;
+  return ret;
 }
 
 void con_flush(struct dhdr FAR *pdev)
@@ -150,6 +155,8 @@ int ndread(struct dhdr FAR *pdev)
   CharCmd(pdev, C_NDREAD);
   if (CharReqHdr.r_status & S_BUSY)
     return -1;
+  if (!CharReqHdr.r_count)
+    return 256;
   return CharReqHdr.r_ndbyte;
 }
 
@@ -321,13 +328,15 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
 
   FOREVER
   {
-    if (!Busy(pdev))
+    if (!(c = Busy(pdev)))
     {
       c = CharIO(pdev, 0, C_INPUT);
       if (c == CTL_C && !check_break && !break_ena)
         clear_break();
       break;
     }
+    if (c == 256)
+      break;
     if (pdev != syscon)
     {
       if (check_break)
@@ -340,7 +349,7 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
         if (c1 == CTL_C)
         {
           con_flush(syscon);
-          c = -1;  // EOF
+          c = 256;  // EOF
           break;
         }
       }
@@ -377,15 +386,15 @@ STATIC int raw_get_char(struct dhdr FAR *pdev, BOOL check_break)
   return read_char_sft_dev(pdev, check_break);
 }
 
-static unsigned char dev_read_char(int sft_in, BOOL check_break)
+static unsigned int dev_read_char(int sft_in, BOOL check_break)
 {
   struct dhdr FAR *dev = sft_to_dev(idx_to_sft(sft_in));
   return read_char_sft_dev(dev, check_break);
 }
 
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
-static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
-    unsigned char (*do_read_char)(int, BOOL))
+static unsigned int do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
+    unsigned int (*do_read_char)(int, BOOL))
 {
   unsigned c;
   unsigned cu_pos = scr_pos;
@@ -395,7 +404,7 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
   int sft_out = sft_in;
 
   if (size == 0)
-    return;
+    return 0;
 
   /* the stored line is invalid unless it ends with a CR */
   if (kp->_kb_buf[stored_size] != CR)
@@ -411,7 +420,8 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
     switch (c)
     {
       case 0:
-        return;
+      case 256:
+        return c;
       case LF:
         /* show LF if it's not the first character. Never store it */
         if (!first)
@@ -533,19 +543,28 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
         break;
     }
     first = FALSE;
-  } while (c != CR);
+  } while (c != CR && c != CTL_C);  // but not CTL_Z, checked with ms-dos
   memcpy(kp->_kb_buf, local_buffer, count);
   /* if local_buffer overflows into the CON default buffer we
      must invalidate it */
   if (count > LINEBUFSIZECON)
     ____R(kb_buf.kb_size) = 0;
   /* kb_count does not include the final CR */
-  kp->kb_count = count - 1;
+  kp->kb_count = count - (c == CR);
+  return c;
+}
+
+static unsigned read_char_eof(int sft_in, BOOL check_break)
+{
+  unsigned char c = read_char(sft_in, check_break);
+  if (!c)
+    return 256;
+  return c;
 }
 
 void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
 {
-  do_read_line(sft_in, kp, check_break, read_char);
+  do_read_line(sft_in, kp, check_break, read_char_eof);
 }
 
 /* called by handle func READ (int21/ah=3f) */
@@ -556,6 +575,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
 
   if (inputptr == NULL)
   {
+    unsigned int c;
     /* can we reuse kb_buf or was it overwritten? */
     if (kb_buf.kb_size != LINEBUFSIZECON)
     {
@@ -563,8 +583,12 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
       ____R(kb_buf.kb_size) = LINEBUFSIZECON;
     }
     ktmp = (kbd0a FAR *)&kb_buf;
-    do_read_line(sft_idx, ktmp, check_break, dev_read_char);
-    kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
+    c = do_read_line(sft_idx, ktmp, check_break, dev_read_char);
+    if (c == CR)
+    {
+      ____R(kb_buf.kb_count) += 2;
+      kb_buf._kb_buf[kb_buf.kb_count - 1] = echo_char(LF, sft_idx);
+    }
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)
     {
@@ -573,7 +597,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
     }
   }
 
-  chars_left = &kb_buf._kb_buf[kb_buf.kb_count + 2] - inputptr;
+  chars_left = &kb_buf._kb_buf[kb_buf.kb_count] - inputptr;
   if (n > chars_left)
     n = chars_left;
 
