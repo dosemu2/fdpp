@@ -377,7 +377,7 @@ STATIC int raw_get_char(struct dhdr FAR *pdev, BOOL check_break)
   return read_char_sft_dev(pdev, check_break);
 }
 
-static unsigned char dev_read_char(int sft_in, BOOL check_break)
+static unsigned int dev_read_char(int sft_in, BOOL check_break)
 {
   struct dhdr FAR *dev = sft_to_dev(idx_to_sft(sft_in));
   return read_char_sft_dev(dev, check_break);
@@ -385,7 +385,7 @@ static unsigned char dev_read_char(int sft_in, BOOL check_break)
 
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
 static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
-    unsigned char (*do_read_char)(int, BOOL))
+    unsigned int (*do_read_char)(int, BOOL))
 {
   unsigned c;
   unsigned cu_pos = scr_pos;
@@ -411,6 +411,7 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
     switch (c)
     {
       case 0:
+      case 256:
         return;
       case LF:
         /* show LF if it's not the first character. Never store it */
@@ -543,9 +544,17 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
   kp->kb_count = count - 1;
 }
 
+static unsigned read_char_eof(int sft_in, BOOL check_break)
+{
+  unsigned char c = read_char(sft_in, check_break);
+  if (!c)
+    return 256;
+  return c;
+}
+
 void read_line(int sft_in, kbd0a FAR *kp, BOOL check_break)
 {
-  do_read_line(sft_in, kp, check_break, read_char);
+  do_read_line(sft_in, kp, check_break, read_char_eof);
 }
 
 /* called by handle func READ (int21/ah=3f) */
