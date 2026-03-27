@@ -106,8 +106,13 @@ STATIC void CharCmd(struct dhdr FAR *pdev, unsigned command)
 
 STATIC int Busy(struct dhdr FAR *pdev)
 {
+  int ret;
+  ____R(CharReqHdr.r_count) = 1;
   CharCmd(pdev, C_ISTAT);
-  return CharReqHdr.r_status & S_BUSY;
+  ret = CharReqHdr.r_status & S_BUSY;
+  if (!ret && !CharReqHdr.r_count)
+    return 256;
+  return ret;
 }
 
 void con_flush(struct dhdr FAR *pdev)
@@ -150,6 +155,8 @@ int ndread(struct dhdr FAR *pdev)
   CharCmd(pdev, C_NDREAD);
   if (CharReqHdr.r_status & S_BUSY)
     return -1;
+  if (!CharReqHdr.r_count)
+    return 256;
   return CharReqHdr.r_ndbyte;
 }
 
@@ -321,13 +328,15 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
 
   FOREVER
   {
-    if (!Busy(pdev))
+    if (!(c = Busy(pdev)))
     {
       c = CharIO(pdev, 0, C_INPUT);
       if (c == CTL_C && !check_break && !break_ena)
         clear_break();
       break;
     }
+    if (c == 256)
+      break;
     if (pdev != syscon)
     {
       if (check_break)
