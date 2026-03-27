@@ -83,6 +83,8 @@ ConRead:
 
 ConRead1:
                 call    KbdRdChar               ; Get a char from kbd in al
+                or      ax,ax
+                jz      _IOSuccess
                 stosb                           ; Store al to es:[di]
                 loop    ConRead1                ; Loop until all are read
 
@@ -125,7 +127,7 @@ KbdRdChar:
                 jnz     KbdRdRtn                ; Exit if it was, returning it
 		call	readkey     		; get keybd char in al, ah=scan
                 or      ax,ax                   ; Zero ?
-                jz      KbdRdChar               ; Loop if it is
+                jz      KbdRdRtn
                 cmp     ax,CTL_PRT_SCREEN       ; Ctrl-Print screen?
                 jne     KbdRd1                  ; Nope, keep going
                 mov     al,CTL_P                        ; Yep, make it ^P
@@ -157,11 +159,13 @@ CommonNdRdExit:		; *** tell if key waiting and return its ASCII if yes
                 int     16h                     ; Get status, if zf=0  al=char
                 jz      ConNdRd4                ; Jump if no char available
                 or      ax,ax                   ; See if call was supported
-                jz      ConNdRd4                ; 0 (sometimes) means unsupported
+                jz      _IOSuccess              ; 0 (sometimes) means unsupported
 		call	checke0			; check for e0 scancode
                 or      ax,ax                   ; Zero ?
                 jnz     ConNdRd1                ; Jump if not zero
 		call	readkey
+                or      ax,ax                   ; See if call was supported
+                jz      _IOSuccess              ; 0 (sometimes) means unsupported
                 jmp     short CommonNdRdExit
 		; if char was there but 0, fetch and retry...
 		; (why do we check uScanCode here?)
@@ -200,8 +204,12 @@ KbdInpCh1:
 		add	ah,[cs:_kbdType]
                 int     16h                     ; get status, if zf=0  al=char
                 jz      KbdInpRtnZero           ; Jump if zero
+                or      ax,ax                   ; See if call was supported
+                jz      KbdInpRtnZero           ; Jump if zero
 		; returns 0 or the last key that was waiting in AL
 		call	readkey
+                or      ax,ax                   ; See if call was supported
+                jz      KbdInpRtnZero           ; Jump if zero
                 jmp     short KbdInpCh1
                 ; just read any key that is waiting, then check if
                 ; more keys are waiting. if not, return AL of this
