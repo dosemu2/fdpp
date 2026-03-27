@@ -393,7 +393,7 @@ static unsigned int dev_read_char(int sft_in, BOOL check_break)
 }
 
 /* reads a line (buffered, called by int21/ah=0ah, 3fh) */
-static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
+static unsigned int do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
     unsigned int (*do_read_char)(int, BOOL))
 {
   unsigned c;
@@ -404,7 +404,7 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
   int sft_out = sft_in;
 
   if (size == 0)
-    return;
+    return 0;
 
   /* the stored line is invalid unless it ends with a CR */
   if (kp->_kb_buf[stored_size] != CR)
@@ -421,7 +421,7 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
     {
       case 0:
       case 256:
-        return;
+        return c;
       case LF:
         /* show LF if it's not the first character. Never store it */
         if (!first)
@@ -543,14 +543,15 @@ static void do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
         break;
     }
     first = FALSE;
-  } while (c != CR);
+  } while (c != CR && c != CTL_C);  // but not CTL_Z, checked with ms-dos
   memcpy(kp->_kb_buf, local_buffer, count);
   /* if local_buffer overflows into the CON default buffer we
      must invalidate it */
   if (count > LINEBUFSIZECON)
     ____R(kb_buf.kb_size) = 0;
   /* kb_count does not include the final CR */
-  kp->kb_count = count - 1;
+  kp->kb_count = count - (c == CR);
+  return c;
 }
 
 static unsigned read_char_eof(int sft_in, BOOL check_break)
@@ -574,6 +575,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
 
   if (inputptr == NULL)
   {
+    unsigned int c;
     /* can we reuse kb_buf or was it overwritten? */
     if (kb_buf.kb_size != LINEBUFSIZECON)
     {
@@ -581,8 +583,12 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
       ____R(kb_buf.kb_size) = LINEBUFSIZECON;
     }
     ktmp = (kbd0a FAR *)&kb_buf;
-    do_read_line(sft_idx, ktmp, check_break, dev_read_char);
-    kb_buf._kb_buf[kb_buf.kb_count + 1] = echo_char(LF, sft_idx);
+    c = do_read_line(sft_idx, ktmp, check_break, dev_read_char);
+    if (c == CR)
+    {
+      ____R(kb_buf.kb_count) += 2;
+      kb_buf._kb_buf[kb_buf.kb_count - 1] = echo_char(LF, sft_idx);
+    }
     inputptr = kb_buf._kb_buf;
     if (*inputptr == CTL_Z)
     {
@@ -591,7 +597,7 @@ size_t read_line_handle(int sft_idx, size_t n, char FAR * bp, BOOL check_break)
     }
   }
 
-  chars_left = &kb_buf._kb_buf[kb_buf.kb_count + 2] - inputptr;
+  chars_left = &kb_buf._kb_buf[kb_buf.kb_count] - inputptr;
   if (n > chars_left)
     n = chars_left;
 
