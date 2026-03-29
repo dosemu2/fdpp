@@ -611,8 +611,6 @@ int21regs_seg   dw      0
 critical_sp     dw      0               ;268 - critical error internal stack
                 global  current_ddsc
 current_ddsc    times 2 dw 0
-                global  int21_sp
-int21_sp        dw      0
 
                 ; Pad to 027ah
                 times (27ah - ($ - _internal_data)) db 0

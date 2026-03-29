@@ -34,10 +34,7 @@
                 extern  _user_r
 
                 extern  _break_flg     ; break detected flag
-                extern  _int21_service
-                extern  int21_exit
-                extern   _InDOS
-                extern   int21_sp
+                extern  _int21_handler
 
                 %include "stacks.inc"
 
@@ -106,28 +103,33 @@ segment	HMA_TEXT
                 global  _spawn_int23
 _spawn_int23:
 		mov ds, [cs:_DGROUP_]		;; Make sure DS is OK
-		mov sp, [int21_sp]
+		mov bp, [_user_r]
+		cli
+		mov ss, [_user_r+2]
+		RestoreSP
+		sti
+		; get all the user registers back
+		Restore386Registers
+		POP$ALL
+		push bp
 		mov bp, sp
 		clc
 		int 23h
 		mov sp, bp
-		mov bp, [_user_r]
-		mov si, [_user_r+2]
+		pop bp
 		jnc ??int23_respawn
 		;; The user returned via RETF 0, Carry is set
 		;; --> terminate program
 		;; This is done by set the _break_flg and modify the
 		;; AH value, which is passed to the _respawn_ call
 		;; into 0, which is "Terminate program".
+		push ds                 ;; we need DGROUP
+		mov ds, [cs:_DGROUP_]
 		inc byte [_break_flg]
-		push es
-		mov es, si
-		mov word [es:bp], 0		;; clear ah --> perform DOS-00 --> terminate
-		pop es
+		pop ds
+		xor ax, ax		;; clear ah --> perform DOS-00 --> terminate
 ??int23_respawn:
-		inc byte [_InDOS]
-		call _int21_service
-		jmp int21_exit
+		jmp DGROUP:_int21_handler
 
 ;
 ; interrupt enable and disable routines

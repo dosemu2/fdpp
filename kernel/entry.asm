@@ -44,7 +44,6 @@ segment HMA_TEXT
                 extern   _cu_psp
                 extern   _MachineId
                 extern   critical_sp
-                extern   int21_sp
 
                 extern   int21regs_seg
                 extern   int21regs_off
@@ -420,10 +419,8 @@ int21_4:
 
                 push    si  ; user SS:SP
                 push    bp
-                mov     [int21_sp], sp  ; for int23
                 call    _int21_service
 
-                global int21_exit
 int21_exit:     dec     byte [_InDOS]
 
                 ;
