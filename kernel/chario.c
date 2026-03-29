@@ -311,8 +311,10 @@ long cooked_read(struct dhdr FAR *pdev, size_t n, char FAR *bp,
     c = raw_get_char(pdev, check_break);
     if (c < 0)
       return c;
-    if (c == 256)
+    if (c == 256) {
+      handle_sig(_SIGHUP);
       break;
+    }
     *bp++ = c;
     xfer++;
     if ((unsigned char)c == CTL_Z)
@@ -346,7 +348,7 @@ STATIC unsigned do_read_char_dev(struct dhdr FAR *pdev, BOOL check_break)
       else
       {
         unsigned char c1 = ndread(syscon);
-        if (c1 == CTL_C)
+        if (!c1 || c1 == CTL_C)
         {
           con_flush(syscon);
           c = 256;  // EOF
@@ -421,6 +423,7 @@ static unsigned int do_read_line(int sft_in, kbd0a FAR *kp, BOOL check_break,
     {
       case 0:
       case 256:
+        handle_sig(_SIGHUP);
         return c;
       case LF:
         /* show LF if it's not the first character. Never store it */

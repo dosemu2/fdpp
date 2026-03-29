@@ -63,6 +63,7 @@ static BYTE *Globals_hRcsId =
 #include "nls.h"
 #include "dyn.h"
 #include "memtype.h"
+#include "sig.h"
 #include "glob_fd.h"
 #include "debug.h"
 

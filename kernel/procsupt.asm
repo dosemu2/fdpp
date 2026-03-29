@@ -35,6 +35,8 @@
 
                 extern  _break_flg     ; break detected flag
                 extern  _int21_handler
+                extern  _sig_act
+                extern  sig_num
 
                 %include "stacks.inc"
 
@@ -130,6 +132,50 @@ _spawn_int23:
 		xor ax, ax		;; clear ah --> perform DOS-00 --> terminate
 ??int23_respawn:
 		jmp DGROUP:_int21_handler
+
+; void ASMFUNC NORETURN dispatch_sig(void);
+                global  _dispatch_sig
+_dispatch_sig:
+		mov ds, [cs:_DGROUP_]		;; Make sure DS is OK
+		mov bp, [_user_r]
+		cli
+		mov ss, [_user_r+2]
+		RestoreSP
+		sti
+		; get all the user registers back
+		Restore386Registers
+		POP$ALL
+		push ds
+		push bp
+		mov bp, sp
+		clc
+		pushf
+		mov ds, [cs:_DGROUP_]
+		call far [ds:_sig_act]
+		mov sp, bp
+		pop bp
+		pop ds
+		jc ??sig_term
+		jz ??sig_err
+??sig_respawn:
+		jmp DGROUP:_int21_handler
+??sig_term:
+		;; The user returned via RETF 0, Carry is set
+		;; --> terminate program
+		;; This is done by set the _break_flg and modify the
+		;; AH value, which is passed to the _respawn_ call
+		;; into 0, which is "Terminate program".
+		push ds                 ;; we need DGROUP
+		mov ds, [cs:_DGROUP_]
+		mov byte [_break_flg], 4
+		mov al, byte [sig_num]
+		pop ds
+		mov ah, 4ch		;; terminate
+		jmp ??sig_respawn
+??sig_err:
+		mov ax, 5fh  ; interrupted
+		stc
+		retf 2
 
 ;
 ; interrupt enable and disable routines

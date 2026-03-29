@@ -54,6 +54,7 @@ unsigned char ctrl_break_pressed(void);
 unsigned char check_handle_break(__FAR(struct dhdr) pdev);
 void handle_break(__FAR(struct dhdr) pdev);
 void clear_break(void);
+void handle_sig(int signum);
 #ifdef __WATCOMC__
 #pragma aux handle_break aborts;
 #endif
@@ -551,5 +552,6 @@ WORD ASMPASCAL INITTEXT init_switchar(WORD chr);
 COUNT ASMPASCAL INITTEXT UMB_get_largest(__FAR(void) driverAddress, UDWORD * __seg, UCOUNT * size);
 VOID ASMFUNC INITTEXT init_stacks(__FAR(VOID) stack_base, COUNT nStacks, WORD stackSize);
 void ASMFUNC NORETURN spawn_int23(void);        /* procsupt.asm */
+void ASMFUNC NORETURN dispatch_sig(void);       /* procsupt.asm */
 /* kernel.asm */
 VOID ASMFUNC FAR NORETURN call_p_0(__FAR(const struct config)Config); /* P_0, actually */

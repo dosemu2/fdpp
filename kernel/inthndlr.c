@@ -167,6 +167,26 @@ VOID ASMCFUNC int21_syscall(iregs FAR * irp)
     case 0x62:
       irp->BX = cu_psp;
 
+    /* it must be here and not in int21_service() to not overwrite user_r */
+    case 0x8c: {
+      sigact old = sig_act, n;
+      if (irp->AL != _SIGHUP) {
+        irp->AX = 1;
+        irp->FLAGS |= FLG_CARRY;
+        break;
+      }
+      n.sig_num = irp->AL;
+      n.sig_action = irp->BL;
+      n.sig_seg = irp->DS;
+      n.sig_off = irp->DX;
+      n_fmemcpy(&sig_act, &n, sizeof(n));
+      irp->AX = old.sig_action;
+      irp->ES = old.sig_seg;
+      irp->BX = old.sig_off;
+      irp->FLAGS &= ~FLG_CARRY;
+      break;
+    }
+
       /* Normal DOS function - DO NOT ARRIVE HERE          */
  /* default: */
   }
@@ -1079,7 +1099,7 @@ dispatch:
 
       /* Load and Execute Program */
     case 0x4b:
-      break_flg = FALSE;
+      break_flg = 0;
       rc = DosExec(lr.AL, MK_FP(lr.ES, lr.BX), FP_DS_DX);
       goto short_check;
 
@@ -1098,8 +1118,8 @@ dispatch:
       }
       else if (break_flg)
       {
-        break_flg = FALSE;
-        rc = 0x100;
+        rc = break_flg << 8;
+        break_flg = 0;
       }
       return_code = lr.AL | rc;
       if (DosMemCheck() != SUCCESS)

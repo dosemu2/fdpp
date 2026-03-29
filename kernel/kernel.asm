@@ -610,7 +610,14 @@ int21regs_seg   dw      0
                 global  critical_sp
 critical_sp     dw      0               ;268 - critical error internal stack
                 global  current_ddsc
-current_ddsc    times 2 dw 0
+current_ddsc    times 2 dw 0            ;26a
+                global  _sig_act
+_sig_act:
+sig_off         dw      0               ;26e
+sig_seg         dw      0               ;270
+                global  sig_num
+sig_num         db      0               ;272
+sig_act         db      0               ;273
 
                 ; Pad to 027ah
                 times (27ah - ($ - _internal_data)) db 0
