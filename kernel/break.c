@@ -96,3 +96,26 @@ void handle_break(struct dhdr FAR *pdev)
 
   spawn_int23();                /* invoke user INT-23 and never come back */
 }
+
+void handle_sig(int signum)
+{
+  if (signum != sig_act.sig_num)
+    return;
+  switch (sig_act.sig_action) {
+    case _SIG_DFL:
+      return_code = 0x400 | signum;
+      return_user();
+      /* no break */
+    case _SIG_IGN:
+      return;
+  }
+  if (!ErrorMode) {             /* within int21_handler, InDOS is not incremented */
+    if (InDOS)
+      --InDOS;                  /* fail-safe */
+    else
+      panic("Signal not in DOS");
+  }
+
+  /* TODO: if more signals implemented, copy sa to sig_act here */
+  dispatch_sig();
+}

@@ -974,7 +974,7 @@ VOID ASMCFUNC P_0(const struct config FAR *Config)
 
 VOID ASMCFUNC P_0_exit(unsigned short retcode)
 {
-  if ((retcode & 0xff) == 0) {
+  if ((retcode & 0xff) == 0 || (retcode >> 8)) {
     switch (retcode >> 8) {
       case 0:
         _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
@@ -984,6 +984,10 @@ VOID ASMCFUNC P_0_exit(unsigned short retcode)
         break;
       case 2:
         _printf("\nShell %s aborted due to critical error, press any key...\n", GET_PTR(Shell));
+        break;
+      case 4:
+        _printf("\nShell %s aborted by signal %i, press any key...\n",
+            GET_PTR(Shell), retcode & 0xff);
         break;
     }
     con_flush_stdin();

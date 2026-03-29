@@ -324,6 +324,8 @@ int21_reentry:
                 je      int21_user
                 cmp     ah,51h
                 je      int21_user
+                cmp     ah,8ch
+                je      int21_user
                 cmp     ah,62h
                 jne     int21_1
 
