@@ -34,7 +34,10 @@
                 extern  _user_r
 
                 extern  _break_flg     ; break detected flag
-                extern  _int21_handler ; far call system services
+                extern  _int21_service
+                extern  int21_exit
+                extern   _InDOS
+                extern   int21_sp
 
                 %include "stacks.inc"
 
@@ -100,177 +103,31 @@ _got_cbreak:
 
 segment	HMA_TEXT
 
-;
-;       Special call for switching processes during break handling
-;
-;       void interrupt far spawn_int23()
-;
-;
-;       +---------------+
-;       |     flags     |       22
-;       +---------------+
-;       |       cs      |       20
-;       +---------------+
-;       |       ip      |       18
-;       +---------------+
-;       |       es      |       16
-;       +---------------+
-;       |       ds      |       14
-;       +---------------+
-;       |       bp      |       12
-;       +---------------+
-;       |       di      |       10
-;       +---------------+
-;       |       si      |       8
-;       +---------------+
-;       |       dx      |       6
-;       +---------------+
-;       |       cx      |       4
-;       +---------------+
-;       |       bx      |       2
-;       +---------------+
-;       |       ax      |       0       <--- bp & sp after mov bp,sp
-;       +---------------+
-;
                 global  _spawn_int23
 _spawn_int23:
-
-;; 1999/03/27 ska - comments: see cmt1.txt
 		mov ds, [cs:_DGROUP_]		;; Make sure DS is OK
+		mov sp, [int21_sp]
+		mov bp, sp
+		clc
+		int 23h
+		mov sp, bp
 		mov bp, [_user_r]
-
-                ; restore to user stack
-                cli					;; Pre-8086 don't disable INT autom.
-;*TE PATCH
-;      CtrlC at DosInput (like C:>DATE does)
-;      Nukes the Kernel.
-;
-;      it looks like ENTRY.ASM+PROCSUPT.ASM
-;      got out of sync.
-;
-;      spawn_int() assumes a stack layout at
-;      usr_ss:usr:sp. but usr:ss currently contains 0
-;
-;      this patch helps FreeDos to survive CtrlC,
-;      but should clearly be done somehow else.
-                mov     ss, [_user_r+2]
-                RestoreSP
-
-                sti
-
-                ; get all the user registers back
-                Restore386Registers
-                POP$ALL
-
-                ;; Construct the piece of code into the stack
-
-		;; stack frame:		during generation of code piece
-		;; <higher address>
-		;; BP | SP | Meaning
-		;;  7 | 11 | offset CALL FAR will push onto stack
-		;;  5 |  9 | CALL FAR segment
-		;;  3 |  7 | CALL FAR offset
-		;;  2 |  6 | CALL FAR ??regain_control_int23  | instruction byte
-		;;  0 |  4 | INT 23 <<should-be value of SP upon return>>
-		;; -2 |  2 | segment of address of INT-23	\ To jump to INT 23
-		;; -4 |  0 | offset of address of INT-23	/ via RETF
-		;; Upon return from INT-23 the CALL FAR pushes the address of
-		;; the byte immediately following the CALL FAR onto the stack.
-		;; This value POPed and decremented by 7 is the value SP must
-		;; contain, if the INT-23 was returned with RETF2/IRET.
-
-  		sub sp, byte 8		;; code piece needs 7 bytes --> 4 words
-  		push ss			;; prepare jump to INT-23 via RETF
-  		push bp			;; will be offset / temp: saved BP
-  		mov bp, sp
-  		add bp, byte 4		;; position BP onto INT-23
-  		mov word [bp], 23cdh		;; INT 23h
-  		mov byte [bp+2], 9ah			;; CALL FAR immediate
-  		mov word [bp+3], ??regain_control_int23
-  		mov word [bp+5], cs
-
-  		;; complete the jump to INT-23 via RETF and restore BP
-  		xchg word [bp-4], bp
-
-                clc			;; set default action --> resume
-                ; invoke the int 23 handler its address has been constructed
-                ;; on the stack
-                retf
-
-??regain_control_int23:
-
-		;; stack frame:		constructed on entry to INT-23
-		;; <higher address>
-		; BP | SP | Meaning
-		;;  7 | 11 | offset CALL FAR will push onto stack
-		;;  5 |  9 | CALL FAR segment
-		;;  3 |  7 | CALL FAR offset
-		;;  2 |  6 | CALL FAR ??regain_control_int23  | instruction byte
-		;;  0 |  4 | INT 23 <<should-be value of SP upon return>>
-		;; -2 |  2 | segment of address of INT-23	\ To jump to INT 23
-		;; -4 |  0 | offset of address of INT-23	/ via RETF
-		;; Upon return from INT-23 the CALL FAR pushes the address of
-		;; the byte immediately following the CALL FAR onto the stack.
-		;; This value POPed and decremented by 7 is the value SP must
-		;; contain, if the INT-23 was returned with RETF2/IRET.
-
-		;; stack frame:		used during recovering from INT-23
-		;; <higher address>
-		;; BP | Meaning
-		;;  1 | <<next word onto stack, or value SP has to become>>
-		;;  0 | <<return address from CALL FAR>>
-		;; -1 | saved BP
-		;; -3 | saved AX
-		;; -7 | INT 23 <<should-be value of SP upon return>>
-
-		;; Somewhere on stack:
-		;; SP | Meaning
-		;;  4 | segment of return address of CALL FAR
-		;;  2 | offset of return address of CALL FAR
-		;;  0 | saved BP
-
-				push bp
-				mov bp, sp
-				mov bp, [bp+2]		;; get should-be address + 7
-				mov word [bp-3], ax		;; save AX
-				pop ax				;; old BP
-				mov word [bp-1], ax		;; preserve saved BP
-				mov ax, bp
-				dec ax			;; last used word of stack
-				dec ax			;; Don't use SUB to keep Carry flag
-				dec ax
-				xchg ax, sp		;; AX := current stack; SP corrected
-				;; Currently: BP - 7 == address of INT-23
-				;; should be  AX + 4 --> IRET or RETF 2
-				;; ==> Test if BP - 7 == AX + 4
-				;; ==> Test if AX + 4 - BP + 7 == 0
-				pushf			;; preserve Carry flag
-				add ax, byte 4 + 7
-				sub ax, bp		;; AX := SP + 4
-				pop ax			;; saved Carry flag
-				jz ??int23_ign_carry ;; equal -> IRET --> ignore Carry
-									;; Carry is already cleared
-				push ax
-				popf			;; restore Carry flag
-
-??int23_ign_carry:
-				pop ax					;; Restore the original register
-				jnc ??int23_respawn
-				;; The user returned via RETF 0, Carry is set
-				;; --> terminate program
-				;; This is done by set the _break_flg and modify the
-				;; AH value, which is passed to the _respawn_ call
-				;; into 0, which is "Terminate program".
-				push ds			;; we need DGROUP
-				mov ds, [cs:_DGROUP_]
-				inc byte [_break_flg]
-				pop ds
-
-				xor ah, ah		;; clear ah --> perform DOS-00 --> terminate
-
+		mov si, [_user_r+2]
+		jnc ??int23_respawn
+		;; The user returned via RETF 0, Carry is set
+		;; --> terminate program
+		;; This is done by set the _break_flg and modify the
+		;; AH value, which is passed to the _respawn_ call
+		;; into 0, which is "Terminate program".
+		inc byte [_break_flg]
+		push es
+		mov es, si
+		mov word [es:bp], 0		;; clear ah --> perform DOS-00 --> terminate
+		pop es
 ??int23_respawn:
-				pop bp					;; Restore the original register
-                jmp 	DGROUP:_int21_handler
+		inc byte [_InDOS]
+		call _int21_service
+		jmp int21_exit
 
 ;
 ; interrupt enable and disable routines
