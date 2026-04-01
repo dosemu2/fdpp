@@ -34,7 +34,8 @@ static hmcb init_mcb = { .signature = HMCB_SIG, };
 #define FIRST_MCB 0x10
 
 #define nxtMCBsize(mcb,size) MK_FP(FP_SEG(mcb), FP_OFF(mcb) + (size) + 16)
-#define nxtMCB(mcb) MK_FP(FP_SEG(mcb), mcb->next)
+#define nxtMCBsizeTd(mcb,size) MK_FP(FP_SEG(mcb), FP_OFF(mcb) + (mcb)->size - (size))
+#define nxtMCB(mcb) MK_FP(FP_SEG(mcb), (mcb)->next)
 
 #define mcbFree(mcb) ((mcb)->owner == 0)
 #define mcbValid(mcb) ( ((mcb)->signature == HMCB_SIG) )
@@ -99,10 +100,10 @@ STATIC COUNT joinMCBs(UWORD off)
    size is the minimum size of the block to search for,
    even if mode == LARGEST.
  */
-COUNT DosHMAAlloc(UWORD size, UWORD *off)
+COUNT DosHMAAlloc(UWORD size, BOOL topdown, UWORD *off)
 {
-  REG hmcb FAR *p;
-  REG hmcb FAR *q = NULL;
+  hmcb FAR *p;
+  hmcb FAR *q = NULL;
   hmcb FAR *foundSeg;
   hmcb FAR *biggestSeg;
 
@@ -156,13 +157,16 @@ stopIt:                        /* reached from FIRST_FIT on match */
     /* foundSeg := pointer to allocated block
        p := pointer to MCB that will form the rest of the block
      */
-    p = nxtMCBsize(foundSeg, size);
+    p = topdown ? nxtMCBsizeTd(foundSeg, size) : nxtMCBsize(foundSeg, size);
 
     fd_prot_mem(p, sizeof(*p), FD_MEM_NORMAL);
     /* initialize stuff because p > foundSeg  */
     *p = init_mcb;
     p->next = foundSeg->next;
-    p->size = foundSeg->size - size - 16;
+    if (topdown)
+      p->size = size;
+    else
+      p->size = foundSeg->size - size - 16;
     fd_mark_mem(p, sizeof(*p), FD_MEM_READONLY);
     fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_NORMAL);
     foundSeg->next = mcb2off(p);
@@ -173,8 +177,13 @@ stopIt:                        /* reached from FIRST_FIT on match */
     p->owner = 0;        /* unused */
     fd_prot_mem(p, sizeof(*p), FD_MEM_READONLY);
 
-    foundSeg->size = size;
+    if (topdown)
+      foundSeg->size -= size + 16;
+    else
+      foundSeg->size = size;
     fd_prot_mem(foundSeg, sizeof(*foundSeg), FD_MEM_READONLY);
+    if (topdown)
+      foundSeg = p;
   }
 
   /* Already initialized:

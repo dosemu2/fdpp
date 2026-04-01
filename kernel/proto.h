@@ -251,7 +251,7 @@ void DosUmbLink(unsigned n);
 VOID mcb_print(__FAR(mcb) mcbp);
 
 COUNT DosHMAQuery(UWORD *off, UWORD *avail);
-COUNT DosHMAAlloc(UWORD size, UWORD *off);
+COUNT DosHMAAlloc(UWORD size, BOOL topdown, UWORD *off);
 COUNT DosHMAFree(UWORD off);
 COUNT DosHMAChange(UWORD para, UWORD size);
 COUNT DosHMACheck(void);
