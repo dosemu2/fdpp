@@ -1861,7 +1861,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
       r.BX = (r.BX + 0xf) & 0xfff0;
       if (r.BX > avail)
         r.BX = avail;
-      rc = DosHMAAlloc(r.BX, &r.DI);
+      rc = DosHMAAlloc(r.BX, 0, &r.DI);
       break;
     case 3:
       if (!HMAclaimed)
@@ -1876,14 +1876,10 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
       switch (r.DL)
       {
         case 0:  // alloc
+        case 1:
           /* align to para */
           r.BX = (r.BX + 0xf) & 0xfff0;
-          rc = DosHMAAlloc(r.BX, &r.DI);
-          break;
-        case 1:  // resize
-          /* align to para */
-          r.BX = (r.BX + 0xf) & 0xfff0;
-          rc = DosHMAChange(r.DI, r.BX);
+          rc = DosHMAAlloc(r.BX, r.DL, &r.DI);
           break;
         case 2:  // free
           rc = DosHMAFree(r.DI);
