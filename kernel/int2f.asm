@@ -268,7 +268,8 @@ call_int2f:
                 je      remote_print_doredir
 
 int2f_call:
-                xor     cx, cx         ; set to succeed; clear carry and CX
+                xor     cx, cx
+                stc
                 int     2fh
                 pop     bx
                 jnc     ret_set_ax_to_cx
@@ -293,7 +294,7 @@ remote_print_doredir:                  ; di points to an lregs structure
                 mov     si,[es:di+8]
                 lds     di,[es:di+0xa]
                 pop     es
-                clc                     ; set to succeed
+                stc
                 int     2fh
                 pop     bx              ; restore stack and ds=ss
                 push    ss
@@ -304,7 +305,7 @@ ret_set_ax_to_carry:                    ; carry => -1 else 0 (SUCCESS)
                 jmp     short ret_int2f
 
 remote_rw:
-                clc                    ; set to succeed
+                stc
                 int     2fh
                 jc      ret_min_dx_ax
                 xor     dx, dx         ; dx:ax := dx:cx = bytes read
@@ -316,7 +317,7 @@ ret_min_dx_ax:  neg     ax
 remote_process_end:                   ; Terminate process
                 mov     ds, [_cu_psp]
 int2f_restore_ds:
-                clc
+                stc
                 int     2fh
                 push    ss
                 pop     ds

@@ -74,6 +74,7 @@ UDWORD remote_lseek(void FAR *sft, DWORD pos)
     regs.d.x = pos & 0xffff;
     regs.c.x = pos >> 16;
     regs.a.x = 0x1121;
+    regs.flags |= FLG_CARRY;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
         return -regs.a.x;
@@ -84,6 +85,7 @@ UWORD remote_getfattr(void)
 {
     iregs regs = {};
     regs.a.x = 0x110f;
+    regs.flags |= FLG_CARRY;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
         return -regs.a.x;
@@ -101,6 +103,7 @@ BYTE remote_lock_unlock(void FAR *sft, BYTE unlock,
     regs.ds = FP_SEG(arg);
     regs.d.x = FP_OFF(arg);
     regs.a.x = 0x110a;
+    regs.flags |= FLG_CARRY;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
         return -regs.a.x;
@@ -114,6 +117,7 @@ BYTE remote_qualify_filename(char FAR *dst, const char FAR *src)
     regs.di = FP_OFF(dst);
     regs.ds = FP_SEG(src);
     regs.si = FP_OFF(src);
+    regs.flags |= FLG_CARRY;
     regs.a.x = 0x1123;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
@@ -128,6 +132,7 @@ BYTE remote_getfree(void FAR *cds, void *dst)
     regs.es = FP_SEG(cds);
     regs.di = FP_OFF(cds);
     regs.a.x = 0x110c;
+    regs.flags |= FLG_CARRY;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
         return -regs.a.x;
@@ -145,6 +150,7 @@ BYTE remote_getfree_11a3(void FAR *cds, void *dst)
     regs.es = FP_SEG(cds);
     regs.di = FP_OFF(cds);
     regs.a.x = 0x11a3;
+    regs.flags |= FLG_CARRY;
     call_intr(0x2f, MK_FAR_SCP(regs));
     if (regs.flags & FLG_CARRY)
         return -regs.a.x;
