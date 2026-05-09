@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
 
 usage() {
-  echo "$0 [-b <build_dir>] [-c] [-d] [-- <meson_args>]"
-  echo -e "\t-c selects clang for build"
+  echo "$0 [-b <build_dir>] [-c] [-s] [-d] [-- <meson_args>]"
+  echo -e "\t-c selects clang instead of gcc"
+  echo -e "\t-s selects nasm-segelf instead of nasm"
 }
 
 CROSS_F="toolchain.ini"
 BLD="build"
 
-while getopts "b:cdh" opt; do
+while getopts "b:csdh" opt; do
   case "$opt" in
     b)
       BLD="$OPTARG"
       ;;
     c)
       CROSS_F="toolchain-clang.ini"
+      ;;
+    s)
+      CROSS_F="toolchain-segelf.ini"
       ;;
     d)
       DEBUG="1"
