@@ -26,6 +26,6 @@ else
   pipx install meson
   export PATH=${HOME}/.local/bin:${PATH}
 
-  ./configure.meson -- --prefix ${INST}
+  ./configure.meson -s -- --prefix ${INST}
   meson compile --verbose -C build
 fi
