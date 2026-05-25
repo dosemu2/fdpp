@@ -48,6 +48,6 @@
 #ifndef CMA
 #define CMA
 #endif
-#define KVS(v) "FDPP kernel " CMA #v CMA " (compiled " CMA __DATE__ CMA ")"
+#define KVS(v) "FDPP kernel " CMA #v
 #define xKVS(v) KVS(v)
 #define KERNEL_VERSION_STRING xKVS(KERNEL_VERSION)
