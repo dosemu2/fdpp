@@ -24,5 +24,4 @@ LIBLOADER = shared_library('fdldr', 'elf.c', 'loader.c',
   # But we trick it by having gcc as cross-compiler, and cross-linking
   # via custom_target.
 #  native: true,
-  install: true,
-  install_dir: get_option('libdir') / 'fdpp')
+  install: true)

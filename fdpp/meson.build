@@ -184,5 +184,4 @@ LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   sources: [gad, pac, pap, tc, ta],
   cpp_args: CXX_ARGS,
   link_args: ['-Wl,-Bsymbolic', LD_ARGS],
-  install: true,
-  install_dir: get_option('libdir') / 'fdpp')
+  install: true)

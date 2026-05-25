@@ -178,11 +178,11 @@ endif
 
 INSTALL ?= install
 install: $(ALL)
-	$(INSTALL) -d $(DESTDIR)$(libdir)/fdpp
-	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(libdir)/fdpp
-	cp -fP $(FDPPDEVL) $(DESTDIR)$(libdir)/fdpp
-	$(INSTALL) $(LDRLIB) $(DESTDIR)$(libdir)/fdpp
-	cp -fP $(LDRDEVL) $(DESTDIR)$(libdir)/fdpp
+	$(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(libdir)
+	cp -fP $(FDPPDEVL) $(DESTDIR)$(libdir)
+	$(INSTALL) $(LDRLIB) $(DESTDIR)$(libdir)
+	cp -fP $(LDRDEVL) $(DESTDIR)$(libdir)
 	$(INSTALL) -d $(DESTDIR)$(datadir)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(datadir)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(datadir)/fdpp
@@ -196,6 +196,10 @@ uninstall:
 	$(RM) -r $(DESTDIR)$(datadir)/fdpp
 	$(RM) -r $(DESTDIR)$(pkgconfdir)/fdpp.pc
 	$(RM) -r $(DESTDIR)$(prefix)/include/fdpp
+	$(RM) -f $(DESTDIR)$(libdir)/$(FDPPDEVL)
+	$(RM) -f $(DESTDIR)$(libdir)/$(FDPPLIB)
+	$(RM) -f $(DESTDIR)$(libdir)/$(LDRDEVL)
+	$(RM) -f $(DESTDIR)$(libdir)/$(LDRLIB)
 
 $(TGZ):
 	cd $(TOP) && git archive -o $(TOP)/$(TAR) --prefix=$(PKG)/ HEAD
