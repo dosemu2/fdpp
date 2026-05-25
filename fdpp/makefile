@@ -22,7 +22,7 @@ FDPPDEVL = libfdpp.so
 FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
 LDRDEVL = libfdldr.so
 LDRLIB = $(LDRDEVL).$(AVER).$(BVER)
-LDFLAGS += -Wl,-soname=$(FDPPLIB) -Wl,-Bsymbolic
+_LDFLAGS = -Wl,-soname=$(FDPPLIB) -Wl,-Bsymbolic
 TARGET=fdppkrnl.$(AVER).$(BVER)
 MAJ = 1
 RELVER = 10
@@ -147,7 +147,7 @@ $(GEN_CC): %.cc: $(SRC)/%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
-	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(_LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
 $(FDPPDEVL): | $(FDPPLIB)
