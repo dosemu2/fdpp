@@ -19,7 +19,7 @@ BVER = $(shell echo BPRM_VER | cpp -include $(PPINC)/bprm.h - | tail -n 1)
 TARGET=fdppkrnl.$(AVER).$(BVER)
 FDPPDEVL = libfdldr.so
 FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
-LDFLAGS += -Wl,-soname=$(FDPPLIB) -L..
+LDFLAGS += -Wl,-soname=$(FDPPDEVL).$(AVER) -L..
 SOURCES = elf.c loader.c
 HEADERS = elf_priv.h
 OBJECTS = $(SOURCES:.c=.o)

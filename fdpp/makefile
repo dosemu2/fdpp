@@ -20,9 +20,11 @@ AVER = $(shell echo FDPP_API_VER | cpp -include $(PPINC)/thunks.h - | tail -n 1)
 BVER = $(shell echo BPRM_VER | cpp -include $(PPINC)/bprm.h - | tail -n 1)
 FDPPDEVL = libfdpp.so
 FDPPLIB = $(FDPPDEVL).$(AVER).$(BVER)
+FDPPVSO = $(FDPPDEVL).$(AVER)
 LDRDEVL = libfdldr.so
 LDRLIB = $(LDRDEVL).$(AVER).$(BVER)
-LDFLAGS += -Wl,-soname=$(FDPPLIB) -Wl,-Bsymbolic
+LDRVSO = $(LDRDEVL).$(AVER)
+_LDFLAGS = -Wl,-soname=$(FDPPVSO) -Wl,-Bsymbolic
 TARGET=fdppkrnl.$(AVER).$(BVER)
 MAJ = 1
 RELVER = 10
@@ -43,8 +45,8 @@ CPPFLAGS += -I . -I $(FD_EXT_H) -I $(SRC) -I $(srcdir)
 
 #               *Explicit Rules*
 
-ALL = $(FDPPLIB) $(FDPPDEVL) $(LDRLIB) $(LDRDEVL) $(TARGET).elf $(TARGET).map \
-    $(GEN_EXT)
+ALL = $(FDPPLIB) $(FDPPDEVL) $(LDRLIB) $(LDRDEVL) $(FDPPVSO) $(LDRVSO) \
+    $(TARGET).elf $(TARGET).map $(GEN_EXT)
 
 all: $(ALL)
 
@@ -147,13 +149,13 @@ $(GEN_CC): %.cc: $(SRC)/%.c makefile
 	$(srcdir)/parsers/mkfar.sh $< >$@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
-	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(_LDFLAGS) $(LIBS)
 	@echo "Have `nm -u $@ | grep "U " | wc -l` undefined symbols"
 
-$(FDPPDEVL): | $(FDPPLIB)
+$(FDPPDEVL) $(FDPPVSO): | $(FDPPLIB)
 	ln -sf $(FDPPLIB) $@
 
-$(LDRDEVL): | $(LDRLIB)
+$(LDRDEVL) $(LDRVSO): | $(LDRLIB)
 	ln -sf $(LDRLIB) $@
 
 # we have custom PDS
@@ -178,11 +180,13 @@ endif
 
 INSTALL ?= install
 install: $(ALL)
-	$(INSTALL) -d $(DESTDIR)$(libdir)/fdpp
-	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(libdir)/fdpp
-	cp -fP $(FDPPDEVL) $(DESTDIR)$(libdir)/fdpp
-	$(INSTALL) $(LDRLIB) $(DESTDIR)$(libdir)/fdpp
-	cp -fP $(LDRDEVL) $(DESTDIR)$(libdir)/fdpp
+	$(INSTALL) -d $(DESTDIR)$(libdir)
+	$(INSTALL) $(FDPPLIB) $(DESTDIR)$(libdir)
+	cp -fP $(FDPPDEVL) $(DESTDIR)$(libdir)
+	cp -fP $(FDPPVSO) $(DESTDIR)$(libdir)
+	$(INSTALL) $(LDRLIB) $(DESTDIR)$(libdir)
+	cp -fP $(LDRDEVL) $(DESTDIR)$(libdir)
+	cp -fP $(LDRVSO) $(DESTDIR)$(libdir)
 	$(INSTALL) -d $(DESTDIR)$(datadir)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).elf $(DESTDIR)$(datadir)/fdpp
 	$(INSTALL) -m 0644 $(TARGET).map $(DESTDIR)$(datadir)/fdpp
@@ -196,6 +200,12 @@ uninstall:
 	$(RM) -r $(DESTDIR)$(datadir)/fdpp
 	$(RM) -r $(DESTDIR)$(pkgconfdir)/fdpp.pc
 	$(RM) -r $(DESTDIR)$(prefix)/include/fdpp
+	$(RM) -f $(DESTDIR)$(libdir)/$(FDPPDEVL)
+	$(RM) -f $(DESTDIR)$(libdir)/$(FDPPVSO)
+	$(RM) -f $(DESTDIR)$(libdir)/$(FDPPLIB)
+	$(RM) -f $(DESTDIR)$(libdir)/$(LDRDEVL)
+	$(RM) -f $(DESTDIR)$(libdir)/$(LDRVSO)
+	$(RM) -f $(DESTDIR)$(libdir)/$(LDRLIB)
 
 $(TGZ):
 	cd $(TOP) && git archive -o $(TOP)/$(TAR) --prefix=$(PKG)/ HEAD

@@ -46,7 +46,7 @@ meson install -C build --destdir %{buildroot}
 
 %files
 %defattr(-,root,root)
-%{_libdir}/fdpp/*.so.*
+%{_libdir}/*.so.*
 %{_datadir}/fdpp
 
 %package devel
@@ -58,7 +58,7 @@ This package contains headers for fdpp usage.
 %files devel
 %defattr(-,root,root)
 %{_libdir}/pkgconfig/fdpp.pc
-%{_libdir}/fdpp/*.so
+%{_libdir}/*.so
 %{_includedir}/fdpp
 
 %changelog

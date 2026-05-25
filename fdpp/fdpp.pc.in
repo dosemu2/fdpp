@@ -1,7 +1,4 @@
-libdir=@LIBDIR@
-fdpplibdir=${libdir}/fdpp
-
 Name: fdpp
 Description: 64-bit DOS core
 Version: @VERSION@
-Libs: -L${fdpplibdir} -lfdpp -lfdldr
+Libs: -lfdpp -lfdldr

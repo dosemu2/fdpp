@@ -40,7 +40,7 @@ fi
 
   CC=clang ./default-configure -d \
     --prefix=${DIR_ROOT}/${DIR_INSTALLED_FDPP} \
-    --with-fdpp-lib-dir=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/lib/fdpp \
+    --with-fdpp-lib-dir=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/lib \
     --with-fdpp-include-dir=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/include \
     --with-fdpp-pkgconf-dir=${DIR_ROOT}/${DIR_INSTALLED_FDPP}/lib/pkgconfig
   make
