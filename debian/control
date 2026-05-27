@@ -22,6 +22,7 @@ Homepage: https://github.com/dosemu2/fdpp
 Package: libfdpp35
 Architecture: any
 Section: otherosfs
+Replaces: fdpp
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: 64-bit DOS core
  fdpp is a 64-bit DOS core.
@@ -30,6 +31,7 @@ Description: 64-bit DOS core
 Package: libfdldr35
 Architecture: any
 Section: otherosfs
+Replaces: fdpp
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: 64-bit DOS core
  fdpp kernel loader.
