@@ -78,7 +78,7 @@ clean:
 	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
 		*.o $(GEN_CC) $(FDPPDEVL) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(LDRDEVL) $(LDRLIB) $(GEN_HEADERS_FD) \
-		*.pc *.so *.elf
+		*.pc *.so *.so.* *.elf
 
 HDRS = $(wildcard $(HDR)/*.h) $(wildcard $(SRC)/*.h)
 PLPHDRS = farobj.hpp farptr.hpp dispatch.hpp ctors.hpp
