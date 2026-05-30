@@ -72,15 +72,8 @@ if ld_id == 'ld.bfd'
 else
   nasm_ld = find_program(['ld.lld'])
 endif
-as_id = as.cmd_array()[0]
-if as_id == 'nasm-segelf' and ld_id == 'ld.bfd'
-  LA = '--emit-relocs'
-  message('Building relocatable kernel')
-else
-  LA = '--defsym=loadaddr=0x900'
-  nargs += '-DFDPP_STATIC'
-  message('Building static kernel')
-endif
+LA = '--emit-relocs'
+nargs += '-DFDPP_STATIC'
 
 lib = static_library('dummy',
   [SRCS, sfiles, plt_inc],
