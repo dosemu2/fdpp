@@ -65,6 +65,7 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
     Elf_Data *rel_data;
     Elf_Data *st_data;
     int rel_count, st_count, i;
+    char *name2 = NULL;
 
     rel_data = elf_getdata(rel_scn, NULL);
     rel_count = rel_shdr->sh_size / rel_shdr->sh_entsize;
@@ -75,7 +76,7 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
         uint16_t *val;
         GElf_Rel rel;
         GElf_Sym sym;
-        char *name, *name2, *p;
+        char *name, *p;
         int rc;
 
         gelf_getrel(rel_data, i, &rel);
@@ -105,12 +106,12 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
         p = strchr(p + 1, ':');
         if (!p)
             continue;
+        free(name2);
         name2 = strdup(p + 1);
         p = strchr(name2, ':');
         if (p)
             *p = '\0';
         rc = do_getsym(state, name2, &sym);
-        free(name2);
         if (rc)
             continue;
 
@@ -120,6 +121,7 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
         val = (uint16_t *)(state->addr + state->load_offs + rel.r_offset);
         *val += seg;
     }
+    free(name2);
 }
 
 static void elf_dl(struct elfstate *state, uint16_t seg)
