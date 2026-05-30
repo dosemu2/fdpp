@@ -8,7 +8,7 @@ Build-Depends:
     sed,
     bash,
     clang,
-    nasm-segelf,
+    nasm,
     binutils,
     binutils-x86-64-linux-gnu,
     coreutils,
