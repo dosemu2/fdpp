@@ -46,10 +46,13 @@ endif
 NASM_VER = $(shell $(NASM) -v 2>/dev/null)
 $(warning $(NASM_VER))
 ifeq ($(filter (segelf),$(NASM_VER)),)
-$(warning nasm-segelf not found, producing unrelocatable build)
-want_loadaddr = 0x900
+$(warning nasm-segelf not found)
+#want_loadaddr = 0x900
 NASM = nasm
 NASMFLAGS += -DFDPP_STATIC
+CPPFLAGS += -DFDPP_RELOC_SYM=\"_LOADSEG\"
+else
+CPPFLAGS += -DFDPP_RELOC_SYM=\"__LOADADDR\"
 endif
 
 PKG_CONFIG ?= pkg-config
@@ -59,6 +62,7 @@ export CC
 export CC_FOR_BUILD
 export CC_LD
 export PKG_CONFIG
+export CPPFLAGS
 
 TARGETOPT = -std=c++20 -c -fno-threadsafe-statics -fpic
 # _XTRA should go at the end of cmd line
