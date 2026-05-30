@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <inttypes.h>
+#include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -65,6 +66,7 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
     Elf_Data *rel_data;
     Elf_Data *st_data;
     int rel_count, st_count, i;
+    char *name2 = NULL;
 
     rel_data = elf_getdata(rel_scn, NULL);
     rel_count = rel_shdr->sh_size / rel_shdr->sh_entsize;
@@ -75,7 +77,7 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
         uint16_t *val;
         GElf_Rel rel;
         GElf_Sym sym;
-        char *name, *name2, *p;
+        char *name, *p;
         int rc;
 
         gelf_getrel(rel_data, i, &rel);
@@ -89,37 +91,56 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
             return;
         }
         gelf_getsym(st_data, GELF_R_SYM(rel.r_info), &sym);
+        name = elf_strptr(state->elf, state->symtab_shdr.sh_link, sym.st_name);
 #ifndef STT_RELC
 #define STT_RELC 8
 #endif
-        if (GELF_ST_TYPE(sym.st_info) != STT_RELC)
+        if (GELF_ST_TYPE(sym.st_info) == STT_RELC) {
+            /* make sure its a SEG16 reloc symbol */
+            if (strncmp(name, ">>:", 3) != 0 || !strstr(name, "04"))
+                continue;
+            p = strstr(name, ":s");
+            if (!p)
+                continue;
+            p = strchr(p + 1, ':');
+            if (!p)
+                continue;
+            free(name2);
+            name2 = strdup(p + 1);
+            p = strchr(name2, ':');
+            if (p)
+                *p = '\0';
+            rc = do_getsym(state, name2, &sym);
+            if (rc)
+                continue;
+            /* not relocating against abs symbol */
+            if (sym.st_shndx == SHN_ABS)
+                continue;
+            /* Assumption is that dynamic relocs are needed against
+             * any non-absolute symbols with RELC (SEG) reference, so
+             * no need to check for symbol name. */
+#ifdef FDPP_RELOC_SYM
+            assert(strcmp(FDPP_RELOC_SYM, name2) == 0);
+#endif
+        } else {
+            /* No RELC reference, and also lld tends to put symbols
+             * from linker script to ABS section more agressively than
+             * GNU ld, so can't depend also on SHN_ABS check here.
+             * But since 30d37cd we have only 1 relocation base symbol. */
+#ifdef FDPP_RELOC_SYM
+            /* Assuming relocatable build. Undefine this or remove
+             * --emit-relocs if unwanted. loadaddr/SHN_ABS is not
+             * reliable because of lld. */
+            if (strcmp(FDPP_RELOC_SYM, name) != 0)
+                continue;
+#else
             continue;
-
-        name = elf_strptr(state->elf, state->symtab_shdr.sh_link, sym.st_name);
-        /* make sure its a SEG16 reloc symbol */
-        if (strncmp(name, ">>:", 3) != 0 || !strstr(name, "04"))
-            continue;
-        p = strstr(name, ":s");
-        if (!p)
-            continue;
-        p = strchr(p + 1, ':');
-        if (!p)
-            continue;
-        name2 = strdup(p + 1);
-        p = strchr(name2, ':');
-        if (p)
-            *p = '\0';
-        rc = do_getsym(state, name2, &sym);
-        free(name2);
-        if (rc)
-            continue;
-
-        /* not relocating against abs symbol */
-        if (sym.st_shndx == SHN_ABS)
-            continue;
+#endif
+        }
         val = (uint16_t *)(state->addr + state->load_offs + rel.r_offset);
         *val += seg;
     }
+    free(name2);
 }
 
 static void elf_dl(struct elfstate *state, uint16_t seg)

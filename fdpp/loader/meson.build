@@ -18,7 +18,8 @@ LIBLOADER = shared_library('fdldr', 'elf.c', 'loader.c',
   c_args: [
     '-DFDPPKRNLDIR=' + get_option('prefix') / get_option('datadir') / 'fdpp',
     '-DKRNL_ELFNAME=' + TARGET + '.elf',
-    '-DKRNL_MAP_NAME=' + TARGET + '.map'
+    '-DKRNL_MAP_NAME=' + TARGET + '.map',
+    '-DFDPP_RELOC_SYM="_LOADSEG"',
   ],
   # meson thinks we cross-compile and won't allow native.
   # But we trick it by having gcc as cross-compiler, and cross-linking

@@ -24,7 +24,7 @@ SOURCES = elf.c loader.c
 HEADERS = elf_priv.h
 OBJECTS = $(SOURCES:.c=.o)
 
-CFLAGS += -I . -I $(PPINC) \
+CFLAGS += -I . -I $(PPINC) $(CPPFLAGS) \
     -DFDPPKRNLDIR=$(datadir)/fdpp \
     -DKRNL_ELFNAME=$(TARGET).elf -DKRNL_MAP_NAME=$(TARGET).map \
     -fpic
