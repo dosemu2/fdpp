@@ -5,21 +5,16 @@ fdpp is a 64-bit DOS core.<br/>
 It is based on a FreeDOS kernel ported to modern C++.<br/>
 In short, FreeDOS plus-plus.
 
-Can be compiled with clang (or experimentally with gcc) and booted under
-[dosemu2](https://github.com/dosemu2/dosemu2).
+Can be compiled with clang (or, since v1.10, experimentally with gcc)
+and booted under [dosemu2](https://github.com/dosemu2/dosemu2).
 
 ## building and installing
 Run `./configure.meson [-c] [-b <build_dir>]`.<br/>
 This creates and configures the build dir and prints
 the instructions for the further build steps. It should also inform
 you about any missing build-dependencies, which you need to install.
-Among those are
-[nasm-segelf](https://github.com/stsp/nasm-segelf)
-and GNU ld (in case you have LLVM toolchain installed instead).
 
-`-c` stands for "compatibility" build. This way you don't need `nasm-segelf`
-and you can use `ld.lld` from LLVM. But the cost is extra ~8K of
-the DOS memory space eaten at boot.
+`-c` stands for clang build.
 
 ## installing from pre-built package
 For the ubuntu package please visit
