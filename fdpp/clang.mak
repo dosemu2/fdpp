@@ -10,12 +10,12 @@ else
 $(error binutils-x86-64-linux-gnu not installed)
 endif
 endif
+
+NASM ?= nasm-segelf
 LD_VER = $(shell $(CROSS_LD) --version 2>/dev/null)
 ifneq ($(filter LLD,$(LD_VER)),)
-$(warning lld found, producing unrelocatable build)
-want_loadaddr = 0x900
+$(warning lld found, not using nasm-segelf)
 NASM = nasm
-NASMFLAGS += -DFDPP_STATIC
 endif
 
 # don't use ?= here as that doesn't override make's builtin CC var
@@ -43,15 +43,13 @@ ifeq ($(CC_LD),)
 CC_LD = $(CC)
 endif
 
-ifeq ($(want_loadaddr),)
-NASM ?= nasm-segelf
 NASM_VER = $(shell $(NASM) -v 2>/dev/null)
+$(warning $(NASM_VER))
 ifeq ($(filter (segelf),$(NASM_VER)),)
 $(warning nasm-segelf not found, producing unrelocatable build)
 want_loadaddr = 0x900
 NASM = nasm
 NASMFLAGS += -DFDPP_STATIC
-endif
 endif
 
 PKG_CONFIG ?= pkg-config
