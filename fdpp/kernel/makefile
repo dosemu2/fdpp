@@ -109,8 +109,8 @@ cdata.asm: $(srcdir)/cdata.S $(HDR)/version.h $(GIT_REV) $(srcdir)/makefile
 
 thunk_calls.tmp: $(SRC)/proto.h
 	srcdir=$(srcdir)/$(T)/parsers CPP="$(CPP)" \
-	$(srcdir)/$(T)/parsers/parse_decls.sh 1 $< >$@ || \
-	($(RM) $@ ; false)
+	$(srcdir)/$(T)/parsers/parse_decls.sh 1 $< | \
+		nl -v 0 | sed -E 's/^ *//' >$@ || ($(RM) $@ ; false)
 plt.inc: thunk_calls.tmp
 	$(srcdir)/$(T)/parsers/parse_decls.sh 3 $< >$@ || \
 	($(RM) $@ ; false)

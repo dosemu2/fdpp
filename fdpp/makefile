@@ -75,7 +75,7 @@ endif
 clean:
 	$(MAKE) -C kernel clean
 	$(MAKE) -C loader clean
-	-$(RM) .tstamp *.map $(TARGET).elf *.inc \
+	-$(RM) .tstamp *.map $(TARGET).elf *.inc thunk_c.h thunk_p.h \
 		*.o $(GEN_CC) $(FDPPDEVL) $(FDPPLIB) *.tmp $(GEN_HEADERS) \
 		$(LDRDEVL) $(LDRLIB) $(GEN_HEADERS_FD) \
 		*.pc *.so *.so.* *.elf

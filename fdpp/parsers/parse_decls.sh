@@ -4,7 +4,7 @@ set -e
 set -o pipefail
 
 gen_calls_tmp() {
-	grep ASMCFUNC $1 | $CPP -P -I $srcdir -include unfar.h - | nl -v 0 | sed -E 's/^ *//'
+	grep ASMCFUNC $1 | $CPP -P -I $srcdir -include unfar.h -
 }
 
 gen_plt_inc() {
@@ -14,7 +14,7 @@ gen_plt_inc() {
 
 gen_asms_tmp() {
 	grep 'ASMFUNC\|ASMPASCAL' $1 | grep -v "//" | \
-		$CPP -P -I $srcdir -include unfar.h - | nl -v 0 | sed -E 's/^ *//'
+		$CPP -P -I $srcdir -include unfar.h -
 }
 
 gen_plt_asmc() {
