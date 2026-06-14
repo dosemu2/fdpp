@@ -4,7 +4,8 @@ project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 RA = meson.current_source_dir() / 'run_arg.sh'
-tg = dependency('thunk_gen')
+NS = meson.current_source_dir() / 'num.sh'
+tg = dependency('thunk_gen', version: '>=1.9')
 TGMK = tg.get_variable('makeinc')
 tgmke = environment()
 TG = tg.get_variable('binary')
@@ -77,14 +78,14 @@ make = find_program('make')
 
 gad = custom_target('glob_asmdefs.h',
   output: 'glob_asmdefs.h',
-  input: 'src/glob_asm.h',
-  command: [RA, 'glob_asmdefs.h', make, '-f', TGMK,
-            'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
+  input: SRC / 'glob_asm.h',
+  command: [RA, 'glob_asmdefs.h', make,
+            '-f', TGMK, 'glob_asmdefs.h', 'GLOB_ASM=@INPUT@'],
   env: tgmke,
   depends: tgbin,
   capture: true)
 
-GEN_TMP = { '1':'thunk_calls.tmp', '2':'thunk_asms.tmp' }
+GEN_TMP = { '1':'thunk_c.h', '2':'thunk_p.h' }
 GEN_H = { 'plt_asmc.h':'4', 'plt_asmp.h':'5' }
 
 env = environment()
@@ -101,15 +102,21 @@ foreach n: GEN_TMP.keys()
       env: ['CPP=cpp', 'srcdir=' + meson.current_source_dir() / 'parsers'])
 endforeach
 GEN = { GEN_TMP['1']:gt[0], GEN_TMP['2']:gt[1] }
+tat = custom_target('thunk_asms.tmp',
+  output: 'thunk_asms.tmp',
+  input: GEN['thunk_p.h'],
+  command: [NS],
+  feed: true,
+  capture: true)
 pac = custom_target('plt_asmc.h',
   output: 'plt_asmc.h',
-  input: GEN['thunk_asms.tmp'],
+  input: tat,
   command: [PD, GEN_H['plt_asmc.h'], '@INPUT@'],
   env: env,
   capture: true)
 pap = custom_target('plt_asmp.h',
   output: 'plt_asmp.h',
-  input: GEN['thunk_asms.tmp'],
+  input: tat,
   command: [PD, GEN_H['plt_asmp.h'], '@INPUT@'],
   env: env,
   capture: true)
@@ -117,9 +124,15 @@ pap = custom_target('plt_asmp.h',
 tgenv = tgmke
 tgenv.set('TFLAGS', TFLAGS)
 
+tct = custom_target('thunk_calls.tmp',
+  output: 'thunk_calls.tmp',
+  input: GEN['thunk_c.h'],
+  command: [NS],
+  feed: true,
+  capture: true)
 tc = custom_target('thunk_calls.h',
   output: 'thunk_calls.h',
-  input: GEN['thunk_calls.tmp'],
+  input: tct,
   command: [RA, '-i', 'thunk_calls.tmp', 'thunk_calls.h',
             make, '-f', TGMK, 'thunk_calls.h'],
   env: tgenv,
@@ -129,7 +142,7 @@ tc = custom_target('thunk_calls.h',
 
 ta = custom_target('thunk_asms.h',
   output: 'thunk_asms.h',
-  input: GEN['thunk_asms.tmp'],
+  input: tat,
   command: [RA, '-i', 'thunk_asms.tmp', 'thunk_asms.h',
             make, '-f', TGMK, 'thunk_asms.h'],
   env: tgenv,

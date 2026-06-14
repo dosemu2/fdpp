@@ -1,6 +1,7 @@
 project('kernel', ['nasm', 'c'], version: '1.7', meson_version: '>= 1.3.2')
 
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
+NS = meson.current_source_dir() / 'num.sh'
 SRC = 'src'
 DSRC = 'src/drivers'
 kernel_ld = meson.current_source_dir() / 'kernel.ld'
@@ -29,11 +30,17 @@ sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
 env = environment()
 env.set('CPP', 'cpp')
 env.set('srcdir', meson.current_source_dir() / '../parsers')
-tct = custom_target('thunk_calls.tmp',
-  output: 'thunk_calls.tmp',
+tch = custom_target('thunk_c.h',
+  output: 'thunk_c.h',
   input: SRC / 'proto.h',
   env: env,
   command: [PD, '1', '@INPUT@'],
+  capture: true)
+tct = custom_target('thunk_calls.tmp',
+  output: 'thunk_calls.tmp',
+  input: tch,
+  command: [NS],
+  feed: true,
   capture: true)
 plt_inc = custom_target('plt.inc',
   output: 'plt.inc',
