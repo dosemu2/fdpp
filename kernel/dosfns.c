@@ -1126,7 +1126,7 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
   SAttr = (BYTE) attr;
 
 #if defined(FIND_DEBUG)
-  DebugPrintf(("Remote Find: n='%Fs\n", PriPathName));
+  DebugPrintf(("Remote Find: n='%s\n", GET_PTR(PriPathName)));
 #endif
 
   dta = &sda_tmp_dm;

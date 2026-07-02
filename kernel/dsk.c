@@ -482,8 +482,8 @@ STATIC WORD getbpb(ddt FAR * pddt)
 #ifdef DSK_DEBUG
   DebugPrintf(("BPB_NSECS     = %04x\n", pbpbarray->bpb_nsecs));
   DebugPrintf(("BPB_NHEADS    = %04x\n", pbpbarray->bpb_nheads));
-  DebugPrintf(("BPB_HIDDEN    = %08lx\n", pbpbarray->bpb_hidden));
-  DebugPrintf(("BPB_HUGE      = %08lx\n", pbpbarray->bpb_huge));
+  DebugPrintf(("BPB_HIDDEN    = %04x\n", pbpbarray->bpb_hidden));
+  DebugPrintf(("BPB_HUGE      = %04x\n", pbpbarray->bpb_huge));
 #endif
 
   return 0;
