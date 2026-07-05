@@ -261,11 +261,10 @@ STATIC VOID upMMem(UBYTE FAR * map, UBYTE FAR * str, unsigned len)
 
   oldStr = str;
   oldLen = len;
-  log(("NLS: upMMem(): len=%u, %04x:%04x=\"", len, FP_SEG(str),
-       FP_OFF(str)));
+  DebugPrintf(("NLS: upMMem(): len=%u, %P=\"", len, GET_FP32(str)));
   for (c = 0; c < len; ++c)
-    DebugPrintf(("%c", str[c] > 32 ? str[c] : '.'));
-  DebugPrintf(("\"\n"));
+    DebugPrintf(("@%c", str[c] > 32 ? str[c] : '.'));
+  DebugPrintf(("@\"\n"));
 #endif
   if (len)
     do
@@ -280,8 +279,8 @@ STATIC VOID upMMem(UBYTE FAR * map, UBYTE FAR * str, unsigned len)
 #ifdef NLS_DEBUG
   DebugPrintf(("NLS: upMMem(): result=\""));
   for (c = 0; c < oldLen; ++c)
-    DebugPrintf(("%c", oldStr[c] > 32 ? oldStr[c] : '.'));
-  DebugPrintf(("\"\n"));
+    DebugPrintf(("@%c", oldStr[c] > 32 ? oldStr[c] : '.'));
+  DebugPrintf(("@\"\n"));
 #endif
 }
 
@@ -523,11 +522,10 @@ VOID DosUpFMem(VOID FAR * str, unsigned len)
 {
 #ifdef NLS_DEBUG
   unsigned c;
-  log(("NLS: DosUpFMem(): len=%u, %04x:%04x=\"", len, FP_SEG(str),
-       FP_OFF(str)));
+  DebugPrintf(("NLS: DosUpFMem(): len=%u, %P=\"", len, GET_FP32(str)));
   for (c = 0; c < len; ++c)
-    DebugPrintf(("%c", ((char FAR *)str)[c] > 32 ? ((char FAR *)str)[c] : '.'));
-  DebugPrintf(("\"\n"));
+    DebugPrintf(("@%c", ((char FAR *)str)[c] > 32 ? ((char FAR *)str)[c] : '.'));
+  DebugPrintf(("@\"\n"));
 #endif
   if (nlsInfo.actPkg->flags & NLS_FLAG_DIRECT_FUPCASE)
     nlsFUpMem(nlsInfo.actPkg, str, len);
@@ -698,10 +696,10 @@ UWORD ASMCFUNC syscall_MUX14(iregs FAR * regs)
       {
         unsigned j;
         BYTE FAR *p;
-        log(("NLS: MUX14(FILE_UPMEM): len=%u, %04x:%04x=\"", regs->CX, regs->ES, regs->DI));
+        DebugPrintf(("NLS: MUX14(FILE_UPMEM): len=%u, %04x:%04x=\"", regs->CX, regs->ES, regs->DI));
         for (j = 0, p = MK_FP(regs->ES, regs->DI); j < regs->CX; ++j)
-          DebugPrintf(("%c", p[j] > 32 ? p[j] : '.'));
-        DebugPrintf(("\"\n"));
+          DebugPrintf(("@%c", p[j] > 32 ? p[j] : '.'));
+        DebugPrintf(("@\"\n"));
       }
 #endif
       nlsFUpMem(nls, MK_FP(regs->ES, regs->DI), regs->CX);

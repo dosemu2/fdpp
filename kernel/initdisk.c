@@ -794,11 +794,11 @@ StandardBios:                  /* old way to get parameters */
 
   driveParam->driveno = drive;
 
-  DebugPrintf(("drive %02Xh total: C = %u, H = %u, S = %u,",
+  DebugPrintf(("drive %02Xh total: C = %u, H = %u, S = %u, total size %uMB\n",
                drive,
                driveParam->chs.Cylinder,
-               driveParam->chs.Head, driveParam->chs.Sector));
-  DebugPrintf((" total size %uMB\n", driveParam->total_sectors / 2048));
+               driveParam->chs.Head, driveParam->chs.Sector,
+               driveParam->total_sectors / 2048));
 
 ErrorReturn:
 
