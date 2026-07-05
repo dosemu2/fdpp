@@ -77,7 +77,7 @@ ld_id = as.get_linker_id()
 if ld_id == 'ld.bfd'
   nasm_ld = find_program(['i686-linux-gnu-ld', 'i386-elf-ld', 'x86_64-linux-gnu-ld', 'ld.bfd'])
 else
-  nasm_ld = find_program(['ld.lld'])
+  nasm_ld = find_program(['ld'])
 endif
 LA = '--emit-relocs'
 nargs += '-DFDPP_STATIC'
