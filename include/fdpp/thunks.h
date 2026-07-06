@@ -43,6 +43,7 @@ int FdppCall(struct vm86_regs *regs);
 int FdppCtrl(int idx, struct vm86_regs *regs);
 
 enum { FDPP_PRINT_LOG, FDPP_PRINT_TERMINAL, FDPP_PRINT_SCREEN };
+#define FDPP_PRINT_LOG_NOPREFIX (1 << 16)
 enum { ASM_CALL_OK, ASM_CALL_ABORT };
 enum { FDPP_RET_ABORT = -1, FDPP_RET_OK, FDPP_RET_NORET };
 

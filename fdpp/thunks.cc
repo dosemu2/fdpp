@@ -233,9 +233,9 @@ void fdvprintf(const char *format, va_list vl)
     fdpp->print(FDPP_PRINT_TERMINAL, format, vl);
 }
 
-static void fdlogvprintf(const char *format, va_list vl)
+static void fdlogvprintf(int prio, const char *format, va_list vl)
 {
-    fdpp->print(FDPP_PRINT_LOG, format, vl);
+    fdpp->print(prio, format, vl);
 }
 
 void fdprintf(const char *format, ...)
@@ -250,9 +250,27 @@ void fdprintf(const char *format, ...)
 void fdlogprintf(const char *format, ...)
 {
     va_list vl;
+    int prio = FDPP_PRINT_LOG;
 
+    if (strcmp("%s", format) == 0) {    // The string has been preformatted and we
+        const char *s;                  // may need to move an @ from args to format
+
+        va_start(vl, format);
+        s = va_arg(vl, const char *);
+        va_end(vl);
+
+        if (s[0] == '@') {
+            fdlogprintf("@%s", s + 1);  // call ourselves again
+            return;
+        }
+    }
+
+    if (format[0] == '@') {
+        prio |= FDPP_PRINT_LOG_NOPREFIX;
+        format++;
+    }
     va_start(vl, format);
-    fdlogvprintf(format, vl);
+    fdlogvprintf(prio, format, vl);
     va_end(vl);
 }
 
