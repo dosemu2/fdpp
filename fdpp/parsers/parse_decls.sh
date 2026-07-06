@@ -13,7 +13,7 @@ gen_plt_inc() {
 }
 
 gen_asms_tmp() {
-	grep 'ASMFUNC\|ASMPASCAL' $1 | grep -v "//" | \
+	grep -E 'ASMFUNC|ASMPASCAL' $1 | grep -v "//" | \
 		$CPP -P -I $srcdir -include unfar.h -
 }
 
