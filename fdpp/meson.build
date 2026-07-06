@@ -99,7 +99,7 @@ gt = []
 foreach n: GEN_TMP.keys()
   gt += gtgen.process(SRC / 'proto.h',
       extra_args: n,
-      env: ['CPP=cpp', 'srcdir=' + meson.current_source_dir() / 'parsers'])
+      env: env)
 endforeach
 GEN = { GEN_TMP['1']:gt[0], GEN_TMP['2']:gt[1] }
 tat = custom_target('thunk_asms.tmp',
