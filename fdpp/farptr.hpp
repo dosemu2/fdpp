@@ -46,8 +46,8 @@ static inline far_s _MK_S(uint32_t s, uint16_t o)
     return (far_s){o, (uint16_t)s};
 }
 
-#define _P(T1) std::is_pointer<T1>::value
-#define _C(T1) std::is_const<T1>::value
+#define ___P(T1) std::is_pointer<T1>::value
+#define ___C(T1) std::is_const<T1>::value
 #define _RP(T1) typename std::remove_pointer<T1>::type
 #define _RC(T1) typename std::remove_const<T1>::type
 template<typename> class SymWrp;
@@ -73,7 +73,7 @@ using WrpType = typename WrpTypeS<T>::type;
         std::is_same<_RC(T1), unsigned char>::value || \
         std::is_same<_RC(T1), T0>::value) && \
         !std::is_same<T0, T1>::value && \
-        (_C(T1) || !_C(T0)))
+        (___C(T1) || !___C(T0)))
 
 template<typename T>
 class FarPtr;
@@ -230,23 +230,23 @@ public:
 
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
-        _C(T0) == _C(T1)>::type* = nullptr>
+        ___C(T0) == ___C(T1)>::type* = nullptr>
     operator FarPtrBase<T0>() const & {
         return FarPtrBase<T0>(this->_seg_(), this->_off_());
     }
     template<typename T0, typename T1 = T,
         typename std::enable_if<ALLOW_CNV(T1, T0) &&
-        _C(T0) == _C(T1)>::type* = nullptr>
+        ___C(T0) == ___C(T1)>::type* = nullptr>
     operator FarPtrBase<T0>() && {
         ___assert(!obj);
         return FarPtrBase<T0>(this->seg(), this->off());
     }
 
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) && !_C(T0)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV(T1, T0) && !___C(T0)>::type* = nullptr>
     operator T0*() { return (T0*)resolve_segoff_fd(this->ptr); }
     template<typename T0, typename T1 = T,
-        typename std::enable_if<ALLOW_CNV(T1, T0) && _C(T0)>::type* = nullptr>
+        typename std::enable_if<ALLOW_CNV(T1, T0) && ___C(T0)>::type* = nullptr>
     operator T0*() const { return (T0*)resolve_segoff_fd(this->ptr); }
     template<typename T0, typename T1 = T,
         typename std::enable_if<!ALLOW_CNV(T1, T0)>::type* = nullptr>
@@ -416,10 +416,10 @@ class SymWrp : public T {
     }
 
     template <typename T1 = T,
-        typename std::enable_if<!_C(T1)>::type* = nullptr>
+        typename std::enable_if<!___C(T1)>::type* = nullptr>
     void dtor() { dtor_common(len > 0); }
     template <typename T1 = T,
-        typename std::enable_if<_C(T1)>::type* = nullptr>
+        typename std::enable_if<___C(T1)>::type* = nullptr>
     void dtor() { dtor_common(false); }
     void ctor(far_s f, size_t l, auto vadd) {
         const char *ptr = (char *)resolve_segoff(f);
@@ -490,13 +490,13 @@ class SymWrp2 {
     T backup;
 
     template <typename T1 = T,
-        typename std::enable_if<!_C(T1)>::type* = nullptr>
+        typename std::enable_if<!___C(T1)>::type* = nullptr>
     void dtor() {
         if (fptr.get_ptr() && sym != backup)
             *(decltype(sym) *)resolve_segoff(fptr.get_far()) = sym;
     }
     template <typename T1 = T,
-        typename std::enable_if<_C(T1)>::type* = nullptr>
+        typename std::enable_if<___C(T1)>::type* = nullptr>
     void dtor() {}
 public:
     SymWrp2(far_s f) : sym(*(T *)resolve_segoff(f)), fptr(f), backup(sym) {}
@@ -514,7 +514,7 @@ public:
     operator T &() { return sym; }
     /* for fmemcpy() etc that need const void* */
     template <typename T1 = T,
-        typename std::enable_if<_P(T1) &&
+        typename std::enable_if<___P(T1) &&
         !std::is_void<_RP(T1)>::value>::type* = nullptr>
     operator FarPtr<const void> () const {
         return _MK_F(FarPtr<const void>, fptr.get_far());
@@ -659,10 +659,10 @@ public:
     static constexpr decltype(max_len) len = max_len;
 
     template <typename T1 = T,
-        typename std::enable_if<!_C(T1)>::type* = nullptr>
+        typename std::enable_if<!___C(T1)>::type* = nullptr>
     operator FarPtr<void> () { return this->lookup_sym(); }
     template <typename T1 = T,
-        typename std::enable_if<!_C(T1)>::type* = nullptr>
+        typename std::enable_if<!___C(T1)>::type* = nullptr>
     operator FarPtr<const T1> () { return this->lookup_sym(); }
     operator FarPtr<T> () { return this->lookup_sym(); }
     template <uint16_t (*SEG)(void)>
