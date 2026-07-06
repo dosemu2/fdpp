@@ -1,6 +1,5 @@
 project('loader', 'c', version: '0.1')
 rel_inc = 'include/fdpp'
-lelf = dependency('libelf')
 incdir = include_directories(rel_inc)
 cpp = meson.get_compiler('c')
 AVER = cpp.get_define('FDPP_API_VER',
@@ -11,6 +10,14 @@ BVER = cpp.get_define('BPRM_VER',
   prefix: '#include "bprm.h"')
 FVER = AVER + '.' + BVER
 TARGET = 'fdppkrnl.' + FVER
+lelf = dependency('libelf', required: false)
+if not lelf.found()
+  lelf = cpp.find_library('elf', required: false)
+endif
+if not lelf.found()
+  # just print error
+  lelf = dependency('libelf', required: true)
+endif
 LIBLOADER = shared_library('fdldr', 'elf.c', 'loader.c',
   dependencies: lelf,
   include_directories: incdir,
