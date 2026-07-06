@@ -74,7 +74,7 @@ ccgen = generator(find_program(MF),
   capture: true)
 ccfiles = ccgen.process(CFILES)
 
-make = find_program('make')
+make = find_program(['gmake', 'make'])
 
 gad = custom_target('glob_asmdefs.h',
   output: 'glob_asmdefs.h',
