@@ -82,6 +82,9 @@ static void do_elf_dl(struct elfstate *state, uint16_t seg, Elf_Scn *rel_scn,
 
         gelf_getrel(rel_data, i, &rel);
         /* look for R_386_SEG16 */
+#ifndef R_386_16
+#define R_386_16           20
+#endif
         if (GELF_R_TYPE(rel.r_info) != R_386_16)
             continue;
         if (GELF_R_SYM(rel.r_info) >= st_count) {
