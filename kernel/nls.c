@@ -34,6 +34,7 @@
  *		==ska*/
 
 #include "portab.h"
+#include "debug.h"
 #include "globals.h"
 #include "pcb.h"
 #include "nls.h"

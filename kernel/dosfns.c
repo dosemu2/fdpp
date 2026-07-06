@@ -27,6 +27,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "debug.h"
 
 #ifdef VERSION_STRINGS
 static BYTE *dosfnsRcsId =

@@ -48,6 +48,30 @@ void logprintf(const char *format, ...) PRINTF(1);
 
 /* use to limit output to debug builds */
 #ifdef DEBUG
+
+/* enable or disable various chunks of debug output */
+
+/* show stored IRQ vectors */
+#define DEBUGIRQ
+/* display output during kernel config processing phase */
+#define DEBUGCFG
+/* display info on various DOS functions (dosfns.c) */
+#define DEBUGDOSFNS
+/* extra debug output related to chdir */
+#define CHDIR_DEBUG
+/* extra debug output related to findfirst */
+#define FIND_DEBUG
+/* display info on various DOS directory functions (fatdir.c) */
+#define DEBUGFATDIR
+/* extra output during read/write operations */
+#define DSK_DEBUG
+/* display info on various FAT handling functions (fatfs.c) */
+#define DEBUGFATFS
+/* debug truename */
+#define DEBUG_TRUENAME
+/* display nls conversion */
+#define NLS_DEBUG
+
 #ifdef DEBUG_PRINT_COMPORT
 #define DebugPrintf(x) dbgc_printf x
 #else
@@ -61,12 +85,6 @@ void logprintf(const char *format, ...) PRINTF(1);
    keep around for later use.  */
 #define DDebugPrintf(x)
 
-
-/* enable or disable various chunks of debug output */
-
-/* show stored IRQ vectors */
-/* #define DEBUGIRQ */
-
 /* show output related to moving kernel into HMA */
 #ifdef DEBUG
 #define HMAInitPrintf(x) DebugPrintf(x)
@@ -74,30 +92,18 @@ void logprintf(const char *format, ...) PRINTF(1);
 #define HMAInitPrintf(x)
 #endif
 
-/* display output during kernel config processing phase */
-/* #define DEBUGCFG */
 #ifdef DEBUGCFG
 #define CfgDbgPrintf(x) DebugPrintf(x)
 #else
 #define CfgDbgPrintf(x)
 #endif
 
-/* display info on various DOS functions (dosfns.c) */
-/* #define DEBUGDOSFNS */
 #ifdef DEBUGDOSFNS
 #define DFnsDbgPrintf(x) DebugPrintf(x)
 #else
 #define DFnsDbgPrintf(x)
 #endif
 
-/* extra debug output related to chdir */
-/* #define CHDIR_DEBUG */
-
-/* extra debug output related to findfirst */
-/* #define FIND_DEBUG */
-
-/* display info on various DOS directory functions (fatdir.c) */
-/* #define DEBUGFATDIR */
 #ifdef DEBUGFATDIR
 #define FDirDbgPrintf(x) DebugPrintf(x)
 #else
@@ -107,25 +113,17 @@ void logprintf(const char *format, ...) PRINTF(1);
 /* extra debug output when transferring I/O chunks of data */
 /* #define DISPLAY_GETBLOCK */
 
-/* extra output during read/write operations */
-/* #define DSK_DEBUG */
-
-/* display info on various FAT handling functions (fatfs.c) */
-/* #define DEBUGFATFS */
 #ifdef DEBUGFATFS
 #define FatFSDbgPrintf(x) DebugPrintf(x)
 #else
 #define FatFSDbgPrintf(x)
 #endif
 
-/* debug truename */
-/* #define DEBUG_TRUENAME */
 #ifdef DEBUG_TRUENAME
 #define tn_printf(x) DebugPrintf(x)
 #else
 #define tn_printf(x)
 #endif
-
 
 /* ensure printf is prototyped */
 #if defined(DEBUG) || defined(DEBUGIRQ) || defined(DEBUGCFG) || \

@@ -25,6 +25,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "debug.h"
 #include "globals.h"
 #include "dyndata.h"
 

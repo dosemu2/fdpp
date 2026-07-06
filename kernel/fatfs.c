@@ -28,6 +28,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "debug.h"
 #include "globals.h"
 
 #ifdef VERSION_STRINGS

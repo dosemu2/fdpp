@@ -106,10 +106,6 @@ long DosMkTmp(char FAR * pathname, UWORD attr)
   return rc;
 }
 
-#ifdef DEBUG
-#define DEBUG_TRUENAME
-#endif
-
 #define drLetterToNr(dr) ((unsigned char)((dr) - 'A'))
 /* Convert an uppercased drive letter into the drive index */
 #define drNrToLetter(dr) ((dr) + 'A')
