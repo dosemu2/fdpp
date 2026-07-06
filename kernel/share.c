@@ -116,15 +116,15 @@ typedef struct {
 	unsigned long start;	/* Beginning offset of locked region */
 	unsigned long end;		/* Ending offset of locked region */
 	unsigned short fileno;	/* file_table entry number */
-} lock_t;
+} __lock_t;
 
 
 		/* ------------- GLOBALS ------------- */
 //static char progname[9];
 static const int file_table_size = 256;	/* # of file_t we can have */
 static file_t file_table[file_table_size];
-static const int lock_table_size = 1024;	/* # of lock_t we can have */
-static lock_t lock_table[lock_table_size];
+static const int __lock_table_size = 1024;	/* # of __lock_t we can have */
+static __lock_t __lock_table[__lock_table_size];
 
 		/* ------------- HOOK ------------- */
 void int2F_10_handler(iregs FAR *iregs_p)
@@ -154,10 +154,10 @@ void int2F_10_handler(iregs FAR *iregs_p)
 
 static void remove_all_locks(int fileno) {
 	int i;
-	lock_t *lptr;
+	__lock_t *lptr;
 
-	for (i = 0; i < lock_table_size; i++) {
-		lptr = &lock_table[i];
+	for (i = 0; i < __lock_table_size; i++) {
+		lptr = &__lock_table[i];
 		if (lptr->fileno == fileno) lptr->used = 0;
 	}
 }
@@ -321,7 +321,7 @@ static WORD do_access_check(
 {
 	int i;
 	char *filename = file_table[fileno].filename;
-	lock_t *lptr;
+	__lock_t *lptr;
 	unsigned long endofs = ofs + len;
 
 	if (endofs < ofs) {
@@ -331,8 +331,8 @@ static WORD do_access_check(
 
 	if (len < 1L) return 0;
 
-	for (i = 0; i < lock_table_size; i++) {
-		lptr = &lock_table[i];
+	for (i = 0; i < __lock_table_size; i++) {
+		lptr = &__lock_table[i];
 		if (   (lptr->used)
 			&& (!allow_same_fd || fileno != lptr->fileno)
 			&& (fnmatches(filename, file_table[lptr->fileno].filename))
@@ -388,7 +388,7 @@ WORD share_lock_unlock(
 	 WORD unlock) {		/* non-zero to unlock; zero to lock */
 
 	int i;
-	lock_t *lptr;
+	__lock_t *lptr;
 	unsigned long endofs = ofs + len;
 
     if (endofs < ofs) {
@@ -402,8 +402,8 @@ WORD share_lock_unlock(
      than the first locked region to be unlocked (japheth, 09/2005) */
 
 	if (unlock) {
-		for (i = 0; i < lock_table_size; i++) {
-			lptr = &lock_table[i];
+		for (i = 0; i < __lock_table_size; i++) {
+			lptr = &__lock_table[i];
 			if (   (lptr->used)
 				&& (lptr->fileno == fileno)
 				&& (lptr->start == ofs)
@@ -419,8 +419,8 @@ WORD share_lock_unlock(
 				/* Already locked; can't lock. */
 			return DE_LOCK;		/* lock violation */
 		}
-		for (i = 0; i < lock_table_size; i++) {
-			lptr = &lock_table[i];
+		for (i = 0; i < __lock_table_size; i++) {
+			lptr = &__lock_table[i];
 			if (!lptr->used) {
 				lptr->used = 1;
 				lptr->start = ofs;
@@ -454,6 +454,6 @@ WORD share_is_file_open(const char FAR * filename, UWORD *mode, UWORD *psp)
 int share_init(void)
 {
 	memset(file_table, 0, file_table_size * sizeof(file_t));
-	memset(lock_table, 0, lock_table_size * sizeof(lock_t));
+	memset(__lock_table, 0, __lock_table_size * sizeof(__lock_t));
 	return 0;
 }
