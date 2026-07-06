@@ -28,7 +28,7 @@ sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
         ' [GIT: ' + GIT_DESCRIBE + ']',
       '-DCMA=,', '-P'])
 env = environment()
-env.set('CPP', 'cpp')
+env.set('CPP', cpp.cmd_array()[0] + ' -E')
 env.set('srcdir', meson.current_source_dir() / '../parsers')
 tch = custom_target('thunk_c.h',
   output: 'thunk_c.h',

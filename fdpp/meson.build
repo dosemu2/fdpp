@@ -89,7 +89,7 @@ GEN_TMP = { '1':'thunk_c.h', '2':'thunk_p.h' }
 GEN_H = { 'plt_asmc.h':'4', 'plt_asmp.h':'5' }
 
 env = environment()
-env.set('CPP', 'cpp')
+env.set('CPP', cpp.cmd_array()[0] + ' -E')
 env.set('srcdir', meson.current_source_dir() / 'parsers')
 gtgen = generator(find_program(PD),
   arguments: ['@EXTRA_ARGS@', '@INPUT@'],
