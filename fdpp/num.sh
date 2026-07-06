@@ -1,3 +1,3 @@
 #!/bin/sh
 
-nl -v 0 | sed -E 's/^ *//'
+nl -v0 | sed -E 's/^ *//'
