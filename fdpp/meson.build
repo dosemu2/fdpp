@@ -191,10 +191,16 @@ else
     LD_ARGS += ['-Wno-odr']
   endif
 endif
+ld_id = cxx.get_linker_id()
+overr = []
+if ld_id == 'ld.solaris'
+  overr = ['b_lto=false']
+endif
 LIBFDPP = shared_library('fdpp', [ccfiles, ppccf, FDPP_CCFILES, CPPFILES],
   include_directories: incdir2,
   version: FVER,
   sources: [gad, pac, pap, tc, ta],
   cpp_args: CXX_ARGS,
   link_args: ['-Wl,-Bsymbolic', LD_ARGS],
-  install: true)
+  install: true,
+  override_options: overr)
