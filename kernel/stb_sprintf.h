@@ -102,8 +102,8 @@ int stbsp_vsprintfcb( STBSP_SPRINTFCB * callback, void * user, char * buf, char 
   The buffer you pass in must hold at least STB_SPRINTF_MIN characters.
     // you return the next buffer to use or 0 to stop converting
 
-void stbsp_set_separators( char comma, char period )
-  Set the comma and period characters to use.
+void stbsp_set_separators( char colon, char comma, char period )
+  Set the colon, comma and period characters to use.
 
 FLOATS/DOUBLES:
 ===============
@@ -233,7 +233,7 @@ STBSP__PUBLICDEC int STB_SPRINTF_DECORATE(sprintf)(char *buf, char const *fmt, .
 STBSP__PUBLICDEC int STB_SPRINTF_DECORATE(snprintf)(char *buf, int count, char const *fmt, ...) STBSP__ATTRIBUTE_FORMAT(3,4);
 
 STBSP__PUBLICDEC int STB_SPRINTF_DECORATE(vsprintfcb)(STBSP_SPRINTFCB *callback, void *user, char *buf, char const *fmt, va_list va);
-STBSP__PUBLICDEC void STB_SPRINTF_DECORATE(set_separators)(char comma, char period);
+STBSP__PUBLICDEC void STB_SPRINTF_DECORATE(set_separators)(char colon, char comma, char period);
 
 #endif // STB_SPRINTF_H_INCLUDE
 
@@ -280,6 +280,7 @@ static stbsp__int32 stbsp__real_to_parts(stbsp__int64 *bits, stbsp__int32 *expo,
 
 static char stbsp__period = '.';
 static char stbsp__comma = ',';
+static char stbsp__colon = ':';
 static struct
 {
    short temp; // force next field to be 2-byte aligned
@@ -293,10 +294,11 @@ static struct
    "75767778798081828384858687888990919293949596979899"
 };
 
-STBSP__PUBLICDEF void STB_SPRINTF_DECORATE(set_separators)(char pcomma, char pperiod)
+STBSP__PUBLICDEF void STB_SPRINTF_DECORATE(set_separators)(char pcolon, char pcomma, char pperiod)
 {
    stbsp__period = pperiod;
    stbsp__comma = pcomma;
+   stbsp__colon = pcolon;
 }
 
 #define STBSP__LEFTJUST 1
@@ -312,6 +314,7 @@ STBSP__PUBLICDEF void STB_SPRINTF_DECORATE(set_separators)(char pcomma, char ppe
 #define STBSP__METRIC_NOSPACE 1024
 #define STBSP__METRIC_1024 2048
 #define STBSP__METRIC_JEDEC 4096
+#define STBSP__SEGOFF 8192
 
 static void stbsp__lead_sign(stbsp__uint32 fl, char *sign)
 {
@@ -1019,6 +1022,15 @@ STBSP__PUBLICDEF int STB_SPRINTF_DECORATE(vsprintfcb)(STBSP_SPRINTFCB *callback,
          l = (3 << 4) | (3 << 8);
          goto radixnum;
 
+      case 'P': // FAR pointer passed as 32 bit unsigned
+         fl |= (sizeof(void *) == 8) ? STBSP__INTMAX : 0;
+         fl |= (STBSP__SEGOFF | STBSP__LEADINGZERO);
+         fw = 9;    // field width includes the colon
+         h = hex;   // lower case hex digits i.e. 0090:00b7
+         l = (4 << 4) | (4 << 8);
+         lead[0] = 0;
+         goto radixnum;
+
       case 'p': // pointer
          fl |= (sizeof(void *) == 8) ? STBSP__INTMAX : 0;
          pr = sizeof(void *) * 2;
@@ -1065,6 +1077,13 @@ STBSP__PUBLICDEF int STB_SPRINTF_DECORATE(vsprintfcb)(STBSP_SPRINTFCB *callback,
                if ((l & 15) == ((l >> 4) & 15)) {
                   l &= ~15;
                   *--s = stbsp__comma;
+               }
+            }
+            if (fl & STBSP__SEGOFF) {
+               ++l;
+               if ((l & 15) == ((l >> 4) & 15)) {
+                  l &= ~15;
+                  *--s = stbsp__colon;
                }
             }
          };
