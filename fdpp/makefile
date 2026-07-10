@@ -146,7 +146,7 @@ $(FDPP_CPPOBJS): %.o: $(srcdir)/%.cpp $(PPHDRS) $(srcdir)/makefile
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 $(GEN_CC): %.cc: $(SRC)/%.c makefile
-	$(srcdir)/parsers/mkfar.sh $< >$@
+	$(srcdir)/parsers/mkfar.sh $< | $(srcdir)/parsers/fix_printf.py -I $< -o $@
 
 $(FDPPLIB): $(OBJECTS) $(FDPP_COBJS) $(FDPP_CCOBJS) $(FDPP_CPPOBJS)
 	$(CXX_LD) -o $@ $^ $(LDFLAGS) $(_LDFLAGS) $(LIBS)
