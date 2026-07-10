@@ -38,6 +38,7 @@ else
   ARGS="--buildtype=debug -Db_lto=false"
 fi
 
+meson subprojects update
 meson setup \
   --cross-file $TOP/fdpp/kernel/$CROSS_F $ARGS $* $BLD $TOP
 [ "$?" = "0" ] || exit 1
