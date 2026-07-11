@@ -29,416 +29,22 @@
 #include "portab.h"
 #include "pcb.h"
 #include "globals.h"
-#include "init-mod.h"
 
-#ifdef FORSYS
-#include <io.h>
-#include <stdarg.h>
-#endif
+#define STB_SPRINTF_IMPLEMENTATION
+#include "stb_sprintf.h"
 
-#ifdef _INIT
-#define handle_char init_handle_char
-#define put_console init_put_console
-#define ltob init_ltob
-#define do_printf init_do_printf
-#define printf init_printf
-#define sprintf init_sprintf
-#define charp init_charp
-#endif
 
-#include "debug.h"  /* must be below xx to init_xx */
-
-/* special console output routine */
-/*#define DOSEMU */
-#ifdef DOSEMU
-
-#define MAX_BUFSIZE 80                       /* adjust if necessary */
-static int buff_offset = 0;
-static char buff[MAX_BUFSIZE];
-
-void put_console(int c)
-{
-  if (buff_offset >= MAX_BUFSIZE)
-  {
-    buff_offset = 0;
-    DebugPrintf(("Printf buffer overflow!\n"));
-  }
-  if (c == '\n')
-  {
-    buff[buff_offset] = 0;
-    buff_offset = 0;
-#ifdef __TURBOC__
-    _ES = FP_SEG(buff);
-    _DX = FP_OFF(buff);
-    _AX = 0x13;
-    __int__(0xe6);
-#elif defined(I86)
-    asm
-      {
-        push ds;
-        pop es;
-        mov dx, offset buff;
-        mov ax, 0x13;
-        int 0xe6;
-      }
-#endif
-  }
-  else
-  {
-    buff[buff_offset] = c;
-    buff_offset++;
-  }
-}
-#else
-#ifdef __WATCOMC__
-void int29(char c);
-#pragma aux int29 = "int 0x29" parm [al] modify exact [bx];
-#endif
+static char large_buf[1024];
 
 void put_console(int c)
 {
   if (c == '\n')
     put_console('\r');
 
-#ifdef FORSYS
-  write(1, &c, 1);              /* write character to stdout */
-#elif defined(__TURBOC__)
-  _AL = c;
-  __int__(0x29);
-#elif defined(__WATCOMC__)
-  int29(c);
-#elif defined(I86)
-  __asm
-  {
-    mov al, byte ptr c;
-    int 0x29;
-  }
-#else
   iregs r = {};
   r.a.b.l = c;
   call_intr(0x29, MK_FAR_SCP(r));
-#endif
 }
-#endif                          /*  DOSEMU   */
-
-#if defined(DEBUG_NEED_PRINTF) && !defined(_INIT) && !defined(FORSYS)
-/* need to use FAR pointers for resident DEBUG printf()s where SS != DS */
-#define SSFAR FAR
-#else
-#define SSFAR
-#endif
-
-#if !defined(FORSYS) && !defined(__GNUC__)
-/* copied from bcc (Bruce's C compiler) stdarg.h */
-typedef char SSFAR *va_list;
-#define va_start(arg, last) ((arg) = (va_list) (&(last)+1))
-#define va_arg(arg, type) (((type SSFAR *)(arg+=sizeof(type)))[-1])
-#define va_end(arg)
-#else
-#include <stdarg.h>
-#endif
-
-static BYTE SSFAR *charp = 0;
-
-STATIC VOID handle_char(COUNT);
-STATIC void ltob(LONG, BYTE SSFAR *, COUNT);
-STATIC void do_printf(CONST BYTE *, va_list);
-STATIC void do_printf_n(size_t size, CONST BYTE * fmt, va_list arg);
-
-/* special handler to switch between sprintf and printf */
-STATIC VOID handle_char(COUNT c)
-{
-  if (charp == 0)
-    put_console(c);
-  else
-    *charp++ = c;
-}
-
-/* ltob -- convert an long integer to a string in any base (2-16) */
-STATIC void ltob(LONG n, BYTE SSFAR * s, COUNT base)
-{
-  ULONG u;
-  BYTE SSFAR *p, SSFAR *q;
-  int c;
-
-  u = n;
-
-  if (base == -10)              /* signals signed conversion */
-  {
-    base = 10;
-    if (n < 0)
-    {
-      u = -n;
-      *s++ = '-';
-    }
-  }
-
-  p = s;
-  do
-  {                             /* generate digits in reverse order */
-    *p++ = "0123456789abcdef"[(UWORD) (u % base)];
-  }
-  while ((u /= base) > 0);
-
-  *p = '\0';                    /* terminate the string */
-  for (q = s; q < --p; q++)
-  {                             /* reverse the digits */
-    c = *q;
-    *q = *p;
-    *p = c;
-  }
-}
-
-#define _LEFT    0
-#define _RIGHT   1
-#define ZEROSFILL 2
-#define LONGARG 4
-
-/* printf -- short version of printf to conserve space */
-int VA_CDECL _printf(CONST char *fmt, ...)
-{
-  va_list arg;
-  va_start(arg, fmt);
-  charp = 0;
-  do_printf(fmt, arg);
-  va_end(arg);
-  return 0;
-}
-
-int _vprintf(CONST char *fmt, va_list arg)
-{
-  charp = 0;
-  do_printf(fmt, arg);
-  return 0;
-}
-
-PRINTF(2)
-int VA_CDECL _sprintf(char * buff, CONST char * fmt, ...)
-{
-  va_list arg;
-
-  va_start(arg, fmt);
-  charp = buff;
-  do_printf(fmt, arg);
-  va_end(arg);
-  handle_char('\0');
-  return 0;
-}
-
-int _vsprintf(char * buff, CONST char * fmt, va_list arg)
-{
-  charp = buff;
-  do_printf(fmt, arg);
-  handle_char('\0');
-  return 0;
-}
-
-PRINTF(3)
-int VA_CDECL _snprintf(char * buff, size_t size, CONST char * fmt, ...)
-{
-  va_list arg;
-
-  va_start(arg, fmt);
-  charp = buff;
-  do_printf_n(size, fmt, arg);
-  va_end(arg);
-  handle_char('\0');
-  return 0;
-}
-
-int _vsnprintf(char * buff, size_t size, CONST char * fmt, va_list arg)
-{
-  charp = buff;
-  do_printf_n(size, fmt, arg);
-  handle_char('\0');
-  return 0;
-}
-
-enum { RET_CONT, RET_RET };
-STATIC int printf_handle_char(CONST BYTE ** _fmt, va_list *_arg)
-{
-#define fmt (*_fmt)
-#define arg (*_arg)
-    int base;
-    BYTE s[11], * p;
-    int size;
-    unsigned char flags;
-
-    if (*fmt != '%')
-    {
-      handle_char(*fmt);
-      return RET_CONT;
-    }
-
-    fmt++;
-    flags = _RIGHT;
-
-    if (*fmt == '-')
-    {
-      flags = _LEFT;
-      fmt++;
-    }
-
-    if (*fmt == '0')
-    {
-      flags |= ZEROSFILL;
-      fmt++;
-    }
-
-    size = 0;
-    while (1)
-    {
-      unsigned c = (unsigned char)(*fmt - '0');
-      if (c > 9)
-        break;
-      fmt++;
-      size = size * 10 + c;
-    }
-
-    if (*fmt == 'l' || *fmt == 'z')
-    {
-      flags |= LONGARG;
-      fmt++;
-    }
-
-    switch (*fmt)
-    {
-      case '\0':
-        return RET_RET;
-
-      case 'c':
-        handle_char(va_arg(arg, int));
-        return RET_CONT;
-
-      case 'P':
-        {
-          UDWORD w0 = va_arg(arg, unsigned);
-          char SSFAR *tmp = charp;
-          _sprintf(s, "%04x:%04x", w0 >> 16, w0 & 0xffff);
-          p = s;
-          charp = tmp;
-          break;
-        }
-
-      case 's':
-        p = va_arg(arg, char *);
-        break;
-
-      case 'F':
-        fmt++;
-        /* we assume %Fs here */
-      case 'S':
-#ifndef __GNUC__
-        p = va_arg(arg, char FAR *);
-#else
-        p = (char FAR *)(va_arg(arg, uint32_t));
-#endif
-        break;
-
-      case 'i':
-      case 'd':
-        base = -10;
-        goto lprt;
-
-      case 'o':
-        base = 8;
-        goto lprt;
-
-      case 'u':
-        base = 10;
-        goto lprt;
-
-      case 'X':
-      case 'x':
-        base = 16;
-
-    lprt:
-        {
-          long currentArg;
-          if (flags & LONGARG)
-            currentArg = va_arg(arg, long);
-          else
-          {
-            currentArg = va_arg(arg, int);
-            if (base >= 0)
-              currentArg =  (long)(unsigned)currentArg;
-          }
-          ltob(currentArg, s, base);
-          p = s;
-        }
-        break;
-
-      default:
-        handle_char('?');
-      case '%':
-
-        handle_char(*fmt);
-        return RET_CONT;
-
-    }
-    {
-      size_t i = 0;
-      while(p[i]) i++;
-      size -= i;
-    }
-
-    if (flags & _RIGHT)
-    {
-      int ch = ' ';
-      if (flags & ZEROSFILL) ch = '0';
-      for (; size > 0; size--)
-        handle_char(ch);
-    }
-    for (; *p != '\0'; p++)
-      handle_char(*p);
-
-    for (; size > 0; size--)
-      handle_char(' ');
-
-    return RET_CONT;
-#undef fmt
-#undef arg
-}
-
-STATIC void do_printf(CONST BYTE * fmt, va_list arg)
-{
-  /* in order to pass va_list by pointer, we need to create a copy!
-   * https://stackoverflow.com/questions/8047362/is-gcc-mishandling-a-pointer-to-a-va-list-passed-to-a-function
-   * Weird! */
-  va_list arg_copy;
-  va_copy(arg_copy, arg);
-  for (;*fmt != '\0'; fmt++)
-  {
-    switch (printf_handle_char(&fmt, &arg_copy)) {
-    case RET_CONT:
-      continue;
-    case RET_RET:
-      break;
-    }
-  }
-  va_end(arg_copy);
-}
-
-STATIC void do_printf_n(size_t size, CONST BYTE * fmt, va_list arg)
-{
-  va_list arg_copy;
-  va_copy(arg_copy, arg);
-  for (;*fmt != '\0' && size > 0; fmt++, size--)
-  {
-    switch (printf_handle_char(&fmt, &arg_copy)) {
-    case RET_CONT:
-      continue;
-    case RET_RET:
-      break;
-    }
-  }
-  va_end(arg_copy);
-}
-
-#if !defined(FORSYS) && !defined(_INIT)
-
-extern void put_string(const char *);
-extern void put_unsigned(unsigned, int, int);
 
 void hexd(const char *title, VOID FAR * v_p, COUNT numBytes)
 {
@@ -489,125 +95,50 @@ void put_string(const char *s)
     put_console(*s++);
 }
 
-#endif
-
-#ifdef TEST
-/*
-        this testprogram verifies that the strings are printed correctly
-        ( or the way, I expect them to print)
-
-        compile like (note -DTEST !)
-
-        c:\tc\tcc -DTEST -DI86 -I..\hdr prf.c
-
-        and run. if strings are wrong, the program will wait for the ANYKEY
-
-*/
-#include <stdio.h>
-#include <string.h>
-
-void cso(char c)
+int _printf(const char *fmt, ...)
 {
-  putchar(c);
+  va_list va;
+  int ret;
+
+  va_start(va, fmt);
+  ret = stbsp_vsnprintf(large_buf, sizeof(large_buf), fmt, va);
+  va_end(va);
+
+  put_string(large_buf);
+
+  return ret;
 }
 
-struct {
-  char *should;
-  char *format;
-  unsigned lowint;
-  unsigned highint;
-
-} testarray[] = {
-  {
-  "hello world", "%s %s", (unsigned)"hello", (unsigned)"world"},
-  {
-  "hello", "%3s", (unsigned)"hello", 0},
-  {
-  "  hello", "%7s", (unsigned)"hello", 0},
-  {
-  "hello  ", "%-7s", (unsigned)"hello", 0},
-  {
-  "hello", "%s", (unsigned)"hello", 0},
-  {
-  "1", "%d", 1, 0},
-  {
-  "-1", "%d", -1, 0},
-  {
-  "65535", "%u", -1, 0},
-  {
-  "-32768", "%d", 0x8000, 0},
-  {
-  "32767", "%d", 0x7fff, 0},
-  {
-  "-32767", "%d", 0x8001, 0},
-  {
-  "8000", "%x", 0x8000, 0},
-  {
-  "   1", "%4x", 1, 0},
-  {
-  "0001", "%04x", 1, 0},
-  {
-  "1   ", "%-4x", 1, 0},
-  {
-  "1   ", "%-04x", 1, 0},
-  {
-  "1", "%ld", 1, 0},
-  {
-  "-1", "%ld", -1, -1},
-  {
-  "65535", "%ld", -1, 0},
-  {
-  "65535", "%u", -1, 0},
-  {
-  "8000", "%lx", 0x8000, 0},
-  {
-  "80000000", "%lx", 0, 0x8000},
-  {
-  "   1", "%4lx", 1, 0},
-  {
-  "0001", "%04lx", 1, 0},
-  {
-  "1   ", "%-4lx", 1, 0},
-  {
-  "1   ", "%-04lx", 1, 0},
-  {
-  "-2147483648", "%ld", 0, 0x8000},
-  {
-  "2147483648", "%lu", 0, 0x8000},
-  {
-  "2147483649", "%lu", 1, 0x8000},
-  {
-  "-2147483647", "%ld", 1, 0x8000},
-  {
-  "32767", "%ld", 0x7fff, 0},
-  {
-"ptr 1234:5678", "ptr %P", 0x5678, 0x1234}, {0}};
-
-void test(char *should, char *format, unsigned lowint, unsigned highint)
+int _vprintf(const char *fmt, va_list va)
 {
-  char b[100];
-
-  _sprintf(b, format, lowint, highint);
-
-  _printf("'%s' = '%s'\n", should, b);
-
-  if (strcmp(b, should))
-  {
-    _printf("\nhit ENTER\n");
-    getchar();
-  }
+  return stbsp_vsnprintf(large_buf, sizeof(large_buf), fmt, va);
 }
 
-int main(void)
+int _sprintf(char *buf, const char *fmt, ...)
 {
-  int i;
-  _printf("hello world\n");
+  va_list va;
+  int ret;
 
-  for (i = 0; testarray[i].should; i++)
-  {
-    test(testarray[i].should, testarray[i].format, testarray[i].lowint,
-         testarray[i].highint);
-  }
-  return 0;
+  va_start(va, fmt);
+  ret = stbsp_vsnprintf(buf, /* FIXME, what size should this be? */ 120, fmt, va);
+  va_end(va);
+
+  return ret;
 }
-#endif
+
+int _snprintf(char *buf, size_t size, const char *fmt, ...)
+{
+  va_list va;
+  int ret;
+
+  va_start(va, fmt);
+  ret = stbsp_vsnprintf(buf, size, fmt, va);
+  va_end(va);
+
+  return ret;
+}
+
+int _vsnprintf(char *buf, size_t size, const char *fmt, va_list va)
+{
+  return stbsp_vsnprintf(buf, size, fmt, va);
+}
