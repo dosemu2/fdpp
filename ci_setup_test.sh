@@ -34,8 +34,10 @@ fi
   sed -i -e 's/fdpp-dev,/bash,/' debian/control
 
   # Use debian package build deps so we don't have to maintain a list here
-  sudo add-apt-repository ppa:stsp-0/dj64
-  sudo add-apt-repository -y ppa:dosemu2/ppa
+  sudo add-apt-repository -y --no-update ppa:stsp-0/dj64
+  sudo add-apt-repository -y --no-update ppa:dosemu2/ppa
+  sudo apt update -q
+
   mk-build-deps --install --root-cmd sudo
 
   CC=clang ./default-configure -d \
@@ -56,9 +58,17 @@ fi
   sudo chmod 755 /bin/dosemu_tap_interface.sh
 
   # Install the extra packages needed to run the test suite
-  sudo add-apt-repository -y ppa:dosemu2/ppa
-  sudo add-apt-repository -y ppa:jwt27/djgpp-toolchain
-  sudo add-apt-repository -y ppa:stsp-0/gcc-ia16
+  sudo add-apt-repository -y --no-update ppa:dosemu2/ppa
+
+  # Install djgpp and ia16 compilers / libs.
+  sudo add-apt-repository -y --no-update ppa:jwt27/djgpp-toolchain
+  sudo add-apt-repository -y --no-update ppa:stsp-0/gcc-ia16
+  is_amd64v3=$(apt-config dump | grep -q 'Variants.*amd64v3' && echo true || echo false) # APT::Architecture-Variants "amd64v3"
+  if [ "$is_amd64v3" = "true" ] ; then
+    # Since there are no host libs to link against we can use amd64 arch on arm64v3
+    sudo sed -i '/^URIs:/i Architectures: amd64' /etc/apt/sources.list.d/jwt27-ubuntu-djgpp-toolchain-resolute.sources
+    sudo sed -i '/^URIs:/i Architectures: amd64' /etc/apt/sources.list.d/stsp-0-ubuntu-gcc-ia16-resolute.sources
+  fi
   sudo apt update -q
 
   sudo apt install -y \
