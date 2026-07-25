@@ -64,6 +64,11 @@ jobs:
     - name: Set up test environment
       run: ./ci_test_prereq.sh
 
+    - name: Open Watcom install
+      uses: open-watcom/setup-watcom@v1
+      with:
+        version: 2.0-64
+
     - name: Test
       id: test
       run: ./ci_test.sh
