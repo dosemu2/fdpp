@@ -22,7 +22,37 @@ jobs:
     runs-on: ubuntu-26.04
 
     steps:
-    - uses: actions/checkout@v6
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Add an ACL to KVM for ourselves
+      run: |
+          echo 'SUBSYSTEM=="misc", KERNEL=="kvm", RUN+="/usr/bin/setfacl -m u:'${USER}':rw- /dev/kvm"' | sudo tee /etc/udev/rules.d/99-kvm4dosemu2.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+    - name: Information
+      run: |
+        #
+        echo "::group::CPU"
+        lscpu
+        echo "::endgroup::"
+
+        echo "::group::Kernel Config"
+        cat /boot/config-$(uname -r)
+        echo "::endgroup::"
+
+        echo "::group::Kernel Modules"
+        sudo lsmod
+        echo "::endgroup::"
+
+        echo "::group::Kernel Parameters (sysctl)"
+        sysctl -a
+        echo "::endgroup::"
+
+        echo "::group::KVM permissions"
+        getfacl -p /dev/kvm
+        echo "::endgroup::"
 
     - name: Package install
       run: ./ci_prereq.sh
@@ -34,4 +64,12 @@ jobs:
       run: ./ci_setup_test.sh
 
     - name: Test
+      id: test
       run: ./ci_test.sh
+
+    - name: Upload failure logs
+      if: ${{ always() && (steps.test.outcome == 'failure') }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: failure-logs
+        path: ${{ env.DIR_TEST_DOSEMU }}/test_*
