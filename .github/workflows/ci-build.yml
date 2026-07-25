@@ -61,7 +61,7 @@ jobs:
       run: ./ci_build.sh
 
     - name: Set up test environment
-      run: ./ci_setup_test.sh
+      run: ./ci_test_prereq.sh
 
     - name: Test
       id: test
