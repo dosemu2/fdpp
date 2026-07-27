@@ -17,7 +17,7 @@ test -d ${DIR_TEST_DOSEMU} && (echo $DIR_TEST_DOSEMU already exists && exit 1)
 DIR_ROOT="$(pwd)"
 
 # Grab the dosemu2 source
-git clone --depth 1 --no-single-branch https://github.com/dosemu2/dosemu2.git ${DIR_TEST_DOSEMU}
+git clone --depth 1 --no-single-branch ${USE_DOSEMU_REPO} ${DIR_TEST_DOSEMU}
 
 # Install fdpp into local directory
 if false ; then

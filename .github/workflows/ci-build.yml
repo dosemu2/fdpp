@@ -11,6 +11,7 @@ on:
 env:
   DIR_TEST_DOSEMU: test-dosemu
   DIR_INSTALLED_FDPP: test-dosemu/installed-fdpp
+  USE_DOSEMU_REPO: https://github.com/dosemu2/dosemu2.git
   USE_DOSEMU_BRANCH: devel
 
 jobs:
