@@ -48,7 +48,6 @@ endif
 NASM_VER = $(shell $(NASM) -v 2>/dev/null)
 $(warning $(NASM_VER))
 ifeq ($(filter (segelf),$(NASM_VER)),)
-$(warning nasm-segelf not found)
 #want_loadaddr = 0x900
 NASM = nasm
 NASMFLAGS += -DFDPP_STATIC
