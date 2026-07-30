@@ -21,13 +21,15 @@ endif
 # don't use ?= here as that doesn't override make's builtin CC var
 CC = clang
 CXX = clang++
-CLANG_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep clang | \
+CLANG_VER := $(shell $(CXX) --version 2>/dev/null | head -n 1 | grep clang | \
   sed -E 's/.+ version ([^.]+)\.[^.]+\.[^ ]+.*/\1/')
 ifeq ($(CLANG_VER),)
 GCC_VER := $(shell $(CXX) --version 2>&1 | head -n 1 | grep g++)
 ifeq ($(GCC_VER),)
 $(error unknown compiler $(CXX) $(shell $(CXX) --version))
 endif
+CC := gcc
+CXX := g++
 endif
 FLEX = $(shell which flex 2>/dev/null)
 ifneq ($(FLEX),)
