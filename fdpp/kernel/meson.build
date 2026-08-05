@@ -26,7 +26,7 @@ sfiles = cpp.preprocess(['cdata.S', 'plt.S'],
       '-D__ASSEMBLER__',
       '-DKERNEL_VERSION=' + meson.project_version() +
         ' [GIT: ' + GIT_DESCRIBE + ']',
-      '-DCMA=,', '-P'])
+      '-DCMA=,', '-P', '-g0'])
 env = environment()
 env.set('CPP', cpp.cmd_array()[0] + ' -E')
 env.set('srcdir', meson.current_source_dir() / '../parsers')
