@@ -46,8 +46,8 @@ static inline far_s _MK_S(uint32_t s, uint16_t o)
     return (far_s){o, (uint16_t)s};
 }
 
-#define ___P(T1) std::is_pointer<T1>::value
-#define ___C(T1) std::is_const<T1>::value
+#define ___P(T1) std::is_pointer_v<T1>
+#define ___C(T1) std::is_const_v<T1>
 #define _RP(T1) typename std::remove_pointer<T1>::type
 #define _RC(T1) typename std::remove_const<T1>::type
 template<typename> class SymWrp;
@@ -64,16 +64,18 @@ public:
 template<typename T>
 using WrpType = typename WrpTypeS<T>::type;
 
-#define ALLOW_CNV(T0, T1) (( \
-        std::is_void<T0>::value || \
-        std::is_void<T1>::value || \
-        std::is_same<_RC(T0), char>::value || \
-        std::is_same<_RC(T1), char>::value || \
-        std::is_same<_RC(T0), unsigned char>::value || \
-        std::is_same<_RC(T1), unsigned char>::value || \
-        std::is_same<_RC(T1), T0>::value) && \
-        !std::is_same<T0, T1>::value && \
-        (___C(T1) || !___C(T0)))
+#define ALLOW_CNV(T0, T1) allow_cnv<T0, T1>
+template <typename T0, typename T1>
+concept allow_cnv = ((
+        std::is_void_v<T0> ||
+        std::is_void_v<T1> ||
+        std::is_same_v<_RC(T0), char> ||
+        std::is_same_v<_RC(T1), char> ||
+        std::is_same_v<_RC(T0), unsigned char> ||
+        std::is_same_v<_RC(T1), unsigned char> ||
+        std::is_same_v<_RC(T1), T0>) &&
+        !std::is_same_v<T0, T1> &&
+        (___C(T1) || !___C(T0)));
 
 template<typename T>
 class FarPtr;
