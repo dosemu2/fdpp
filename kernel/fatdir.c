@@ -340,7 +340,7 @@ COUNT dos_findfirst(UCOUNT attr, const char * name)
   REG f_node_ptr fnp;
   REG dmatch *dmp = &sda_tmp_dm;
 
-/*  _printf("ff %Fs\n", name);*/
+/*  _printf("ff %s\n", name);*/
 
   /* The findfirst/findnext calls are probably the worst of the   */
   /* DOS calls. They must work somewhat on the fly (i.e. - open   */

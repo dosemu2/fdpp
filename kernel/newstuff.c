@@ -267,7 +267,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   char FAR *rootPos;
   char src0;
 
-  tn_printf(("truename(%s)\n", GET_PTR(src)));
+  tn_printf(("truename(%S)\n", src));
 
   /* First, adjust the source pointer */
   src = adjust_far(src);
@@ -289,7 +289,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
       unc_src++;
     } while (src0);
     current_ldt = (struct cds FAR *)MK_FP(0xFFFF,0xFFFF);
-    tn_printf(("Returning path: \"%s\"\n", GET_PTR(dest)));
+    tn_printf(("Returning path: \"%S\"\n", dest));
     /* Flag as network - drive bits are empty but shouldn't get */
     /* referenced for network with empty current_ldt.           */
     return IS_NETWORK;
@@ -320,8 +320,8 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   }
 
   fmemcpy(&TempCDS, cdsEntry, sizeof(struct cds));
-  tn_printf(("CDS entry: #%u @%P (%u) '%s'\n", result, GET_FP32(cdsEntry),
-            TempCDS.cdsBackslashOffset, GET_FP32(TempCDS.cdsCurrentPath)));
+  tn_printf(("CDS entry: #%u @%P (%u) '%S'\n", result, cdsEntry,
+            TempCDS.cdsBackslashOffset, TempCDS.cdsCurrentPath));
   /* is the current_ldt thing necessary for compatibly??
      -- 2001/09/03 ska*/
   current_ldt = cdsEntry;
@@ -338,7 +338,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   {
   if (!(mode & CDS_MODE_SKIP_PHYSICAL) && QRemote_Fn(dest, src) == SUCCESS && dest[0] != '\0')
   {
-    tn_printf(("QRemoteFn() returned: \"%s\"\n", GET_PTR(dest)));
+    tn_printf(("QRemoteFn() returned: \"%S\"\n", dest));
 #ifdef DEBUG_TRUENAME
     if (fstrlen(dest) >= REMOTE_PATH_MAX)
       panic("Truename: QRemote_Fn() overflowed output buffer");
@@ -429,7 +429,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 
     if (!(mode & CDS_MODE_SKIP_PHYSICAL))
     {
-      tn_printf(("SUBSTing from: %s\n", cp));
+      tn_printf(("SUBSTing from: %S\n", cp));
 /* What to do now: the logical drive letter will be replaced by the hidden
    portion of the associated path. This is necessary for NETWORK and
    SUBST drives. For local drives it should not harm.
@@ -583,7 +583,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     assumed that the CDS is configured correctly and if it contains
     lower case letters, it is required so **/
 
-  tn_printf(("Absolute logical path: \"%s\"\n", GET_PTR(dest)));
+  tn_printf(("Absolute logical path: \"%S\"\n", dest));
 
   /* Now, all the steps 1) .. 7) are fullfilled. Join now */
   /* search, if this path is a joined drive */
@@ -617,7 +617,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
         result &= ~IS_NETWORK;
         if (cdsp->cdsFlags & CDSNETWDRV)
           result |= IS_NETWORK;
-	tn_printf(("JOINed path: \"%s\"\n", GET_PTR(dest)));
+        tn_printf(("JOINed path: \"%S\"\n", dest));
         return result;
       }
     }
@@ -637,6 +637,6 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     else
       result = 0; /* AL is 00, 2f, 5c, or last-of-TempCDS.cdsCurrentPath? */
   }
-  tn_printf(("Physical path: \"%s\"\n", GET_PTR(dest)));
+  tn_printf(("Physical path: \"%S\"\n", dest));
   return result;
 }
