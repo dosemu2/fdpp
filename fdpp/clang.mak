@@ -68,7 +68,7 @@ ifeq ($(GCC_VER),)
 TARGETOPT += -DCLANG_VER=$(CLANG_VER)
 TARGETOPT_XTRA = -Wno-format-invalid-specifier
 else
-TARGETOPT_XTRA = -Wno-error=format-security
+TARGETOPT_XTRA = -Wno-format-security
 endif
 
 DEBUG_MODE ?= 1
