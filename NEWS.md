@@ -9,7 +9,7 @@ Around 85 commits, most of which are porting from nasm-segelf to nasm.
 - hmamgr: implement topdown allocations
 - deb packages split to separate `lib*` packages
 - Replace prf.c with new printf implementation (@andrewbird)
-- switch to c++20 for concepts and labdas (Focal build dropped)
+- switch to c++20 for concepts and lambdas (Focal build dropped)
 
 ## 1.10
 
