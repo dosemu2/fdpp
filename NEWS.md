@@ -1,3 +1,16 @@
+## 1.11
+
+Around 85 commits, most of which are porting from nasm-segelf to nasm.
+
+- nasm-segelf no longer needed, code fully ported to nasm+manual relocs.
+- lld can now be used w/o sacrificing ~8K of DOS memory space.
+- int32 handler rewritten to not run its code on stack
+- added int21/8Ch call: SET SIGNAL HANDLER
+- hmamgr: implement topdown allocations
+- deb packages split to separate `lib*` packages
+- Replace prf.c with new printf implementation (@andrewbird)
+- switch to c++20 for concepts and labdas (Focal build dropped)
+
 ## 1.10
 
 Nearly ~150 commits, mostly introducing the new architecture with
