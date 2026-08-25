@@ -81,7 +81,7 @@ long cooked_write(__FAR(struct dhdr) pdev, size_t n,__XFAR(const char)bp);
 __FAR(sft)get_sft(UCOUNT);
 
 /* dosfns.c */
-__FAR(const char)get_root(__XFAR(const char));
+__FAR(const char)get_basename(__XFAR(const char));
 BOOL check_break(void);
 UCOUNT GenericReadSft(__FAR(sft) sftp, UCOUNT n,__FAR(void) bp,
                       COUNT * err, BOOL force_binary);

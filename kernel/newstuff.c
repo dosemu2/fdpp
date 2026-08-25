@@ -373,7 +373,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   dest[2] = '\\';
   if (result & IS_DEVICE)
   {
-    froot = get_root(src);
+    froot = get_basename(src);
     if (froot == src || froot == src + 5)
     {
       if (froot == src + 5)

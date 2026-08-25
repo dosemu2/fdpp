@@ -481,7 +481,7 @@ STATIC sft FAR *get_free_sft(COUNT * sft_idx)
   return (sft FAR *) - 1;
 }
 
-const char FAR *get_root(__XFAR(const char)fname)
+const char FAR *get_basename(__XFAR(const char)fname)
 {
   /* find the end                                 */
   REG unsigned length = fstrlen(fname);
@@ -503,7 +503,7 @@ const char FAR *get_root(__XFAR(const char)fname)
 
 STATIC void ConvertPathNameToFCBName(char *FCBName, const char FAR *PathName)
 {
-  ConvertNameSZToName83(FCBName, get_root(PathName));
+  ConvertNameSZToName83(FCBName, get_basename(PathName));
   FCBName[FNAME_SIZE + FEXT_SIZE] = '\0';
 }
 
@@ -1145,7 +1145,7 @@ COUNT DosFindFirst(UCOUNT attr, const char FAR * name)
     ____R(SearchDir.dir_attrib) = D_DEVICE;
     ____R(SearchDir.dir_time) = dos_gettime();
     ____R(SearchDir.dir_date) = dos_getdate();
-    p = get_root(PriPathName);
+    p = get_basename(PriPathName);
     memset(SearchDir.dir_name, ' ', FNAME_SIZE + FEXT_SIZE);
     for (i = 0; i < FNAME_SIZE && *p && *p != '.'; i++)
       ____R(SearchDir.dir_name[i]) = *p++;
@@ -1423,7 +1423,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
 struct dhdr FAR *IsDevice(__XFAR(const char)fname)
 {
   struct dhdr FAR *dhp;
-  const char FAR *froot = get_root(fname);
+  const char FAR *froot = get_basename(fname);
   int i;
 
 /* /// BUG!!! This is absolutely wrong.  A filename of "NUL.LST" must be
