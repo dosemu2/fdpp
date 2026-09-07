@@ -523,7 +523,9 @@ ULONG ASMPASCAL ReadPCClock(VOID);
 VOID ASMPASCAL WriteATClock(__FAR(BYTE), BYTE, BYTE, BYTE);
 VOID ASMPASCAL WritePCClock(ULONG);
 
+COUNT DoCriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);
 COUNT ASMFUNC CriticalError(COUNT nFlag, COUNT nDrive, COUNT nError,__FAR(struct dhdr) lpDevice);
+VOID ASMFUNC NORETURN CritErrAbort(VOID);
 VOID ASMFUNC FAR CharMapSrvc(VOID);
 
 UWORD ASMPASCAL INITTEXT init_call_intr(WORD nr, iregs * rp);

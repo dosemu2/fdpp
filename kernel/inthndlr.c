@@ -1927,7 +1927,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
     case 0x06:                 /* invoke critical error */
 
       /* code, drive number, error, device header */
-      r.AL = CriticalError(r.callerARG1 >> 8,
+      r.AL = DoCriticalError(r.callerARG1 >> 8,
                            (r.callerARG1 & (EFLG_CHAR << 8)) ? 0 :
                            r.callerARG1 & 0xff, r.DI, MK_FP(r.BP, r.SI));
       break;
@@ -1946,7 +1946,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
     case 0x0a:                 /* perform critical error */
                                /* differs from 0x06 as uses current drive & error on stack */
       /* code, drive number, error, device header */
-      r.AL = CriticalError(0x38, /* ignore/retry/fail - based on RBIL possible return values */
+      r.AL = DoCriticalError(0x38, /* ignore/retry/fail - based on RBIL possible return values */
                            default_drive,
                            r.callerARG1, /* error, from RBIL passed on stack */
                            CDSp[(WORD)default_drive].cdsDpb->dpb_device);
@@ -1963,7 +1963,7 @@ VOID ASMCFUNC int2F_12_handler(struct int2f12regs FAR *regs)
         /* from RBIL if SFT for FCB or compatibility mode without NOINHERIT call int24h */
         if ((sftp->sft_mode & _O_FCB) || !(sftp->sft_mode & (_O_SHAREMASK | _O_NOINHERIT)))
         {
-          r.AL = CriticalError(0x38, /* ignore/retry/fail - ??? */
+          r.AL = DoCriticalError(0x38, /* ignore/retry/fail - ??? */
                                default_drive,
                                r.callerARG1, /* error, from RBIL passed on stack */
                                CDSp[(WORD)default_drive].cdsDpb->dpb_device);

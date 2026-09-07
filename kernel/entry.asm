@@ -699,8 +699,8 @@ CritErr20:
                 ; exit.
                 ;
 CritErr30:
-                cmp     al,ABORT
-                je      CritErrAbort            ; process abort
+;                cmp     al,ABORT
+;                je      CritErrAbort            ; process abort
 
 CritErrExit:
                 xor     ah,ah                   ; clear out top for return
@@ -712,7 +712,8 @@ CritErrExit:
                 ;
                 ; Abort processing.
                 ;
-CritErrAbort:
+                global  _CritErrAbort
+_CritErrAbort:
                 mov     ax,[_cu_psp]
                 mov     es,ax
                 cmp     ax,[es:PSP_PARENT]
