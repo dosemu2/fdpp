@@ -36,10 +36,11 @@ static uint32_t addr(far_t fp)
     return (fp.seg << 4) + fp.off;
 }
 
-void objlock_ref(far_t fp)
+int objlock_ref(far_t fp)
 {
     lock_s &ent = lmap[addr(fp)];  // inserts if needed
     ent.refcnt++;
+    return ent.lockcnt;
 }
 
 void objlock_unref(far_t fp)
@@ -52,10 +53,10 @@ void objlock_unref(far_t fp)
         lmap.erase(a);
 }
 
-void objlock_lock(far_t fp)
+void objlock_lock(far_t fp, int cnt)
 {
     lock_s &ent = lmap[addr(fp)];
     assert(ent.refcnt > 0);
-    ___assert(ent.lockcnt == 0);
+    ___assert(ent.lockcnt == cnt);
     ent.lockcnt++;
 }

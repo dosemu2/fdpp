@@ -19,8 +19,8 @@
 #ifndef OBJLOCK_HPP
 #define OBJLOCK_HPP
 
-void objlock_ref(far_t fp);
+int objlock_ref(far_t fp);
 void objlock_unref(far_t fp);
-void objlock_lock(far_t fp);
+void objlock_lock(far_t fp, int cnt);
 
 #endif

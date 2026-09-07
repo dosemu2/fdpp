@@ -395,15 +395,16 @@ class SymWrp : public T {
     FarPtr<T> fptr;
     size_t len;
     _RC(T) backup;
+    int lockcnt;
     /* Magic is needed to check in a parent lookup if the wrapper
      * was actually emitted. It is checked in get_far() method.
      */
     static constexpr const char magic_val[] = "voodoo magic 123";
     char magic[sizeof(magic_val)];
 
-    static void copy_mods(far_t fp, const T *src, const T *ref, size_t l) {
+    void copy_mods(far_t fp, const T *src, const T *ref, size_t l) {
         if (std::memcmp(src, ref, l)) {
-            objlock_lock(fp);
+            objlock_lock(fp, lockcnt);
             std::memcpy(resolve_segoff(fp), src, l);
         }
     }
@@ -428,7 +429,7 @@ class SymWrp : public T {
         size_t add;
         /* too large symbols may slow down execution */
         ___assert(l < 1024);
-        objlock_ref(f);
+        lockcnt = objlock_ref(f);
         std::memcpy((_RC(T) *)this, ptr, l);
         /* now safe to call vadd() */
         add = vadd();
