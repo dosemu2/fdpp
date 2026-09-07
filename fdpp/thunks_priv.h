@@ -28,7 +28,7 @@ void fdprintf(const char *format, ...) PRINTF(1);
 void fdlogprintf(const char *format, ...) PRINTF(1);
 void fdloudprintf(const char *format, ...) PRINTF(1);
 void fdvprintf(const char *format, va_list vl);
-void fddebug(const BYTE * s, ...);
+void fddebug(const char * s, ...) PRINTF(1);
 int is_dos_space(const void *ptr);
 
 #endif

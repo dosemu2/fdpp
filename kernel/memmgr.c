@@ -44,9 +44,9 @@ static BYTE *memmgrRcsId =
 	((mcb)->m_type == MCB_NORMAL || (mcb)->m_type == MCB_LAST)
 
 #define para2far(seg) (mcb FAR *)MK_FP((seg) , 0)
-#define MCBDESTRY2(p, q) (fdebug("MCB corruption, good:%P bad:%P\n", \
+#define MCBDESTRY2(p, q) (fddebug("MCB corruption, good:%P bad:%P\n", \
 	GET_FAR(p), GET_FAR(q)),_fail(),DE_MCBDESTRY)
-#define MCBDESTRY(p) (fdebug("MCB corruption, bad:%P\n", \
+#define MCBDESTRY(p) (fddebug("MCB corruption, bad:%P\n", \
 	GET_FAR(p)),_fail(),DE_MCBDESTRY)
 
 /*

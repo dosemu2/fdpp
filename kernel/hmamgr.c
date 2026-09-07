@@ -44,9 +44,9 @@ static hmcb init_mcb = { .signature = HMCB_SIG, };
 
 #define off2far(off) (hmcb FAR *)MK_FP(0xffff, (off))
 #define mcb2off(mcb) FP_OFF(mcb)
-#define MCBDESTRY2(p, q) (fdebug("MCB corruption, good:%P bad:%P\n", \
+#define MCBDESTRY2(p, q) (fddebug("MCB corruption, good:%P bad:%P\n", \
 	GET_FAR(p), GET_FAR(q)),_fail(),DE_MCBDESTRY)
-#define MCBDESTRY(p) (fdebug("MCB corruption, bad:%P\n", \
+#define MCBDESTRY(p) (fddebug("MCB corruption, bad:%P\n", \
 	GET_FAR(p)),_fail(),DE_MCBDESTRY)
 
 /*

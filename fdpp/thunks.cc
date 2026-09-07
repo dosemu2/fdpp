@@ -26,6 +26,7 @@
 #include "dispatch.hpp"
 #include "objtrace.hpp"
 #include "farhlp.hpp"
+#include "fd_exports.h"
 #include "thunks_c.h"
 #include "thunks_a.h"
 #include "thunks_p.h"
@@ -467,16 +468,6 @@ void fpanic(const BYTE * s, ...)
     _vsnprintf(buf, sizeof(buf), s, l);
     va_end(l);
     fdpp->panic(buf);
-}
-
-void fdebug(const BYTE * s, ...)
-{
-    char buf[128];
-    va_list l;
-    va_start(l, s);
-    _vsnprintf(buf, sizeof(buf), s, l);
-    va_end(l);
-    fdpp->debug(buf);
 }
 
 void fddebug(const BYTE * s, ...)
