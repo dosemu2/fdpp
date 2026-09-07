@@ -844,9 +844,6 @@ public:
 })
 #define MK_FP_N(seg, ofs) (__FAR(void)(seg, ofs, true))
 #define __DOSFAR(t) FarPtrBase<t>
-#define __DOSFAR2(t, c) \
-    static_assert(!c || std::is_const<t>::value, "should be const"); \
-    FarPtrBase<t>
 #define _MK_DOS_FP(t, s, o) __FAR(t)(MK_FP(s, o))
 #define GET_FP32(f) (f).get_fp32()
 #define GET_FAR(f) (f).get_far()
