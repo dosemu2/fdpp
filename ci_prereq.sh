@@ -9,3 +9,4 @@ sudo apt install -y \
 
 sudo add-apt-repository ppa:stsp-0/thunk-gen
 mk-build-deps --install --root-cmd sudo
+sudo apt-get remove thunk-gen
