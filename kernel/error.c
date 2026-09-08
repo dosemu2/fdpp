@@ -89,11 +89,14 @@ VOID fatal(BYTE * err_msg)
 
 COUNT DoCriticalError(COUNT nFlag, COUNT nDrive, COUNT nError, struct dhdr FAR * lpDevice)
 {
+#if 0
   COUNT ret = CriticalError(nFlag, nDrive, nError, lpDevice);
-#define ABORT 2
   if (ret == ABORT)
     CritErrAbort();
   return ret;
+#else
+  return FAIL;
+#endif
 }
 
 /* Abort, retry or fail for character devices                   */
