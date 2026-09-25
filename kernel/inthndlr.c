@@ -166,6 +166,7 @@ VOID ASMCFUNC int21_syscall(iregs FAR * irp)
       /* UNDOCUMENTED: return current psp                             */
     case 0x62:
       irp->BX = cu_psp;
+      break;
 
     /* it must be here and not in int21_service() to not overwrite user_r */
     case 0x8c: {
