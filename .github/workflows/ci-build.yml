@@ -3,7 +3,6 @@ on:
   pull_request:
     types:
       - opened
-      - edited
       - ready_for_review
       - reopened
       - synchronize
@@ -12,6 +11,7 @@ on:
 env:
   DIR_TEST_DOSEMU: test-dosemu
   DIR_INSTALLED_FDPP: test-dosemu/installed-fdpp
+  USE_DOSEMU_REPO: https://github.com/dosemu2/dosemu2.git
   USE_DOSEMU_BRANCH: devel
 
 jobs:
@@ -20,10 +20,40 @@ jobs:
 
     if: contains(github.event.head_commit.message, '[skip ci]') == false
 
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
-    - uses: actions/checkout@v6
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Add an ACL to KVM for ourselves
+      run: |
+          echo 'SUBSYSTEM=="misc", KERNEL=="kvm", RUN+="/usr/bin/setfacl -m u:'${USER}':rw- /dev/kvm"' | sudo tee /etc/udev/rules.d/99-kvm4dosemu2.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+    - name: Information
+      run: |
+        #
+        echo "::group::CPU"
+        lscpu
+        echo "::endgroup::"
+
+        echo "::group::Kernel Config"
+        cat /boot/config-$(uname -r)
+        echo "::endgroup::"
+
+        echo "::group::Kernel Modules"
+        sudo lsmod
+        echo "::endgroup::"
+
+        echo "::group::Kernel Parameters (sysctl)"
+        sysctl -a
+        echo "::endgroup::"
+
+        echo "::group::KVM permissions"
+        getfacl -p /dev/kvm
+        echo "::endgroup::"
 
     - name: Package install
       run: ./ci_prereq.sh
@@ -32,7 +62,20 @@ jobs:
       run: ./ci_build.sh
 
     - name: Set up test environment
-      run: ./ci_setup_test.sh
+      run: ./ci_test_prereq.sh
+
+    - name: Open Watcom install
+      uses: open-watcom/setup-watcom@v1
+      with:
+        version: 2.0-64
 
     - name: Test
+      id: test
       run: ./ci_test.sh
+
+    - name: Upload failure logs
+      if: ${{ always() && (steps.test.outcome == 'failure') }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: failure-logs
+        path: ${{ env.DIR_TEST_DOSEMU }}/test_*
