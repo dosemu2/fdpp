@@ -551,7 +551,7 @@ STATIC COUNT DosComLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
   }
 
 #ifdef DEBUG
-  DebugPrintf(("DosComLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem));
+  DebugPrintf(("DosComLoader. Loading '%S' at %04x\n", namep, mem));
 #endif
   /* Now load the executable                              */
   {
@@ -748,7 +748,7 @@ STATIC COUNT DosExeLoader(const char FAR * namep, exec_blk FAR * exp, COUNT mode
         return rc;
 
 #ifdef DEBUG
-      DebugPrintf(("DosExeLoader. Loading '%s' at %04x\n", GET_PTR(namep), mem));
+      DebugPrintf(("DosExeLoader. Loading '%S' at %04x\n", namep, mem));
 #endif
 
       /* memory found large enough - continue processing      */
@@ -962,8 +962,7 @@ VOID ASMCFUNC P_0(const struct config FAR *Config)
   fmemcpy_n(buf, endp, 2);
   endp[0] = '\n';
   endp[1] = '\0';
-  _printf("Process 0 starting: %s%s", GET_PTR(Shell),
-      exb->exec.cmd_line->ctBuffer);
+  _printf("Process 0 starting: %S%s", Shell, exb->exec.cmd_line->ctBuffer);
   /* and back */
   n_fmemcpy(endp, buf, 2);
 
@@ -977,23 +976,22 @@ VOID ASMCFUNC P_0_exit(unsigned short retcode)
   if ((retcode & 0xff) == 0 || (retcode >> 8)) {
     switch (retcode >> 8) {
       case 0:
-        _printf("\nShell %s exited, press any key...\n", GET_PTR(Shell));
+        _printf("\nShell %S exited, press any key...\n", Shell);
         break;
       case 1:
-        _printf("\nShell %s aborted (^C), press any key...\n", GET_PTR(Shell));
+        _printf("\nShell %S aborted (^C), press any key...\n", Shell);
         break;
       case 2:
-        _printf("\nShell %s aborted due to critical error, press any key...\n", GET_PTR(Shell));
+        _printf("\nShell %S aborted due to critical error, press any key...\n", Shell);
         break;
       case 4:
-        _printf("\nShell %s aborted by signal %i, press any key...\n",
-            GET_PTR(Shell), retcode & 0xff);
+        _printf("\nShell %S aborted by signal %i, press any key...\n", Shell, retcode & 0xff);
         break;
     }
     con_flush_stdin();
     read_char_stdin(0);
   } else {
-    _printf("\nShell %s exited with code 0x%x\n", GET_PTR(Shell), retcode);
+    _printf("\nShell %S exited with code 0x%x\n", Shell, retcode);
   }
   fdexit(retcode & 0xff);
 }
@@ -1005,7 +1003,7 @@ VOID ASMCFUNC P_0_bad(void)
   exec_blk FAR *exb = TempExeBlock_p;
 
   if (termNoComcom) {
-    fdloudprintf("Bad or missing Command Interpreter: %s\n", GET_PTR(Shell));
+    fdloudprintf("Bad or missing Command Interpreter: %S\n", Shell);
     fdexit(1);
   }
   put_string("Bad or missing Command Interpreter: "); /* failure _or_ exit */

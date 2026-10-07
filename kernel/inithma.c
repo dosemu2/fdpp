@@ -64,7 +64,7 @@ void int3()
 STATIC VOID hdump(BYTE FAR * p)
 {
   int loop;
-  HMAInitPrintf(("%P", GET_FP32(p)));
+  HMAInitPrintf(("%P", p));
 
   for (loop = 0; loop < 16; loop++)
     HMAInitPrintf(("%02x ", (const char)p[loop]));
@@ -261,7 +261,7 @@ void MoveKernel(UWORD NewKernelSegment)
   }
 
   HMAInitPrintf(("HMA moving %P up to %P for %04x bytes\n",
-                 GET_FP32(HMASource), GET_FP32(HMADest), len));
+                 HMASource, HMADest, len));
 
   NewKernelSegment -= FP_OFF(_HMATextStart) >> 4;
   for (rp = _HMARelocationTableStart; rp < _HMARelocationTableEnd; rp++)

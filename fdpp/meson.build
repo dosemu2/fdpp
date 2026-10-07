@@ -2,6 +2,7 @@ project('libfdpp', ['c', 'cpp'], default_options: ['cpp_std=c++20'],
   version: '0.1', meson_version: '>= 1.3.0')
 
 MF = meson.current_source_dir() / 'parsers/mkfar.sh'
+FP = meson.current_source_dir() / 'parsers/fix_printf.py'
 PD = meson.current_source_dir() / 'parsers/parse_decls.sh'
 RA = meson.current_source_dir() / 'run_arg.sh'
 NS = meson.current_source_dir() / 'num.sh'
@@ -68,11 +69,17 @@ CFILES = [
     SRC / 'prf.c',
     SRC / 'share.c']
 
-ccgen = generator(find_program(MF),
-  output: '@BASENAME@.cc',
+ccgen1 = generator(find_program(MF),
+  output: '@BASENAME@.cc.int1',
   arguments: ['@INPUT@'],
   capture: true)
-ccfiles = ccgen.process(CFILES)
+ccfiles1 = ccgen1.process(CFILES)
+
+ccgen2 = generator(find_program(FP),
+  output: '@BASENAME@',
+  arguments: ['-i', '@INPUT@', '-O', '@BASENAME@'],
+  capture: true)
+ccfiles = ccgen2.process(ccfiles1)
 
 make = find_program(['gmake', 'make'])
 

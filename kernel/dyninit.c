@@ -164,8 +164,7 @@ far_t DynAllocLow(const char *what, unsigned num, unsigned size)
 void FAR *DynLast(void)
 {
   struct HeapS *h = HeapMap[HEAP_LOW];
-  DebugPrintf(("dynamic data end at %P\n",
-               GET_FP32(h->Dynp + h->Allocated)));
+  DebugPrintf(("dynamic data end at %P\n", h->Dynp + h->Allocated));
 
   return h->Dynp + h->Allocated;
 }
