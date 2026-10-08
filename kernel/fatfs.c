@@ -28,6 +28,7 @@
 /****************************************************************/
 
 #include "portab.h"
+#include "debug.h"
 #include "globals.h"
 
 #ifdef VERSION_STRINGS
@@ -1135,8 +1136,8 @@ STATIC COUNT dos_extend(f_node_ptr fnp)
     boff = (UWORD)(fnp->f_offset % secsize);
 
 #ifdef DSK_DEBUG
-    DebugPrintf(("write %d links; dir offset %ld, cluster %d\n",
-           fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster));
+    DebugPrintf(("dir offset %ld, cluster %d\n",
+           fnp->f_dmp->dm_entry, fnp->f_cluster));
 #endif
 
     xfr_cnt = count < (ULONG) secsize - boff ?
@@ -1432,8 +1433,8 @@ long rwblock(COUNT fd, VOID FAR * buffer, UCOUNT count, int mode)
   normal_xfer:
 
 #ifdef DSK_DEBUG
-    DebugPrintf(("r/w %d links; dir offset %d, cluster %d, mode %x\n",
-           fnp->f_count, fnp->f_dmp->dm_entry, fnp->f_cluster, mode));
+    DebugPrintf(("dir offset %d, cluster %d, mode %x\n",
+           fnp->f_dmp->dm_entry, fnp->f_cluster, mode));
 #endif
 
     /* Get the block we need from cache                     */

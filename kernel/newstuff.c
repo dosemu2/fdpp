@@ -106,10 +106,6 @@ long DosMkTmp(char FAR * pathname, UWORD attr)
   return rc;
 }
 
-#ifdef DEBUG
-#define DEBUG_TRUENAME
-#endif
-
 #define drLetterToNr(dr) ((unsigned char)((dr) - 'A'))
 /* Convert an uppercased drive letter into the drive index */
 #define drNrToLetter(dr) ((dr) + 'A')
@@ -321,7 +317,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 
   fmemcpy(&TempCDS, cdsEntry, sizeof(struct cds));
   tn_printf(("CDS entry: #%u @%P (%u) '%s'\n", result, GET_FP32(cdsEntry),
-            TempCDS.cdsBackslashOffset, GET_FP32(TempCDS.cdsCurrentPath)));
+            TempCDS.cdsBackslashOffset, GET_PTR(TempCDS.cdsCurrentPath)));
   /* is the current_ldt thing necessary for compatibly??
      -- 2001/09/03 ska*/
   current_ldt = cdsEntry;
@@ -429,7 +425,8 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
 
     if (!(mode & CDS_MODE_SKIP_PHYSICAL))
     {
-      tn_printf(("SUBSTing from: %s\n", cp));
+      tn_printf(("SUBSTing from: %s\n", GET_PTR(cp)));
+
 /* What to do now: the logical drive letter will be replaced by the hidden
    portion of the associated path. This is necessary for NETWORK and
    SUBST drives. For local drives it should not harm.

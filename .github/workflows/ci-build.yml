@@ -35,4 +35,13 @@ jobs:
       run: ./ci_setup_test.sh
 
     - name: Test
+      id: test
       run: ./ci_test.sh
+
+    - name: Upload failure logs
+      if: ${{ always() && (steps.test.outcome == 'failure') }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: failure-logs
+        path: ${{ env.DIR_TEST_DOSEMU }}/test_*
+
