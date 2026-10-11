@@ -373,7 +373,7 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
   dest[2] = '\\';
   if (result & IS_DEVICE)
   {
-    froot = get_basename(src);
+    froot = get_devname(src);
     if (froot == src || froot == src + 5)
     {
       if (froot == src + 5)
@@ -528,6 +528,9 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     while(*src != '/' && *src  != '\\' && *src != '\0')
     {
       char c = *src++;
+      /* "NUL:" - ignore the colon that follows a device name */
+      if (c == ':' && *src == '\0' && (result & IS_DEVICE))
+        break;
       if (c == '*')
       {
         /* register the wildcard, even if no '?' is appended */

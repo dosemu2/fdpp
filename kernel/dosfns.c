@@ -501,6 +501,44 @@ const char FAR *get_basename(__XFAR(const char)fname)
   return fname;
 }
 
+/* Extracts the device name from a path for IsDevice() validation.
+ * Preserves names with an optional trailing colon, while leaving
+ * bare drive specifications untouched.
+ *
+ * Examples:
+ *   "NUL:"         -> "NUL:"
+ *   "C:\DIR\NUL:"  -> "NUL:"
+ *   "C:NUL:"       -> "NUL:"
+ *   "NUL"          -> "NUL"
+ *   "C:"           -> ""
+ *   "C:\DIR\FILE"  -> "FILE"
+ */
+const char FAR *get_devname(__XFAR(const char) fname)
+{
+  const char FAR *froot = get_basename(fname);
+  const char FAR *name_start;
+
+  /* If a valid basename was found, or the path doesn't end in ':', we're done */
+  if (*froot != '\0' || froot == fname || *(froot - 1) != ':')
+    return froot;
+
+  /* Walk back before the trailing ':' to find the start of the device token */
+  name_start = froot - 1;
+  while (name_start > fname &&
+         name_start[-1] != '/' &&
+         name_start[-1] != '\\' &&
+         name_start[-1] != ':')
+  {
+    name_start--;
+  }
+
+  /* Single-character prefixes before the colon (e.g., "C:") are bare drive specs */
+  if ((froot - 1) - name_start < 2)
+    return froot;
+
+  return name_start;
+}
+
 STATIC void ConvertPathNameToFCBName(char *FCBName, const char FAR *PathName)
 {
   ConvertNameSZToName83(FCBName, get_basename(PathName));
@@ -1423,7 +1461,7 @@ COUNT DosLockUnlock(COUNT hndl, LONG pos, LONG len, COUNT unlock)
 struct dhdr FAR *IsDevice(__XFAR(const char)fname)
 {
   struct dhdr FAR *dhp;
-  const char FAR *froot = get_basename(fname);
+  const char FAR *froot = get_devname(fname);
   int i;
 
 /* /// BUG!!! This is absolutely wrong.  A filename of "NUL.LST" must be
@@ -1464,8 +1502,9 @@ struct dhdr FAR *IsDevice(__XFAR(const char)fname)
     for (i = 0; i < FNAME_SIZE; i++)
     {
       unsigned char c1 = (unsigned char)froot[i];
-      /* ignore extensions and handle filenames shorter than FNAME_SIZE */
-      if (c1 == '.' || c1 == '\0')
+      /* ignore extensions and handle filenames shorter than FNAME_SIZE;
+         a trailing colon ("NUL:") also ends the name */
+      if (c1 == '.' || c1 == '\0' || c1 == ':')
       {
         /* check if remainder of device name consists of spaces or nulls */
         for (; i < FNAME_SIZE; i++)
