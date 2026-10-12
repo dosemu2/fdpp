@@ -295,9 +295,21 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     return IS_NETWORK;
   }
 
-  dhp = IsDevice(src); /* returns header if -char- device */
+  i = fstrlen(src);
+  if (!i)
+    return DE_PATHNOTFND;
+  /* drop trailing ':' unless at pos 1 */
+  if (i > 2 && src[i - 1] == ':') {
+    fstrcpy(dest, src);
+    dest[--i] = '\0';
+    dhp = IsDevice(dest);
+    if (!dhp)
+      return DE_PATHNOTFND;
+  } else {
+    dhp = IsDevice(src); /* returns header if -char- device */
+  }
   /* Do we have a drive?                                          */
-  if (src[1] == ':')
+  if (i > 1 && src[1] == ':')
   {
     result = drLetterToNr(DosUpFChar(src0));
     cdsEntry = get_cds(result);
@@ -528,6 +540,9 @@ COUNT truename(__XFAR(const char) src, char FAR *dest, COUNT mode)
     while(*src != '/' && *src  != '\\' && *src != '\0')
     {
       char c = *src++;
+      /* "NUL:" - ignore the colon that follows a device name */
+      if (c == ':' && *src == '\0' && (result & IS_DEVICE))
+        break;
       if (c == '*')
       {
         /* register the wildcard, even if no '?' is appended */
