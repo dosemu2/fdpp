@@ -20,6 +20,7 @@
 #define CTORS_HPP
 
 #include <cstring>
+#include <cstdlib>
 #include <string>
 
 class ctor_base;
